@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:saoirse_app/constants/app_assets.dart';
 import 'package:saoirse_app/constants/app_colors.dart';
 import 'package:saoirse_app/screens/home/home_controller.dart';
+import 'package:saoirse_app/widgets/app_text.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -219,16 +220,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: 8,
                                   margin: EdgeInsets.symmetric(horizontal: 4.w),
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius: BorderRadius.circular(4.r),
                                     color:
                                         homeController
                                                 .currentCarouselIndex
                                                 .value ==
                                             entry.key
                                         ? AppColors.white
-                                        : Colors.white.withOpacity(
-                                            0.5,
-                                          ), // Semi-transparent inactive dots
+                                        : AppColors.transparentWhite,
                                   ),
                                 );
                               })
@@ -262,13 +261,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(15.r),
                               border: Border.all(color: Colors.grey.shade400),
                             ),
-                            child: Text(
+                            child: appText(
                               category,
-                              style: GoogleFonts.poppins(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.text_black,
-                              ),
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.text_black,
                             ),
                           );
                         })
@@ -286,20 +283,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
+                        appText(
                           'Most Popular',
-                          style: GoogleFonts.poppins(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.06,
-                          ),
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.06,
                         ),
-                        Text(
+
+                        appText(
                           'See All',
-                          style: GoogleFonts.poppins(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.06,
                         ),
                       ],
                     ),
@@ -360,8 +355,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: Container(
                                         width: 28.w,
                                         height: 28.h,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.white,
                                           shape: BoxShape.circle,
                                         ),
                                         child: Icon(
@@ -370,8 +365,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                               : Icons.favorite_border,
                                           size: 16.sp,
                                           color: product.isFavorite
-                                              ? Colors.red
-                                              : Colors.grey,
+                                              ? AppColors.red
+                                              : AppColors.grey,
                                         ),
                                       ),
                                     ),
@@ -388,18 +383,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Row(
                                         children: [
-                                          Text(
+                                          appText(
                                             product.name,
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize: 13.sp,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black87,
-                                              ),
-                                            ),
+                                            fontSize: 13.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.text_black,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
+
                                           Spacer(),
                                           Container(
                                             padding: EdgeInsets.symmetric(
@@ -407,7 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               vertical: 2.h,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: Color(0xFFF4BB00),
+                                              color: AppColors.lightAmber,
                                               borderRadius:
                                                   BorderRadius.circular(10.r),
                                             ),
@@ -419,43 +411,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 Icon(
                                                   Icons.star,
                                                   size: 8.sp,
-                                                  color: const Color.fromARGB(
-                                                    255,
-                                                    112,
-                                                    90,
-                                                    10,
-                                                  ),
+                                                  color: AppColors.darkAmber,
                                                 ),
-                                                Text(
-                                                  "4.3",
-                                                  style: TextStyle(
-                                                    fontSize: 8.sp,
-                                                  ),
-                                                ),
+
+                                                appText("4.3", fontSize: 8.sp),
                                               ],
                                             ),
                                           ),
                                         ],
                                       ),
                                       SizedBox(height: 2.h),
-                                      Text(
+                                      appText(
                                         product.name,
-                                        style: GoogleFonts.inter(
-                                          fontSize: 10.sp,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.text_black,
-                                        ),
+                                        fontFamily: 'inter',
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.w400,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
+
                                       SizedBox(height: 2.h),
-                                      Text(
+                                      appText(
                                         '₹ ${product.price.toStringAsFixed(0)}',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w700,
-                                          color: AppColors.text_black,
-                                        ),
+                                        fontFamily: 'inter',
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w700,
                                       ),
                                     ],
                                   ),
@@ -479,20 +459,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
+                        appText(
                           'Best Seller Products',
-                          style: GoogleFonts.poppins(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.06,
-                          ),
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.06,
                         ),
-                        Text(
+
+                        appText(
                           'See All',
-                          style: GoogleFonts.poppins(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.06,
                         ),
                       ],
                     ),
@@ -514,11 +492,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 220.w,
                               padding: EdgeInsets.all(5.sp),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 borderRadius: BorderRadius.circular(12.sp),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black12,
+                                    color: AppColors.shadowColor,
                                     blurRadius: 6,
                                     offset: Offset(0, 2),
                                   ),
@@ -547,22 +525,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                           MainAxisAlignment.start,
                                       children: [
                                         SizedBox(height: 5.h),
-                                        Text(
+                                        appText(
                                           product.name,
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                          fontFamily: 'inter',
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w600,
                                           overflow: TextOverflow.ellipsis,
                                         ),
+
                                         SizedBox(height: 4.h),
-                                        Text(
+                                        appText(
                                           "₹ ${product.price.toStringAsFixed(0)}",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 13.sp,
-                                            fontWeight: FontWeight.w800,
-                                            color: AppColors.text_black,
-                                          ),
+                                          fontFamily: 'inter',
+                                          fontSize: 13.sp,
+                                          fontWeight: FontWeight.w800,
                                         ),
                                       ],
                                     ),
@@ -587,20 +563,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Trending Products',
-                          style: GoogleFonts.poppins(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.06,
-                          ),
+                        appText(
+                          "Trending Products",
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.06,
                         ),
-                        Text(
+
+                        appText(
                           'See All',
-                          style: GoogleFonts.poppins(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.06,
                         ),
                       ],
                     ),
@@ -623,11 +597,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: 150.w,
                             margin: EdgeInsets.only(right: 15.w),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.white,
                               borderRadius: BorderRadius.circular(12.r),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black12,
+                                  color: AppColors.shadowColor,
                                   blurRadius: 6,
                                   offset: Offset(0, 2),
                                 ),
@@ -645,7 +619,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         vertical: 5.h,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.grey.shade100,
+                                        color: AppColors.lightGrey,
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Center(
@@ -661,8 +635,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: Container(
                                         width: 28.w,
                                         height: 28.h,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.white,
                                           shape: BoxShape.circle,
                                         ),
                                         child: Icon(
@@ -671,8 +645,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                               : Icons.favorite_border,
                                           size: 16.sp,
                                           color: product.isFavorite
-                                              ? Colors.red
-                                              : Colors.grey,
+                                              ? AppColors.red
+                                              : AppColors.grey,
                                         ),
                                       ),
                                     ),
@@ -689,15 +663,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Row(
                                         children: [
-                                          Text(
+                                          appText(
                                             product.name,
-                                            style: GoogleFonts.poppins(
-                                              textStyle: TextStyle(
-                                                fontSize: 13.sp,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black87,
-                                              ),
-                                            ),
+                                            fontSize: 13.sp,
+                                            fontWeight: FontWeight.bold,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -708,7 +677,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               vertical: 2.h,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: Color(0xFFF4BB00),
+                                              color: AppColors.lightAmber,
                                               borderRadius:
                                                   BorderRadius.circular(10.r),
                                             ),
@@ -720,43 +689,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 Icon(
                                                   Icons.star,
                                                   size: 8.sp,
-                                                  color: const Color.fromARGB(
-                                                    255,
-                                                    112,
-                                                    90,
-                                                    10,
-                                                  ),
+                                                  color: AppColors.darkAmber,
                                                 ),
-                                                Text(
-                                                  "4.3",
-                                                  style: TextStyle(
-                                                    fontSize: 8.sp,
-                                                  ),
-                                                ),
+                                                appText("4.3", fontSize: 8.sp),
                                               ],
                                             ),
                                           ),
                                         ],
                                       ),
                                       SizedBox(height: 2.h),
-                                      Text(
+                                      appText(
                                         product.name,
-                                        style: GoogleFonts.inter(
-                                          fontSize: 10.sp,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.text_black,
-                                        ),
+                                        fontFamily: 'inter',
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.w400,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
+
                                       SizedBox(height: 2.h),
-                                      Text(
+                                      appText(
                                         '₹ ${product.price.toStringAsFixed(0)}',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w700,
-                                          color: AppColors.text_black,
-                                        ),
+                                        fontFamily: 'inter',
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w700,
                                       ),
                                     ],
                                   ),
@@ -784,8 +740,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       colors: [
                         AppColors.gradientPink, // Deep purple
                         AppColors.gradientBlue, // Pinkish purple
-                        // Color.fromRGBO(206, 4, 140, 1.0),
-                        // Color.fromRGBO(77, 10, 142, 1.0),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.centerRight,
@@ -817,13 +771,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          child: Text(
+                          child: appText(
                             "START PURCHASING",
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFFFF5500),
-                            ),
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.gradientPink,
+                            fontFamily: "jakarta",
                           ),
                         ),
                       ),
@@ -832,13 +785,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         left: 24.w,
                         child: SizedBox(
                           width: 240.w,
-                          child: Text(
+                          child: appText(
                             "Just save minimum ₹100 everyday\nto get your desired product",
-                            style: GoogleFonts.poppins(
-                              fontSize: 15.sp,
-                              color: AppColors.white,
-                              fontWeight: FontWeight.w400,
-                            ),
+                            fontSize: 15.sp,
+                            color: AppColors.white,
+                            fontWeight: FontWeight.w400,
+                            textAlign: TextAlign.start,
                           ),
                         ),
                       ),
@@ -898,11 +850,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               return Builder(
                                 builder: (BuildContext context) {
                                   return Container(
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 8,
+                                    margin: EdgeInsets.symmetric(
+                                      horizontal: 8.w,
                                     ),
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(20.r),
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.black.withOpacity(0.15),
@@ -912,7 +864,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ],
                                     ),
                                     child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(20.r),
                                       child: Image.asset(
                                         imagePath,
                                         fit: BoxFit.cover,
@@ -971,7 +923,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       .value ==
                                                   entry.key
                                               ? AppColors.white
-                                              : Colors.white.withOpacity(0.5),
+                                              : AppColors.transparentWhite,
                                         ),
                                       );
                                     })
@@ -997,25 +949,24 @@ class _HomeScreenState extends State<HomeScreen> {
                             Positioned(
                               right: 30.w,
                               top: 37.h,
-                              child: Text(
+                              child: appText(
                                 "Refer EPI",
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 25.sp,
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.skyBlue,
-                                ),
+                                fontSize: 25.sp,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.skyBlue,
+                                fontFamily: "jakarta",
                               ),
                             ),
                             Positioned(
                               right: 40.w,
                               top: 75.h,
-                              child: Text(
+                              child: appText(
                                 "Earn Money\nEveryday",
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 28.sp,
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.white,
-                                ),
+                                fontSize: 28.sp,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.white,
+                                fontFamily: "jakarta",
+                                textAlign: TextAlign.start,
                               ),
                             ),
                             Positioned(
@@ -1025,7 +976,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onPressed: () {},
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.white,
-                                  
+
                                   padding: EdgeInsets.symmetric(
                                     horizontal: 34.w,
                                     vertical: 10.h,
@@ -1035,13 +986,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   elevation: 2,
                                 ),
-                                child: Text(
-                                  'Refer A Friend Now',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 17.sp,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.gradientDarkBlue,
-                                  ),
+                                child: appText(
+                                  "Refer A Friend Now",
+                                  fontSize: 17.sp,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.gradientDarkBlue,
+                                  fontFamily: "jakarta",
                                 ),
                               ),
                             ),

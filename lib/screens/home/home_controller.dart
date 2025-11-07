@@ -2,7 +2,8 @@
 
 import 'package:get/get.dart';
 import 'package:saoirse_app/constants/app_assets.dart';
-import 'package:saoirse_app/services/model/product_model.dart';
+import 'package:saoirse_app/model/product_model.dart';
+
 
 class HomeController extends GetxController {
   RxBool loading = false.obs;
