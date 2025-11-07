@@ -150,19 +150,19 @@ class _appTextFieldState extends State<appTextField> {
           borderRadius: widget.borderRadius ?? BorderRadius.circular(8.r),
           borderSide:
               widget.borderSide ??
-              BorderSide(color: AppColors.lightGrey, width: 1.w),
+              BorderSide(color: AppColors.grey, width: 1.w),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: widget.borderRadius ?? BorderRadius.circular(8.r),
           borderSide:
               widget.borderSide ??
-              BorderSide(color: AppColors.lightGrey, width: 1.w),
+              BorderSide(color: AppColors.grey, width: 1.w),
         ),
         border: OutlineInputBorder(
           borderRadius: widget.borderRadius ?? BorderRadius.circular(8.r),
           borderSide:
               widget.borderSide ??
-              BorderSide(color: AppColors.lightGrey, width: 1.w),
+              BorderSide(color: AppColors.grey, width: 1.w),
         ),
       ),
     );

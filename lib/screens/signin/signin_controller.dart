@@ -36,7 +36,7 @@ class SignInController extends GetxController {
           storage.write(AppConst.USER_ID, responseData['data']['id']);
           Get.offAll(() => const HomeScreen());
         } else {
-          appSnackbar(error: true, content: AppStrings.email_not_found);
+          //appSnackbar(error: true, content: AppStrings.email_not_found);
         }
       }
     } catch (error) {
