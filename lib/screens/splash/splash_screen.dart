@@ -1,10 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../constants/app_assets.dart';
 import '../../constants/app_constant.dart';
 import '../../main.dart';
 import '../home/home_screen.dart';
@@ -43,12 +41,12 @@ class _SplashScreenState extends State<SplashScreen> {
     return SafeArea(
       child: Scaffold(
         body: Center(
-          child: Image.asset(
-            AppAssets.app_logo,
-            height: 250.h,
-            width: Get.width,
-            fit: BoxFit.contain,
-          ),
+          // child: Image.asset(
+          //   AppAssets.app_logo,
+          //   height: 250.h,
+          //   width: Get.width,
+          //   fit: BoxFit.contain,
+          // ),
         ),
       ),
     );

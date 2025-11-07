@@ -22,7 +22,7 @@ appDialogBox({
 }) {
   Get.defaultDialog(
     radius: 10.r,
-    backgroundColor: AppColors.scaffoldColor,
+    backgroundColor: AppColors.grey,
     barrierDismissible: false,
     contentPadding: contentPadding ?? EdgeInsets.symmetric(horizontal: 20.w),
     titlePadding: EdgeInsets.symmetric(vertical: 10.h),
@@ -61,7 +61,7 @@ appDialogBox({
               borderRadius: BorderRadius.circular(10.r),
               borderWidth: 1.w,
               borderColor: AppColors.white,
-              buttonColor: AppColors.scaffoldColor,
+              buttonColor: AppColors.grey,
               textColor: AppColors.white,
               buttonText: cancelText,
               fontSize: 14.sp,
@@ -88,7 +88,7 @@ appDialogBox({
                 ),
                 child: appText(
                   confirmText,
-                  color: textColor ?? AppColors.scaffoldColor,
+                  color: textColor ?? AppColors.green,
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w700,
                 ),
