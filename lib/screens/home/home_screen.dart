@@ -1,3 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:saoirse_app/screens/home/home_controller.dart';
+import 'package:saoirse_app/widgets/app_loader.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 

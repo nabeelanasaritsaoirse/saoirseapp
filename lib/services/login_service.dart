@@ -8,7 +8,7 @@ class LoginService {
         !RegExp(
           r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
         ).hasMatch(email)) {
-      appSnackbar(error: true, content: AppStrings.invalid_email);
+     // appSnackbar(error: true, content: AppStrings.invalid_email);
       return '';
     }
 
