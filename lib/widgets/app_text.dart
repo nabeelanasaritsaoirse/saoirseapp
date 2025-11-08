@@ -27,7 +27,7 @@ Widget appText(
     fontWeight: fontWeight,
     letterSpacing: letterSpacing, // ➕ added
     fontStyle: fontStyle, // ➕ added
-    color: color ?? AppColors.text_black,
+    color: color ?? AppColors.textBlack,
   );
 
   switch (fontFamily.toLowerCase()) {
@@ -45,7 +45,7 @@ Widget appText(
     case 'inter':
       fontStyleSelected = GoogleFonts.inter(textStyle: baseStyle);
     default:
-      fontStyleSelected = GoogleFonts.poppins(textStyle: baseStyle);
+      fontStyleSelected = baseStyle.copyWith(fontFamily: fontFamily);
   }
 
   return Text(

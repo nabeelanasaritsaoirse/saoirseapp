@@ -11,6 +11,8 @@ class AppAssets {
   static String success_image_2 = "assets/images/success_image_2.jpeg";
   static String success_image_3 = "assets/images/success_image_3.jpeg";
   static String refer_image = "assets/images/refer_image.png";
-
+  static String notification = "assets/icons/notification.png";
+  static String search = "assets/icons/search.png";
+  static String wallet = "assets/icons/wallet.png";
   //icons
 }

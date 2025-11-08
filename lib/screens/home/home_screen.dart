@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:saoirse_app/constants/app_assets.dart';
 import 'package:saoirse_app/constants/app_colors.dart';
 import 'package:saoirse_app/screens/home/home_controller.dart';
+import 'package:saoirse_app/widgets/app_button.dart';
 import 'package:saoirse_app/widgets/app_text.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   HomeController homeController = Get.put(HomeController());
 
-  Widget _iconBox(IconData icon) {
+  Widget _iconBox({String? image, double? padding}) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       width: 36,
@@ -27,7 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Icon(icon, color: Colors.black87, size: 22),
+      child: Padding(
+        padding: EdgeInsets.all(padding!),
+        child: Image.asset(image!),
+      ),
     );
   }
 
@@ -46,27 +50,33 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: PreferredSize(
           preferredSize: Size(0, 54.h),
           child: AppBar(
-            backgroundColor: const Color(0xFF000E63), // dark blue
+            backgroundColor: AppColors.primaryColor,
             elevation: 0,
             leadingWidth: 70.w,
             leading: Padding(
               padding: EdgeInsets.only(left: 12.w),
-              child: Image.asset(AppAssets.app_logo, height: 35.h, width: 35.w),
+              child: Padding(
+                padding: EdgeInsets.only(top: 1.h),
+                child: Image.asset(
+                  AppAssets.app_logo,
+                  height: 35.h,
+                  width: 35.w,
+                ),
+              ),
             ),
             titleSpacing: 0,
 
             actions: [
-              _iconBox(Icons.notifications_none_rounded),
+              _iconBox(image: AppAssets.notification, padding: 3.w),
               SizedBox(width: 8.w),
-              _iconBox(Icons.search),
+              _iconBox(image: AppAssets.search, padding: 7.w),
               SizedBox(width: 8.w),
-              _iconBox(Icons.account_balance_wallet_outlined),
+              _iconBox(image: AppAssets.wallet, padding: 5.w),
               SizedBox(width: 12.w),
             ],
           ),
         ),
         body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
           child: Column(
             children: [
               SizedBox(height: 15.h),
@@ -90,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.15),
+                                    color: AppColors.lightBlack,
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -98,7 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               child: Stack(
                                 children: [
-                                  // Gradient overlay for text readability
                                   Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
@@ -106,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         begin: Alignment.bottomCenter,
                                         end: Alignment.topCenter,
                                         colors: [
-                                          Colors.black.withOpacity(0.5),
+                                          AppColors.lightBlack,
                                           AppColors.transparent,
                                         ],
                                       ),
@@ -129,17 +138,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              'Stylish',
-                                              style: TextStyle(
-                                                fontSize: 24.sp,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w800,
-                                                fontStyle: FontStyle.italic,
-                                                fontFamily: 'Times New Roman',
-                                              ),
+                                            appText(
+                                              "Stylish",
+                                              fontSize: 24.sp,
+                                              color: AppColors.white,
+                                              fontWeight: FontWeight.w800,
+                                              fontStyle: FontStyle.italic,
+                                              fontFamily: "Times New Roman",
                                             ),
-
                                             SizedBox(height: 8.h),
                                             Text(
                                               'Turn your savings into success\ninvest today and secure the future you’ve always wanted!',
@@ -151,30 +157,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
 
                                             SizedBox(height: 16.h),
-                                            ElevatedButton(
-                                              onPressed: () {},
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    AppColors.white,
-                                                foregroundColor: Colors.black87,
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: 37.w,
-                                                  vertical: 11.h,
-                                                ),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        8.r,
-                                                      ),
-                                                ),
-                                                elevation: 3,
+                                            appButton(
+                                              onTap: () {},
+                                              buttonText: 'Book Now',
+                                              buttonColor: AppColors.white,
+                                              textColor: Colors.black87,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                              borderRadius:
+                                                  BorderRadius.circular(8.r),
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 37.w,
+                                                vertical: 11.h,
                                               ),
-                                              child: const Text(
+
+                                              child: appText(
                                                 'Book Now',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 13,
-                                                ),
+                                                color: Colors.black87,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                           ],
@@ -217,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           entry.key
                                       ? 24.w
                                       : 8.w,
-                                  height: 8,
+                                  height: 8.h,
                                   margin: EdgeInsets.symmetric(horizontal: 4.w),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(4.r),
@@ -265,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               category,
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.text_black,
+                              color: AppColors.textBlack,
                             ),
                           );
                         })
@@ -322,7 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black12,
-                                  blurRadius: 6,
+                                  blurRadius: 6.r,
                                   offset: Offset(0, 2),
                                 ),
                               ],
@@ -387,7 +388,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             product.name,
                                             fontSize: 13.sp,
                                             fontWeight: FontWeight.bold,
-                                            color: AppColors.text_black,
+                                            color: AppColors.textBlack,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -602,7 +603,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               boxShadow: [
                                 BoxShadow(
                                   color: AppColors.shadowColor,
-                                  blurRadius: 6,
+                                  blurRadius: 6.r,
                                   offset: Offset(0, 2),
                                 ),
                               ],
@@ -730,7 +731,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // Adverticement Section
               Padding(
-                padding: EdgeInsets.all(10.w),
+                padding: EdgeInsets.all(8.w),
                 child: Container(
                   width: double.infinity,
                   height: 168.h,
@@ -738,8 +739,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(23),
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.gradientPink, // Deep purple
-                        AppColors.gradientBlue, // Pinkish purple
+                        AppColors.gradientPink,
+                        AppColors.gradientBlue, 
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.centerRight,
@@ -760,26 +761,26 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       Positioned(
-                        top: 80.h,
+                        top: 83.h,
                         left: 24.w,
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            fixedSize: Size(140.w, 27.h),
-                            backgroundColor: AppColors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                        child: appButton(
+                          onTap: () {},
+                          width: 140.w,
+                          height: 33.h,
+                          buttonColor: AppColors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          child: Center(
+                            child: appText(
+                              "START PURCHASING",
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.gradientPink,
+                              fontFamily: "jakarta",
                             ),
-                          ),
-                          child: appText(
-                            "START PURCHASING",
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.gradientPink,
-                            fontFamily: "jakarta",
                           ),
                         ),
                       ),
+
                       Positioned(
                         bottom: 10.h,
                         left: 24.w,
@@ -857,7 +858,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       borderRadius: BorderRadius.circular(20.r),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.15),
+                                          color: AppColors.lightBlack,
                                           blurRadius: 8,
                                           offset: const Offset(0, 4),
                                         ),
@@ -910,12 +911,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ? 24
                                             : 8,
                                         height: 8,
-                                        margin: const EdgeInsets.symmetric(
-                                          horizontal: 4,
+                                        margin: EdgeInsets.symmetric(
+                                          horizontal: 4.w,
                                         ),
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(
-                                            4,
+                                            4.r,
                                           ),
                                           color:
                                               homeController
@@ -972,20 +973,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             Positioned(
                               bottom: 5.h,
                               right: 35.w,
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.white,
-
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 34.w,
-                                    vertical: 10.h,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  elevation: 2,
+                              child: appButton(
+                                onTap: () {},
+                                buttonColor: AppColors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 34.w,
+                                  vertical: 10.h,
                                 ),
+                                // Simulate elevation using BoxShadow
                                 child: appText(
                                   "Refer A Friend Now",
                                   fontSize: 17.sp,
