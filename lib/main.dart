@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:saoirse_app/screens/OnBoard_screen/OnBoard.dart';
+import 'package:saoirse_app/screens/login_screen/Loginpage.dart';
 import 'package:saoirse_app/screens/productListing/product_listing.dart';
 
 import 'constants/app_colors.dart';
@@ -42,13 +43,13 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: AppStrings.app_name,
             theme: ThemeData(
-              scaffoldBackgroundColor: AppColors.scaffoldColor,
+              scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
               textTheme: GoogleFonts.poppinsTextTheme(),
               highlightColor: AppColors.transparent,
               splashColor: AppColors.transparent,
             ),
             scrollBehavior: CustomScrollBehavior(),
-            home: ProductListing(),
+            home: LoginPage(),
           ),
         );
       },
