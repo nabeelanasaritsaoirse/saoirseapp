@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:saoirse_app/constants/app_colors.dart';
+import 'package:saoirse_app/widgets/app_text.dart';
 
 class ProductListing extends StatefulWidget {
   const ProductListing({super.key});
@@ -167,7 +168,7 @@ class _ProductListingState extends State<ProductListing> {
                       //  SORT BUTTON FUNCTION
                     },
                     icon: Icon(LucideIcons.arrowUpDown, size: 18.sp),
-                    label: const Text('Sort'),
+                    label: appText("sort", fontSize: 18.sp),
                   ),
                 ),
 
@@ -185,7 +186,7 @@ class _ProductListingState extends State<ProductListing> {
                       //    FILTER BUTTON FUNCTION
                     },
                     icon: Icon(LucideIcons.filter, size: 18.sp),
-                    label: const Text('Filter'),
+                    label: appText("filter ", fontSize: 18.sp),
                   ),
                 ),
               ],
@@ -248,29 +249,29 @@ class _ProductListingState extends State<ProductListing> {
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(10.w, 8.h, 10.w, 2.h),
-            child: Text(
-              product['name'],
-              style: TextStyle(fontSize: 14.w, fontWeight: FontWeight.w600),
+            child: appText(
+              product["name"],
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.h),
-            child: Text(
-              product['brand'],
-              style: const TextStyle(color: AppColors.grey, fontSize: 13),
+            child: appText(
+              product["brand"],
+              fontSize: 13.sp,
+
+              color: AppColors.grey,
             ),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.h, vertical: 6.w),
-            child: Text(
-              product['price'],
-              style: TextStyle(
-                fontSize: 12.w,
-                fontWeight: FontWeight.bold,
-                color: AppColors.black,
-              ),
+            child: appText(
+              product["price"],
+              fontSize: 12.sp,
+              fontWeight: FontWeight.bold,
             ),
           ),
           Padding(
@@ -279,7 +280,8 @@ class _ProductListingState extends State<ProductListing> {
               children: [
                 Icon(Icons.star, color: AppColors.mediumAmber, size: 16.sp),
                 SizedBox(width: 4.w),
-                Text(product['rating'], style: TextStyle(fontSize: 13.w)),
+
+                appText(product["rating"], fontSize: 13.sp),
               ],
             ),
           ),

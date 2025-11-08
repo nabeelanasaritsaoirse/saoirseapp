@@ -2,7 +2,10 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:saoirse_app/constants/app_assets.dart';
 import 'package:saoirse_app/constants/app_colors.dart';
+import 'package:saoirse_app/widgets/app_button.dart';
+import 'package:saoirse_app/widgets/app_text.dart';
 
 class Onboard extends StatefulWidget {
   const Onboard({super.key});
@@ -18,9 +21,9 @@ class OnboardState extends State<Onboard> {
       body: Stack(
         children: [
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('lib/Assets/splashScreen demo.jpg'),
+                image: AssetImage(AppAssets.onBoard_img),
                 fit: BoxFit.cover,
               ),
             ),
@@ -35,17 +38,15 @@ class OnboardState extends State<Onboard> {
                   Column(
                     children: [
                       SizedBox(height: 120.h),
-                      Image.asset('lib/Assets/Saoirse_logo.png', height: 180.h),
-                      SizedBox(height: 15.h),
-                      Text(
+                      Image.asset(AppAssets.app_logo, height: 180.h),
+                      SizedBox(height: 18.h),
+                      appText(
                         "INVEST SMALL, DREAM BIG,\nOWN IT",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 22.sp,
-                          color: AppColors.white,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 1.0,
-                        ),
+                        color: AppColors.white,
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.0,
+                        // need to add font style
                       ),
                     ],
                   ),
@@ -53,43 +54,27 @@ class OnboardState extends State<Onboard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          log("login button");
+                      appButton(
+                        onTap: () {
+                          // LOGIN BUTTON
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          foregroundColor: AppColors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.r),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 14.w),
-                          textStyle: TextStyle(
-                            fontSize: 16.w,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        child: Text("Login", style: TextStyle(fontSize: 20.w)),
+                        height: 40.h,
+                        width: 100.w,
+                        buttonText: "Login",
+                        textColor: AppColors.white,
+                        buttonColor: AppColors.primaryColor,
                       ),
-                      SizedBox(height: 10.h),
-                      ElevatedButton(
-                        onPressed: () {
-                          log("sign Up biutton");
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          foregroundColor: AppColors.white,
 
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.r),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 14.w),
-                          textStyle: TextStyle(
-                            fontSize: 18.w,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        child: const Text("Sign Up"),
+                      SizedBox(height: 10.h),
+                      appButton(
+                        onTap: () {
+                          //SIGNUP BuTTON
+                        },
+                        height: 40.h,
+                        width: 100.w,
+                        buttonText: "signup",
+                        textColor: AppColors.white,
+                        buttonColor: AppColors.primaryColor,
                       ),
                     ],
                   ),
