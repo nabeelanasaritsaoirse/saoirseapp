@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, must_be_immutable
+// ignore_for_file: camel_case_types, must_be_immutable, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -150,19 +150,19 @@ class _appTextFieldState extends State<appTextField> {
           borderRadius: widget.borderRadius ?? BorderRadius.circular(8.r),
           borderSide:
               widget.borderSide ??
-              BorderSide(color: AppColors.lightGrey, width: 1.w),
+              BorderSide(color: AppColors.grey, width: 1.w),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: widget.borderRadius ?? BorderRadius.circular(8.r),
           borderSide:
               widget.borderSide ??
-              BorderSide(color: AppColors.lightGrey, width: 1.w),
+              BorderSide(color: AppColors.grey, width: 1.w),
         ),
         border: OutlineInputBorder(
           borderRadius: widget.borderRadius ?? BorderRadius.circular(8.r),
           borderSide:
               widget.borderSide ??
-              BorderSide(color: AppColors.lightGrey, width: 1.w),
+              BorderSide(color: AppColors.grey, width: 1.w),
         ),
       ),
     );

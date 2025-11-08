@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_constant.dart';
-import '../../constants/app_strings.dart';
 import '../../constants/app_urls.dart';
 import '../../main.dart';
 import '../../services/api_service.dart';
@@ -36,7 +35,7 @@ class SignInController extends GetxController {
           storage.write(AppConst.USER_ID, responseData['data']['id']);
           Get.offAll(() => const HomeScreen());
         } else {
-          appSnackbar(error: true, content: AppStrings.email_not_found);
+          //appSnackbar(error: true, content: AppStrings.email_not_found);
         }
       }
     } catch (error) {
