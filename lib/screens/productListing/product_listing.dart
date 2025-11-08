@@ -102,14 +102,14 @@ class _ProductListingState extends State<ProductListing> {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.blue,
+        backgroundColor: AppColors.primaryColor,
         elevation: 0,
         titleSpacing: 0,
         leading: GestureDetector(
           onTap: () {
             // BACK ARROW BUTTON FUNCTION
           },
-          child: Icon(Icons.arrow_back, size: 40.w, color: AppColors.white),
+          child: Icon(Icons.arrow_back, size: 40.sp, color: AppColors.white),
         ),
         title: Container(
           height: 35.h,
@@ -121,7 +121,7 @@ class _ProductListingState extends State<ProductListing> {
           child: Row(
             children: [
               SizedBox(width: 10.w),
-              Icon(Icons.search, color: Colors.grey, size: 22.w),
+              Icon(Icons.search, color: Colors.grey, size: 22.sp),
               SizedBox(width: 10.w),
               Expanded(
                 child: TextField(
@@ -144,7 +144,7 @@ class _ProductListingState extends State<ProductListing> {
             child: Icon(
               Icons.favorite_border,
               color: AppColors.white,
-              size: 40.w,
+              size: 35.sp,
             ),
           ),
           SizedBox(width: 10.w),
@@ -154,7 +154,7 @@ class _ProductListingState extends State<ProductListing> {
       body: Column(
         children: [
           Container(
-            color: AppColors.lightgrey,
+            color: AppColors.lightGrey,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -166,14 +166,15 @@ class _ProductListingState extends State<ProductListing> {
                     onPressed: () {
                       //  SORT BUTTON FUNCTION
                     },
-                    icon: Icon(LucideIcons.arrowUpDown, size: 18.w),
+                    icon: Icon(LucideIcons.arrowUpDown, size: 18.sp),
                     label: const Text('Sort'),
                   ),
                 ),
+
                 Container(
                   width: 1.w,
                   height: 40.h,
-                  color: AppColors.shadedBlack,
+                  color: AppColors.shadowColor,
                 ),
                 Expanded(
                   child: TextButton.icon(
@@ -183,7 +184,7 @@ class _ProductListingState extends State<ProductListing> {
                     onPressed: () {
                       //    FILTER BUTTON FUNCTION
                     },
-                    icon: Icon(LucideIcons.filter, size: 18.w),
+                    icon: Icon(LucideIcons.filter, size: 18.sp),
                     label: const Text('Filter'),
                   ),
                 ),
@@ -194,11 +195,11 @@ class _ProductListingState extends State<ProductListing> {
           Expanded(
             child: GridView.builder(
               padding: EdgeInsets.all(12.w),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.72,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
+                childAspectRatio: 0.60.r,
+                mainAxisSpacing: 10.h,
+                crossAxisSpacing: 10.w,
               ),
               itemCount: products.length,
               itemBuilder: (context, index) {
@@ -218,7 +219,7 @@ class _ProductListingState extends State<ProductListing> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14.r),
         boxShadow: [
-          BoxShadow(color: Colors.grey, spreadRadius: 2, blurRadius: 6),
+          BoxShadow(color: Colors.grey, spreadRadius: 2.r, blurRadius: 6.r),
         ],
       ),
       child: Column(
@@ -227,9 +228,7 @@ class _ProductListingState extends State<ProductListing> {
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(14),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
                 child: Image.network(
                   product['image'],
                   height: 115.h,
@@ -278,7 +277,7 @@ class _ProductListingState extends State<ProductListing> {
             padding: EdgeInsets.symmetric(horizontal: 10.h),
             child: Row(
               children: [
-                Icon(Icons.star, color: AppColors.amber, size: 16.w),
+                Icon(Icons.star, color: AppColors.mediumAmber, size: 16.sp),
                 SizedBox(width: 4.w),
                 Text(product['rating'], style: TextStyle(fontSize: 13.w)),
               ],

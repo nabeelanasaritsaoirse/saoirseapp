@@ -36,12 +36,12 @@ class OnboardState extends State<Onboard> {
                     children: [
                       SizedBox(height: 120.h),
                       Image.asset('lib/Assets/Saoirse_logo.png', height: 180.h),
-                      SizedBox(height: 25.h),
+                      SizedBox(height: 15.h),
                       Text(
                         "INVEST SMALL, DREAM BIG,\nOWN IT",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 22.w,
+                          fontSize: 22.sp,
                           color: AppColors.white,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 1.0,
@@ -58,7 +58,7 @@ class OnboardState extends State<Onboard> {
                           log("login button");
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.blue,
+                          backgroundColor: AppColors.primaryColor,
                           foregroundColor: AppColors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.r),
@@ -77,11 +77,11 @@ class OnboardState extends State<Onboard> {
                           log("sign Up biutton");
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.blue,
+                          backgroundColor: AppColors.primaryColor,
                           foregroundColor: AppColors.white,
-                          side: BorderSide(color: AppColors.white, width: 2.w),
+
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(30.r),
                           ),
                           padding: EdgeInsets.symmetric(vertical: 14.w),
                           textStyle: TextStyle(

@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
               splashColor: AppColors.transparent,
             ),
             scrollBehavior: CustomScrollBehavior(),
-            home: Onboard(),
+            home: ProductListing(),
           ),
         );
       },
