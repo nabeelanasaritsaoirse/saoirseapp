@@ -1,5 +1,3 @@
-import '../constants/app_strings.dart';
-import '../widgets/app_snackbar.dart';
 
 class LoginService {
   //email validation

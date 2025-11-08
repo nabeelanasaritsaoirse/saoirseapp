@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_constant.dart';
-import '../../constants/app_strings.dart';
 import '../../constants/app_urls.dart';
 import '../../main.dart';
 import '../../services/api_service.dart';
