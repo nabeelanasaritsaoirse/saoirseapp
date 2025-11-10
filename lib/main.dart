@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: AppStrings.app_name,
             theme: ThemeData(
-              scaffoldBackgroundColor: AppColors.scaffoldColor,
+              scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
               textTheme: GoogleFonts.poppinsTextTheme(),
               highlightColor: AppColors.transparent,
               splashColor: AppColors.transparent,
