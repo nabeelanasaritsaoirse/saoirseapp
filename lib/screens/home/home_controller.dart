@@ -1,14 +1,14 @@
 // ignore_for_file: library_prefixes
 
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_assets.dart';
-import 'package:saoirse_app/models/product_model.dart';
 
+import '../../constants/app_assets.dart';
+import '../../models/product_model.dart';
 
 class HomeController extends GetxController {
   RxBool loading = false.obs;
-   RxInt currentCarouselIndex = 0.obs;
-   RxInt currentBottomCarouselIndex = 0.obs;
+  RxInt currentCarouselIndex = 0.obs;
+  RxInt currentBottomCarouselIndex = 0.obs;
   // Fot the custom  images
   final RxList<String> carouselImages = <String>[
     'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800',
@@ -91,4 +91,3 @@ class HomeController extends GetxController {
     ),
   ].obs;
 }
-

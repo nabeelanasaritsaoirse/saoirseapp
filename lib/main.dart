@@ -3,26 +3,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:saoirse_app/screens/home/home_screen.dart';
-
+import 'package:saoirse_app/screens/category/category_screen.dart';
 
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
 import 'services/api_service.dart';
-
-
-
-
 
 GetStorage storage = GetStorage();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
- 
-  runApp(
-    const MyApp(),
-  );
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -54,7 +47,7 @@ class MyApp extends StatelessWidget {
               splashColor: AppColors.transparent,
             ),
             scrollBehavior: CustomScrollBehavior(),
-            home: HomeScreen(),
+            home: CategoryScreen(),
           ),
         );
       },
@@ -74,21 +67,10 @@ class CustomScrollBehavior extends ScrollBehavior {
   // Optional: To also remove overscroll glow on Android
   @override
   Widget buildOverscrollIndicator(
-      BuildContext context, Widget child, ScrollableDetails details) {
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
     return child;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:saoirse_app/constants/app_assets.dart';
-import 'package:saoirse_app/constants/app_colors.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
-import 'package:saoirse_app/screens/home/home_controller.dart';
-import 'package:saoirse_app/widgets/app_button.dart';
-import 'package:saoirse_app/widgets/app_text.dart';
+
+import '../../constants/app_assets.dart';
+import '../../constants/app_colors.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_text.dart';
+import '../../constants/app_strings.dart';
+import 'home_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

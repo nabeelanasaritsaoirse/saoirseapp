@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+
+import '../../constants/app_colors.dart';
+import '../../widgets/app_text.dart';
 
 class ProductListing extends StatefulWidget {
   const ProductListing({super.key});
@@ -11,7 +15,7 @@ class ProductListing extends StatefulWidget {
 class _ProductListingState extends State<ProductListing> {
   @override
   Widget build(BuildContext context) {
-  final TextEditingController nameContoller = TextEditingController();
+    final TextEditingController nameContoller = TextEditingController();
 
     final products = [
       {
@@ -98,34 +102,35 @@ class _ProductListingState extends State<ProductListing> {
     ];
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: Colors.indigo[900],
+        backgroundColor: AppColors.primaryColor,
         elevation: 0,
         titleSpacing: 0,
         leading: GestureDetector(
           onTap: () {
             // BACK ARROW BUTTON FUNCTION
           },
-          child: Icon(Icons.arrow_back, size: 40, color: Colors.white),
+          child: Icon(Icons.arrow_back, size: 40.sp, color: AppColors.white),
         ),
         title: Container(
-          height: 42,
-          margin: const EdgeInsets.only(right: 12),
+          height: 35.h,
+          margin: EdgeInsets.only(right: 12.w),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(20.r),
           ),
           child: Row(
             children: [
-              const SizedBox(width: 10),
-              const Icon(Icons.search, color: Colors.grey, size: 22),
-              const SizedBox(width: 10),
+              SizedBox(width: 10.w),
+              Icon(Icons.search, color: Colors.grey, size: 22.sp),
+              SizedBox(width: 10.w),
               Expanded(
-                child: TextField(controller: nameContoller,
+                child: TextField(
+                  controller: nameContoller,
                   decoration: InputDecoration(
                     hintText: 'Search',
-                    hintStyle: const TextStyle(color: Colors.grey),
+                    hintStyle: const TextStyle(color: AppColors.grey),
                     border: InputBorder.none,
                   ),
                 ),
@@ -138,50 +143,51 @@ class _ProductListingState extends State<ProductListing> {
             onTap: () {
               //    FAVORITE BUTTON FUNCTION
             },
-            child: const Icon(
+            child: Icon(
               Icons.favorite_border,
-              color: Color.fromARGB(255, 255, 255, 255),
-              size: 40,
+              color: AppColors.white,
+              size: 35.sp,
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10.w),
         ],
       ),
 
       body: Column(
         children: [
           Container(
-            color: const Color.fromARGB(255, 245, 245, 246),
+            color: AppColors.lightGrey,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
                   child: TextButton.icon(
                     style: TextButton.styleFrom(
-                      foregroundColor: const Color.fromARGB(255, 0, 0, 0),
+                      foregroundColor: AppColors.black,
                     ),
                     onPressed: () {
                       //  SORT BUTTON FUNCTION
                     },
-                    icon: const Icon(LucideIcons.arrowUpDown, size: 18),
-                    label: const Text('Sort'),
+                    icon: Icon(LucideIcons.arrowUpDown, size: 18.sp),
+                    label: appText("sort", fontSize: 18.sp),
                   ),
                 ),
+
                 Container(
-                  width: 1,
-                  height: 40,
-                  color: const Color.fromARGB(60, 17, 17, 17),
+                  width: 1.w,
+                  height: 40.h,
+                  color: AppColors.shadowColor,
                 ),
                 Expanded(
                   child: TextButton.icon(
                     style: TextButton.styleFrom(
-                      foregroundColor: const Color.fromARGB(255, 0, 0, 0),
+                      foregroundColor: AppColors.black,
                     ),
                     onPressed: () {
                       //    FILTER BUTTON FUNCTION
                     },
-                    icon: const Icon(LucideIcons.filter, size: 18),
-                    label: const Text('Filter'),
+                    icon: Icon(LucideIcons.filter, size: 18.sp),
+                    label: appText("filter ", fontSize: 18.sp),
                   ),
                 ),
               ],
@@ -190,12 +196,12 @@ class _ProductListingState extends State<ProductListing> {
 
           Expanded(
             child: GridView.builder(
-              padding: const EdgeInsets.all(12),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              padding: EdgeInsets.all(12.w),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.72,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
+                childAspectRatio: 0.60.r,
+                mainAxisSpacing: 10.h,
+                crossAxisSpacing: 10.w,
               ),
               itemCount: products.length,
               itemBuilder: (context, index) {
@@ -213,9 +219,9 @@ class _ProductListingState extends State<ProductListing> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.r),
         boxShadow: [
-          BoxShadow(color: Colors.grey, spreadRadius: 2, blurRadius: 6),
+          BoxShadow(color: Colors.grey, spreadRadius: 2.r, blurRadius: 6.r),
         ],
       ),
       child: Column(
@@ -224,19 +230,17 @@ class _ProductListingState extends State<ProductListing> {
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(14),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
                 child: Image.network(
                   product['image'],
-                  height: 130,
+                  height: 115.h,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
               ),
               Positioned(
-                top: 8,
-                right: 8,
+                top: 8.h,
+                right: 8.w,
                 child: Icon(
                   product['fav'] ? Icons.favorite : Icons.favorite_border,
                   color: product['fav'] ? Colors.red : Colors.grey,
@@ -245,39 +249,40 @@ class _ProductListingState extends State<ProductListing> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 8, 10, 2),
-            child: Text(
-              product['name'],
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            padding: EdgeInsets.fromLTRB(10.w, 8.h, 10.w, 2.h),
+            child: appText(
+              product["name"],
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              product['brand'],
-              style: const TextStyle(color: Colors.grey, fontSize: 13),
+            padding: EdgeInsets.symmetric(horizontal: 10.h),
+            child: appText(
+              product["brand"],
+              fontSize: 13.sp,
+
+              color: AppColors.grey,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: Text(
-              product['price'],
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+            padding: EdgeInsets.symmetric(horizontal: 10.h, vertical: 6.w),
+            child: appText(
+              product["price"],
+              fontSize: 12.sp,
+              fontWeight: FontWeight.bold,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
+            padding: EdgeInsets.symmetric(horizontal: 10.h),
             child: Row(
               children: [
-                const Icon(Icons.star, color: Colors.amber, size: 16),
-                const SizedBox(width: 4),
-                Text(product['rating'], style: const TextStyle(fontSize: 13)),
+                Icon(Icons.star, color: AppColors.mediumAmber, size: 16.sp),
+                SizedBox(width: 4.w),
+
+                appText(product["rating"], fontSize: 13.sp),
               ],
             ),
           ),
