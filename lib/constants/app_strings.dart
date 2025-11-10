@@ -6,6 +6,16 @@ class AppStrings {
   //signin screen
   static String sign_in = 'Sign In';
 
+  //Login Screen
+  static String login = 'LOGIN';
+  static String sign_up = "SIGN UP";
+  static String login_title = "Let’s you log in";
+  static String login_note = "Welcome back you have been missed";
+  static String Forgot_password = "Forgot Password..?";
+
+  //Onboard Screen
+  static String onboard_note = "INVEST SMALL, DREAM BIG, \nOWN IT";
+
   // Home Screen
   static String card_discription =
       "Turn your savings into success\ninvest today and secure the future you’ve always wanted!";

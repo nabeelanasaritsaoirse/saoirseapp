@@ -1,8 +1,9 @@
 // ignore_for_file: file_names
 
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:saoirse_app/constants/app_strings.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../widgets/app_button.dart';
@@ -39,15 +40,18 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                   Column(
                     children: [
                       SizedBox(height: 120.h),
-                      Image.asset(AppAssets.app_logo, height: 180.h),
+                      Image.asset(
+                        AppAssets.app_logo,
+                        height: 180.h,
+                        fit: BoxFit.cover,
+                      ),
                       SizedBox(height: 18.h),
                       appText(
-                        "INVEST SMALL, DREAM BIG,\nOWN IT",
+                        AppStrings.onboard_note,
                         color: AppColors.white,
                         fontSize: 20.sp,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.0,
-                        // need to add font style
                       ),
                     ],
                   ),
@@ -57,11 +61,12 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                     children: [
                       appButton(
                         onTap: () {
+                          log("Login Button Tapped");
                           // LOGIN BUTTON
                         },
                         height: 40.h,
                         width: 100.w,
-                        buttonText: "Login",
+                        buttonText: AppStrings.login,
                         textColor: AppColors.white,
                         buttonColor: AppColors.primaryColor,
                       ),
@@ -69,11 +74,12 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                       SizedBox(height: 10.h),
                       appButton(
                         onTap: () {
+                          log("Signup Button Tapped");
                           //SIGNUP BuTTON
                         },
                         height: 40.h,
                         width: 100.w,
-                        buttonText: "signup",
+                        buttonText: AppStrings.sign_up,
                         textColor: AppColors.white,
                         buttonColor: AppColors.primaryColor,
                       ),

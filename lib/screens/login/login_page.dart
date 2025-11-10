@@ -2,11 +2,16 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 // import 'package:google_fonts/google_fonts.dart';
 
 import 'package:saoirse_app/constants/app_colors.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
+import 'package:saoirse_app/screens/login/login_controller.dart';
+import 'package:saoirse_app/services/login_service.dart';
 import 'package:saoirse_app/widgets/app_button.dart';
 import 'package:saoirse_app/widgets/app_text.dart';
+import 'package:saoirse_app/widgets/app_text_field.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,6 +21,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  //
+  //
+  LoginController loginController = Get.put(LoginController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,64 +46,48 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   SizedBox(height: 12.h),
                   appText(
-                    "Let’s you log in",
+                    AppStrings.login_title,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primaryColor,
                     fontSize: 28.sp,
-                    // fontStyle:  GoogleFonts.poppinsTextTheme(),
+                    fontFamily: "Poppins",
                   ),
 
                   SizedBox(height: 6.h),
                   appText(
-                    "Welcome back you have been missed",
+                    AppStrings.login_note,
 
                     color: AppColors.textBlack,
                     fontSize: 14.sp,
-                    // fontStyle: GoogleFonts.poppinsTextTheme(),
                   ),
 
                   SizedBox(height: 28.h),
 
-                  TextFormField(
-                    // controller: _usernameController,
-                    decoration: InputDecoration(
-                      labelText: "Username",
-                      hintText: "eg. Admin@1234",
-                      prefixIcon: const Icon(Icons.person_outline_rounded),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
+                  appTextField(
+                    controller: loginController.passController,
+
+                    hintText: "eg. Admin@1234",
+                    hintColor: AppColors.black,
+                    hintSize: 12.sp,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your username';
-                      }
-                      return null;
+                      return LoginService.emailValidation(email: value!);
                     },
                   ),
+
                   SizedBox(height: 15.h),
 
-                  TextFormField(
-                    // controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: "Password",
-                      hintText: "eg. Admin82200",
-                      prefixIcon: const Icon(Icons.lock_outline_rounded),
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.visibility_rounded),
-                        onPressed: () {
-                          // PASSWORD VISIBILITY FUNCTION
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
+                  appTextField(
+                    controller: loginController.passController,
+                    suffixWidget: Icon(
+                      Icons.visibility_rounded,
+                      color: AppColors.black,
                     ),
+
+                    hintText: "eg. Admin82200",
+                    hintColor: AppColors.black,
+                    hintSize: 12.sp,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      return null;
+                      return LoginService.passValidation(pass: value!);
                     },
                   ),
 
@@ -104,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextButton(
                       onPressed: () {},
                       child: appText(
-                        "Forget Password..?",
+                        AppStrings.Forgot_password,
                         fontWeight: FontWeight.w500,
                         color: AppColors.primaryColor,
                         // fontStyle: GoogleFonts.poppinsTextTheme(),
@@ -119,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
                       //  LOGIN BUTTON FUNCTION
                     },
                     buttonColor: AppColors.primaryColor,
-                    buttonText: "LOGIN",
+                    buttonText: AppStrings.login,
                     textColor: AppColors.white,
                     height: 40.h,
                   ),

@@ -90,4 +90,6 @@ class HomeController extends GetxController {
       hasDiscount: true,
     ),
   ].obs;
+
+  
 }

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+
+import 'package:saoirse_app/screens/productListing/productListing_controller.dart';
+import 'package:saoirse_app/widgets/app_text_field.dart';
 import '../../constants/app_colors.dart';
+import '../../services/login_service.dart';
 import '../../widgets/app_text.dart';
 
 class ProductListing extends StatefulWidget {
@@ -13,17 +18,9 @@ class ProductListing extends StatefulWidget {
 class _ProductListingState extends State<ProductListing> {
   @override
   Widget build(BuildContext context) {
-    final TextEditingController nameContoller = TextEditingController();
-
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    ///
-    ///
+    ProductlistingController productlistingController = Get.put(
+      ProductlistingController(),
+    );
 
     final products = [
       {
@@ -134,8 +131,15 @@ class _ProductListingState extends State<ProductListing> {
               Icon(Icons.search, color: AppColors.grey, size: 22.sp),
               SizedBox(width: 10.w),
               Expanded(
+                // child: appTextField(
+                //   controller: productlistingController.nameContoller,
+                //   hintText: "srearch",
+                //   validator: (value) {
+                //     return LoginService.emailValidation(email: value!);
+                //   },
+                // ),
                 child: TextField(
-                  controller: nameContoller,
+                  controller: productlistingController.nameContoller,
                   decoration: InputDecoration(
                     hintText: 'Search',
                     hintStyle: const TextStyle(color: AppColors.grey),
