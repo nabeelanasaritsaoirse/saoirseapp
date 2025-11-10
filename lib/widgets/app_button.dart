@@ -17,6 +17,7 @@ Widget appButton({
   String? buttonText,
   double? fontSize,
   FontWeight? fontWeight,
+  String fontFamily = 'poppins',
   Widget? child,
 }) {
   return InkWell(
@@ -39,6 +40,7 @@ Widget appButton({
             appText(
               buttonText!,
               color: textColor,
+              fontFamily: fontFamily,
               fontSize: fontSize ?? 16.sp,
               fontWeight: fontWeight ?? FontWeight.w600,
             ),

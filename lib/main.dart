@@ -3,10 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:saoirse_app/screens/category/category_screen.dart';
 
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
+import 'screens/splash/splash_screen.dart';
 import 'services/api_service.dart';
 
 GetStorage storage = GetStorage();
@@ -41,13 +41,13 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: AppStrings.app_name,
             theme: ThemeData(
-              scaffoldBackgroundColor: AppColors.scaffoldColor,
+              scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
               textTheme: GoogleFonts.poppinsTextTheme(),
               highlightColor: AppColors.transparent,
               splashColor: AppColors.transparent,
             ),
             scrollBehavior: CustomScrollBehavior(),
-            home: CategoryScreen(),
+            home: SplashScreen(),
           ),
         );
       },

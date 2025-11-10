@@ -16,11 +16,15 @@ class AppStrings {
   static String trending = "Trending Products";
   static String explore = "Explore\nMore!!";
   static String purchase = "START PURCHASING";
-  static String Adverticement_content = "Just save minimum ₹100 everyday\nto get your desired product";
+  static String Adverticement_content =
+      "Just save minimum ₹100 everyday\nto get your desired product";
   static String refer = "Refer EPI";
   static String refer_heding = "Earn Money\nEveryday";
   static String refer_button_lebel = "Refer A Friend Now";
 
   //snackbars
   static String no_internet = 'No internet connection';
+  static String invalid_email = 'Please enter valid email ID';
+  static String invalid_pass =
+      'Password length should be minimum 8 with uppercase, lowercase, number, and special character.';
 }
