@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:saoirse_app/constants/app_colors.dart';
-import 'package:saoirse_app/widgets/app_text.dart';
+
+import '../../constants/app_colors.dart';
+import '../../widgets/app_text.dart';
 
 class ProductListing extends StatefulWidget {
   const ProductListing({super.key});

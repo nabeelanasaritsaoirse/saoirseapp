@@ -19,6 +19,7 @@ class AppColors {
   static const Color lightAmber = Color(0xFFF4BD46);
   static const Color mediumAmber = Color(0xFFF4BB00);
   static const Color darkAmber = Color.fromARGB(255, 112, 90, 10);
+  static final Color lightBlack = Colors.black.withValues(alpha: 0.15);
   static const Color green = Colors.green;
   static const Color red = Colors.red;
   static const Color blue = Colors.blue;
