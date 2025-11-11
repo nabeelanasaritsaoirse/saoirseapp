@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-
 import 'package:saoirse_app/screens/productListing/productListing_controller.dart';
 import 'package:saoirse_app/widgets/app_text_field.dart';
 import '../../constants/app_colors.dart';
@@ -119,17 +118,7 @@ class _ProductListingState extends State<ProductListing> {
           child: Icon(Icons.arrow_back, size: 40.sp, color: AppColors.white),
         ),
         title:
-            // Expanded(
-            //   child: appTextField(
-            //     borderRadius: BorderRadius.circular(55.r),
-            //     controller: productlistingController.nameContoller,
-            //     fillColor: AppColors.white,
-            //     hintText: "srearch",
-            //     validator: (value) {
-            //       return LoginService.emailValidation(email: value!);
-            //     },
-            //   ),
-            // ),
+            
             Container(
               height: 35.h,
               margin: EdgeInsets.only(right: 12.w),
@@ -139,9 +128,7 @@ class _ProductListingState extends State<ProductListing> {
               ),
               child: Row(
                 children: [
-                  // SizedBox(width: 10.w),
-                  // Icon(Icons.search, color: AppColors.grey, size: 22.sp),
-                  // SizedBox(width: 10.w),
+                 
                   Expanded(
                     child: appTextField(
                       prefixWidth: 12.w,
