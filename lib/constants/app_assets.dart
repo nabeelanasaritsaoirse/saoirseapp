@@ -37,6 +37,17 @@ class AppAssets {
   static String upiImage = "assets/images/upi.png";
   static String paytmImage = "assets/images/paytm.png";
   static String paypalImage = "assets/images/paypal.png";
+
+  // referal page
+  static String  refferal = "assets/images/refferal.png";
+  static String whatsapp = "assets/images/whatsapp.jpg";
+  static String facebook = "assets/images/facebook.png";
+  static String telegram = "assets/images/telegram.png";
+  static String x = "assets/images/x.png";
+  static String gmail = "assets/images/gmail.png";
+  static String message = "assets/icons/message.png";
+
+
   
 
 }
