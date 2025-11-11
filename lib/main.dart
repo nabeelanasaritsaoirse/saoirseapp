@@ -6,6 +6,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:saoirse_app/l10n/app_localizations.dart';
 import 'package:saoirse_app/screens/home/home_screen.dart';
+import 'package:saoirse_app/screens/otp/otp_screen.dart';
 import 'package:saoirse_app/screens/splash/splash_screen.dart';
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
@@ -57,7 +58,9 @@ class MyApp extends StatelessWidget {
               useMaterial3: true, // optional modern UI
             ),
             scrollBehavior: CustomScrollBehavior(),
-            home: HomeScreen(),
+            home: VerifyOTPScreen(
+              phoneNumber: "+1234567890",
+            ),
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,

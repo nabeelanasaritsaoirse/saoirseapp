@@ -8,4 +8,8 @@ class AppStrings {
 
   //snackbars
   static String no_internet = 'No internet connection';
+
+  //otp screen
+  static String verify = "Verify";
+  static String send_otp = "Send OTP";
 }
