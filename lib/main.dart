@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,9 +18,19 @@ GetStorage storage = GetStorage();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  Platform.isIOS
+      ? await Firebase.initializeApp(
+          options: const FirebaseOptions(
+          apiKey: 'AIzaSyDpQb5HVM28WGffCCwrMmNs9luxSMFyaBY',
+          appId: '1:486829564070:ios:07e32a618113ab29479467',
+          messagingSenderId: '486829564070',
+          projectId: 'saoirse-epi',
+        ))
+      : await Firebase.initializeApp();
   String? lang = storage
       .read('language'); // ✅ use the GetStorage instance you already defined
   Locale locale = lang != null ? Locale(lang) : const Locale('en');
+
   runApp(MyApp(locale: locale));
 }
 

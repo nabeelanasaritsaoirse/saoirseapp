@@ -1,4 +1,4 @@
-package com.example.saoirse_app
+package com.saoirse.epi
 
 import io.flutter.embedding.android.FlutterActivity
 

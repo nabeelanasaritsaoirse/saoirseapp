@@ -1,0 +1,78 @@
+{
+  "project_info": {
+    "project_number": "486829564070",
+    "project_id": "saoirse-epi",
+    "storage_bucket": "saoirse-epi.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486829564070:android:74e217e102e40a69479467",
+        "android_client_info": {
+          "package_name": "com.saoirse.epi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "486829564070-4d1fkup9ndsfec17mg830p1p7eqd6469.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saoirse.epi",
+            "certificate_hash": "513c8dde321ba0a2fb5adecf085a155eb37548b8"
+          }
+        },
+        {
+          "client_id": "486829564070-7mr0jui2f593spr2s8vjukorl0jq5crk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saoirse.epi",
+            "certificate_hash": "38832385225cc6c2f691043e307e3f27c26ce04c"
+          }
+        },
+        {
+          "client_id": "486829564070-91mff0c2c7bi88cc2k5d7i6rts03ic1c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saoirse.epi",
+            "certificate_hash": "b7be95fd60a1eaf5f380d63dfa2a7d3f2f8813fb"
+          }
+        },
+        {
+          "client_id": "486829564070-tffrnp1203iuigjmtq8k0caph1515hat.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saoirse.epi",
+            "certificate_hash": "18cde78d52c38d74bab28cfeadb5766204c2d96a"
+          }
+        },
+        {
+          "client_id": "486829564070-mkrkm4v9tji249t6u7gdfiefups09gs4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxnv1w6XLZhEd0E_WZU3cXk8D3qh5Ssg0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "486829564070-mkrkm4v9tji249t6u7gdfiefups09gs4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.saoirse.epi"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
