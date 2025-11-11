@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../main.dart';
 import '../widgets/app_snackbar.dart';
 
 class AuthService {
@@ -34,6 +35,16 @@ class AuthService {
       appSnackbar(content: 'Google Error: ${e.toString()}', error: true);
       print("ERROR::: ${e.toString()}");
       return null;
+    }
+  }
+
+  static signOut() async {
+    try {
+      await auth.signOut();
+      await GoogleSignIn.instance.signOut();
+      await storage.erase();
+    } catch (e) {
+      print("GET ERROR::: $e");
     }
   }
 }

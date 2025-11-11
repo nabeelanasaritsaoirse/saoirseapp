@@ -8,7 +8,7 @@ import '../../constants/app_assets.dart';
 import '../../constants/app_constant.dart';
 import '../../main.dart';
 import '../home/home_screen.dart';
-import '../login/login_page.dart';
+import '../onboard/onboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (isLogin) {
         Get.offAll(() => const HomeScreen());
       } else {
-        Get.offAll(() => const LoginPage());
+        Get.offAll(() => const OnBoardScreen());
       }
     });
   }

@@ -7,6 +7,7 @@ class AppStrings {
   static String sign_in = 'Sign In';
 
   //Login Screen
+  static String send_otp = "Send OTP";
   static String login = 'LOGIN';
   static String sign_up = "SIGN UP";
   static String login_title = "Let’s you log in";
@@ -37,4 +38,5 @@ class AppStrings {
   static String invalid_email = 'Please enter valid email ID';
   static String invalid_pass =
       'Password length should be minimum 8 with uppercase, lowercase, number, and special character.';
+  static String invalid_phone = 'Please enter valid phone number';
 }

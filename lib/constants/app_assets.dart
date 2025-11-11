@@ -16,11 +16,8 @@ class AppAssets {
   static String refer_image = "assets/images/refer_image.png";
   static String notification = "assets/icons/notification.png";
 
-
- 
-
-
   //icons
+  static String google_icon = "assets/icons/google_icon.webp";
 
   // Categroy Screens
   static String search = "assets/icons/search.png";

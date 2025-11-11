@@ -3,10 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import '/screens/productListing/productListing_controller.dart';
+import '/widgets/app_text_field.dart';
 import '../../constants/app_colors.dart';
 import '../../widgets/app_text.dart';
-import '../../widgets/app_text_field.dart';
-import 'productListing_controller.dart';
 
 class ProductListing extends StatefulWidget {
   const ProductListing({super.key});
@@ -159,7 +159,6 @@ class _ProductListingState extends State<ProductListing> {
           SizedBox(width: 10.w),
         ],
       ),
-
       body: Column(
         children: [
           Container(
@@ -182,7 +181,6 @@ class _ProductListingState extends State<ProductListing> {
                     },
                   ),
                 ),
-
                 Container(
                   width: 1.w,
                   height: 40.h,
@@ -206,7 +204,6 @@ class _ProductListingState extends State<ProductListing> {
               ],
             ),
           ),
-
           Expanded(
             child: GridView.builder(
               padding: EdgeInsets.all(12.w),
@@ -276,7 +273,6 @@ class _ProductListingState extends State<ProductListing> {
             child: appText(
               product["brand"],
               fontSize: 13.sp,
-
               color: AppColors.grey,
             ),
           ),
@@ -294,7 +290,6 @@ class _ProductListingState extends State<ProductListing> {
               children: [
                 Icon(Icons.star, color: AppColors.mediumAmber, size: 16.sp),
                 SizedBox(width: 4.w),
-
                 appText(product["rating"], fontSize: 13.sp),
               ],
             ),

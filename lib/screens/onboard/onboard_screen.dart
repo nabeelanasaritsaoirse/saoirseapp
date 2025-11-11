@@ -1,12 +1,13 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
+import '../login/login_page.dart';
 
 class OnBoardScreen extends StatefulWidget {
   const OnBoardScreen({super.key});
@@ -29,7 +30,6 @@ class OnBoardScreenState extends State<OnBoardScreen> {
               ),
             ),
           ),
-
           SafeArea(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.h, vertical: 40.w),
@@ -54,14 +54,12 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                       ),
                     ],
                   ),
-
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       appButton(
                         onTap: () {
-                          log("Login Button Tapped");
-                          // LOGIN BUTTON
+                          Get.offAll(() => const LoginPage());
                         },
                         height: 40.h,
                         width: 100.w,
@@ -69,11 +67,9 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                         textColor: AppColors.white,
                         buttonColor: AppColors.primaryColor,
                       ),
-
                       SizedBox(height: 10.h),
                       appButton(
                         onTap: () {
-                          log("Signup Button Tapped");
                           //SIGNUP BuTTON
                         },
                         height: 40.h,
