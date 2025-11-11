@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/dummy/dummy_assets.dart';
-import 'package:saoirse_app/models/category_model.dart';
+
+import '../../dummy/dummy_assets.dart';
+import '../../models/category_model.dart';
 
 class CategoryController extends GetxController {
   final selectedIndex = 0.obs;

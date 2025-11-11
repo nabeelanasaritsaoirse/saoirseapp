@@ -1,0 +1,19 @@
+{
+  "@@locale": "ml",
+  "appTitle": "സയോഴ്‌സ് ആപ്പ്",
+  "signIn": "സൈൻ ഇൻ",
+  "welcomeUser": "സ്വാഗതം, {name}!",
+  "@welcomeUser": {
+    "description": "ഉപയോക്താവിന്റെ പേര് ഉൾപ്പെടുത്തി സ്വാഗതം സന്ദേശം",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "itemsCount": "{count, plural, =0{ഒന്നുമില്ല} =1{1 ഇനം} other{{count} ഇനങ്ങൾ}}",
+
+  "stylishTitle": "സ്റ്റൈലിഷ്",
+  "investmentDescription": "നിങ്ങളുടെ സംഗ്രഹങ്ങളെ വിജയത്തിലേക്ക് മാറ്റൂ. \nഇന്നുതന്നെ നിക്ഷേപിച്ച് നിങ്ങൾ ആഗ്രഹിക്കുന്ന ഭാവി ഉറപ്പാക്കൂ!",
+  "bookNow": "ഇപ്പോൾ ബുക്ക് ചെയ്യൂ"
+}
