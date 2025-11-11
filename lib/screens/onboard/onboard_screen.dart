@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
+import '/constants/app_strings.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../widgets/app_button.dart';
@@ -78,7 +78,7 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                         height: 40.h,
                         width: 100.w,
                         buttonText: AppStrings.sign_up,
-                        
+
                         textColor: AppColors.white,
                         buttonColor: AppColors.primaryColor,
                       ),
