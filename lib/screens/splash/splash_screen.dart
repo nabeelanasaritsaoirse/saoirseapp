@@ -8,7 +8,7 @@ import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_constant.dart';
 import '../../main.dart';
-import '../home/home_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 import '../onboard/onboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Future.delayed(const Duration(seconds: 2), () async {
       if (isLogin) {
-        Get.offAll(() => const HomeScreen());
+        Get.offAll(() => DashboardScreen());
       } else {
         Get.offAll(() => const OnBoardScreen());
       }

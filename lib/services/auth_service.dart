@@ -26,7 +26,7 @@ class AuthService {
       // Getting users credential
       UserCredential result = await auth.signInWithCredential(authCredential);
 
-      return result;
+      return result.user?.email;
     } catch (e) {
       appSnackbar(content: 'Google Error: ${e.toString()}', error: true);
       print("ERROR::: ${e.toString()}");
