@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_assets.dart';
+import '../../constants/app_colors.dart';
 import '../../constants/app_constant.dart';
 import '../../main.dart';
 import '../home/home_screen.dart';
@@ -42,6 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: AppColors.primaryColor,
         body: Center(
           child: Image.asset(
             AppAssets.app_logo,

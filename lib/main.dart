@@ -12,6 +12,7 @@ import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/splash/splash_screen.dart';
+import 'services/api_service.dart';
 
 GetStorage storage = GetStorage();
 
@@ -26,7 +27,13 @@ Future<void> main() async {
           messagingSenderId: '486829564070',
           projectId: 'saoirse-epi',
         ))
-      : await Firebase.initializeApp();
+      : await Firebase.initializeApp(
+          options: FirebaseOptions(
+          apiKey: 'AIzaSyCxnv1w6XLZhEd0E_WZU3cXk8D3qh5Ssg0',
+          appId: '1:486829564070:android:74e217e102e40a69479467',
+          messagingSenderId: '486829564070',
+          projectId: 'saoirse-epi',
+        ));
   String? lang = storage
       .read('language'); // ✅ use the GetStorage instance you already defined
   Locale locale = lang != null ? Locale(lang) : const Locale('en');
@@ -41,7 +48,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // optional: if APIService needs context later, move it to HomeScreen
-    // APIService.checkConnection(context);
+    APIService.checkConnection(context);
 
     return ScreenUtilInit(
       designSize: const Size(360, 690), //required for ScreenUtil

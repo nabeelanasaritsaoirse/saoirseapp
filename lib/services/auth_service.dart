@@ -11,26 +11,22 @@ class AuthService {
   static googleLogin() async {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+      await googleSignIn.initialize(
+          serverClientId:
+              '486829564070-mkrkm4v9tji249t6u7gdfiefups09gs4.apps.googleusercontent.com');
       final GoogleSignInAccount googleSignInAccount =
           await googleSignIn.authenticate();
 
-      print(googleSignInAccount.authentication);
+      final GoogleSignInAuthentication googleSignInAuthentication =
+          googleSignInAccount.authentication;
+      final AuthCredential authCredential = GoogleAuthProvider.credential(
+        idToken: googleSignInAuthentication.idToken,
+      );
 
-      if (googleSignInAccount != null) {
-        final GoogleSignInAuthentication googleSignInAuthentication =
-            await googleSignInAccount.authentication;
-        final AuthCredential authCredential = GoogleAuthProvider.credential(
-          idToken: googleSignInAuthentication.idToken,
-        );
+      // Getting users credential
+      UserCredential result = await auth.signInWithCredential(authCredential);
 
-        // Getting users credential
-        UserCredential result = await auth.signInWithCredential(authCredential);
-
-        return result;
-      } else {
-        appSnackbar(content: 'Login unsuccessful', error: true);
-        return null;
-      }
+      return result;
     } catch (e) {
       appSnackbar(content: 'Google Error: ${e.toString()}', error: true);
       print("ERROR::: ${e.toString()}");

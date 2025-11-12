@@ -50,6 +50,7 @@ class AppStrings {
   static String name = "Name";
   static String purchase_item = "Purchase item";
   static String commission = "Commission";
+  static String noRefferal = "No referrals found";
 
   //snackbars
   static String no_internet = 'No internet connection';

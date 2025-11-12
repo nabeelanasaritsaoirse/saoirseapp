@@ -21,3 +21,27 @@ class ReferralUser {
     required this.commission,
   });
 }
+
+
+class ReferralResponse {
+  final bool success;
+  final String referralCode;
+  final bool isExistingCode;
+  final String message;
+
+  ReferralResponse({
+    required this.success,
+    required this.referralCode,
+    required this.isExistingCode,
+    required this.message,
+  });
+
+  factory ReferralResponse.fromJson(Map<String, dynamic> json) {
+    return ReferralResponse(
+      success: json['success'] ?? false,
+      referralCode: json['referralCode'] ?? '',
+      isExistingCode: json['isExistingCode'] ?? false,
+      message: json['message'] ?? '',
+    );
+  }
+}
