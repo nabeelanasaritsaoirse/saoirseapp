@@ -51,6 +51,17 @@ class AppStrings {
   static String purchase_item = "Purchase item";
   static String commission = "Commission";
   static String noRefferal = "No referrals found";
+  static String fetching_message = "Fetching your code...";
+  static String no_code_fount = "No code found";
+  static String whatsapp = 'WhatsApp';
+  static String facebook = 'Facebook';
+  static String telegram = 'Telegram';
+  static String twitter = 'Twitter';
+  static String gmail = 'Gmail';
+  static String more = 'More';
+  static String your_refferal = "Your referral";
+  
+  
 
   //snackbars
   static String no_internet = 'No internet connection';

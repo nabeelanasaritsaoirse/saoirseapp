@@ -8,7 +8,6 @@ import 'refferal_controller.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 
-
 class ReferralScreen extends StatelessWidget {
   const ReferralScreen({super.key});
 
@@ -27,7 +26,7 @@ class ReferralScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.r),
         ),
         child: Padding(
-          padding: EdgeInsets.all(padding!),
+          padding: EdgeInsets.all(padding!.w),
           child: Image.asset(image!),
         ),
       );
@@ -108,23 +107,23 @@ class ReferralScreen extends StatelessWidget {
                               vertical: 16.h,
                             ),
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black26),
+                              border: Border.all(color: AppColors.shadowColor),
                               borderRadius: BorderRadius.circular(10.r),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const SizedBox(
-                                  height: 22,
-                                  width: 22,
+                                SizedBox(
+                                  height: 22.h,
+                                  width: 22.w,
                                   child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.black54,
+                                    strokeWidth: 2.w,
+                                    color: AppColors.darkGray,
                                   ),
                                 ),
                                 SizedBox(width: 12.w),
                                 appText(
-                                  "Fetching your code...",
+                                  AppStrings.fetching_message,
                                   fontSize: 14.sp,
                                   color: AppColors.grey,
                                 ),
@@ -141,22 +140,21 @@ class ReferralScreen extends StatelessWidget {
                               vertical: 12.h,
                             ),
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black54),
+                              border: Border.all(color: AppColors.shadowColor),
                               borderRadius: BorderRadius.circular(10.r),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 appText(
-                                  "No code found",
+                                  AppStrings.no_code_fount,
                                   fontSize: 14.sp,
                                   color: AppColors.grey,
                                   fontWeight: FontWeight.w500,
                                 ),
                                 SizedBox(width: 10.w),
                                 InkWell(
-                                  onTap: controller
-                                      .getReferralCode, 
+                                  onTap: controller.getReferralCode,
                                   child: Icon(
                                     Icons.refresh_rounded,
                                     size: 20.sp,
@@ -175,7 +173,7 @@ class ReferralScreen extends StatelessWidget {
                             vertical: 10.h,
                           ),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black87),
+                            border: Border.all(color: AppColors.shadowColor),
                             borderRadius: BorderRadius.circular(10.r),
                           ),
                           child: Row(
@@ -218,58 +216,74 @@ class ReferralScreen extends StatelessWidget {
                         children: [
                           _buildSocialButton(
                             image: AppAssets.whatsapp,
-                            label: 'WhatsApp',
-                            color: const Color(0xFF25D366),
+                            label: AppStrings.whatsapp,
+                            color: AppColors.transparent,
                             onTap: controller.shareToWhatsApp,
+                            width: 40.h,
+                            height: 40.h,
+                            radius: 60.r,
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12.w),
                           _buildSocialButton(
                             image: AppAssets.facebook,
-                            label: 'Facebook',
+                            label: AppStrings.facebook,
                             color: AppColors.transparent,
                             onTap: controller.shareToFacebook,
+                            width: 40.h,
+                            height: 40.h,
+                            radius: 60.r,
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12.w),
                           _buildSocialButton(
                             image: AppAssets.telegram,
-                            label: 'Telegram',
+                            label: AppStrings.telegram,
                             color: AppColors.transparent,
                             onTap: controller.shareToTelegram,
+                            width: 40.h,
+                            height: 40.h,
+                            radius: 60.r,
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12.w),
                           _buildSocialButton(
                             image: AppAssets.x,
-                            label: 'Twitter',
+                            label: AppStrings.twitter,
                             color: AppColors.transparent,
                             onTap: controller.shareToTwitter,
+                            width: 40.h,
+                            height: 40.h,
+                            radius: 60.r,
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12.w),
                           _buildSocialButton(
                             image: AppAssets.gmail,
-                            label: 'Gmail',
+                            label: AppStrings.gmail,
                             color: AppColors.transparent,
                             onTap: controller.shareToGmail,
+                            width: 40.h,
+                            height: 40.h,
+                            radius: 60.r,
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12.w),
                           InkWell(
                             onTap: () {},
                             child: Column(
                               children: [
                                 Container(
-                                  width: 45.h,
-                                  height: 45.h,
+                                  width: 40.h,
+                                  height: 40.h,
                                   decoration: BoxDecoration(
                                     color: AppColors.grey,
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(Icons.more_horiz),
                                 ),
-                                const SizedBox(height: 6),
-                              
-                                appText('More',
-                                fontSize: 12.sp,
-                                color: AppColors.darkGray
-                                )
+                                 SizedBox(height: 6.h),
+
+                                appText(
+                                  AppStrings.more,
+                                  fontSize: 12.sp,
+                                  color: AppColors.darkGray,
+                                ),
                               ],
                             ),
                           ),
@@ -278,12 +292,12 @@ class ReferralScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 28.h),
 
-                    // 🔹 Your Referral Section
+                    // Your Referral Section
                     appText(
-                      "Your referral",
+                      AppStrings.your_refferal,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: AppColors.textBlack,
                     ),
                     SizedBox(height: 12.h),
 
@@ -310,14 +324,13 @@ class ReferralScreen extends StatelessWidget {
                     SizedBox(height: 20.h),
 
                     // Table Header
-                
                     Container(
                       padding: EdgeInsets.symmetric(
                         vertical: 10.h,
                         horizontal: 16.w,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         borderRadius: BorderRadius.circular(12.r),
                         boxShadow: [
                           BoxShadow(
@@ -377,9 +390,9 @@ class ReferralScreen extends StatelessWidget {
 
                     Obx(() {
                       if (controller.isDashboardLoading.value) {
-                        return const Center(
+                        return  Center(
                           child: Padding(
-                            padding: EdgeInsets.all(20),
+                            padding: EdgeInsets.all(20.w),
                             child: CircularProgressIndicator(),
                           ),
                         );
@@ -387,7 +400,7 @@ class ReferralScreen extends StatelessWidget {
 
                       if (controller.filteredReferrals.isEmpty) {
                         return Padding(
-                          padding: const EdgeInsets.all(20),
+                          padding: EdgeInsets.all(20.w),
                           child: Center(
                             child: appText(
                               AppStrings.noRefferal,
@@ -428,57 +441,50 @@ class ReferralScreen extends StatelessWidget {
                                   boxShadow: [
                                     BoxShadow(
                                       color: AppColors.shadowColor,
-                                      blurRadius: 8,
-                                      spreadRadius: 1,
+                                      blurRadius: 8.r,
+                                      spreadRadius: 1.r,
                                       offset: const Offset(0, 2),
                                     ),
                                   ],
                                 ),
                                 child: Row(
                                   children: [
-                                    // 🔹 No.
+                                    // No.
                                     Expanded(
                                       flex: 1,
-                                      child: Text(
+                                      child: appText(
                                         index.toString(),
-                                        style: TextStyle(
-                                          fontSize: 13.sp,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black,
-                                        ),
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.textBlack,
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
 
-                                    // 🔹 Name
+                                    // Name
                                     Expanded(
                                       flex: 3,
-                                      child: Text(
+                                      child: appText(
                                         user.name,
-                                        style: TextStyle(
-                                          fontSize: 13.sp,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black,
-                                        ),
-                                        textAlign: TextAlign.start,
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.textBlack,
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
 
-                                    // 🔹 Purchase Progress (2/17)
+                                    // Purchase Progress (2/17)
                                     Expanded(
                                       flex: 3,
-                                      child: Text(
+                                      child: appText(
                                         user.progress.isNotEmpty
                                             ? user.progress
                                             : "$daysPaid/$totalDays",
-                                        style: TextStyle(
-                                          fontSize: 13.sp,
-                                          fontWeight: FontWeight.w500,
-                                          color: hasPurchased == 'Yes'
-                                              ? Colors.green
-                                              : Colors.grey.shade600,
-                                        ),
-                                        textAlign: TextAlign.center,
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: hasPurchased == 'Yes'
+                                            ? AppColors.green
+                                            : AppColors.mediumGray,
                                       ),
                                     ),
 
@@ -490,7 +496,7 @@ class ReferralScreen extends StatelessWidget {
                                         style: TextStyle(
                                           fontSize: 13.sp,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.black,
+                                          color: AppColors.textBlack,
                                         ),
                                         textAlign: TextAlign.end,
                                       ),
@@ -517,24 +523,27 @@ class ReferralScreen extends StatelessWidget {
     required String label,
     required Color color,
     required VoidCallback onTap,
+    required double height,
+    required double width,
+    required double radius,
   }) {
     return InkWell(
       onTap: onTap,
       child: Column(
         children: [
           Container(
-            width: 45,
-            height: 45,
+            width: width,
+            height: height,
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(50.r),
-              child: Image.asset(image, fit: BoxFit.contain),
+              borderRadius: BorderRadius.circular(radius),
+              child: Image.asset(image, fit: BoxFit.cover),
             ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6.h),
           Text(
             label,
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 10.sp, color: AppColors.grey),
           ),
         ],
       ),
