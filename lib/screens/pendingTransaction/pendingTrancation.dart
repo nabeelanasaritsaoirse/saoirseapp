@@ -13,53 +13,69 @@ class Pendingtrancation extends StatefulWidget {
 }
 
 class _PendingtrancationState extends State<Pendingtrancation> {
+  final List<Map<String, dynamic>> transactions = [
+    {
+      "title": "Mitzie organic",
+      "subtitle": "Red | 1TB",
+      "price": 999,
+      "image":
+          "https://images.unsplash.com/photo-1549049950-48d5887197a0?auto=format&fit=crop&q=60&w=600",
+    },
+    {
+      "title": "Boat wear",
+      "subtitle": "Red | 1TB",
+      "price": 100,
+      "image":
+          "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=60&w=600",
+    },
+    {
+      "title": "GUCCI",
+      "subtitle": "Red | 1TB",
+      "price": 566,
+      "image":
+          'https://plus.unsplash.com/premium_photo-1664392147011-2a720f214e01?auto=format&fit=crop&q=60&w=600',
+    },
+    {
+      "title": "Sony camera",
+      "subtitle": "Gray | 512GB",
+      "price": 15000,
+      "image":
+          'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&q=60&w=600',
+    },
+  ];
+
+  late List<bool> selectedList = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    selectedList = List.generate(transactions.length, (index) => true);
+  }
+
+  int get totalAmount {
+    int total = 0;
+    for (int i = 0; i < transactions.length; i++) {
+      if (selectedList[i]) {
+        total += transactions[i]['price'] as int;
+      }
+    }
+    return total;
+  }
+
   @override
   Widget build(BuildContext context) {
-    int selectedIndex = 0;
-    final List<Map<String, dynamic>> transactions = [
-      {
-        "title": "Mitzie organic",
-        "subtitle": "Red | 1TB",
-        "price": 999,
-        "image":
-            "https://images.unsplash.com/photo-1549049950-48d5887197a0?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHByb2R1Y3R8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600",
-      },
-      {
-        "title": "Boat wear",
-        "subtitle": "Red | 1TB",
-        "price": 100,
-        "image":
-            "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
-      },
-      {
-        "title": "GUCCI",
-        "subtitle": "Red | 1TB",
-        "price": 566,
-        "image":
-            'https://plus.unsplash.com/premium_photo-1664392147011-2a720f214e01?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600',
-      },
-      {
-        "title": "Sony camera",
-        "subtitle": "Gray | 512GB",
-        "price": 15000,
-        "image":
-            'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600',
-      },
-    ];
     return Scaffold(
       backgroundColor: AppColors.lightGrey,
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
         elevation: 0,
         leading: GestureDetector(
-          child: Icon(
-            Icons.arrow_back_ios_new,
-            color: AppColors.white,
-            size: 30.sp,
-          ),
           onTap: () {
-            //BACK BUTTON FUNCTION
+            Navigator.pop(context);
           },
+          child: Icon(Icons.arrow_back_ios_new,
+              color: AppColors.white, size: 30.sp),
         ),
         title: appText(
           "Pending Transaction",
@@ -78,10 +94,11 @@ class _PendingtrancationState extends State<Pendingtrancation> {
               itemCount: transactions.length,
               itemBuilder: (context, index) {
                 final item = transactions[index];
+                final isSelected = selectedList[index];
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      selectedIndex = index;
+                      selectedList[index] = !selectedList[index];
                     });
                   },
                   child: Container(
@@ -101,12 +118,7 @@ class _PendingtrancationState extends State<Pendingtrancation> {
                       children: [
                         SizedBox(width: 6.w),
                         ClipRRect(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(8.r),
-                            bottomLeft: Radius.circular(8.r),
-                            bottomRight: Radius.circular(8.r),
-                            topRight: Radius.circular(8.r),
-                          ),
+                          borderRadius: BorderRadius.circular(8.r),
                           child: Image.network(
                             item["image"],
                             width: 80.w,
@@ -117,9 +129,7 @@ class _PendingtrancationState extends State<Pendingtrancation> {
                         Expanded(
                           child: Padding(
                             padding: EdgeInsets.symmetric(
-                              horizontal: 10.w,
-                              vertical: 10.h,
-                            ),
+                                horizontal: 10.w, vertical: 10.h),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -142,29 +152,25 @@ class _PendingtrancationState extends State<Pendingtrancation> {
                                 Row(
                                   children: [
                                     GestureDetector(
-                                      child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 10.w,
-                                            vertical: 4.h,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primaryColor,
-                                            borderRadius:
-                                                BorderRadius.circular(6.r),
-                                          ),
-                                          child: appText(
-                                            "Pay Now",
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.white,
-                                            fontFamily: "poppins",
-                                          )),
                                       onTap: () {
-                                        //
-                                        // PAY NOW BUTTON FUNCTION
-
-                                        //
+                                        // PAY NOW BUTTON (BLUE)
                                       },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w, vertical: 4.h),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primaryColor,
+                                          borderRadius:
+                                              BorderRadius.circular(6.r),
+                                        ),
+                                        child: appText(
+                                          "Pay Now",
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.white,
+                                          fontFamily: "poppins",
+                                        ),
+                                      ),
                                     ),
                                     SizedBox(width: 10.w),
                                     appText(
@@ -183,10 +189,12 @@ class _PendingtrancationState extends State<Pendingtrancation> {
                         Padding(
                           padding: EdgeInsets.only(right: 12.w),
                           child: Icon(
-                            selectedIndex == index
-                                ? Icons.radio_button_checked
-                                : Icons.radio_button_off,
-                            color: AppColors.primaryColor,
+                            isSelected
+                                ? Icons.check_circle
+                                : Icons.radio_button_unchecked,
+                            color: isSelected
+                                ? AppColors.primaryColor
+                                : AppColors.grey,
                           ),
                         ),
                       ],
@@ -222,9 +230,9 @@ class _PendingtrancationState extends State<Pendingtrancation> {
                       fontFamily: "poppins",
                     ),
                     appText(
-                      "₹${transactions[selectedIndex]['price']}",
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w500,
+                      "₹$totalAmount",
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.black,
                       fontFamily: "poppins",
                     ),
@@ -232,9 +240,7 @@ class _PendingtrancationState extends State<Pendingtrancation> {
                 ),
                 appButton(
                   onTap: () {
-                    //
-                    // PAY NOW BUTTON FUNCTION
-                    //
+                    //   PAYNOW BUTTON FUNCTION (YELLOW)
                   },
                   child: Center(
                     child: appText(
@@ -252,7 +258,7 @@ class _PendingtrancationState extends State<Pendingtrancation> {
                   fontWeight: FontWeight.w600,
                   borderColor: AppColors.primaryColor,
                   buttonColor: AppColors.mediumAmber,
-                )
+                ),
               ],
             ),
           ),
