@@ -265,7 +265,7 @@ class ReferralScreen extends StatelessWidget {
                           ),
                           SizedBox(width: 12.w),
                           InkWell(
-                            onTap: () {},
+                            onTap: () => controller.shareMore(),
                             child: Column(
                               children: [
                                 Container(
@@ -277,7 +277,7 @@ class ReferralScreen extends StatelessWidget {
                                   ),
                                   child: Icon(Icons.more_horiz),
                                 ),
-                                 SizedBox(height: 6.h),
+                                SizedBox(height: 6.h),
 
                                 appText(
                                   AppStrings.more,
@@ -390,7 +390,7 @@ class ReferralScreen extends StatelessWidget {
 
                     Obx(() {
                       if (controller.isDashboardLoading.value) {
-                        return  Center(
+                        return Center(
                           child: Padding(
                             padding: EdgeInsets.all(20.w),
                             child: CircularProgressIndicator(),
