@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:saoirse_app/constants/app_colors.dart';
 import 'app_text.dart';
 
 Widget appButton({
@@ -39,12 +40,12 @@ Widget appButton({
             (buttonText != null
                 ? appText(
                     buttonText,
-                    color: textColor ?? Colors.white,
+                    color: textColor ?? AppColors.white,
                     fontFamily: fontFamily,
                     fontSize: fontSize ?? 16.sp,
                     fontWeight: fontWeight ?? FontWeight.w600,
                   )
-                : const SizedBox()), // 👈 Fallback when no text or child
+                : const SizedBox()), 
       ),
     ),
   );

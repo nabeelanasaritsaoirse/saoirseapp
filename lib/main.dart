@@ -7,9 +7,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:saoirse_app/screens/pendingTransaction/pendingTrancation.dart';
-import 'package:saoirse_app/screens/productListing/product_listing.dart';
-import 'package:saoirse_app/screens/transaction_succsess/transactionSuccsess.dart';
+import 'package:saoirse_app/screens/home/home_screen.dart';
+import 'package:saoirse_app/screens/invite_friend/invite_friend_details_screen.dart';
+import 'package:saoirse_app/screens/product_details/product_details_screen.dart';
+
 
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
@@ -38,7 +39,7 @@ Future<void> main() async {
           projectId: 'saoirse-epi',
         ));
   String? lang = storage
-      .read('language'); // ✅ use the GetStorage instance you already defined
+      .read('language'); 
   Locale locale = lang != null ? Locale(lang) : const Locale('en');
 
   runApp(MyApp(locale: locale));
@@ -77,10 +78,10 @@ class MyApp extends StatelessWidget {
               textTheme: GoogleFonts.poppinsTextTheme(),
               highlightColor: AppColors.transparent,
               splashColor: AppColors.transparent,
-              useMaterial3: true, // optional modern UI
+              useMaterial3: true, 
             ),
             scrollBehavior: CustomScrollBehavior(),
-            home: SplashScreen(),
+            home: InviteFriendDetailsScreen(),
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,

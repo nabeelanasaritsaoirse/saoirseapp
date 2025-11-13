@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_assets.dart';
-import 'package:saoirse_app/constants/app_colors.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
-import 'package:saoirse_app/models/invite_friend_product_model.dart';
-import 'package:saoirse_app/screens/invite_friend/invite_friend_controller.dart';
-import 'package:saoirse_app/widgets/app_button.dart';
-import 'package:saoirse_app/widgets/app_text.dart';
-import 'package:saoirse_app/widgets/product_details_dialog.dart';
+
+import '../../constants/app_assets.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
+import '../../models/invite_friend_product_model.dart';
+import '../../screens/invite_friend/invite_friend_controller.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_text.dart';
+import '../../widgets/product_details_dialog.dart';
+
 
 class InviteFriendDetailsScreen extends StatelessWidget {
   const InviteFriendDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController messageController = TextEditingController();
+
     final controller = Get.put(InviteFriendController());
 
     return Scaffold(
@@ -134,7 +138,9 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                         ),
                       ),
                       appButton(
-                        onTap: () {},
+                        onTap: () {
+                         
+                        },
                         width: 89.w,
                         height: 25.h,
                         padding: EdgeInsets.all(5.w),

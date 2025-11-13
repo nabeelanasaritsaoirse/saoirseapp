@@ -2,6 +2,7 @@
 
 class AppStrings {
   static String app_name = 'EPI';
+  static String ok = "Ok";
 
   //signin screen
   static String sign_in = 'Sign In';
@@ -39,6 +40,7 @@ class AppStrings {
   static String description = "Description";
   static String selectPlan = "Select Plan";
   static String checkout = "Check Out";
+  static String addToCart = "Add to Cart";
 
   // Refferal page
   static String refferalTitle = "Referral Details";
@@ -88,6 +90,19 @@ class AppStrings {
   static String days = "Days";
   static String day = "/Day";
   static String each = "/Each";
+
+  // select planning sheet
+  static String select_plan = "Select Your Plan";
+  static String costomize_plan = "Customize My Plan";
+  static String enter_days = "Enter the days";
+  static String enter_amount = "Enter the Amount";
+  static String convert = "Convert";
+  static String auto_generated = "Auto generated";
+  static String recommented = "Recommended";
+  static String equivalent_time = "Equivalent Time:";
+  static String start_on = "Start On";
+  static String end_on = "Start On";
+  static String selected = "Selected";
 
   //snackbars
   static String no_internet = 'No internet connection';

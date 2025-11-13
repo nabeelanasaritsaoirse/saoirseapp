@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_assets.dart';
-import 'package:saoirse_app/models/product_details_model.dart';
-import 'package:saoirse_app/models/product_model.dart';
+
+import '../../constants/app_assets.dart';
+import '../../models/product_details_model.dart';
+import '../../models/product_model.dart';
+import '../../widgets/select_plan_sheet.dart';
+
 
 class ProductDetailsController extends GetxController {
   // UI States
@@ -10,6 +13,7 @@ class ProductDetailsController extends GetxController {
   final RxInt selectedColorIndex = 0.obs;
   final RxInt selectedStorageIndex = 0.obs;
   final RxBool isFavorite = false.obs;
+  final RxInt selectedPlanIndex = (-1).obs;
 
   // Bottom buttons visibility
   final RxBool showBottomButtons = false.obs;
@@ -152,15 +156,27 @@ class ProductDetailsController extends GetxController {
   }
 
   // 🛒 Button Actions
-  void handleSelectPlan() {
-    // TODO: Implement plan selection logic
-    Get.snackbar(
-      'Select Plan',
-      'Plan selection feature coming soon',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: Duration(seconds: 2),
-    );
-  }
+  // void handleSelectPlan() {
+  //   // TODO: Implement plan selection logic
+  //   Get.snackbar(
+  //     'Select Plan',
+  //     'Plan selection feature coming soon',
+  //     snackPosition: SnackPosition.BOTTOM,
+  //     duration: Duration(seconds: 2),
+  //   );
+  // }
+  void openSelectPlanSheet() {
+  Get.bottomSheet(
+    SelectPlanSheet(),
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+  );
+}
+
+
 
   void handleCheckout() {
    

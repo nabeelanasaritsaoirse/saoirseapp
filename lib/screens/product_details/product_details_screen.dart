@@ -2,11 +2,14 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
+import '../../widgets/warning_dialog.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_text.dart';
 import 'product_details_controller.dart';
+
 
 class ProductDetailsScreen extends StatelessWidget {
   const ProductDetailsScreen({super.key});
@@ -31,8 +34,7 @@ class ProductDetailsScreen extends StatelessWidget {
                     children: [
                       CarouselSlider(
                         options: CarouselOptions(
-                          height: 280
-                              .h, 
+                          height: 280.h,
                           viewportFraction: 1.0,
                           enableInfiniteScroll: false,
                           onPageChanged: (index, reason) {
@@ -45,7 +47,7 @@ class ProductDetailsScreen extends StatelessWidget {
                             alignment: Alignment.center,
                             child: ConstrainedBox(
                               constraints: BoxConstraints(
-                                maxHeight: 250.h, 
+                                maxHeight: 250.h,
                                 minHeight: 150.h,
                                 maxWidth: double.infinity,
                               ),
@@ -53,7 +55,7 @@ class ProductDetailsScreen extends StatelessWidget {
                                 padding: EdgeInsets.all(15.0.w),
                                 child: Image.asset(
                                   image,
-                                  fit: BoxFit.contain, 
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                             ),
@@ -72,30 +74,27 @@ class ProductDetailsScreen extends StatelessWidget {
                                 .asMap()
                                 .entries
                                 .map((entry) {
-                                  final index = entry.key;
-                                  return AnimatedContainer(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut,
-                                    width:
-                                        controller.currentImageIndex.value ==
-                                            index
+                              final index = entry.key;
+                              return AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                                width:
+                                    controller.currentImageIndex.value == index
                                         ? 18.w
                                         : 8.w,
-                                    height: 6.h,
-                                    margin: EdgeInsets.symmetric(
-                                      horizontal: 2.w,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(4.r),
-                                      color:
-                                          controller.currentImageIndex.value ==
-                                              index
-                                          ? AppColors.black
-                                          : AppColors.textBlack,
-                                    ),
-                                  );
-                                })
-                                .toList(),
+                                height: 6.h,
+                                margin: EdgeInsets.symmetric(
+                                  horizontal: 2.w,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  color: controller.currentImageIndex.value ==
+                                          index
+                                      ? AppColors.black
+                                      : AppColors.textBlack,
+                                ),
+                              );
+                            }).toList(),
                           ),
                         ),
                       ),
@@ -229,7 +228,6 @@ class ProductDetailsScreen extends StatelessWidget {
                                         size: 8.sp,
                                         color: AppColors.darkAmber,
                                       ),
-
                                       appText("4.3", fontSize: 8.sp),
                                     ],
                                   ),
@@ -250,7 +248,6 @@ class ProductDetailsScreen extends StatelessWidget {
                                 fontSize: 24,
                                 textAlign: TextAlign.left,
                                 fontWeight: FontWeight.bold,
-
                                 color: AppColors.textBlack,
                               ),
                             ),
@@ -314,7 +311,7 @@ class ProductDetailsScreen extends StatelessWidget {
                               return Obx(() {
                                 final isSelected =
                                     controller.selectedColorIndex.value ==
-                                    index;
+                                        index;
                                 return GestureDetector(
                                   onTap: () => controller.selectColor(index),
                                   child: Container(
@@ -363,7 +360,7 @@ class ProductDetailsScreen extends StatelessWidget {
                               (index) {
                                 final isSelected =
                                     controller.selectedStorageIndex.value ==
-                                    index;
+                                        index;
                                 return GestureDetector(
                                   onTap: () => controller.selectStorage(index),
                                   child: AnimatedContainer(
@@ -422,16 +419,13 @@ class ProductDetailsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 10.h),
-
                     appText(
                       AppStrings.description,
-
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textBlack,
                     ),
                     SizedBox(height: 8.h),
-
                     appText(
                       controller.product.description,
                       fontSize: 12.sp,
@@ -460,7 +454,6 @@ class ProductDetailsScreen extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.06,
                             ),
-
                             appText(
                               AppStrings.see_all,
                               fontSize: 15.sp,
@@ -566,7 +559,6 @@ class ProductDetailsScreen extends StatelessWidget {
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
-
                                               Spacer(),
                                               Container(
                                                 padding: EdgeInsets.symmetric(
@@ -577,8 +569,8 @@ class ProductDetailsScreen extends StatelessWidget {
                                                   color: AppColors.lightAmber,
                                                   borderRadius:
                                                       BorderRadius.circular(
-                                                        10.r,
-                                                      ),
+                                                    10.r,
+                                                  ),
                                                 ),
                                                 child: Row(
                                                   mainAxisAlignment:
@@ -591,7 +583,6 @@ class ProductDetailsScreen extends StatelessWidget {
                                                       color:
                                                           AppColors.darkAmber,
                                                     ),
-
                                                     appText(
                                                       "4.3",
                                                       fontSize: 8.sp,
@@ -610,7 +601,6 @@ class ProductDetailsScreen extends StatelessWidget {
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
-
                                           SizedBox(height: 2.h),
                                           appText(
                                             '₹ ${product.price.toStringAsFixed(0)}',
@@ -724,7 +714,6 @@ class ProductDetailsScreen extends StatelessWidget {
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
-
                                               Spacer(),
                                               Container(
                                                 padding: EdgeInsets.symmetric(
@@ -735,8 +724,8 @@ class ProductDetailsScreen extends StatelessWidget {
                                                   color: AppColors.lightAmber,
                                                   borderRadius:
                                                       BorderRadius.circular(
-                                                        10.r,
-                                                      ),
+                                                    10.r,
+                                                  ),
                                                 ),
                                                 child: Row(
                                                   mainAxisAlignment:
@@ -749,7 +738,6 @@ class ProductDetailsScreen extends StatelessWidget {
                                                       color:
                                                           AppColors.darkAmber,
                                                     ),
-
                                                     appText(
                                                       "4.3",
                                                       fontSize: 8.sp,
@@ -768,7 +756,6 @@ class ProductDetailsScreen extends StatelessWidget {
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
-
                                           SizedBox(height: 2.h),
                                           appText(
                                             '₹ ${product.price.toStringAsFixed(0)}',
@@ -790,98 +777,94 @@ class ProductDetailsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              Obx(() {
-                return AnimatedPositioned(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOut,
-                  bottom: controller.showBottomButtons.value ? 0 : -80.h,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 8.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(16.r),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.shadowColor,
-                          blurRadius: 8.r,
-                          offset: const Offset(0, -2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        /// 🔹 Select Plan Button
-                        Expanded(
-                          child: OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: AppColors.white,
-                              side: BorderSide(color: AppColors.shadowColor),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              padding: EdgeInsets.symmetric(vertical: 10.h),
-                            ),
-                            onPressed: () {},
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  AppStrings.selectPlan,
-                                  style: TextStyle(
-                                    color: AppColors.textBlack,
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: AppColors.textBlack,
-                                  size: 20.sp,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(width: 10.w),
-
-                        /// 🔹 Check Out Button
-                        Expanded(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.gradientDarkBlue,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              padding: EdgeInsets.symmetric(vertical: 10.h),
-                            ),
-                            onPressed: () {
-                              // handle checkout action
-                            },
-                            child: Text(
-                              AppStrings.checkout,
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }),
             ],
           ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15.r), topRight: Radius.circular(15.r)),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowColor,
+              blurRadius: 8,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            /// 🔹 Select Plan Button
+            Expanded(
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: AppColors.white,
+                  side: BorderSide(color: AppColors.shadowColor),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 10.h),
+                ),
+                onPressed: () => controller.openSelectPlanSheet(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      AppStrings.selectPlan,
+                      style: TextStyle(
+                        color: AppColors.textBlack,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      color: AppColors.textBlack,
+                      size: 20.sp,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            SizedBox(width: 10.w),
+
+            /// 🔹 Check Out Button
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.gradientDarkBlue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 10.h),
+                ),
+                onPressed: () {
+                  if (controller.selectedPlanIndex.value == -1) {
+                    WarningDialog.show(
+                      title: "Please Select Your Plan",
+                      message:
+                          "You haven’t selected a plan yet. Please choose a plan before proceeding to Add to Cart.",
+                    );
+                    return;
+                  }
+
+                  controller.handleCheckout();
+                },
+                child: Text(
+                  AppStrings.addToCart,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
