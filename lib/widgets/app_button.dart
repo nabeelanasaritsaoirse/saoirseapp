@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'app_text.dart';
 
 Widget appButton({
-  required Function() onTap,
+  required VoidCallback onTap,
   double? height,
   double? width,
   EdgeInsets? padding,
-  BorderRadiusGeometry? borderRadius,
+  BorderRadius? borderRadius,
   double? borderWidth,
   Color? borderColor,
   Color? buttonColor,
@@ -22,29 +21,32 @@ Widget appButton({
 }) {
   return InkWell(
     onTap: onTap,
+    borderRadius: borderRadius ?? BorderRadius.circular(15.r),
     child: Container(
-      width: width,
-      height: height,
-      padding: padding,
+      width: width ?? double.infinity,
+      height: height ?? 48.h,
+      padding: padding ?? EdgeInsets.symmetric(vertical: 10.h),
       decoration: BoxDecoration(
         color: buttonColor,
         gradient: gradient,
         borderRadius: borderRadius ?? BorderRadius.circular(15.r),
         border: borderColor != null
-            ? Border.all(width: borderWidth!, color: borderColor)
-            : const Border(),
+            ? Border.all(width: borderWidth ?? 1, color: borderColor)
+            : null,
       ),
       child: Center(
-        child:
-            child ??
-            appText(
-              buttonText!,
-              color: textColor,
-              fontFamily: fontFamily,
-              fontSize: fontSize ?? 16.sp,
-              fontWeight: fontWeight ?? FontWeight.w600,
-            ),
+        child: child ??
+            (buttonText != null
+                ? appText(
+                    buttonText,
+                    color: textColor ?? Colors.white,
+                    fontFamily: fontFamily,
+                    fontSize: fontSize ?? 16.sp,
+                    fontWeight: fontWeight ?? FontWeight.w600,
+                  )
+                : const SizedBox()), // 👈 Fallback when no text or child
       ),
     ),
   );
 }
+

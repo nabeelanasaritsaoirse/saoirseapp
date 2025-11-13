@@ -30,6 +30,10 @@ class AppColors {
   static const Color skyBlue = Color(0xFF9BBBFC);
   static const Color lightRed = Color(0xFFFF5B5B);
   static const Color lightGreen = Color(0xFFE8F5E9);
+  static const Color buttonSecondary = Color(0xFF9BBEF4);
+  static const Color mediumGreen = Color(0xFFA0D69A);
+
+
 
   // 🎨 Gradient Colors
   static const Color gradientLightBlue = Color(0xFF4F4FBC);
