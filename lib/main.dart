@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:saoirse_app/screens/pendingTransaction/pendingTrancation.dart';
+import 'package:saoirse_app/screens/productListing/product_listing.dart';
+import 'package:saoirse_app/screens/transaction_succsess/transactionSuccsess.dart';
 
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
@@ -78,7 +80,7 @@ class MyApp extends StatelessWidget {
               useMaterial3: true, // optional modern UI
             ),
             scrollBehavior: CustomScrollBehavior(),
-            home: SplashScreen(),
+            home: Transactionsuccsess(),
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
