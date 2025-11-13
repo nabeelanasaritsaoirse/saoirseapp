@@ -41,8 +41,10 @@ class AppStrings {
   static String checkout = "Check Out";
 
   // Refferal page
-  static String refferalTitle = "Referral";
-  static String referalBannerContent = "Invite Friends\nEarn Money\nStart Referring Today!";
+  static String refferalTitle = "Referral Details";
+  static String refferal_details = "Referral";
+  static String referalBannerContent =
+      "Invite Friends\nEarn Money\nStart Referring Today!";
   static String refer_via = "Refer Via";
   static String shareTo = "Share to";
   static String search = "Search";
@@ -60,8 +62,32 @@ class AppStrings {
   static String gmail = 'Gmail';
   static String more = 'More';
   static String your_refferal = "Your referral";
-  
-  
+
+  // Invite friend Details page
+  static String referal_screen_label = "Referal Details";
+  static String productId = "Product ID";
+  static String amount = "Amount";
+  static String pending_status = "Pending Status";
+  static String view_details = "View Details";
+  static String user_name = "Rajive Kumar";
+  static String user_email = "rajive.kumar@gmail.com";
+  static String total_product = "Total Product";
+  static String my_commission = "My commission";
+  static String message = "Message Me";
+  static String product = "Products";
+  static String no_products = "No products available";
+  static String dp = "D.P  ";
+  static String date_of_purchase = "Date of Purchase";
+  static String total_price = "Total price";
+  static String daily_sip = "Daily SIP";
+  static String myCommission = "My Commission";
+  static String myTotalErnings = "My Total Ernings";
+  static String pending_inv = "Pending Investment";
+  static String close = 'Close';
+  static String last = "Last ";
+  static String days = "Days";
+  static String day = "/Day";
+  static String each = "/Each";
 
   //snackbars
   static String no_internet = 'No internet connection';
@@ -72,4 +98,10 @@ class AppStrings {
   static String invalid_pass =
       'Password length should be minimum 8 with uppercase, lowercase, number, and special character.';
   static String invalid_phone = 'Please enter valid phone number';
+
+  //payment Succsess
+  static String confirm = "Confirm";
+  static String payment_Sucsess_note =
+      "Thank you for your payment!\nStay consistent with your daily payments and get your product when the plan completes.";
+  static String payment_Sucsess = "Payment success!";
 }

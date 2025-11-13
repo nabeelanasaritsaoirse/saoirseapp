@@ -8,7 +8,7 @@ import 'package:iconsax/iconsax.dart';
 import '../../constants/app_colors.dart';
 import '../category/category_screen.dart';
 import '../home/home_screen.dart';
-import '../refferal/refferal_screen.dart';
+import '../refferal/referral_screen.dart';
 import 'dashboard_controller.dart';
 
 class DashboardScreen extends StatelessWidget {

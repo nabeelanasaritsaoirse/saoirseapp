@@ -42,4 +42,7 @@ class AppAssets {
   static String x = "assets/images/x.png";
   static String gmail = "assets/images/gmail.png";
   static String message = "assets/icons/message.png";
+
+  // Invite friend details page
+  static String profile_image = "assets/images/profile_image.jpg";
 }
