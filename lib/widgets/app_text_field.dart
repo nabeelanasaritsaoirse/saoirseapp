@@ -107,6 +107,7 @@ class _appTextFieldState extends State<appTextField> {
         ),
       ),
       decoration: InputDecoration(
+        isDense: true,
         contentPadding: widget.contentPadding ??
             EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
         filled: widget.fillColor != null,

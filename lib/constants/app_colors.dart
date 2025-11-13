@@ -16,6 +16,7 @@ class AppColors {
   static const Color shadowColor = Colors.black12;
   static const Color darkGray = Color(0x99000000);
   static const Color mediumGray = Color(0xFF757575);
+  static const Color yellow = Color(0xFFFFF9C4);
 
   //  Accent / Secondary Colors
   static const Color lightAmber = Color(0xFFF4BD46);

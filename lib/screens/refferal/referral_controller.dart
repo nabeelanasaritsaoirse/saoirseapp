@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:android_intent_plus/android_intent.dart';
-
 import 'package:get/get.dart';
-
-import 'package:saoirse_app/models/dashboard_model.dart';
-import 'package:saoirse_app/services/refferal_service.dart';
-import 'package:saoirse_app/widgets/app_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../models/dashboard_model.dart';
+import '../../services/refferal_service.dart';
+import '../../widgets/app_snackbar.dart';
+
 
 class ReferralController extends GetxController {
   final ReferralService _referralService = ReferralService();

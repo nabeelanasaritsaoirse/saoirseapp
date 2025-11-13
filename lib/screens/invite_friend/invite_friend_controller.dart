@@ -43,7 +43,7 @@ class InviteFriendController extends GetxController {
 
       products.assignAll(productList);
     } catch (e) {
-      print("Error fetching product list: $e");
+     
     } finally {
       isLoading.value = false;
     }
