@@ -106,6 +106,8 @@ class AppStrings {
 
   //snackbars
   static String no_internet = 'No internet connection';
+  static String something_went_wrong =
+      'Something went wrong. Please try again.';
 
   //otp screen
   static String verify = "Verify";

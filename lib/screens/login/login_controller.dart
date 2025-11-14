@@ -65,7 +65,7 @@ class LoginController extends GetxController {
     if (APIService.internet) {
       await AuthService.signOut();
       String? idToken = await AuthService.googleLogin();
-      print(idToken);
+      debugPrint(idToken,wrapWidth: 1024);
 
       if (idToken != null) {
         await userLogin(idToken);
@@ -104,6 +104,12 @@ class LoginController extends GetxController {
             AppConst.ACCESS_TOKEN, responseData['data']['accessToken']);
         storage.write(
             AppConst.REFRESH_TOKEN, responseData['data']['refreshToken']);
+        Get.offAll(() => DashboardScreen());
+      } else {
+        appSnackbar(
+          error: true,
+          content: responseData['message'] ?? AppStrings.something_went_wrong,
+        );
         Get.offAll(() => DashboardScreen());
       }
     }
