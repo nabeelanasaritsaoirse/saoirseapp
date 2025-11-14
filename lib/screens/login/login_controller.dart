@@ -90,35 +90,13 @@ class LoginController extends GetxController {
       url: AppURLs.LOGIN_API,
       body: body,
       onSuccess: (data) {
+        print('userID: ${data['data']['userId']}');
         storage.write(AppConst.USER_ID, data['data']['userId']);
+        storage.write(AppConst.REFERRAL_CODE, data['data']['referralCode']);
         storage.write(AppConst.ACCESS_TOKEN, data['data']['accessToken']);
         storage.write(AppConst.REFRESH_TOKEN, data['data']['refreshToken']);
         Get.offAll(() => DashboardScreen());
-        return;
       },
     );
-
-    // print(response.toString());
-
-    // if (response != null) {
-    //   var responseData = json.decode(response.body);
-    //   print(responseData.toString());
-
-    //   if (response.statusCode == 200) {
-    //     print(responseData.toString());
-    //     storage.write(AppConst.USER_ID, responseData['data']['userId']);
-    //     storage.write(
-    //         AppConst.ACCESS_TOKEN, responseData['data']['accessToken']);
-    //     storage.write(
-    //         AppConst.REFRESH_TOKEN, responseData['data']['refreshToken']);
-    //     Get.offAll(() => DashboardScreen());
-    //   } else {
-    //     appSnackbar(
-    //       error: true,
-    //       content: responseData['message'] ?? AppStrings.something_went_wrong,
-    //     );
-    //     Get.offAll(() => DashboardScreen());
-    //   }
-    // }
   }
 }
