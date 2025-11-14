@@ -6,6 +6,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/app_snackbar.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
 import '../widgets/app_text.dart';
@@ -14,88 +15,148 @@ import 'package:http/http.dart' as http;
 class APIService {
   static bool internet = false;
 
-
-
 //  Post Request Funtion
-static Future<T?> postRequest<T>({
-    required String url,
-    required Map<String, dynamic> body,
-    required T Function(Map<String, dynamic>) onSuccess,
-    Map<String, String>? headers,
-    int timeoutSeconds = 15,
-  }) async {
-    try {
-      log("post: $url");
-      log("body: $body");
+  static Future<T?> postRequest<T>({
+  required String url,
+  required Map<String, dynamic> body,
+  required T Function(Map<String, dynamic>) onSuccess,
+  Map<String, String>? headers,
+  int timeoutSeconds = 15,
+}) async {
+  try {
+    log("post: $url");
+    log("body: $body");
 
-      final response = await http
-          .post(
-            Uri.parse(url),
-            body: jsonEncode(body),
-            headers: headers ??
-                {
-                  "Content-Type": "application/json",
-                },
-          )
-          .timeout(Duration(seconds: timeoutSeconds));
+    final response = await http
+        .post(
+          Uri.parse(url),
+          body: jsonEncode(body),
+          headers: headers ??
+              {
+                "Content-Type": "application/json",
+              },
+        )
+        .timeout(Duration(seconds: timeoutSeconds));
 
-      log("Response [${response.statusCode}]: ${response.body}");
+    log("Response [${response.statusCode}]: ${response.body}");
 
-      //  status code handling
-      switch (response.statusCode) {
-        case 200:
-        case 201:
-          final data = jsonDecode(response.body);
-          if (data is! Map<String, dynamic>) {
-            throw Exception("Invalid response format received from server.");
-          }
-          return onSuccess(data);
+    // Handle response codes
+    switch (response.statusCode) {
+      case 200:
+      case 201:
+        final data = jsonDecode(response.body);
 
-        case 204:
-          throw Exception("No data available.");
+        if (data is! Map<String, dynamic>) {
+          appSnackbar(
+            title: "Error",
+            content: "Invalid response format received from server.",
+            error: true,
+          );
+          return null;
+        }
 
-        case 400:
-          throw Exception("Bad request. Check parameters.");
+        return onSuccess(data);
 
-        case 401:
-          throw Exception("Unauthorized. Please log in again.");
+      case 204:
+        appSnackbar(
+          content: "No data available.",
+          error: true,
+        );
+        return null;
 
-        case 403:
-          throw Exception("Forbidden. Access denied.");
+      case 400:
+        appSnackbar(
+          content: "Bad request. Check parameters.",
+          error: true,
+        );
+        return null;
 
-        case 404:
-          throw Exception("Resource not found (404).");
+      case 401:
+        appSnackbar(
+          content: "Unauthorized. Please log in again.",
+          error: true,
+        );
+        return null;
 
-        case 408:
-          throw Exception("Request timeout. Try again later.");
+      case 403:
+        appSnackbar(
+          content: "Forbidden. Access denied.",
+          error: true,
+        );
+        return null;
 
-        case 429:
-          throw Exception("Too many requests. Try again later.");
+      case 404:
+        appSnackbar(
+          content: "Resource not found (404).",
+          error: true,
+        );
+        return null;
 
-        default:
-          if (response.statusCode >= 500) {
-            throw Exception("Server error (${response.statusCode}). Try later.");
-          } else {
-            throw Exception(
-                "Unexpected error (${response.statusCode}). Please try again.");
-          }
-      }
-    } on SocketException {
-      throw Exception("No internet connection. Check your network.");
-    } on FormatException {
-      throw Exception("Invalid response format.");
-    } on TimeoutException {
-      throw Exception("Request timed out. Please try again.");
-    } on http.ClientException catch (e) {
-      throw Exception("Network error occurred: $e");
-    } catch (e) {
-      throw Exception("Something went wrong: ${e.toString()}");
+      case 408:
+        appSnackbar(
+          content: "Request timeout. Try again later.",
+          error: true,
+        );
+        return null;
+
+      case 429:
+        appSnackbar(
+          content: "Too many requests. Try again later.",
+          error: true,
+        );
+        return null;
+
+      default:
+        if (response.statusCode >= 500) {
+          appSnackbar(
+            content: "Server error (${response.statusCode}). Try later.",
+            error: true,
+          );
+        } else {
+          appSnackbar(
+            content:
+                "Unexpected error (${response.statusCode}). Please try again.",
+            error: true,
+          );
+        }
+        return null;
     }
+  } on SocketException {
+    appSnackbar(
+      content: "No internet connection. Check your network.",
+      error: true,
+    );
+    return null;
+  } on FormatException {
+    appSnackbar(
+      content: "Invalid response format.",
+      error: true,
+    );
+    return null;
+  } on TimeoutException {
+    appSnackbar(
+      content: "Request timed out. Please try again.",
+      error: true,
+    );
+    return null;
+  } on http.ClientException catch (e) {
+    appSnackbar(
+      content: "Network error occurred: $e",
+      error: true,
+    );
+    return null;
+  } catch (e) {
+    appSnackbar(
+      content: "Something went wrong: ${e.toString()}",
+      error: true,
+    );
+    return null;
   }
+}
 
 
-//  Get Request Funtion 
-  static Future<T?> getRequest<T>({
+//  Get Request Funtion
+ static Future<T?> getRequest<T>({
   required String url,
   required T Function(Map<String, dynamic>) onSuccess,
   Map<String, String>? headers,
@@ -116,63 +177,262 @@ static Future<T?> postRequest<T>({
 
     log("Response [${response.statusCode}]: ${response.body}");
 
-    // status handling
+    // status code handling
     switch (response.statusCode) {
       case 200:
       case 201:
         final data = jsonDecode(response.body);
 
         if (data is! Map<String, dynamic>) {
-          throw Exception("Invalid response format received from server.");
+          appSnackbar(
+            title: "Error",
+            content: "Invalid response format received from server.",
+            error: true,
+          );
+          return null;
         }
 
         return onSuccess(data);
 
       case 204:
-        throw Exception("No data available.");
+        appSnackbar(
+          content: "No data available.",
+          error: true,
+        );
+        return null;
 
       case 400:
-        throw Exception("Bad request. Check parameters.");
+        appSnackbar(
+          content: "Bad request. Check parameters.",
+          error: true,
+        );
+        return null;
 
       case 401:
-        throw Exception("Unauthorized. Please log in again.");
+        appSnackbar(
+          content: "Unauthorized. Please log in again.",
+          error: true,
+        );
+        return null;
 
       case 403:
-        throw Exception("Forbidden. Access denied.");
+        appSnackbar(
+          content: "Forbidden. Access denied.",
+          error: true,
+        );
+        return null;
 
       case 404:
-        throw Exception("Resource not found. (404)");
+        appSnackbar(
+          content: "Resource not found (404).",
+          error: true,
+        );
+        return null;
 
       case 408:
-        throw Exception("Request timeout. Try again later.");
+        appSnackbar(
+          content: "Request timeout. Try again later.",
+          error: true,
+        );
+        return null;
 
       case 429:
-        throw Exception("Too many requests. Try again later.");
+        appSnackbar(
+          content: "Too many requests. Try again later.",
+          error: true,
+        );
+        return null;
 
       default:
         if (response.statusCode >= 500) {
-          throw Exception("Server error (${response.statusCode}). Try later.");
+          appSnackbar(
+            content: "Server error (${response.statusCode}). Try later.",
+            error: true,
+          );
         } else {
-          throw Exception(
-              "Unexpected error (${response.statusCode}). Please try again.");
+          appSnackbar(
+            content:
+                "Unexpected error (${response.statusCode}). Please try again.",
+            error: true,
+          );
         }
+        return null;
     }
   } on SocketException {
-    throw Exception("No internet connection. Check your network.");
+    appSnackbar(
+      content: "No internet connection. Check your network.",
+      error: true,
+    );
+    return null;
   } on FormatException {
-    throw Exception("Invalid response format.");
+    appSnackbar(
+      content: "Invalid response format.",
+      error: true,
+    );
+    return null;
   } on TimeoutException {
-    throw Exception("Request timed out. Please try again.");
+    appSnackbar(
+      content: "Request timed out. Please try again.",
+      error: true,
+    );
+    return null;
   } on http.ClientException catch (e) {
-    throw Exception("Network error occurred: $e");
+    appSnackbar(
+      content: "Network error occurred: $e",
+      error: true,
+    );
+    return null;
   } catch (e) {
-    throw Exception("Something went wrong: ${e.toString()}");
+    appSnackbar(
+      content: "Something went wrong: ${e.toString()}",
+      error: true,
+    );
+    return null;
   }
 }
 
 
+// Put Request Function
 
-  
+static Future<T?> putRequest<T>({
+  required String url,
+  required Map<String, dynamic> body,
+  required T Function(Map<String, dynamic>) onSuccess,
+  Map<String, String>? headers,
+  int timeoutSeconds = 15,
+}) async {
+  try {
+    log("put: $url");
+    log("body: $body");
+
+    final response = await http
+        .put(
+          Uri.parse(url),
+          body: jsonEncode(body),
+          headers: headers ??
+              {
+                "Content-Type": "application/json",
+              },
+        )
+        .timeout(Duration(seconds: timeoutSeconds));
+
+    log("Response [${response.statusCode}]: ${response.body}");
+
+    // status code handling 
+    switch (response.statusCode) {
+      case 200:
+      case 201:
+        final data = jsonDecode(response.body);
+
+        if (data is! Map<String, dynamic>) {
+          appSnackbar(
+            title: "Error",
+            content: "Invalid response format received from server.",
+            error: true,
+          );
+          return null;
+        }
+
+        return onSuccess(data);
+
+      case 204:
+        appSnackbar(
+          content: "No data available.",
+          error: true,
+        );
+        return null;
+
+      case 400:
+        appSnackbar(
+          content: "Bad request. Check parameters.",
+          error: true,
+        );
+        return null;
+
+      case 401:
+        appSnackbar(
+          content: "Unauthorized. Please log in again.",
+          error: true,
+        );
+        return null;
+
+      case 403:
+        appSnackbar(
+          content: "Forbidden. Access denied.",
+          error: true,
+        );
+        return null;
+
+      case 404:
+        appSnackbar(
+          content: "Resource not found (404).",
+          error: true,
+        );
+        return null;
+
+      case 408:
+        appSnackbar(
+          content: "Request timeout. Try again later.",
+          error: true,
+        );
+        return null;
+
+      case 429:
+        appSnackbar(
+          content: "Too many requests. Try again later.",
+          error: true,
+        );
+        return null;
+
+      default:
+        if (response.statusCode >= 500) {
+          appSnackbar(
+            content: "Server error (${response.statusCode}). Try later.",
+            error: true,
+          );
+        } else {
+          appSnackbar(
+            content:
+                "Unexpected error (${response.statusCode}). Please try again.",
+            error: true,
+          );
+        }
+        return null;
+    }
+  } on SocketException {
+    appSnackbar(
+      content: "No internet connection. Check your network.",
+      error: true,
+    );
+    return null;
+  } on FormatException {
+    appSnackbar(
+      content: "Invalid response format.",
+      error: true,
+    );
+    return null;
+  } on TimeoutException {
+    appSnackbar(
+      content: "Request timed out. Please try again.",
+      error: true,
+    );
+    return null;
+  } on http.ClientException catch (e) {
+    appSnackbar(
+      content: "Network error occurred: $e",
+      error: true,
+    );
+    return null;
+  } catch (e) {
+    appSnackbar(
+      content: "Something went wrong: ${e.toString()}",
+      error: true,
+    );
+    return null;
+  }
+}
+
+
 
   static checkConnection(BuildContext context) {
     Connectivity().checkConnectivity().then((result) {

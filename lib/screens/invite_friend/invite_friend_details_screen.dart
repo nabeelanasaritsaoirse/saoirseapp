@@ -16,8 +16,6 @@ class InviteFriendDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController messageController = TextEditingController();
-
     final controller = Get.put(InviteFriendController());
 
     return Scaffold(

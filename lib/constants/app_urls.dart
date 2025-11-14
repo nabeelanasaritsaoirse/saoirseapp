@@ -2,10 +2,10 @@
 
 class AppURLs {
   //base api
-  static String BASE_API = 'https://epi-api.epielio.com/';
+  static String BASE_API = 'http://13.203.227.43:5000/';
 
   //login api
-  static String GOOGLE_SIGNIN_API = BASE_API + 'api/auth/checkUserExists';
+  static String LOGIN_API = BASE_API + 'api/auth/login';
   static String getRefferal_API = BASE_API + "api/referrals/generate-code";
   static String getDashboard_API = BASE_API + "api/referrals/dashboard?userId=";
 }

@@ -103,9 +103,13 @@ class AppStrings {
   static String start_on = "Start On";
   static String end_on = "Start On";
   static String selected = "Selected";
+  //Cart page
+  static String carttitle = "Cart";
 
   //snackbars
   static String no_internet = 'No internet connection';
+  static String something_went_wrong =
+      'Something went wrong. Please try again.';
 
   //otp screen
   static String verify = "Verify";

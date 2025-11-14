@@ -36,7 +36,7 @@ class AppAssets {
 
   // referal page
   static String refferal = "assets/images/refferal.png";
-  static String whatsapp = "assets/images/whatsapp.jpg";
+  static String whatsapp = "assets/images/whatsapp.jpeg";
   static String facebook = "assets/images/facebook.png";
   static String telegram = "assets/images/telegram.png";
   static String x = "assets/images/x.png";
@@ -46,3 +46,5 @@ class AppAssets {
   // Invite friend details page
   static String profile_image = "assets/images/profile_image.jpg";
 }
+
+
