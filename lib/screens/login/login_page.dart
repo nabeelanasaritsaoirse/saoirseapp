@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../constants/app_assets.dart';
 import '../../widgets/app_loader.dart';
 import '../otp/otp_screen.dart';
 import '/constants/app_colors.dart';
@@ -214,13 +215,13 @@ class _LoginPageState extends State<LoginPage> {
                       Center(
                         child: appButton(
                           onTap: () {
-                           
+                            loginController.googleLogin();
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Image.asset(
-                                "assets/icons/google_icon.webp",
+                                AppAssets.google_icon,
                                 height: 20.h,
                                 width: 20.w,
                                 fit: BoxFit.cover,

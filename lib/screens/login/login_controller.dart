@@ -82,14 +82,21 @@ class LoginController extends GetxController {
 
   //user login
   userLogin(String idToken) async {
-    // Map<String, dynamic> body = {
-    //   'idToken': idToken,
-    // };
+    Map<String, dynamic> body = {
+      'idToken': idToken,
+    };
 
-    // var response = await APIService.postRequest(
-    //   url: AppURLs.LOGIN_API,
-    //   body: body,
-    // );
+    await APIService.postRequest(
+      url: AppURLs.LOGIN_API,
+      body: body,
+      onSuccess: (data) {
+        storage.write(AppConst.USER_ID, data['data']['userId']);
+        storage.write(AppConst.ACCESS_TOKEN, data['data']['accessToken']);
+        storage.write(AppConst.REFRESH_TOKEN, data['data']['refreshToken']);
+        Get.offAll(() => DashboardScreen());
+        return;
+      },
+    );
 
     // print(response.toString());
 
