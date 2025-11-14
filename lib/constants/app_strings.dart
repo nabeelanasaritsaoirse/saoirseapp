@@ -106,6 +106,10 @@ class AppStrings {
   //Cart page
   static String carttitle = "Cart";
 
+
+  // Wishlist Screen
+  static String wishlist = "Whishlist";
+
   //snackbars
   static String no_internet = 'No internet connection';
   static String something_went_wrong =

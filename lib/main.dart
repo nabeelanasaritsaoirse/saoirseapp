@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:saoirse_app/screens/dashboard/dashboard_screen.dart';
+import 'package:saoirse_app/screens/product_details/product_details_screen.dart';
+import 'package:saoirse_app/screens/wishlist/wishlist_screen.dart';
 
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
@@ -77,7 +79,7 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
             ),
             scrollBehavior: CustomScrollBehavior(),
-            home: DashboardScreen(),
+            home: WishlistScreen(),
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,

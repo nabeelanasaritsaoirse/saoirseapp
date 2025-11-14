@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:saoirse_app/models/product_model.dart';
+import 'package:saoirse_app/widgets/product_card.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -294,135 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemBuilder: (context, index) {
                           final product =
                               homeController.mostPopularProducts[index];
-                          return Container(
-                            width: 150.w,
-                            margin: EdgeInsets.only(right: 15.w),
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(12.r),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.shadowColor,
-                                  blurRadius: 6.r,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Stack(
-                                  children: [
-                                    Container(
-                                      height: 120.h,
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: 5.w,
-                                        vertical: 5.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.lightGrey,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Center(
-                                        child: Image.asset(
-                                          product.image,
-                                          width: 80.w,
-                                          height: 80.h,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 8.h,
-                                      right: 8.w,
-                                      child: Container(
-                                        width: 28.w,
-                                        height: 28.h,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.white,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          product.isFavorite
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                          size: 16.sp,
-                                          color: product.isFavorite
-                                              ? AppColors.red
-                                              : AppColors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w,
-                                    vertical: 2.h,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          appText(
-                                            product.name,
-                                            fontSize: 13.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.textBlack,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          Spacer(),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 5.w,
-                                              vertical: 2.h,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.lightAmber,
-                                              borderRadius:
-                                                  BorderRadius.circular(10.r),
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Icon(
-                                                  Icons.star,
-                                                  size: 8.sp,
-                                                  color: AppColors.darkAmber,
-                                                ),
-                                                appText("4.3", fontSize: 8.sp),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 2.h),
-                                      appText(
-                                        product.name,
-                                        fontFamily: 'inter',
-                                        fontSize: 10.sp,
-                                        fontWeight: FontWeight.w400,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      SizedBox(height: 2.h),
-                                      appText(
-                                        '₹ ${product.price.toStringAsFixed(0)}',
-                                        fontFamily: 'inter',
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
+                          return ProductCard(product: product);
                         },
                       ),
                     ),
@@ -570,134 +444,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemBuilder: (context, index) {
                           final product =
                               homeController.trendingProducts[index];
-                          return Container(
-                            width: 150.w,
-                            margin: EdgeInsets.only(right: 15.w),
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(12.r),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.shadowColor,
-                                  blurRadius: 6.r,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Stack(
-                                  children: [
-                                    Container(
-                                      height: 120.h,
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: 5.w,
-                                        vertical: 5.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.lightGrey,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Center(
-                                        child: Image.asset(
-                                          product.image,
-                                          width: 70.h,
-                                          height: 70.h,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 8.h,
-                                      right: 8.w,
-                                      child: Container(
-                                        width: 28.w,
-                                        height: 28.h,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.white,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          product.isFavorite
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                          size: 16.sp,
-                                          color: product.isFavorite
-                                              ? AppColors.red
-                                              : AppColors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w,
-                                    vertical: 2.h,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          appText(
-                                            product.name,
-                                            fontSize: 13.sp,
-                                            fontWeight: FontWeight.bold,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          Spacer(),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 5.w,
-                                              vertical: 2.h,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.lightAmber,
-                                              borderRadius:
-                                                  BorderRadius.circular(10.r),
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Icon(
-                                                  Icons.star,
-                                                  size: 8.sp,
-                                                  color: AppColors.darkAmber,
-                                                ),
-                                                appText("4.3", fontSize: 8.sp),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 2.h),
-                                      appText(
-                                        product.name,
-                                        fontFamily: 'inter',
-                                        fontSize: 10.sp,
-                                        fontWeight: FontWeight.w400,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      SizedBox(height: 2.h),
-                                      appText(
-                                        '₹ ${product.price.toStringAsFixed(0)}',
-                                        fontFamily: 'inter',
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
+                          return ProductCard(product: product);
                         },
                       ),
                     ),
@@ -962,3 +709,5 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+
