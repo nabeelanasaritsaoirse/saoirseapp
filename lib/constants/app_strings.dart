@@ -103,6 +103,8 @@ class AppStrings {
   static String start_on = "Start On";
   static String end_on = "Start On";
   static String selected = "Selected";
+  //Cart page
+  static String carttitle = "Cart";
 
   //snackbars
   static String no_internet = 'No internet connection';
