@@ -1,11 +1,10 @@
-import 'dart:developer';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/otp/otp_screen.dart';
 
 import '../../widgets/app_loader.dart';
+import '../otp/otp_screen.dart';
 import '/constants/app_colors.dart';
 import '/constants/app_strings.dart';
 import '/screens/login/login_controller.dart';
@@ -173,7 +172,8 @@ class _LoginPageState extends State<LoginPage> {
                       Center(
                         child: appButton(
                           onTap: () {
-                            Get.to(() => VerifyOTPScreen(phoneNumber: ""));
+                            Get.to(() => VerifyOTPScreen(
+                                phoneNumber: loginController.fullPhoneNumber));
                             // SENT OTP BUTTON FUNCTION
                           },
                           buttonColor: AppColors.primaryColor,

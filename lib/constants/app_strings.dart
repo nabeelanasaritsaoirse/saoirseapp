@@ -42,7 +42,8 @@ class AppStrings {
 
   // Refferal page
   static String refferalTitle = "Referral";
-  static String referalBannerContent = "Invite Friends\nEarn Money\nStart Referring Today!";
+  static String referalBannerContent =
+      "Invite Friends\nEarn Money\nStart Referring Today!";
   static String refer_via = "Refer Via";
   static String shareTo = "Share to";
   static String search = "Search";
@@ -50,6 +51,19 @@ class AppStrings {
   static String name = "Name";
   static String purchase_item = "Purchase item";
   static String commission = "Commission";
+  static String noRefferal = "No referrals found";
+  static String fetching_message = "Fetching your code...";
+  static String no_code_fount = "No code found";
+  static String whatsapp = 'WhatsApp';
+  static String facebook = 'Facebook';
+  static String telegram = 'Telegram';
+  static String twitter = 'Twitter';
+  static String gmail = 'Gmail';
+  static String more = 'More';
+  static String your_refferal = "Your referral";
+
+  //Cart page
+  static String carttitle = "Cart";
 
   //snackbars
   static String no_internet = 'No internet connection';

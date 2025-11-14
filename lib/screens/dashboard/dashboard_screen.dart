@@ -1,7 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:saoirse_app/screens/cart/cart_screen.dart';
 
 import '../../constants/app_colors.dart';
 import '../category/category_screen.dart';
@@ -9,8 +12,8 @@ import '../home/home_screen.dart';
 import '../refferal/refferal_screen.dart';
 import 'dashboard_controller.dart';
 
-class Dashboard extends StatelessWidget {
-  Dashboard({super.key});
+class DashboardScreen extends StatelessWidget {
+  DashboardScreen({super.key});
 
   final DashboardController controller = Get.put(DashboardController());
 
@@ -18,7 +21,7 @@ class Dashboard extends StatelessWidget {
     const HomeScreen(),
     CategoryScreen(),
     ReferralScreen(),
-    CategoryScreen(),
+    CartScreen(),
     CategoryScreen(),
   ];
 

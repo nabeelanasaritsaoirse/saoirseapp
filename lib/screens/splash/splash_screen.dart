@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/dashboard/dashboard.dart';
 
 import '../../constants/app_assets.dart';
+import '../../constants/app_colors.dart';
 import '../../constants/app_constant.dart';
 import '../../main.dart';
-import '../home/home_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 import '../onboard/onboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Future.delayed(const Duration(seconds: 2), () async {
       if (isLogin) {
-        Get.offAll(() => Dashboard());
+        Get.offAll(() => DashboardScreen());
       } else {
         Get.offAll(() => const OnBoardScreen());
       }
@@ -43,6 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: AppColors.primaryColor,
         body: Center(
           child: Image.asset(
             AppAssets.app_logo,

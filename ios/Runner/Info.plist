@@ -51,5 +51,28 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Google Sign In config -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+    		<key>CFBundleTypeRole</key>
+    		<string>Editor</string>
+    		<key>CFBundleURLSchemes</key>
+    		<array>
+      			<!-- Replace with your REVERSED_CLIENT_ID -->
+      			<string>com.googleusercontent.apps.486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q</string>
+    		</array>
+  		</dict>
+	</array>
+	<!-- For Sharing -->
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+       <string>mailto</string>
+       <string>sms</string>
+       <string>whatsapp</string>
+       <string>fb</string>
+       <string>tg</string>
+       <string>twitter</string>
+</array>
 </dict>
 </plist>
