@@ -117,7 +117,7 @@ class CategoryScreen extends StatelessWidget {
                   crossAxisCount: 2,
                   crossAxisSpacing: 11.w,
                   mainAxisSpacing: 12.h,
-                  childAspectRatio: 0.82.r,
+                  childAspectRatio: 0.77, 
                 ),
                 itemCount: controller.selectedSubCategories.length,
                 itemBuilder: (context, index) {
