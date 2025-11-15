@@ -30,6 +30,14 @@
           }
         },
         {
+          "client_id": "486829564070-8b9m3fjf0e76ln42rsc7p2l9n79ff9ie.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saoirse.epi",
+            "certificate_hash": "ed72723a0d079a21b3984e2c2a0d6eb2cc3c1c5a"
+          }
+        },
+        {
           "client_id": "486829564070-91mff0c2c7bi88cc2k5d7i6rts03ic1c.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
