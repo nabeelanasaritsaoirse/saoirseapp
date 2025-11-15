@@ -9,7 +9,6 @@ import '../../constants/app_colors.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 
-
 class ReferralScreen extends StatelessWidget {
   const ReferralScreen({super.key});
 
@@ -36,11 +35,9 @@ class ReferralScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.white,
-
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
         elevation: 0,
-
         title: appText(
           AppStrings.refferalTitle,
           fontSize: 18.sp,
@@ -280,7 +277,6 @@ class ReferralScreen extends StatelessWidget {
                                   child: Icon(Icons.more_horiz),
                                 ),
                                 SizedBox(height: 6.h),
-
                                 appText(
                                   AppStrings.more,
                                   fontSize: 12.sp,
@@ -402,15 +398,34 @@ class ReferralScreen extends StatelessWidget {
 
                       if (controller.filteredReferrals.isEmpty) {
                         return Padding(
-                          padding: EdgeInsets.all(20.w),
-                          child: Center(
-                            child: appText(
-                              AppStrings.noRefferal,
-                              fontSize: 14.sp,
-                              color: AppColors.grey,
-                            ),
-                          ),
-                        );
+                            padding: EdgeInsets.all(20.w),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    AppAssets.no_data,
+                                    width: 140.w,
+                                    height: 140.h,
+                                  ),
+                                  appText(
+                                    AppStrings.noRefferal,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textBlack,
+                                  ),
+                                  SizedBox(
+                                    height: 3.h,
+                                  ),
+                                  appText(
+                                    AppStrings.no_refferal_content,
+                                    fontSize: 11.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textBlack,
+                                  ),
+                                ],
+                              ),
+                            ));
                       }
 
                       return Column(
@@ -418,96 +433,92 @@ class ReferralScreen extends StatelessWidget {
                             .asMap()
                             .entries
                             .map((entry) {
-                              final index = entry.key + 1;
-                              final user = entry.value;
+                          final index = entry.key + 1;
+                          final user = entry.value;
 
-                              final plan = user.installmentPlan;
-                              final commissionEarned =
-                                  plan?.commissionEarned ?? 0;
-                              final daysPaid = plan?.daysPaid ?? 0;
-                              final totalDays = plan?.days ?? 0;
-                              // final planName = plan?.planName ?? '-';
-                              final hasPurchased = user.hasPurchased
-                                  ? 'Yes'
-                                  : 'No';
+                          final plan = user.installmentPlan;
+                          final commissionEarned = plan?.commissionEarned ?? 0;
+                          final daysPaid = plan?.daysPaid ?? 0;
+                          final totalDays = plan?.days ?? 0;
+                          // final planName = plan?.planName ?? '-';
+                          final hasPurchased = user.hasPurchased ? 'Yes' : 'No';
 
-                              return Container(
-                                margin: EdgeInsets.only(bottom: 10.h),
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 14.h,
-                                  horizontal: 16.w,
+                          return Container(
+                            margin: EdgeInsets.only(bottom: 10.h),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 14.h,
+                              horizontal: 16.w,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              borderRadius: BorderRadius.circular(12.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.shadowColor,
+                                  blurRadius: 8.r,
+                                  spreadRadius: 1.r,
+                                  offset: const Offset(0, 2),
                                 ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.white,
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.shadowColor,
-                                      blurRadius: 8.r,
-                                      spreadRadius: 1.r,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                // No.
+                                Expanded(
+                                  flex: 1,
+                                  child: appText(
+                                    index.toString(),
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textBlack,
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
-                                child: Row(
-                                  children: [
-                                    // No.
-                                    Expanded(
-                                      flex: 1,
-                                      child: appText(
-                                        index.toString(),
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.textBlack,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
 
-                                    // Name
-                                    Expanded(
-                                      flex: 3,
-                                      child: appText(
-                                        user.name,
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.textBlack,
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-
-                                    // Purchase Progress (2/17)
-                                    Expanded(
-                                      flex: 3,
-                                      child: appText(
-                                        user.progress.isNotEmpty
-                                            ? user.progress
-                                            : "$daysPaid/$totalDays",
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: hasPurchased == 'Yes'
-                                            ? AppColors.green
-                                            : AppColors.mediumGray,
-                                      ),
-                                    ),
-
-                                    // 🔹 Commission
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        "₹${commissionEarned.toStringAsFixed(0)}",
-                                        style: TextStyle(
-                                          fontSize: 13.sp,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.textBlack,
-                                        ),
-                                        textAlign: TextAlign.end,
-                                      ),
-                                    ),
-                                  ],
+                                // Name
+                                Expanded(
+                                  flex: 3,
+                                  child: appText(
+                                    user.name,
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textBlack,
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
-                              );
-                            })
-                            .toList(),
+
+                                // Purchase Progress (2/17)
+                                Expanded(
+                                  flex: 3,
+                                  child: appText(
+                                    user.progress.isNotEmpty
+                                        ? user.progress
+                                        : "$daysPaid/$totalDays",
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: hasPurchased == 'Yes'
+                                        ? AppColors.green
+                                        : AppColors.mediumGray,
+                                  ),
+                                ),
+
+                                // 🔹 Commission
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    "₹${commissionEarned.toStringAsFixed(0)}",
+                                    style: TextStyle(
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textBlack,
+                                    ),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
                       );
                     }),
                   ],

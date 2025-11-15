@@ -76,19 +76,21 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                             height: 38.h,
                             borderRadius: BorderRadius.circular(10.r),
                             buttonColor: AppColors.buttonSecondary,
-                            child: Column(
-                              children: [
-                                appText(
-                                  AppStrings.total_product,
-                                  fontSize: 10.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                appText(
-                                  "2",
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ],
+                            child: FittedBox(
+                              child: Column(
+                                children: [
+                                  appText(
+                                    AppStrings.total_product,
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  appText(
+                                    "2",
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           appButton(
@@ -98,19 +100,21 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                             height: 38.h,
                             borderRadius: BorderRadius.circular(10.r),
                             buttonColor: AppColors.mediumGreen,
-                            child: Column(
-                              children: [
-                                appText(
-                                  AppStrings.my_commission,
-                                  fontSize: 10.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                appText(
-                                  "₹840",
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ],
+                            child: FittedBox(
+                              child: Column(
+                                children: [
+                                  appText(
+                                    AppStrings.my_commission,
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  appText(
+                                    "₹840",
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],

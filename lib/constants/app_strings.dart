@@ -54,7 +54,7 @@ class AppStrings {
   static String name = "Name";
   static String purchase_item = "Purchase item";
   static String commission = "Commission";
-  static String noRefferal = "No referrals found";
+  static String noRefferal = "No ongoing referrals!";
   static String fetching_message = "Fetching your code...";
   static String no_code_fount = "No code found";
   static String whatsapp = 'WhatsApp';
@@ -64,6 +64,7 @@ class AppStrings {
   static String gmail = 'Gmail';
   static String more = 'More';
   static String your_refferal = "Your referral";
+  static String no_refferal_content = "Refer your friends and earn money";
 
   // Invite friend Details page
   static String referal_screen_label = "Referal Details";
@@ -105,6 +106,9 @@ class AppStrings {
   static String selected = "Selected";
   //Cart page
   static String carttitle = "Cart";
+
+  // Wishlist Screen
+  static String wishlist = "Whishlist";
 
   //snackbars
   static String no_internet = 'No internet connection';
