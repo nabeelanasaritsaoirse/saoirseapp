@@ -16,6 +16,7 @@ class ProfileScreen extends StatelessWidget {
     final controller = Get.put(ProfileController());
 
     return Scaffold(
+      backgroundColor: AppColors.paperColor,
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
         elevation: 0,
@@ -35,23 +36,79 @@ class ProfileScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // -------------------- PROFILE BANNER -----------------------
-            Container(
-              width: double.infinity,
-              height: 200,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(AppAssets.profile_bg),
-                  fit: BoxFit.cover,
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // BACKGROUND CONTAINER
+                Container(
+                  width: double.infinity,
+                  height: 200.h,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(AppAssets.profile_bg),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-              ),
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: 50.w,
-                    height: 50.h,
-                  )
-                ],
-              ),
+
+                // PROFILE - DETAILS
+                Positioned(
+                  top: 20.h, // moves the circle down
+                  left: 0,
+                  right: 0,
+                  child: Column(
+                    children: [
+                      // PROFILE WITH EDIT BUTTON
+                      Stack(
+                        children: [
+                          Container(
+                            width: 90.w,
+                            height: 90.w,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: AssetImage(
+                                    AppAssets.facebook), // your profile image
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+
+                          // SMALL EDIT ICON
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              width: 28.w,
+                              height: 28.w,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.primaryColor,
+                              ),
+                              child: Icon(
+                                Icons.edit,
+                                color: AppColors.white,
+                                size: 14.sp,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+
+                      SizedBox(height: 12.h),
+
+                      appText('Albert Dan',
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textBlack,
+                          fontSize: 18.sp),
+                      appText('albert.dan@gmail.com',
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textBlack,
+                          fontSize: 14.sp)
+                    ],
+                  ),
+                ),
+              ],
             ),
 
             SizedBox(height: 20.h),
@@ -63,7 +120,7 @@ class ProfileScreen extends StatelessWidget {
                 "My Orders",
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w700,
-                color: Colors.black,
+                color: AppColors.textBlack,
               ),
             ),
 
@@ -100,7 +157,7 @@ class ProfileScreen extends StatelessWidget {
                 "Settings",
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w700,
-                color: Colors.black,
+                color: AppColors.textBlack,
               ),
             ),
 
