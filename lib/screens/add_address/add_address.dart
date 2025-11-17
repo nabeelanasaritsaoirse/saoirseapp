@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+
 import '/screens/add_address/add_address_controller.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
 import '/widgets/app_text_field.dart';
 
-class addAdress extends StatefulWidget {
-  const addAdress({super.key});
+class AddAddress extends StatefulWidget {
+  const AddAddress({super.key});
 
   @override
-  State<addAdress> createState() => _addAdressState();
+  State<AddAddress> createState() => _AddAddressState();
 }
 
-class _addAdressState extends State<addAdress> {
+class _AddAddressState extends State<AddAddress> {
   @override
   Widget build(BuildContext context) {
     AddAddressController addAddressController = Get.put(AddAddressController());

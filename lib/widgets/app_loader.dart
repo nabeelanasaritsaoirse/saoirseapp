@@ -7,8 +7,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/app_colors.dart';
 
 Widget appLoader({double? height, double? width}) {
-  return WillPopScope(
-    onWillPop: () async => false,
+  return PopScope(
+    canPop: false,
     child: InkWell(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
