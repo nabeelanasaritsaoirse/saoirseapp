@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
             ),
             scrollBehavior: CustomScrollBehavior(),
-            home: TransactionHistory(),
+            home: SplashScreen(),
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
