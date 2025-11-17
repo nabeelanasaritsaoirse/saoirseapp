@@ -25,21 +25,21 @@ class ReferralUser {
 
 
 
-class ReferralResponse {
+class ReferralResponses {
   final bool success;
   final String referralCode;
   final bool isExistingCode;
   final String message;
 
-  ReferralResponse({
+  ReferralResponses({
     required this.success,
     required this.referralCode,
     required this.isExistingCode,
     required this.message,
   });
 
-  factory ReferralResponse.fromJson(Map<String, dynamic> json) {
-    return ReferralResponse(
+  factory ReferralResponses.fromJson(Map<String, dynamic> json) {
+    return ReferralResponses(
       success: json['success'] ?? false,
       referralCode: json['referralCode'] ?? '',
       isExistingCode: json['isExistingCode'] ?? false,

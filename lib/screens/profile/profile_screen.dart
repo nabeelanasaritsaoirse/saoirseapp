@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:saoirse_app/constants/app_assets.dart';
 import 'package:saoirse_app/constants/app_colors.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:saoirse_app/widgets/app_text.dart';
 import 'package:saoirse_app/widgets/profile_menu_card.dart';
 import 'profile_controller.dart';
@@ -43,6 +42,15 @@ class ProfileScreen extends StatelessWidget {
                   image: AssetImage(AppAssets.profile_bg),
                   fit: BoxFit.cover,
                 ),
+              ),
+              child: Column(
+                children: [
+                 SizedBox(
+                  width: 50.w,
+                  height: 50.h,
+                   
+                 )
+                ],
               ),
             ),
 

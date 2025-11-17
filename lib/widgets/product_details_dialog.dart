@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:saoirse_app/models/product_detiails_response.dart';
+
 import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
-import '../models/invite_friend_product_model.dart';
+
 import 'app_button.dart';
 import 'app_text.dart';
 
 void showProductDetailsDialog(
-  BuildContext context,
-  InviteFriendProductModel product,
+    BuildContext context,
+    ProductDetails product,
 ) {
   showDialog(
     context: context,
@@ -24,7 +26,6 @@ void showProductDetailsDialog(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title
             Center(
               child: appText(
                 product.productName,
@@ -35,37 +36,26 @@ void showProductDetailsDialog(
             ),
             SizedBox(height: 14.h),
 
-            // Info rows
             _buildInfoRow(AppStrings.productId, product.productId),
-            _buildInfoRow(AppStrings.date_of_purchase, product.date),
-            _buildInfoRow(
-              AppStrings.total_price,
-              "₹${product.amount.toStringAsFixed(0)}",
-            ),
-            _buildInfoRow(
-              AppStrings.daily_sip,
-              "₹${product.dailySip.toStringAsFixed(0)}${AppStrings.day}",
-            ),
-            _buildInfoRow(
-              AppStrings.myCommission,
-              "₹${product.commissionPerDay.toStringAsFixed(0)}${AppStrings.each}",
-            ),
-            _buildInfoRow(
-              AppStrings.myTotalErnings,
-              "₹${product.totalEarnings.toStringAsFixed(0)}",
-              valueColor: AppColors.green,
-            ),
-            _buildInfoRow(
-              AppStrings.pending_inv,
-              "${AppStrings.last}${product.pendingCount} ${AppStrings.days}",
-              valueColor: product.pendingCount > 0
-                  ? AppColors.red
-                  : AppColors.green,
-            ),
+            _buildInfoRow(AppStrings.date_of_purchase,
+                product.dateOfPurchase.substring(0, 10)),
+            _buildInfoRow(AppStrings.total_price, "₹${product.totalPrice}"),
+            _buildInfoRow(AppStrings.daily_sip,
+                "₹${product.commissionPerDay}${AppStrings.each}"),
+            _buildInfoRow(AppStrings.myCommission,
+                "₹${product.totalCommission}"),
+            _buildInfoRow(AppStrings.myTotalErnings,
+                "₹${product.earnedCommission}",
+                valueColor: AppColors.green),
+            _buildInfoRow(AppStrings.pending_inv,
+                "${product.pendingDays} Days",
+                valueColor: product.pendingDays > 0
+                    ? AppColors.red
+                    : AppColors.green),
+        
 
             SizedBox(height: 24.h),
 
-            // Close Button
             Center(
               child: SizedBox(
                 width: 170.w,
@@ -93,6 +83,7 @@ void showProductDetailsDialog(
     ),
   );
 }
+
 
 // Helper Row Widget
 Widget _buildInfoRow(String label, String value, {Color? valueColor}) {
