@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:saoirse_app/constants/app_assets.dart';
 import 'package:saoirse_app/constants/app_colors.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:saoirse_app/widgets/app_text.dart';
 import 'package:saoirse_app/widgets/profile_menu_card.dart';
 import 'profile_controller.dart';
@@ -67,7 +66,7 @@ class ProfileScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               image: DecorationImage(
-                                image: AssetImage(AppAssets.facebook), // your profile image
+                                image: AssetImage(AppAssets.facebook),
                                 fit: BoxFit.cover,
                               ),
                             ),
