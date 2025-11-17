@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '/screens/add_address/add_address.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
@@ -58,9 +59,11 @@ class _selectAddressState extends State<selectAddress> {
                     fontWeight: FontWeight.w600,
                   ),
                   onTap: () {
-//
-//               Add New Address Button function
-//
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => add_Address(),
+                        ));
                   },
                 )),
             SizedBox(height: 10.h),

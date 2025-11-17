@@ -8,14 +8,14 @@ import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
 import '/widgets/app_text_field.dart';
 
-class addAdress extends StatefulWidget {
-  const addAdress({super.key});
+class add_Address extends StatefulWidget {
+  const add_Address({super.key});
 
   @override
-  State<addAdress> createState() => _addAdressState();
+  State<add_Address> createState() => _add_AddressState();
 }
 
-class _addAdressState extends State<addAdress> {
+class _add_AddressState extends State<add_Address> {
   @override
   Widget build(BuildContext context) {
     AddAddressController addAddressController = Get.put(AddAddressController());
