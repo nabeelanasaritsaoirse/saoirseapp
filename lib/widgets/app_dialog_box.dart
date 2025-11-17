@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -34,8 +36,8 @@ appDialogBox({
         fontWeight: FontWeight.w700,
       ),
     ),
-    content: WillPopScope(
-      onWillPop: () async => false,
+    content: PopScope(
+      canPop: false,
       child: Padding(
         padding: EdgeInsets.only(bottom: 10.h),
         child: appText(

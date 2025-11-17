@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '/screens/add_address/add_address.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
 
-class selectAddress extends StatefulWidget {
-  const selectAddress({super.key});
+class SelectAddress extends StatefulWidget {
+  const SelectAddress({super.key});
 
   @override
-  State<selectAddress> createState() => _selectAddressState();
+  State<SelectAddress> createState() => _SelectAddressState();
 }
 
 int selectedIndex = 0;
 
-class _selectAddressState extends State<selectAddress> {
+class _SelectAddressState extends State<SelectAddress> {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, String>> addressList = [
@@ -58,9 +59,11 @@ class _selectAddressState extends State<selectAddress> {
                     fontWeight: FontWeight.w600,
                   ),
                   onTap: () {
-//
-//               Add New Address Button function
-//
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddAddress(),
+                        ));
                   },
                 )),
             SizedBox(height: 10.h),
@@ -70,7 +73,7 @@ class _selectAddressState extends State<selectAddress> {
                 padding: EdgeInsets.symmetric(horizontal: 15.w),
                 itemBuilder: (context, index) {
                   final item = addressList[index];
-                  return AddressCard(
+                  return addressCard(
                     title: item["title"]!,
                     subtitle: item["subtitle"]!,
                     isSelected: selectedIndex == index,
@@ -105,7 +108,7 @@ class _selectAddressState extends State<selectAddress> {
     );
   }
 
-  Widget AddressCard({
+  Widget addressCard({
     required String title,
     required String subtitle,
     required bool isSelected,

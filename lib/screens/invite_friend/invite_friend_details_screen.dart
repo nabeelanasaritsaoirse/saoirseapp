@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/friend_details_response.dart';
+
+import 'package:saoirse_app/widgets/product_details_dialog.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
-import '../../models/invite_friend_product_model.dart';
 import '../../screens/invite_friend/invite_friend_controller.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
-import '../../widgets/product_details_dialog.dart';
 
 class InviteFriendDetailsScreen extends StatelessWidget {
-  const InviteFriendDetailsScreen({super.key});
+  final String userId;
+
+  const InviteFriendDetailsScreen({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(InviteFriendController());
+    final controller = Get.put(InviteFriendController(userId));
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -34,50 +37,70 @@ class InviteFriendDetailsScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: AppColors.white),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(12.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Card
-            Container(
-              width: double.infinity,
-              height: 120.h,
-              padding: EdgeInsets.symmetric(vertical: 5.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Left side
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    spacing: 2.h,
-                    children: [
-                      appText(
-                        AppStrings.user_name,
-                        fontSize: 17.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textBlack,
-                      ),
-                      appText(
-                        AppStrings.user_email,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textBlack,
-                      ),
-                      SizedBox(height: 8.h),
-                      Row(
-                        spacing: 8.w,
-                        children: [
-                          appButton(
-                            onTap: () {},
-                            width: 96.w,
-                            padding: EdgeInsets.all(6.w),
-                            height: 38.h,
-                            borderRadius: BorderRadius.circular(10.r),
-                            buttonColor: AppColors.buttonSecondary,
-                            child: FittedBox(
+
+      // ---------------- BODY ----------------
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final user = controller.friendDetails.value;
+
+        if (user == null) {
+          return Center(
+            child: appText(
+              "No data found",
+              fontSize: 14.sp,
+              color: AppColors.grey,
+            ),
+          );
+        }
+
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(12.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ---------------- HEADER ----------------
+              Container(
+                width: double.infinity,
+                height: 140.h,
+                padding: EdgeInsets.symmetric(vertical: 5.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // LEFT SIDE
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      spacing: 6.h,
+                      children: [
+                        appText(
+                          user.name,
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textBlack,
+                        ),
+                        appText(
+                          user.email,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textBlack,
+                        ),
+                        SizedBox(height: 10.h),
+                        Row(
+                          spacing: 8.w,
+                          children: [
+                            // Total Products
+                            appButton(
+                              onTap: () {},
+                              width: 96.w,
+                              height: 45.h,
+                              padding: EdgeInsets.all(6.w),
+                              borderRadius: BorderRadius.circular(10.r),
+                              buttonColor: AppColors.buttonSecondary,
                               child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   appText(
                                     AppStrings.total_product,
@@ -85,23 +108,24 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                                     fontWeight: FontWeight.w600,
                                   ),
                                   appText(
-                                    "2",
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w600,
+                                    "${user.totalProducts}",
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                          appButton(
-                            onTap: () {},
-                            width: 96.w,
-                            padding: EdgeInsets.all(6.w),
-                            height: 38.h,
-                            borderRadius: BorderRadius.circular(10.r),
-                            buttonColor: AppColors.mediumGreen,
-                            child: FittedBox(
+
+                            // Total Commission
+                            appButton(
+                              onTap: () {},
+                              width: 96.w,
+                              height: 45.h,
+                              padding: EdgeInsets.all(6.w),
+                              borderRadius: BorderRadius.circular(10.r),
+                              buttonColor: AppColors.mediumGreen,
                               child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   appText(
                                     AppStrings.my_commission,
@@ -109,105 +133,101 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                                     fontWeight: FontWeight.w600,
                                   ),
                                   appText(
-                                    "₹840",
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w600,
+                                    "₹${user.totalCommission}",
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                          ],
+                        ),
+                      ],
+                    ),
 
-                  // Right side (profile)
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    spacing: 6.h,
-                    children: [
-                      Container(
-                        width: 75.w,
-                        height: 75.h,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: AssetImage(AppAssets.profile_image),
-                            fit: BoxFit.cover,
+                    // RIGHT SIDE (PROFILE PICTURE + MESSAGE)
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      spacing: 8.h,
+                      children: [
+                        Container(
+                          width: 80.w,
+                          height: 80.h,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: user.profilePicture.isNotEmpty
+                                  ? NetworkImage(user.profilePicture)
+                                  : AssetImage(AppAssets.profile_image)
+                                      as ImageProvider,
+                            ),
                           ),
                         ),
-                      ),
-                      appButton(
-                        onTap: () {},
-                        width: 89.w,
-                        height: 25.h,
-                        padding: EdgeInsets.all(5.w),
-                        buttonColor: AppColors.mediumAmber,
-                        borderColor: AppColors.darkGray,
-                        child: Center(
-                          child: appText(
-                            AppStrings.message,
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.w600,
+                        appButton(
+                          onTap: () {},
+                          width: 89.w,
+                          height: 27.h,
+                          padding: EdgeInsets.all(5.w),
+                          buttonColor: AppColors.mediumAmber,
+                          borderColor: AppColors.darkGray,
+                          child: Center(
+                            child: appText(
+                              AppStrings.message,
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            Divider(color: AppColors.grey),
-            SizedBox(height: 8.h),
+              SizedBox(height: 10.h),
+              Divider(color: AppColors.grey),
+              SizedBox(height: 10.h),
 
-            // Product Section
-            appText(
-              AppStrings.product,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w600,
-            ),
-            SizedBox(height: 10.h),
+              // ---------------- PRODUCT TITLE ----------------
+              appText(
+                AppStrings.product,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
+              SizedBox(height: 10.h),
 
-            Obx(() {
-              if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (controller.products.isEmpty) {
-                return Center(
-                  child: appText(
-                    AppStrings.no_products,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.grey,
-                  ),
-                );
-              }
-
-              return ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
+              // ---------------- PRODUCT LIST ----------------
+              ListView.separated(
                 shrinkWrap: true,
-                itemCount: controller.products.length,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: user.products.length,
                 separatorBuilder: (_, __) => SizedBox(height: 10.h),
                 itemBuilder: (context, index) {
-                  final product = controller.products[index];
-                  return _buildProductCard(context, product);
+                  final product = user.products[index];
+                  return _buildProductCard(context, product , controller);
                 },
-              );
-            }),
-          ],
-        ),
-      ),
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }
 
-// Product Card Widget
-Widget _buildProductCard(
-    BuildContext context, InviteFriendProductModel product) {
-  final isPending = product.pendingCount > 0;
+// ---------------- PRODUCT CARD USING API MODEL ----------------
+Widget _buildProductCard(BuildContext context, FriendProduct product,
+    InviteFriendController controller) {
+  final bool isPending = product.pendingDays > 0;
+
+  // Format date
+  String formattedDate = "";
+  try {
+    formattedDate = product.dateOfPurchase.substring(0, 10);
+  } catch (_) {
+    formattedDate = product.dateOfPurchase;
+  }
 
   return Container(
     padding: EdgeInsets.all(10.w),
@@ -225,7 +245,7 @@ Widget _buildProductCard(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Title Row
+        // ---------------- Title + Date ----------------
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -235,15 +255,16 @@ Widget _buildProductCard(
               fontWeight: FontWeight.w700,
             ),
             appText(
-              "${AppStrings.dp}${product.date}",
+              "${AppStrings.dp}$formattedDate",
               fontSize: 12.sp,
               color: AppColors.darkGray,
             ),
           ],
         ),
-        SizedBox(height: 3.h),
 
-        // Product ID and Amount
+        SizedBox(height: 6.h),
+
+        // ---------------- Product ID + Amount ----------------
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -274,7 +295,7 @@ Widget _buildProductCard(
                   color: AppColors.grey,
                 ),
                 appText(
-                  "₹${product.amount.toStringAsFixed(0)}",
+                  "₹${product.totalAmount}",
                   fontSize: 13.sp,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primaryColor,
@@ -284,15 +305,13 @@ Widget _buildProductCard(
           ],
         ),
 
-        SizedBox(height: 5.h),
+        SizedBox(height: 6.h),
 
-        // Pending Status
+        // ---------------- Pending Status + View Button ----------------
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 5.w,
               children: [
                 appText(
@@ -302,10 +321,10 @@ Widget _buildProductCard(
                   fontWeight: FontWeight.w500,
                 ),
                 appText(
-                  "${product.pendingCount} ${product.pendingLabel}",
+                  "${product.pendingDays} days",
                   fontSize: 13.sp,
                   color: isPending ? AppColors.red : AppColors.green,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ],
             ),
@@ -315,7 +334,14 @@ Widget _buildProductCard(
               child: appButton(
                 padding: EdgeInsets.all(0.w),
                 borderRadius: BorderRadius.circular(6.r),
-                onTap: () => showProductDetailsDialog(context, product),
+                onTap: () async {
+                  final productDetails =
+                      await controller.getProductDetails(product.productId);
+
+                  if (productDetails != null && Get.context != null) {
+                    showProductDetailsDialog(Get.context!, productDetails);
+                  }
+                },
                 buttonColor: AppColors.primaryColor,
                 child: Center(
                   child: appText(
