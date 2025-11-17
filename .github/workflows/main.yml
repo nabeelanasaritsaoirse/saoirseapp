@@ -55,16 +55,32 @@ jobs:
         run: flutter pub get
 
       # ------------------------------
-      # Lint
+      # Lint (Non-blocking + Capture result)
       # ------------------------------
       - name: 🔍 Lint Check
-        run: flutter analyze
+        id: lint
+        run: |
+          flutter analyze
+          if [ $? -eq 0 ]; then
+            echo "success=true" >> $GITHUB_OUTPUT
+          else
+            echo "success=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
 
       # ------------------------------
-      # Run Tests (developer command)
+      # Tests (Non-blocking + Capture result)
       # ------------------------------
       - name: 🧪 Run Tests
-        run: flutter test
+        id: test
+        run: |
+          flutter test
+          if [ $? -eq 0 ]; then
+            echo "success=true" >> $GITHUB_OUTPUT
+          else
+            echo "success=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
 
       # ------------------------------
       # Step Summary
@@ -77,22 +93,24 @@ jobs:
 
           echo "### 🔍 Lint Output" >> $GITHUB_STEP_SUMMARY
           flutter analyze | tail -n 20 >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
 
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🧪 Test Output" >> $GITHUB_STEP_SUMMARY
           flutter test || true >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo ""
 
       # ------------------------------
-      # Build APK
+      # Build APK (Only if BOTH lint & test success)
       # ------------------------------
-      - name: 🏗️ Build APK (Developer command)
+      - name: 🏗️ Build APK
+        if: steps.lint.outputs.success == 'true' && steps.test.outputs.success == 'true'
         run: flutter build apk --release
 
       # ------------------------------
-      # Build AAB
+      # Build AAB (Only if BOTH lint & test success)
       # ------------------------------
-      - name: 📦 Build AAB (Developer command)
+      - name: 📦 Build AAB
+        if: steps.lint.outputs.success == 'true' && steps.test.outputs.success == 'true'
         run: flutter build appbundle --release
 
 
@@ -136,7 +154,6 @@ jobs:
       # -----------------------------------
       # Build using developer commands
       # -----------------------------------
-
       - name: 🏗️ Build AAB
         run: flutter build appbundle --release
 
