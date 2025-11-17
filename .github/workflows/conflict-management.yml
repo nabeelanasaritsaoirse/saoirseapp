@@ -1,0 +1,90 @@
+name: 🧩 GitHub Conflict Management
+run-name: "🚀 Conflict Detection triggered by ${{ github.actor }} on PR #${{ github.event.pull_request.number }}"
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  detect_conflict:
+    name: 🔍 Detect Real Merge Conflicts
+    runs-on: ubuntu-latest
+
+    outputs:
+      has_conflict: ${{ steps.check.outputs.has_conflict }}
+      commit_sha: ${{ steps.info.outputs.sha }}
+      commit_author: ${{ steps.info.outputs.author }}
+      base_branch: ${{ steps.info.outputs.base }}
+      head_branch: ${{ steps.info.outputs.head }}
+
+    steps:
+      - name: 🔍 Check merge conflict status
+        id: check
+        run: |
+          merge_state="${{ github.event.pull_request.mergeable_state }}"
+          echo "Mergeable state: $merge_state"
+          if [ "$merge_state" = "dirty" ]; then
+            echo "has_conflict=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_conflict=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📌 Get PR commit + author info
+        id: info
+        run: |
+          echo "sha=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
+          echo "author=${{ github.event.pull_request.head.user.login }}" >> $GITHUB_OUTPUT
+          echo "base=${{ github.event.pull_request.base.ref }}" >> $GITHUB_OUTPUT
+          echo "head=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+
+  create_issue:
+    name: 📝 Create Issue for REAL Merge Conflicts
+    runs-on: ubuntu-latest
+    needs: detect_conflict
+    if: needs.detect_conflict.outputs.has_conflict == 'true'
+
+    steps:
+      - name: 🧾 Generate Issue Body
+        id: body
+        run: |
+          cat > conflict_issue.md << 'EOF'
+          ## ⚠️ Merge Conflict Detected
+
+          A merge conflict was detected in **PR #${{ github.event.pull_request.number }}**.
+
+          ### 🔀 Commit Causing Conflict
+          - **Commit SHA:** `${{ needs.detect_conflict.outputs.commit_sha }}`
+          - **Author:** **${{ needs.detect_conflict.outputs.commit_author }}`
+
+          ### 🔧 Branch Information
+          - **Base Branch:** `${{ needs.detect_conflict.outputs.base_branch }}`
+          - **Your Branch:** `${{ needs.detect_conflict.outputs.head_branch }}`
+
+          ---
+
+          ## 📌 Steps to Resolve
+          ```bash
+          git checkout ${{ needs.detect_conflict.outputs.head_branch }}
+          git pull
+          git merge origin/${{ needs.detect_conflict.outputs.base_branch }}
+          # Resolve conflicts manually
+          git add .
+          git commit -m "Resolve merge conflicts"
+          git push
+          ```
+
+          This issue was auto-generated because a real merge conflict exists.
+          EOF
+
+      - name: 📝 Create GitHub Issue
+        uses: peter-evans/create-issue@v4
+        with:
+          title: "⚠️ Merge Conflict Detected in PR #${{ github.event.pull_request.number }}"
+          assignees: ${{ needs.detect_conflict.outputs.commit_author }}
+          labels: "⚠️ merge conflict, automation"
+          body-file: conflict_issue.md
