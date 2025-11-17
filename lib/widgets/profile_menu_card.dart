@@ -16,8 +16,9 @@ class ProfileMenuCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 140.h,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
@@ -33,7 +34,7 @@ class ProfileMenuCard extends StatelessWidget {
           // ICON CIRCLE
           SizedBox(
             width: 55.w,
-            height: 55.w, // <-- same ratio!
+            height: 55.h, // <-- same ratio!
             child: Image.asset(
               icon,
               fit: BoxFit.contain,
@@ -43,11 +44,12 @@ class ProfileMenuCard extends StatelessWidget {
           SizedBox(height: 4.h),
 
           SizedBox(
-            width: 90,
+            width: 90.w,
+            height: 32.h,
             child: appText(
               title,
               fontSize: 12.sp,
-              color: Colors.black,
+              color: AppColors.textBlack,
               textAlign: TextAlign.center,
             ),
           ),
