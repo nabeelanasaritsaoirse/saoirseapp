@@ -9,19 +9,19 @@ permissions:
 on:
   push:
     branches: [ main, developer ]
-  #   paths:
-  #     - "android/**"
-  #     - "lib/**"
-  #     - "pubspec.yaml"
-  #     - "pubspec.lock"
+    paths:
+      - "android/**"
+      - "lib/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
 
-  # pull_request:
-  #   branches: [ main, developer ]
-  #   paths:
-  #     - "android/**"
-  #     - "lib/**"
-  #     - "pubspec.yaml"
-  #     - "pubspec.lock"
+  pull_request:
+    branches: [ main, developer ]
+    paths:
+      - "android/**"
+      - "lib/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
 
 jobs:
   android-ci:
