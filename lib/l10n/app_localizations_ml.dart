@@ -35,7 +35,8 @@ class AppLocalizationsMl extends AppLocalizations {
   String get stylishTitle => 'സ്റ്റൈലിഷ്';
 
   @override
-  String get investmentDescription => 'നിങ്ങളുടെ സംഗ്രഹങ്ങളെ വിജയത്തിലേക്ക് മാറ്റൂ. \nഇന്നുതന്നെ നിക്ഷേപിച്ച് നിങ്ങൾ ആഗ്രഹിക്കുന്ന ഭാവി ഉറപ്പാക്കൂ!';
+  String get investmentDescription =>
+      'നിങ്ങളുടെ സംഗ്രഹങ്ങളെ വിജയത്തിലേക്ക് മാറ്റൂ. \nഇന്നുതന്നെ നിക്ഷേപിച്ച് നിങ്ങൾ ആഗ്രഹിക്കുന്ന ഭാവി ഉറപ്പാക്കൂ!';
 
   @override
   String get bookNow => 'ഇപ്പോൾ ബുക്ക് ചെയ്യൂ';

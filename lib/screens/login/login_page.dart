@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_assets.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/app_loader.dart';
 import '../otp/otp_screen.dart';
 import '/constants/app_colors.dart';
@@ -172,10 +173,34 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 15.h),
                       Center(
                         child: appButton(
-                          onTap: () {
-                            Get.to(() => VerifyOTPScreen(
-                                phoneNumber: loginController.fullPhoneNumber));
-                            // SENT OTP BUTTON FUNCTION
+                          onTap: () async {
+                            print("[SEND OTP BUTTON PRESSED]");
+
+                            if (!loginController.validateInputs()) {
+                              print("Validation Failed");
+                              return;
+                            }
+
+                            print("✔ Validation Passed");
+                            print(
+                                "Phone Number = ${loginController.fullPhoneNumber}");
+
+                            bool isSent = await AuthService.sendOTP(
+                                loginController.fullPhoneNumber);
+
+                            print("📨 sendOTP Result: $isSent");
+
+                            if (isSent) {
+                              print("Navigating to VerifyOTPScreen");
+                              Get.to(() => VerifyOTPScreen(
+                                    phoneNumber:
+                                        loginController.fullPhoneNumber,
+                                    referral:
+                                        loginController.referrelController.text,
+                                    username:
+                                        loginController.emailController.text,
+                                  ));
+                            }
                           },
                           buttonColor: AppColors.primaryColor,
                           buttonText: AppStrings.send_otp,

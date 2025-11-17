@@ -6,7 +6,6 @@ import '../../models/product_details_model.dart';
 import '../../models/product_model.dart';
 import '../../widgets/select_plan_sheet.dart';
 
-
 class ProductDetailsController extends GetxController {
   // UI States
   final RxInt currentImageIndex = 0.obs;
@@ -166,20 +165,17 @@ class ProductDetailsController extends GetxController {
   //   );
   // }
   void openSelectPlanSheet() {
-  Get.bottomSheet(
-    SelectPlanSheet(),
-    isScrollControlled: true,
-    backgroundColor: Colors.white,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-  );
-}
-
-
+    Get.bottomSheet(
+      SelectPlanSheet(),
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+    );
+  }
 
   void handleCheckout() {
-   
     Get.snackbar(
       'Checkout',
       'Proceeding to checkout',

@@ -1,4 +1,3 @@
-
 // Model
 class CategoryGroup {
   final String name;

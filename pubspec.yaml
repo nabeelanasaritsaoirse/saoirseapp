@@ -53,11 +53,15 @@ dependencies:
   fluttertoast: ^9.0.0
   url_launcher: ^6.3.2
   android_intent_plus: ^6.0.0
+  firebase_messaging: ^16.0.4
+  json_annotation: ^4.9.0
 
 dev_dependencies:
+  build_runner: ^2.10.3
   flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
+  json_serializable: ^6.11.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -7,7 +7,6 @@ import '../../constants/app_colors.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 
-
 class WarningDialog {
   static void show({
     required String title,

@@ -43,7 +43,6 @@ class InviteFriendController extends GetxController {
 
       products.assignAll(productList);
     } catch (e) {
-     
     } finally {
       isLoading.value = false;
     }

@@ -8,9 +8,8 @@ import 'package:saoirse_app/models/refferal_model.dart';
 import 'package:saoirse_app/services/api_service.dart';
 
 class ReferralService {
-
   //  To fetch referral code
-  
+
   Future<ReferralResponse?> fetchReferralCode() async {
     final userId = await storage.read(AppConst.USER_ID);
 
@@ -40,28 +39,26 @@ class ReferralService {
 
   //  To fetch referral User List & Data
 
-   Future<DashboardModel?> fetchReferralDashboard() async {
-  final userId = await storage.read(AppConst.USER_ID);
+  Future<DashboardModel?> fetchReferralDashboard() async {
+    final userId = await storage.read(AppConst.USER_ID);
 
-  if (userId == null || userId.isEmpty) {
-    throw Exception("User ID not found. Please log in again.");
+    if (userId == null || userId.isEmpty) {
+      throw Exception("User ID not found. Please log in again.");
+    }
+
+    final url = "${AppURLs.getDashboard_API}$userId";
+
+    return APIService.getRequest<DashboardModel>(
+      url: url,
+      onSuccess: (json) {
+        final dashboard = DashboardModel.fromJson(json);
+
+        if (!dashboard.success) {
+          throw Exception("Failed to fetch dashboard data.");
+        }
+
+        return dashboard;
+      },
+    );
   }
-
-  final url = "${AppURLs.getDashboard_API}$userId";
-
-  return APIService.getRequest<DashboardModel>(
-    url: url,
-    onSuccess: (json) {
-      final dashboard = DashboardModel.fromJson(json);
-
-      
-      if (!dashboard.success) {
-        throw Exception("Failed to fetch dashboard data.");
-      }
-
-      return dashboard;
-    },
-  );
-}
-
 }

@@ -9,10 +9,21 @@ import 'package:saoirse_app/widgets/app_text.dart';
 
 class VerifyOTPScreen extends StatelessWidget {
   final String phoneNumber;
+  final String referral;
+  final String username;
+  VerifyOTPScreen(
+      {super.key,
+      required this.phoneNumber,
+      required this.referral,
+      required this.username});
 
-  VerifyOTPScreen({super.key, required this.phoneNumber});
-
-  final VerifyOtpController controller = Get.put(VerifyOtpController());
+  late final VerifyOtpController controller = Get.put(
+    VerifyOtpController(
+      phoneNumber: phoneNumber,
+      referral: referral,
+      username: username,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -71,10 +82,10 @@ class VerifyOTPScreen extends StatelessWidget {
             /// OTP Boxes
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: List.generate(4, (index) {
+              children: List.generate(6, (index) {
                 return SizedBox(
-                  width: 65.w,
-                  height: 65.w,
+                  width: 45.w,
+                  height: 55.w,
                   child: TextField(
                     controller: controller.otpControllers[index],
                     textAlign: TextAlign.center,
@@ -95,7 +106,7 @@ class VerifyOTPScreen extends StatelessWidget {
                       ),
                     ),
                     onChanged: (value) {
-                      if (value.isNotEmpty && index < 3) {
+                      if (value.isNotEmpty && index < 5) {
                         FocusScope.of(context).nextFocus();
                       }
                     },
@@ -132,9 +143,9 @@ class VerifyOTPScreen extends StatelessWidget {
             ),
             if (controller.isLoading.value)
               Container(
-                color: Colors.black.withOpacity(0.3),
                 child: const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
+                  child:
+                      CircularProgressIndicator(color: AppColors.primaryColor),
                 ),
               ),
           ],

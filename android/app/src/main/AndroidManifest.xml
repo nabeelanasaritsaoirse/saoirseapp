@@ -23,6 +23,14 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+            <meta-data
+              android:name="com.google.firebase.auth.DEPRECATED_FIREBASE_APP_CHECK"
+              android:value="true" 
+              />  
+            <meta-data
+              android:name="com.google.firebase.auth.api.gms.module.enabled"
+              android:value="true"
+              />  
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

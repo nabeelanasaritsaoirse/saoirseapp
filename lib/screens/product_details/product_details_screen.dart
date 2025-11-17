@@ -10,7 +10,6 @@ import '../../constants/app_strings.dart';
 import '../../widgets/app_text.dart';
 import 'product_details_controller.dart';
 
-
 class ProductDetailsScreen extends StatelessWidget {
   const ProductDetailsScreen({super.key});
 

@@ -58,9 +58,8 @@ void showProductDetailsDialog(
             _buildInfoRow(
               AppStrings.pending_inv,
               "${AppStrings.last}${product.pendingCount} ${AppStrings.days}",
-              valueColor: product.pendingCount > 0
-                  ? AppColors.red
-                  : AppColors.green,
+              valueColor:
+                  product.pendingCount > 0 ? AppColors.red : AppColors.green,
             ),
 
             SizedBox(height: 24.h),
