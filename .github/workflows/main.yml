@@ -24,38 +24,24 @@ on:
       - "pubspec.lock"
 
 jobs:
-  android-ci: 
-    runs-on: ubuntu-latest 
-    
-    permissions:
-      contents: read
-      checks: write
-      pull-requests: write
+  android-ci:
+    runs-on: ubuntu-latest
 
     steps:
-      # ------------------------------
-      # Checkout
-      # ------------------------------
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      # ------------------------------
-      # Setup Flutter
-      # ------------------------------
       - name: ⚙️ Setup Flutter (3.35.7 Stable)
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.35.7'
           channel: 'stable'
 
-      # ------------------------------
-      # Install Dependencies
-      # ------------------------------
       - name: 📦 Install Dependencies
         run: flutter pub get
 
       # ------------------------------
-      # Lint (Non-blocking + Capture result)
+      # LINT (With success flag)
       # ------------------------------
       - name: 🔍 Lint Check
         id: lint
@@ -69,50 +55,81 @@ jobs:
         continue-on-error: true
 
       # ------------------------------
-      # Tests (Non-blocking + Capture result)
+      # Install junitreport
       # ------------------------------
-      - name: 🧪 Run Tests
+      - name: 📦 Install junitreport
+        run: dart pub global activate junitreport
+
+      # ------------------------------
+      # TEST (JSON + Convert to JUnit)
+      # ------------------------------
+      - name: 🧪 Run Tests (JUnit Output)
         id: test
         run: |
-          flutter test
-          if [ $? -eq 0 ]; then
-            echo "success=true" >> $GITHUB_OUTPUT
-          else
+          export PATH="$HOME/.pub-cache/bin:$PATH"
+
+          flutter test --machine --no-pub > test_output.json || true
+
+          dart pub global run junitreport:tojunit < test_output.json > test-results.xml || true
+
+          if grep -q "<failure" test-results.xml; then
             echo "success=false" >> $GITHUB_OUTPUT
+          else
+            echo "success=true" >> $GITHUB_OUTPUT
           fi
         continue-on-error: true
 
       # ------------------------------
-      # Step Summary
+      # Publish Tests
       # ------------------------------
-      - name: 🧾 Add Lint + Test Summary
+      - name: 📈 Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Flutter Test Results
+          path: test-results.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      # ------------------------------
+      # Summary
+      # ------------------------------
+      - name: 🧾 Add Lint + Test Summary (Readable)
         if: always()
         run: |
           echo "## 🧩 Flutter CI Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          echo "### 🔍 Lint Output" >> $GITHUB_STEP_SUMMARY
-          flutter analyze | tail -n 20 >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Lint Warnings" >> $GITHUB_STEP_SUMMARY
+          flutter analyze --no-fatal-infos --no-fatal-warnings | sed -n '1,20p' >> $GITHUB_STEP_SUMMARY
 
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🧪 Test Output" >> $GITHUB_STEP_SUMMARY
-          flutter test || true >> $GITHUB_STEP_SUMMARY
-          echo ""
+          echo "### 🧪 Test Summary" >> $GITHUB_STEP_SUMMARY
+
+          TOTAL=$(grep -o "<testcase" test-results.xml | wc -l)
+          FAILED=$(grep -o "<failure" test-results.xml | wc -l)
+          PASSED=$((TOTAL - FAILED))
+
+          echo "- **Total Tests:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+          echo "- **Passed:** 🟢 $PASSED" >> $GITHUB_STEP_SUMMARY
+          echo "- **Failed:** 🔴 $FAILED" >> $GITHUB_STEP_SUMMARY
+
+          echo "**Failed Tests:**" >> $GITHUB_STEP_SUMMARY
+          grep -oP '(?<=testcase name=").*?(?=")' test-results.xml | head -n 10 >> $GITHUB_STEP_SUMMARY
+
 
       # ------------------------------
-      # Build APK (Only if BOTH lint & test success)
+      # FINAL GATE — BLOCK DEPLOY IF FAILED
       # ------------------------------
-      - name: 🏗️ Build APK
-        if: steps.lint.outputs.success == 'true' && steps.test.outputs.success == 'true'
-        run: flutter build apk --release
-
-      # ------------------------------
-      # Build AAB (Only if BOTH lint & test success)
-      # ------------------------------
-      - name: 📦 Build AAB
-        if: steps.lint.outputs.success == 'true' && steps.test.outputs.success == 'true'
-        run: flutter build appbundle --release
-
+      - name: ❌ Fail CI if Lint or Tests Failed
+        if: always()
+        run: |
+          if [ "${{ steps.lint.outputs.success }}" != "true" ] || [ "${{ steps.test.outputs.success }}" != "true" ]; then
+            echo "❌ Lint or Tests Failed — stopping deploy"
+            exit 1
+          else
+            echo "✅ Lint & Tests Passed — deploy allowed"
+          fi
 
 # -----------------------------------------
 # JOB 2: DEPLOY (Only on main + CI success)
