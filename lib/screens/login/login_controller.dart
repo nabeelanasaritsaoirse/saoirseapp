@@ -82,6 +82,7 @@ class LoginController extends GetxController {
 
   //   loading.value = false;
   // }
+
   googleLogin() async {
     try {
       loading.value = true;
