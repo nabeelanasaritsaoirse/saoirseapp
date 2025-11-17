@@ -1,0 +1,9 @@
+import 'package:flutter/widgets.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
+
+class MyWalletController extends GetxController {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController accController = TextEditingController();
+  TextEditingController confirmAccController = TextEditingController();
+  TextEditingController ifscController = TextEditingController();
+}
