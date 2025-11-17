@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:saoirse_app/models/product_model.dart';
+import 'package:saoirse_app/widgets/product_card.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_gradient.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
+import '../../constants/app_strings.dart';
 import 'home_controller.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -20,14 +24,16 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   HomeController homeController = Get.put(HomeController());
 
+  // Refactored Icon box
+
   Widget _iconBox({String? image, double? padding}) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      width: 36,
-      height: 36,
+      margin: EdgeInsets.symmetric(vertical: 7.h),
+      width: 36.w,
+      height: 36.h,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(10.r),
       ),
       child: Padding(
         padding: EdgeInsets.all(padding!),
@@ -66,7 +72,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             titleSpacing: 0,
-
             actions: [
               _iconBox(image: AppAssets.notification, padding: 3.w),
               SizedBox(width: 8.w),
@@ -102,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 boxShadow: [
                                   BoxShadow(
                                     color: AppColors.lightBlack,
-                                    blurRadius: 8,
+                                    blurRadius: 8.r,
                                     offset: const Offset(0, 4),
                                   ),
                                 ],
@@ -112,14 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      gradient: LinearGradient(
-                                        begin: Alignment.bottomCenter,
-                                        end: Alignment.topCenter,
-                                        colors: [
-                                          AppColors.lightBlack,
-                                          AppColors.transparent,
-                                        ],
-                                      ),
+                                      gradient: AppGradients.topCarosalGradient,
                                     ),
                                   ),
 
@@ -127,60 +125,51 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Padding(
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 24.w,
-                                      vertical: 20.h,
+                                      vertical: 10.h,
                                     ),
                                     child: Align(
                                       alignment: Alignment.centerLeft,
-                                      child: FittedBox(
-                                        alignment: Alignment.centerLeft,
-                                        fit: BoxFit.scaleDown,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            appText(
-                                              "Stylish",
-                                              fontSize: 24.sp,
-                                              color: AppColors.white,
-                                              fontWeight: FontWeight.w800,
-                                              fontStyle: FontStyle.italic,
-                                              fontFamily: "Times New Roman",
-                                            ),
-                                            SizedBox(height: 8.h),
-                                            Text(
-                                              'Turn your savings into success\ninvest today and secure the future you’ve always wanted!',
-                                              style: TextStyle(
-                                                fontSize: 12.sp,
-                                                color: AppColors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-
-                                            SizedBox(height: 16.h),
-                                            appButton(
-                                              onTap: () {},
-                                              buttonText: 'Book Now',
-                                              buttonColor: AppColors.white,
-                                              textColor: Colors.black87,
-                                              fontSize: 13,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          appText(
+                                            "Stylish",
+                                            fontSize: 24.sp,
+                                            color: AppColors.white,
+                                            fontWeight: FontWeight.w800,
+                                            fontStyle: FontStyle.italic,
+                                            fontFamily: "Times New Roman",
+                                          ),
+                                          SizedBox(height: 2.h),
+                                          appText(
+                                            AppStrings.card_discription,
+                                            maxLines: 2,
+                                            fontSize: 11.sp,
+                                            textAlign: TextAlign.left,
+                                            color: AppColors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          SizedBox(height: 5.h),
+                                          appButton(
+                                            width: 150.w,
+                                            height: 35.h,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 15.w,
+                                                vertical: 5.h),
+                                            onTap: () {},
+                                            buttonColor: AppColors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(8.r),
+                                            child: appText(
+                                              AppStrings.btton_lebel,
+                                              color: AppColors.textBlack,
+                                              fontSize: 12.sp,
                                               fontWeight: FontWeight.bold,
-                                              borderRadius:
-                                                  BorderRadius.circular(8.r),
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 37.w,
-                                                vertical: 11.h,
-                                              ),
-
-                                              child: appText(
-                                                'Book Now',
-                                                color: Colors.black87,
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.bold,
-                                              ),
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -195,15 +184,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         autoPlayInterval: const Duration(seconds: 5),
                         enlargeCenterPage: true,
                         viewportFraction: 1.0,
-                        height: 200,
+                        height: 170.h,
                         onPageChanged: (index, reason) {
                           homeController.currentCarouselIndex.value = index;
                         },
                       ),
                     ),
-
                     Positioned(
-                      bottom: 10.h,
+                      bottom: 8.h,
                       child: Obx(
                         () => Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -211,29 +199,24 @@ class _HomeScreenState extends State<HomeScreen> {
                               .asMap()
                               .entries
                               .map((entry) {
-                                return Container(
-                                  width:
-                                      homeController
-                                              .currentCarouselIndex
-                                              .value ==
+                            return Container(
+                              width:
+                                  homeController.currentCarouselIndex.value ==
                                           entry.key
                                       ? 24.w
                                       : 8.w,
-                                  height: 8.h,
-                                  margin: EdgeInsets.symmetric(horizontal: 4.w),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4.r),
-                                    color:
-                                        homeController
-                                                .currentCarouselIndex
-                                                .value ==
+                              height: 8.h,
+                              margin: EdgeInsets.symmetric(horizontal: 4.w),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4.r),
+                                color:
+                                    homeController.currentCarouselIndex.value ==
                                             entry.key
                                         ? AppColors.white
                                         : AppColors.transparentWhite,
-                                  ),
-                                );
-                              })
-                              .toList(),
+                              ),
+                            );
+                          }).toList(),
                         ),
                       ),
                     ),
@@ -251,27 +234,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     children: ['Technology', 'Fashion', 'Sports', 'Digital']
                         .map((category) {
-                          // final isFirst = category == 'Technology';
-                          return Container(
-                            margin: EdgeInsets.only(right: 10.w),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20.w,
-                              vertical: 6.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(15.r),
-                              border: Border.all(color: Colors.grey.shade400),
-                            ),
-                            child: appText(
-                              category,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textBlack,
-                            ),
-                          );
-                        })
-                        .toList(),
+                      // final isFirst = category == 'Technology';
+                      return Container(
+                        margin: EdgeInsets.only(right: 10.w),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20.w,
+                          vertical: 6.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(15.r),
+                          border: Border.all(color: Colors.grey.shade400),
+                        ),
+                        child: appText(
+                          category,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textBlack,
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
               ),
@@ -286,14 +268,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         appText(
-                          'Most Popular',
+                          AppStrings.poular,
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.06,
                         ),
-
                         appText(
-                          'See All',
+                          AppStrings.see_all,
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.06,
@@ -309,142 +290,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         scrollDirection: Axis.horizontal,
                         padding: EdgeInsets.symmetric(
                           horizontal: 16.w,
-                          vertical: 5,
+                          vertical: 5.h,
                         ),
                         itemCount: homeController.mostPopularProducts.length,
                         itemBuilder: (context, index) {
                           final product =
                               homeController.mostPopularProducts[index];
-                          return Container(
-                            width: 150.w,
-                            margin: EdgeInsets.only(right: 15.w),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12.r),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 6.r,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Stack(
-                                  children: [
-                                    Container(
-                                      height: 120.h,
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: 5.w,
-                                        vertical: 5.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade100,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Center(
-                                        child: Image.asset(
-                                          product.image,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 8.h,
-                                      right: 8.w,
-                                      child: Container(
-                                        width: 28.w,
-                                        height: 28.h,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.white,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          product.isFavorite
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                          size: 16.sp,
-                                          color: product.isFavorite
-                                              ? AppColors.red
-                                              : AppColors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w,
-                                    vertical: 2.h,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          appText(
-                                            product.name,
-                                            fontSize: 13.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.textBlack,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-
-                                          Spacer(),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 5.w,
-                                              vertical: 2.h,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.lightAmber,
-                                              borderRadius:
-                                                  BorderRadius.circular(10.r),
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Icon(
-                                                  Icons.star,
-                                                  size: 8.sp,
-                                                  color: AppColors.darkAmber,
-                                                ),
-
-                                                appText("4.3", fontSize: 8.sp),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 2.h),
-                                      appText(
-                                        product.name,
-                                        fontFamily: 'inter',
-                                        fontSize: 10.sp,
-                                        fontWeight: FontWeight.w400,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-
-                                      SizedBox(height: 2.h),
-                                      appText(
-                                        '₹ ${product.price.toStringAsFixed(0)}',
-                                        fontFamily: 'inter',
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
+                          return ProductCard(product: product);
                         },
                       ),
                     ),
@@ -462,14 +314,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         appText(
-                          'Best Seller Products',
+                          AppStrings.best_products,
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.06,
                         ),
-
                         appText(
-                          'See All',
+                          AppStrings.see_all,
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.06,
@@ -489,7 +340,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           final product =
                               homeController.bestSellerProducts[index];
                           return Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(8.0.w),
                             child: Container(
                               width: 220.w,
                               padding: EdgeInsets.all(5.sp),
@@ -499,7 +350,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 boxShadow: [
                                   BoxShadow(
                                     color: AppColors.shadowColor,
-                                    blurRadius: 6,
+                                    blurRadius: 6.r,
                                     offset: Offset(0, 2),
                                   ),
                                 ],
@@ -534,7 +385,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                           fontWeight: FontWeight.w600,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-
                                         SizedBox(height: 4.h),
                                         appText(
                                           "₹ ${product.price.toStringAsFixed(0)}",
@@ -566,14 +416,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         appText(
-                          "Trending Products",
+                          AppStrings.trending,
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.06,
                         ),
-
                         appText(
-                          'See All',
+                          AppStrings.see_all,
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.06,
@@ -589,139 +438,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         scrollDirection: Axis.horizontal,
                         padding: EdgeInsets.symmetric(
                           horizontal: 16.w,
-                          vertical: 5,
+                          vertical: 5.h,
                         ),
                         itemCount: homeController.trendingProducts.length,
                         itemBuilder: (context, index) {
                           final product =
                               homeController.trendingProducts[index];
-                          return Container(
-                            width: 150.w,
-                            margin: EdgeInsets.only(right: 15.w),
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(12.r),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.shadowColor,
-                                  blurRadius: 6.r,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Stack(
-                                  children: [
-                                    Container(
-                                      height: 120.h,
-                                      margin: EdgeInsets.symmetric(
-                                        horizontal: 5.w,
-                                        vertical: 5.h,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.lightGrey,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Center(
-                                        child: Image.asset(
-                                          product.image,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 8.h,
-                                      right: 8.w,
-                                      child: Container(
-                                        width: 28.w,
-                                        height: 28.h,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.white,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          product.isFavorite
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                          size: 16.sp,
-                                          color: product.isFavorite
-                                              ? AppColors.red
-                                              : AppColors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w,
-                                    vertical: 2.h,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          appText(
-                                            product.name,
-                                            fontSize: 13.sp,
-                                            fontWeight: FontWeight.bold,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          Spacer(),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 5.w,
-                                              vertical: 2.h,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.lightAmber,
-                                              borderRadius:
-                                                  BorderRadius.circular(10.r),
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Icon(
-                                                  Icons.star,
-                                                  size: 8.sp,
-                                                  color: AppColors.darkAmber,
-                                                ),
-                                                appText("4.3", fontSize: 8.sp),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 2.h),
-                                      appText(
-                                        product.name,
-                                        fontFamily: 'inter',
-                                        fontSize: 10.sp,
-                                        fontWeight: FontWeight.w400,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-
-                                      SizedBox(height: 2.h),
-                                      appText(
-                                        '₹ ${product.price.toStringAsFixed(0)}',
-                                        fontFamily: 'inter',
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
+                          return ProductCard(product: product);
                         },
                       ),
                     ),
@@ -737,12 +460,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: double.infinity,
                   height: 168.h,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(23),
-                    gradient: LinearGradient(
-                      colors: [AppColors.gradientPink, AppColors.gradientBlue],
-                      begin: Alignment.topLeft,
-                      end: Alignment.centerRight,
-                    ),
+                    borderRadius: BorderRadius.circular(23.r),
+                    gradient: AppGradients.adverticementGradient,
                   ),
                   child: Stack(
                     children: [
@@ -750,7 +469,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         top: 24.h,
                         left: 25.w,
                         child: Text(
-                          "Explore\nMore!!",
+                          AppStrings.explore,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 25.sp,
                             fontWeight: FontWeight.w800,
@@ -769,7 +488,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(10),
                           child: Center(
                             child: appText(
-                              "START PURCHASING",
+                              AppStrings.purchase,
                               fontSize: 10.sp,
                               fontWeight: FontWeight.w800,
                               color: AppColors.gradientPink,
@@ -778,14 +497,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-
                       Positioned(
                         bottom: 10.h,
                         left: 24.w,
                         child: SizedBox(
                           width: 240.w,
                           child: appText(
-                            "Just save minimum ₹100 everyday\nto get your desired product",
+                            AppStrings.Adverticement_content,
                             fontSize: 15.sp,
                             color: AppColors.white,
                             fontWeight: FontWeight.w400,
@@ -826,14 +544,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: double.infinity,
                 height: 420.h,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.gradientLightBlue,
-                      AppColors.gradientDarkBlue,
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
+                  gradient: AppGradients.succesGradient,
                 ),
                 child: SingleChildScrollView(
                   child: Column(
@@ -857,7 +568,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       boxShadow: [
                                         BoxShadow(
                                           color: AppColors.lightBlack,
-                                          blurRadius: 8,
+                                          blurRadius: 8.r,
                                           offset: const Offset(0, 4),
                                         ),
                                       ],
@@ -869,7 +580,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fit: BoxFit.cover,
                                         width: MediaQuery.of(
                                           context,
-                                        ).size.width,
+                                        ).size.width.w,
                                       ),
                                     ),
                                   );
@@ -881,18 +592,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               autoPlayInterval: const Duration(seconds: 5),
                               enlargeCenterPage: true,
                               viewportFraction: 1.0,
-                              height: 200,
+                              height: 170.h,
                               onPageChanged: (index, reason) {
                                 homeController
-                                        .currentBottomCarouselIndex
-                                        .value =
-                                    index;
+                                    .currentBottomCarouselIndex.value = index;
                               },
                             ),
                           ),
-
                           Positioned(
-                            bottom: 16,
+                            bottom: 10.h,
                             child: Obx(
                               () => Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -900,33 +608,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .asMap()
                                     .entries
                                     .map((entry) {
-                                      return Container(
-                                        width:
-                                            homeController
-                                                    .currentBottomCarouselIndex
-                                                    .value ==
-                                                entry.key
-                                            ? 24
-                                            : 8,
-                                        height: 8,
-                                        margin: EdgeInsets.symmetric(
-                                          horizontal: 4.w,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            4.r,
-                                          ),
-                                          color:
-                                              homeController
-                                                      .currentBottomCarouselIndex
-                                                      .value ==
-                                                  entry.key
-                                              ? AppColors.white
-                                              : AppColors.transparentWhite,
-                                        ),
-                                      );
-                                    })
-                                    .toList(),
+                                  return Container(
+                                    width: homeController
+                                                .currentBottomCarouselIndex
+                                                .value ==
+                                            entry.key
+                                        ? 24.w
+                                        : 8.w,
+                                    height: 8.h,
+                                    margin: EdgeInsets.symmetric(
+                                      horizontal: 4.w,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(
+                                        4.r,
+                                      ),
+                                      color: homeController
+                                                  .currentBottomCarouselIndex
+                                                  .value ==
+                                              entry.key
+                                          ? AppColors.white
+                                          : AppColors.transparentWhite,
+                                    ),
+                                  );
+                                }).toList(),
                               ),
                             ),
                           ),
@@ -941,6 +646,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: AssetImage(AppAssets.refer_image),
+                            fit: BoxFit.fill,
                           ),
                         ),
                         child: Stack(
@@ -949,7 +655,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               right: 30.w,
                               top: 37.h,
                               child: appText(
-                                "Refer EPI",
+                                AppStrings.refer,
                                 fontSize: 25.sp,
                                 fontWeight: FontWeight.w900,
                                 color: AppColors.skyBlue,
@@ -960,7 +666,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               right: 40.w,
                               top: 75.h,
                               child: appText(
-                                "Earn Money\nEveryday",
+                                AppStrings.refer_heding,
                                 fontSize: 28.sp,
                                 fontWeight: FontWeight.w900,
                                 color: AppColors.white,
@@ -973,15 +679,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               right: 35.w,
                               child: appButton(
                                 onTap: () {},
+                                width: 195.w,
+                                height: 45.h,
                                 buttonColor: AppColors.white,
                                 borderRadius: BorderRadius.circular(12),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 34.w,
-                                  vertical: 10.h,
-                                ),
+                                padding: EdgeInsets.symmetric(),
                                 // Simulate elevation using BoxShadow
                                 child: appText(
-                                  "Refer A Friend Now",
+                                  AppStrings.refer_button_lebel,
                                   fontSize: 17.sp,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.gradientDarkBlue,
@@ -1004,3 +709,5 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+

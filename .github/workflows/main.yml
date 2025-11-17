@@ -1,0 +1,176 @@
+name: 🤖 Flutter Android CI
+run-name: "🚀 Android Build by ${{ github.actor }} on ${{ github.ref_name }}"
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+on:
+  push:
+    branches: [ main, developer ]
+    paths:
+      - "android/**"
+      - "lib/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+
+  pull_request:
+    branches: [ main, developer ]
+    paths:
+      - "android/**"
+      - "lib/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+
+jobs:
+  android-ci: 
+    runs-on: ubuntu-latest 
+    
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+
+    steps:
+      # ------------------------------
+      # Checkout
+      # ------------------------------
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      # ------------------------------
+      # Setup Flutter
+      # ------------------------------
+      - name: ⚙️ Setup Flutter (3.35.7 Stable)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.7'
+          channel: 'stable'
+
+      # ------------------------------
+      # Install Dependencies
+      # ------------------------------
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      # ------------------------------
+      # Lint
+      # ------------------------------
+      - name: 🔍 Lint Check
+        run: flutter analyze
+
+      # ------------------------------
+      # Run Tests (developer command)
+      # ------------------------------
+      - name: 🧪 Run Tests
+        run: flutter test
+
+      # ------------------------------
+      # Step Summary
+      # ------------------------------
+      - name: 🧾 Add Lint + Test Summary
+        if: always()
+        run: |
+          echo "## 🧩 Flutter CI Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### 🔍 Lint Output" >> $GITHUB_STEP_SUMMARY
+          flutter analyze | tail -n 20 >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### 🧪 Test Output" >> $GITHUB_STEP_SUMMARY
+          flutter test || true >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      # ------------------------------
+      # Build APK
+      # ------------------------------
+      - name: 🏗️ Build APK (Developer command)
+        run: flutter build apk --release
+
+      # ------------------------------
+      # Build AAB
+      # ------------------------------
+      - name: 📦 Build AAB (Developer command)
+        run: flutter build appbundle --release
+
+
+# -----------------------------------------
+# JOB 2: DEPLOY (Only on main + CI success)
+# -----------------------------------------
+  android-deploy:
+    name: "🚀 Android Deploy to Google Play"
+    runs-on: ubuntu-latest
+    needs: android-ci
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Flutter (3.35.7 Stable)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.7'
+          channel: 'stable'
+
+      # Install dependencies
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      # Decode keystore
+      - name: 🔐 Decode Android Keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > android.keystore
+
+      # Create key.properties
+      - name: 🔧 Configure Signing
+        run: |
+          cat > android/key.properties <<EOF
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=../android.keystore
+          EOF
+
+      # -----------------------------------
+      # Build using developer commands
+      # -----------------------------------
+
+      - name: 🏗️ Build AAB
+        run: flutter build appbundle --release
+
+      - name: 🏗️ Build APK
+        run: flutter build apk --release
+
+      # Upload artifacts
+      - name: 📤 Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-builds
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
+
+      # Setup Fastlane
+      - name: 🔧 Setup Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+
+      - run: gem install fastlane -N
+
+      # Deploy to Google Play
+      - name: 🚀 Deploy to Google Play (Internal Track)
+        env:
+          JSON_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
+        run: |
+          echo "$JSON_KEY" > service_account.json
+          fastlane supply \
+            --aab build/app/outputs/bundle/release/app-release.aab \
+            --json_key service_account.json \
+            --package_name "$PACKAGE_NAME" \
+            --track internal \
+            --skip_upload_screenshots true \
+            --skip_upload_images true

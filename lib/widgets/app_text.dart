@@ -11,9 +11,9 @@ Widget appText(
   int? maxLines,
   double? height,
   double? fontSize,
-  double? letterSpacing, // ➕ added
+  double? letterSpacing, 
   FontWeight? fontWeight,
-  FontStyle? fontStyle, // ➕ added
+  FontStyle? fontStyle,
   Color? color,
   String fontFamily = 'poppins',
 }) {
@@ -24,8 +24,8 @@ Widget appText(
     height: height,
     fontSize: fontSize ?? 12.sp,
     fontWeight: fontWeight,
-    letterSpacing: letterSpacing, // ➕ added
-    fontStyle: fontStyle, // ➕ added
+    letterSpacing: letterSpacing, 
+    fontStyle: fontStyle, 
     color: color ?? AppColors.textBlack,
   );
 
@@ -43,6 +43,7 @@ Widget appText(
       break;
     case 'inter':
       fontStyleSelected = GoogleFonts.inter(textStyle: baseStyle);
+      break;
     default:
       fontStyleSelected = baseStyle.copyWith(fontFamily: fontFamily);
   }

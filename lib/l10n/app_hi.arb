@@ -1,0 +1,19 @@
+{
+  "@@locale": "hi",
+  "appTitle": "सेर्से ऐप",
+  "signIn": "साइन इन",
+  "welcomeUser": "स्वागत है, {name}!",
+  "@welcomeUser": {
+    "description": "उपयोगकर्ता के नाम के साथ अभिवादन संदेश",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "itemsCount": "{count, plural, =0{कोई आइटम नहीं} =1{1 आइटम} other{{count} आइटम}}",
+
+  "stylishTitle": "स्टाइलिश",
+  "investmentDescription": "अपनी बचत को सफलता में बदलें। \nआज ही निवेश करें और वह भविष्य सुरक्षित करें जिसकी आपने हमेशा कल्पना की है!",
+  "bookNow": "अभी बुक करें"
+}

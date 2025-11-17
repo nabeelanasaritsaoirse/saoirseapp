@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>486829564070-4d1fkup9ndsfec17mg830p1p7eqd6469.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDpQb5HVM28WGffCCwrMmNs9luxSMFyaBY</string>
+	<key>GCM_SENDER_ID</key>
+	<string>486829564070</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.saoirse.epi</string>
+	<key>PROJECT_ID</key>
+	<string>saoirse-epi</string>
+	<key>STORAGE_BUCKET</key>
+	<string>saoirse-epi.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:486829564070:ios:07e32a618113ab29479467</string>
+</dict>
+</plist>

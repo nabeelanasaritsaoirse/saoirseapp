@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -6,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
+import 'l10n/app_localizations.dart';
 import 'screens/splash/splash_screen.dart';
 import 'services/api_service.dart';
 
@@ -14,40 +19,79 @@ GetStorage storage = GetStorage();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  Platform.isIOS
+      ? await Firebase.initializeApp(
+          options: const FirebaseOptions(
+          apiKey: 'AIzaSyDpQb5HVM28WGffCCwrMmNs9luxSMFyaBY',
+          appId: '1:486829564070:ios:07e32a618113ab29479467',
+          messagingSenderId: '486829564070',
+          projectId: 'saoirse-epi',
+        ))
+      : await Firebase.initializeApp(
+          options: FirebaseOptions(
+          apiKey: 'AIzaSyCxnv1w6XLZhEd0E_WZU3cXk8D3qh5Ssg0',
+          appId: '1:486829564070:android:74e217e102e40a69479467',
+          messagingSenderId: '486829564070',
+          projectId: 'saoirse-epi',
+        ));
+  String? lang = storage.read('language');
+  Locale locale = lang != null ? Locale(lang) : const Locale('en');
 
-  runApp(const MyApp());
+  runApp(MyApp(locale: locale));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Locale locale;
+  const MyApp({super.key, required this.locale});
 
   @override
   Widget build(BuildContext context) {
+    // optional: if APIService needs context later, move it to HomeScreen
     APIService.checkConnection(context);
 
     return ScreenUtilInit(
-      useInheritedMediaQuery: true,
+      designSize: const Size(360, 690), //required for ScreenUtil
+      minTextAdapt: true, // prevents text overflow
+      splitScreenMode: true, //fixes _splitScreenMode not initialized
+      useInheritedMediaQuery: true, //keeps correct context in GetX
       builder: (context, child) {
         return GestureDetector(
           onTap: () {
+            // Dismiss keyboard on tap outside
             FocusScopeNode currentFocus = FocusScope.of(context);
-
             if (!currentFocus.hasPrimaryFocus &&
                 currentFocus.focusedChild != null) {
               FocusManager.instance.primaryFocus?.unfocus();
             }
           },
           child: GetMaterialApp(
+            locale: locale,
             debugShowCheckedModeBanner: false,
             title: AppStrings.app_name,
             theme: ThemeData(
-              scaffoldBackgroundColor: AppColors.scaffoldColor,
+              scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
               textTheme: GoogleFonts.poppinsTextTheme(),
               highlightColor: AppColors.transparent,
               splashColor: AppColors.transparent,
+              useMaterial3: true,
             ),
             scrollBehavior: CustomScrollBehavior(),
             home: SplashScreen(),
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'), // English
+              Locale('hi'), // Hindi
+              Locale('ml'), // Malayalam
+            ],
+
+            // optional - default locale
+
+            fallbackLocale: const Locale('en'),
           ),
         );
       },
@@ -60,11 +104,9 @@ class CustomScrollBehavior extends ScrollBehavior {
   ScrollPhysics getScrollPhysics(BuildContext context) {
     // Use BouncingScrollPhysics everywhere
     return const BouncingScrollPhysics();
-    // Or use ClampingScrollPhysics() to mimic Android
-    // return ClampingScrollPhysics();
   }
 
-  // Optional: To also remove overscroll glow on Android
+  // Optional: remove overscroll glow on Android
   @override
   Widget buildOverscrollIndicator(
     BuildContext context,
