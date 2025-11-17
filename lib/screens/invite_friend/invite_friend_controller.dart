@@ -14,14 +14,13 @@ class InviteFriendController extends GetxController {
   final ReferralService _referralService = ReferralService();
 
   final friendDetails = Rxn<FriendDetails>();
-  final isProductLoading = false.obs; 
+  final isProductLoading = false.obs;
   final isLoading = false.obs;
-
 
   @override
   void onInit() {
     super.onInit();
-    fetchFriendDetails();      
+    fetchFriendDetails();
   }
 
   // ---------------------------------------------------------------------------
@@ -66,6 +65,4 @@ class InviteFriendController extends GetxController {
 
     return null;
   }
-
-
 }
