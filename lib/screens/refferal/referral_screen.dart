@@ -534,7 +534,7 @@ class ReferralScreen extends StatelessWidget {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          "₹${(referral.totalCommission ?? 0).toStringAsFixed(0)}",
+                          "₹${(referral.totalCommission).toStringAsFixed(0)}",
                           style: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.w600,

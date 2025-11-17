@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 import 'dart:developer';
 
@@ -64,7 +66,7 @@ class LoginController extends GetxController {
   //   loading.value = true;
 
   //   if (APIService.internet) {
-    
+
   //     String? idToken = await AuthService.googleLogin();
   //     debugPrint(idToken, wrapWidth: 1024);
 
@@ -81,28 +83,27 @@ class LoginController extends GetxController {
   //   loading.value = false;
   // }
   googleLogin() async {
-  try {
-    loading.value = true;
+    try {
+      loading.value = true;
 
-    if (!APIService.internet) {
-      appSnackbar(error: true, content: AppStrings.no_internet);
-      return;
+      if (!APIService.internet) {
+        appSnackbar(error: true, content: AppStrings.no_internet);
+        return;
+      }
+
+      String? idToken = await AuthService.googleLogin();
+
+      if (idToken != null) {
+        await userLogin(idToken);
+      } else {
+        debugPrint("Google login returned null");
+      }
+    } catch (e) {
+      debugPrint("Google login error: $e");
+    } finally {
+      loading.value = false;
     }
-
-    String? idToken = await AuthService.googleLogin();
-
-    if (idToken != null) {
-      await userLogin(idToken);
-    } else {
-      debugPrint("Google login returned null");
-    }
-  } catch (e) {
-    debugPrint("Google login error: $e");
-  } finally {
-    loading.value = false;
   }
-}
-
 
   //user login
   userLogin(String idToken) async {

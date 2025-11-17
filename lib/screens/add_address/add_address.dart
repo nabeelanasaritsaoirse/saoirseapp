@@ -97,7 +97,7 @@ class _AddAddressState extends State<AddAddress> {
                       appText("Country",
                           fontSize: 14.sp, fontWeight: FontWeight.w600),
                       appTextField(
-                        controller: addAddressController.CountryController,
+                        controller: addAddressController.countryController,
                         textColor: AppColors.black,
                         hintText: "Country",
                         hintColor: AppColors.grey,
