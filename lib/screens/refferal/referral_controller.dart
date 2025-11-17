@@ -1,17 +1,16 @@
 import 'dart:io';
-
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../models/dashboard_model.dart';
+import '../../models/referral_response_model.dart';
 import '../../services/refferal_service.dart';
 import '../../widgets/app_snackbar.dart';
-
 
 class ReferralController extends GetxController {
   final ReferralService _referralService = ReferralService();
 
+  // Observables
   final referralCode = ''.obs;
   final isLoading = false.obs;
   final isDashboardLoading = false.obs;
@@ -19,87 +18,95 @@ class ReferralController extends GetxController {
   final referrals = <Referral>[].obs;
   final filteredReferrals = <Referral>[].obs;
 
-  final walletBalance = 0.0.obs;
-  final totalEarnings = 0.0.obs;
-  final totalReferrals = 0.obs;
-  final activeReferrals = 0.obs;
-
   @override
   void onInit() {
     super.onInit();
     getReferralCode();
-    fetchReferralDashboard();
+    fetchReferralData();
   }
 
-  //  Fetch referral code
+  // ---------------------------------------------------------------------------
+  // Fetch Referral Code
+  // ---------------------------------------------------------------------------
+
   Future<void> getReferralCode() async {
     try {
-      isLoading.value = true;
+      isLoading(true);
 
       final response = await _referralService.fetchReferralCode();
+
       if (response != null && response.success) {
         referralCode.value = response.referralCode;
       } else {
         appSnackbar(
           error: true,
-          content: response?.message ?? 'Failed to fetch referral code',
+          content: response?.message ?? "Failed to fetch referral code",
         );
       }
     } catch (e) {
       appSnackbar(error: true, content: e.toString());
     } finally {
-      isLoading.value = false;
+      isLoading(false);
     }
   }
 
-  // Fetch Dashboard Data
-  Future<void> fetchReferralDashboard() async {
-  try {
-    isDashboardLoading.value = true;
+  // ---------------------------------------------------------------------------
+  // Fetch Referral List (Dashboard Data)
+  // ---------------------------------------------------------------------------
 
-    final dashboard = await _referralService.fetchReferralDashboard();
+  Future<void> fetchReferralData() async {
+    try {
+      isDashboardLoading(true);
 
-    if (dashboard != null && dashboard.success) {
-      final data = dashboard.dashboardData;
+      final response = await _referralService.fetchReferralResponseFromServer();
 
-      // Stats
-      walletBalance.value = data?.stats?.walletBalance.toDouble() ?? 0.0;
-      totalEarnings.value = data?.stats?.totalEarnings.toDouble() ?? 0.0;
-      activeReferrals.value = data?.stats?.activeReferrals ?? 0;
-      totalReferrals.value = data?.stats?.totalReferrals ?? 0;
-
-      // Lists
-      referrals.assignAll(data?.referrals ?? []);
-      filteredReferrals.assignAll(referrals);
-
-    } else {
-      appSnackbar(error: true, content: "Failed to fetch referral dashboard");
+      if (response != null && response.success) {
+        referrals.assignAll(response.referrals);
+        filteredReferrals.assignAll(response.referrals);
+      } else {
+        appSnackbar(
+          error: true,
+          content: response?.message ?? "Failed to fetch referral data",
+        );
+      }
+    } catch (e) {
+      appSnackbar(error: true, content: e.toString());
+    } finally {
+      isDashboardLoading(false);
     }
-  } catch (e) {
-    appSnackbar(error: true, content: e.toString());
-  } finally {
-    isDashboardLoading.value = false;
   }
-}
+
+   // ---------------------------------------------------------------------------
+  // Fetch Product Details List (Referral Details screen)
+  // ---------------------------------------------------------------------------
+
+
+
+  // ---------------------------------------------------------------------------
+  // SHARE OPTIONS
+  // ---------------------------------------------------------------------------
 
   Future<void> shareToWhatsApp() async {
     final message =
         "Hey! Join me on this app using my referral code: ${referralCode.value}";
+
     final whatsappUrl = "whatsapp://send?text=${Uri.encodeComponent(message)}";
 
     if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
       await launchUrl(Uri.parse(whatsappUrl));
     } else {
-      final fallback = "https://wa.me/?text=${Uri.encodeComponent(message)}";
-      await launchUrl(
-        Uri.parse(fallback),
-        mode: LaunchMode.externalApplication,
-      );
+      // Fallback to web WhatsApp
+      final fallback =
+          "https://wa.me/?text=${Uri.encodeComponent(message)}";
+      await launchUrl(Uri.parse(fallback),
+          mode: LaunchMode.externalApplication);
     }
   }
 
   Future<void> shareToFacebook() async {
-    final message = "Join me using my referral code: ${referralCode.value}";
+    final message =
+        "Join me using my referral code: ${referralCode.value}";
+
     final fbUrl =
         "fb://faceweb/f?href=https://facebook.com/sharer/sharer.php?u=${Uri.encodeComponent(message)}";
 
@@ -108,15 +115,15 @@ class ReferralController extends GetxController {
     } else {
       final fallback =
           "https://www.facebook.com/sharer/sharer.php?u=${Uri.encodeComponent(message)}";
-      await launchUrl(
-        Uri.parse(fallback),
-        mode: LaunchMode.externalApplication,
-      );
+      await launchUrl(Uri.parse(fallback),
+          mode: LaunchMode.externalApplication);
     }
   }
 
   Future<void> shareToTelegram() async {
-    final message = "Join me using my referral code: ${referralCode.value}";
+    final message =
+        "Join me using my referral code: ${referralCode.value}";
+
     final telegramUrl = "tg://msg?text=${Uri.encodeComponent(message)}";
 
     if (await canLaunchUrl(Uri.parse(telegramUrl))) {
@@ -124,89 +131,97 @@ class ReferralController extends GetxController {
     } else {
       final fallback =
           "https://t.me/share/url?text=${Uri.encodeComponent(message)}";
-      await launchUrl(
-        Uri.parse(fallback),
-        mode: LaunchMode.externalApplication,
-      );
+      await launchUrl(Uri.parse(fallback),
+          mode: LaunchMode.externalApplication);
     }
   }
 
   Future<void> shareToTwitter() async {
-    final message = "Join me using my referral code: ${referralCode.value}";
-    final twitterUrl = "twitter://post?message=${Uri.encodeComponent(message)}";
+    final message =
+        "Join me using my referral code: ${referralCode.value}";
+
+    final twitterUrl =
+        "twitter://post?message=${Uri.encodeComponent(message)}";
 
     if (await canLaunchUrl(Uri.parse(twitterUrl))) {
       await launchUrl(Uri.parse(twitterUrl));
     } else {
       final fallback =
           "https://twitter.com/intent/tweet?text=${Uri.encodeComponent(message)}";
-      await launchUrl(
-        Uri.parse(fallback),
-        mode: LaunchMode.externalApplication,
-      );
+      await launchUrl(Uri.parse(fallback),
+          mode: LaunchMode.externalApplication);
     }
   }
 
   Future<void> shareToGmail() async {
-  final subject = "Join me on this app!";
-  final body = "Hey! Use my referral code: ${referralCode.value}";
+    final subject = "Join me on this app!";
+    final body = "Hey! Use my referral code: ${referralCode.value}";
 
-  if (Platform.isAndroid) {
-    try {
-      final intent = AndroidIntent(
-        action: 'android.intent.action.SEND',
-        type: 'message/rfc822',
-        package: 'com.google.android.gm', 
-        arguments: <String, dynamic>{
-          'android.intent.extra.SUBJECT': subject,
-          'android.intent.extra.TEXT': body,
-        },
-      );
-      await intent.launch();
-    } catch (e) {
-      appSnackbar(error: true, content: "Gmail app not found on this device.");
+    if (Platform.isAndroid) {
+      try {
+        final intent = AndroidIntent(
+          action: 'android.intent.action.SEND',
+          type: 'message/rfc822',
+          package: 'com.google.android.gm',
+          arguments: {
+            'android.intent.extra.SUBJECT': subject,
+            'android.intent.extra.TEXT': body,
+          },
+        );
+        await intent.launch();
+      } catch (e) {
+        appSnackbar(error: true, content: "Gmail app not found on this device.");
+      }
+    } else if (Platform.isIOS) {
+      final uri = Uri.parse(
+          "mailto:?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}");
+
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      } else {
+        final gmailWeb = Uri.parse(
+            "https://mail.google.com/mail/?view=cm&fs=1&su=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}");
+
+        await launchUrl(gmailWeb,
+            mode: LaunchMode.externalApplication);
+      }
     }
-  } else if (Platform.isIOS) {
-    
-    final uri = Uri.parse("mailto:?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}");
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      final gmailWeb = Uri.parse("https://mail.google.com/mail/?view=cm&fs=1&su=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}");
-      await launchUrl(gmailWeb, mode: LaunchMode.externalApplication);
-    }
+  }
+
+  Future<void> shareMore() async {
+    final message =
+        "Join me using my referral code: ${referralCode.value}";
+
+    final smsUrl = "sms:?body=${Uri.encodeComponent(message)}";
+
+    await launchUrl(Uri.parse(smsUrl),
+        mode: LaunchMode.externalApplication);
+  }
+
+
+  void filterReferrals(String query) {
+  if (query.isEmpty) {
+    filteredReferrals.assignAll(referrals);
+  } else {
+    filteredReferrals.assignAll(
+      referrals.where((ref) =>
+          ref.referredUser!.name.toLowerCase().contains(query.toLowerCase())),
+    );
   }
 }
 
-  Future<void> shareMore() async {
-    final message = "Join me using my referral code: ${referralCode.value}";
-    final smsUrl = "sms:?body=${Uri.encodeComponent(message)}";
-    await launchUrl(Uri.parse(smsUrl), mode: LaunchMode.externalApplication);
-  }
 
-  // Filter
-  void filterReferrals(String query) {
-    if (query.isEmpty) {
-      filteredReferrals.assignAll(referrals);
-    } else {
-      filteredReferrals.assignAll(
-        referrals
-            .where((r) => r.name.toLowerCase().contains(query.toLowerCase()))
-            .toList(),
-      );
-    }
-  }
+  // ---------------------------------------------------------------------------
+  // Copy Referral Code
+  // ---------------------------------------------------------------------------
 
-  // Copy referral code
   void copyReferralCode() {
-    if (referralCode.value.isEmpty) return;
+    if (referralCode.isEmpty) return;
 
     appSnackbar(
       error: false,
-      title: 'Copied!',
-      content: 'Referral code copied to clipboard',
+      title: "Copied!",
+      content: "Referral code copied to clipboard",
     );
   }
-
-
 }

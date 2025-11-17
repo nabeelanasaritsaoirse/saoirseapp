@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/widgets.dart';
@@ -59,26 +60,49 @@ class LoginController extends GetxController {
   }
 
   //google login
+  // googleLogin() async {
+  //   loading.value = true;
+
+  //   if (APIService.internet) {
+    
+  //     String? idToken = await AuthService.googleLogin();
+  //     debugPrint(idToken, wrapWidth: 1024);
+
+  //     if (idToken != null) {
+  //       await userLogin(idToken);
+  //     }
+  //   } else {
+  //     appSnackbar(
+  //       error: true,
+  //       content: AppStrings.no_internet,
+  //     );
+  //   }
+
+  //   loading.value = false;
+  // }
   googleLogin() async {
+  try {
     loading.value = true;
 
-    if (APIService.internet) {
-      await AuthService.signOut();
-      String? idToken = await AuthService.googleLogin();
-      debugPrint(idToken, wrapWidth: 1024);
-
-      if (idToken != null) {
-        await userLogin(idToken);
-      }
-    } else {
-      appSnackbar(
-        error: true,
-        content: AppStrings.no_internet,
-      );
+    if (!APIService.internet) {
+      appSnackbar(error: true, content: AppStrings.no_internet);
+      return;
     }
 
+    String? idToken = await AuthService.googleLogin();
+
+    if (idToken != null) {
+      await userLogin(idToken);
+    } else {
+      debugPrint("Google login returned null");
+    }
+  } catch (e) {
+    debugPrint("Google login error: $e");
+  } finally {
     loading.value = false;
   }
+}
+
 
   //user login
   userLogin(String idToken) async {
@@ -90,7 +114,7 @@ class LoginController extends GetxController {
       url: AppURLs.LOGIN_API,
       body: body,
       onSuccess: (data) {
-        print('userID: ${data['data']['userId']}');
+        log('userID: ${data['data']['userId']}');
         storage.write(AppConst.USER_ID, data['data']['userId']);
         storage.write(AppConst.REFERRAL_CODE, data['data']['referralCode']);
         storage.write(AppConst.ACCESS_TOKEN, data['data']['accessToken']);
