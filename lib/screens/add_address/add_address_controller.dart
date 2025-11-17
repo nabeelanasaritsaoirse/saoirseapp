@@ -9,7 +9,7 @@ class AddAddressController extends GetxController {
 
   TextEditingController stateController = TextEditingController();
 
-  TextEditingController CountryController = TextEditingController();
+  TextEditingController countryController = TextEditingController();
 
   TextEditingController zipController = TextEditingController();
 

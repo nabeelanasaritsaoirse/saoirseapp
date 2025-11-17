@@ -1,6 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:get/get_state_manager/get_state_manager.dart';
 
-class SelectAddressController extends GetxController{
-  
- 
-}
+class SelectAddressController extends GetxController {}

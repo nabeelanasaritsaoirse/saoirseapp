@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -6,7 +8,6 @@ import '../../constants/app_strings.dart';
 import '../../constants/app_colors.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
-
 
 class WarningDialog {
   static void show({
