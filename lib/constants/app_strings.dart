@@ -127,4 +127,12 @@ class AppStrings {
   static String payment_Sucsess_note =
       "Thank you for your payment!\nStay consistent with your daily payments and get your product when the plan completes.";
   static String payment_Sucsess = "Payment success!";
+
+  // Edit Profile screen
+  static String editLabel = 'Edit Profile';
+  static String fullName = "Full name";
+  static String phoneNumber = 'Phone number';
+  static String saveChanges = "Save Changes";
+  static String email = 'Email';
+
 }

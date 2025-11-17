@@ -91,7 +91,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w600,
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       appText(
                         item["message"],
                         overflow: TextOverflow.ellipsis,

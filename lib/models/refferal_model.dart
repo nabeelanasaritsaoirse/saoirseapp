@@ -22,9 +22,6 @@ class ReferralUser {
   });
 }
 
-
-
-
 class ReferralResponses {
   final bool success;
   final String referralCode;

@@ -11,7 +11,7 @@ Widget appText(
   int? maxLines,
   double? height,
   double? fontSize,
-  double? letterSpacing, 
+  double? letterSpacing,
   FontWeight? fontWeight,
   FontStyle? fontStyle,
   Color? color,
@@ -24,8 +24,8 @@ Widget appText(
     height: height,
     fontSize: fontSize ?? 12.sp,
     fontWeight: fontWeight,
-    letterSpacing: letterSpacing, 
-    fontStyle: fontStyle, 
+    letterSpacing: letterSpacing,
+    fontStyle: fontStyle,
     color: color ?? AppColors.textBlack,
   );
 

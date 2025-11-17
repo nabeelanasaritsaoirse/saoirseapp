@@ -4,6 +4,7 @@ class AppColors {
   // Primary Colors
   static const Color primaryColor = Color(0xFF000063);
   static const Color scaffoldColor = Colors.white;
+  static const Color paperColor = Color(0xFFF7FCFE);
 
   //  Neutral Colors
   static const Color transparent = Colors.transparent;
