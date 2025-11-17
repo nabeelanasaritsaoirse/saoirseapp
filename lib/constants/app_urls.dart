@@ -8,7 +8,7 @@ class AppURLs {
   static String LOGIN_API = BASE_API + 'api/auth/login';
 
   //user details api
-  static String USER_UPDATE_API = BASE_API + "api/auth/profile/";
+  static String USER_UPDATE_API = BASE_API + "api/auth/profiles/";
 
   //refferal api
   static String getRefferal_API = BASE_API + "api/referrals/generate-code";
