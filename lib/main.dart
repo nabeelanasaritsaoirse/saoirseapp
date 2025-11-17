@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:saoirse_app/screens/Select_Address/select_address.dart';
 import 'package:saoirse_app/screens/add_address/add_address.dart';
 import 'package:saoirse_app/screens/my_wallet/my_wallet.dart';
+import 'package:saoirse_app/screens/transaction_history/transaction_history.dart';
 
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
@@ -79,7 +80,7 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
             ),
             scrollBehavior: CustomScrollBehavior(),
-            home: SplashScreen(),
+            home: TransactionHistory(),
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
