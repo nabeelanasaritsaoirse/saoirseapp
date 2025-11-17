@@ -14,6 +14,7 @@ import 'l10n/app_localizations.dart';
 import 'screens/splash/splash_screen.dart';
 import 'services/api_service.dart';
 
+//storage instance
 GetStorage storage = GetStorage();
 
 Future<void> main() async {
