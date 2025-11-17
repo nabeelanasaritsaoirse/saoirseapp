@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:saoirse_app/screens/edit_profile/edit_profile_screen.dart';
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
 import 'l10n/app_localizations.dart';
@@ -75,7 +76,7 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
             ),
             scrollBehavior: CustomScrollBehavior(),
-            home: SplashScreen(),
+            home: EditProfileScreen(),
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,

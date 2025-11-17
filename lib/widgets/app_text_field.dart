@@ -84,7 +84,7 @@ class _appTextFieldState extends State<appTextField> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
-      cursorColor: AppColors.white,
+      cursorColor: widget.textColor ?? AppColors.black,
       readOnly: widget.readOnly,
       obscureText: _isObscured,
       obscuringCharacter: '*',

@@ -61,6 +61,9 @@ class AppAssets {
   static String faq = "assets/icons/faq.png";
   static String about = "assets/icons/about.png";
   static String logout = "assets/icons/log_out.png";
+
+  // Edit Profile Screen
+  static String edit_profile_bg = "assets/images/dummy_profile.jpg";
 }
 
 

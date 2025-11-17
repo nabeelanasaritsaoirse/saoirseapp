@@ -59,27 +59,7 @@ class LoginController extends GetxController {
     super.onClose();
   }
 
-  //google login
-  // googleLogin() async {
-  //   loading.value = true;
-
-  //   if (APIService.internet) {
-    
-  //     String? idToken = await AuthService.googleLogin();
-  //     debugPrint(idToken, wrapWidth: 1024);
-
-  //     if (idToken != null) {
-  //       await userLogin(idToken);
-  //     }
-  //   } else {
-  //     appSnackbar(
-  //       error: true,
-  //       content: AppStrings.no_internet,
-  //     );
-  //   }
-
-  //   loading.value = false;
-  // }
+ 
   googleLogin() async {
   try {
     loading.value = true;
