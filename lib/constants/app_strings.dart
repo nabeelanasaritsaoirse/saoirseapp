@@ -135,4 +135,21 @@ class AppStrings {
   static String saveChanges = "Save Changes";
   static String email = 'Email';
 
+  // Order Details screen
+  static String address = "ADDRESS";
+  static String phone = "Phone :";
+  static String change = "CHANGE";
+  static String item = "ITEMS 1";
+  static String qty = "QTY :";
+  static String apply = "Apply";
+  static String premoCode = "Available Promo Code";
+  static String apply_coupen = "Apply Coupon";
+  static String coupen_hint = "Enter the coupon code";
+  static String tax = "Tax";
+  static String market_fee = "Market Place Fee";
+  static String shipping_charge = "Shipping Charge";
+  static String total_amount = "Total Amount";
+  static String your_plan = "Your Plan";
+  static String pay_now = "Pay Now";
+  static String total_ex_tax = "Total (ex of tax)";
 }
