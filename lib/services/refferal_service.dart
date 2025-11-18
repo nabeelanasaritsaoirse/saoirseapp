@@ -13,7 +13,6 @@ import '../models/refferal_model.dart';
 
 import '../services/api_service.dart';
 
-
 class ReferralService {
   //  To fetch referral code
 

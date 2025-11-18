@@ -174,7 +174,6 @@ class ReferralController extends GetxController {
       } else {
         final gmailWeb = Uri.parse(
             "https://mail.google.com/mail/?view=cm&fs=1&su=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}");
-
         await launchUrl(gmailWeb, mode: LaunchMode.externalApplication);
       }
     }

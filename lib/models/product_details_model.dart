@@ -1,6 +1,4 @@
-
 import 'package:flutter/material.dart';
-
 
 class ProductDetailsModel {
   final String name;
