@@ -159,10 +159,12 @@ class VerifyOTPScreen extends StatelessWidget {
             ),
           ),
         ),
-        Visibility(
-          visible: controller.isLoading.value,
-          child: appLoader(),
-        ),
+        Obx(() {
+         return Visibility(
+            visible: controller.isLoading.value,
+            child: appLoader(),
+          );
+        }),
       ]),
     );
   }

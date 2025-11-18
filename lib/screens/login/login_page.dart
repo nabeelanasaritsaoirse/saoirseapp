@@ -292,10 +292,12 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          Visibility(
-            visible: loginController.loading.value,
-            child: appLoader(),
-          ),
+          Obx(() {
+            return Visibility(
+              visible: loginController.loading.value,
+              child: appLoader(),
+            );
+          }),
         ],
       ),
     );
