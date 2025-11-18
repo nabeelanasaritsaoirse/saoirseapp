@@ -132,22 +132,27 @@ class VerifyOTPScreen extends StatelessWidget {
 
             /// Verify Button
             Center(
-              child: appButton(
-                onTap: controller.verifyOtp,
-                buttonColor: AppColors.primaryColor,
-                buttonText: AppStrings.verify,
-                textColor: AppColors.white,
-                height: 45.h,
-                width: 160.w,
-              ),
+              child: Obx(() {
+                return controller.isLoading.value
+                    ? SizedBox(
+                        height: 45.h,
+                        width: 160.w,
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
+                      )
+                    : appButton(
+                        onTap: controller.verifyOtp,
+                        buttonColor: AppColors.primaryColor,
+                        buttonText: AppStrings.verify,
+                        textColor: AppColors.white,
+                        height: 45.h,
+                        width: 160.w,
+                      );
+              }),
             ),
-            if (controller.isLoading.value)
-              Container(
-                child: const Center(
-                  child:
-                      CircularProgressIndicator(color: AppColors.primaryColor),
-                ),
-              ),
           ],
         ),
       ),

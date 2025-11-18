@@ -74,16 +74,25 @@ class LoginController extends GetxController {
     }
 
     // Step 2: Backend login → get userId
-    String? userId = await userLogin(idToken);
+    final res = await AuthService.loginWithIdToken(idToken);
 
-    if (userId == null) {
-      loading.value = false;
+    if (res == null || res.success != true) {
+      appSnackbar(content: "Login failed", error: true);
       return;
     }
 
+    final data = res.data!;
+    storage.write("userId", data.userId);
+    storage.write("accessToken", data.accessToken);
+    storage.write("refreshToken", data.refreshToken);
+
+    print("✔ SAVED userId: ${storage.read("userId")}");
+    print("✔ SAVED accessToken: ${storage.read("accessToken")}");
+    print("✔ SAVED refreshToken: ${storage.read("refreshToken")}");
+
     // Step 3: Update user with FCM + referral
     bool updated = await updateUser(
-      userId,
+      data.userId!,
       referrelController.text.isNotEmpty ? referrelController.text.trim() : "",
     );
 
@@ -95,36 +104,6 @@ class LoginController extends GetxController {
 
     loading.value = false;
   }
-
-  //user login
-    Future<String?> userLogin(String idToken) async {
-      try {
-        final result = await APIService.postRequest(
-          url: AppURLs.LOGIN_API,
-          body: {"idToken": idToken},
-          onSuccess: (json) => json, // RETURN MAP
-        );
-
-        if (result == null) return null;
-
-        if (result["success"] != true) {
-          appSnackbar(content: result["message"], error: true);
-          return null;
-        }
-
-        final data = result["data"];
-
-        storage.write("accessToken", data["accessToken"]);
-        storage.write("refreshToken", data["refreshToken"]);
-        storage.write("userId", data["userId"]);
-
-        return data["userId"]; // return for next API
-      } catch (e) {
-        print("LOGIN ERROR::: $e");
-        appSnackbar(content: e.toString(), error: true);
-        return null;
-      }
-    }
 
   bool validateInputs() {
     String username = emailController.text.trim();

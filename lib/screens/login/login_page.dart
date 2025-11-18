@@ -172,42 +172,62 @@ class _LoginPageState extends State<LoginPage> {
                       }),
                       SizedBox(height: 15.h),
                       Center(
-                        child: appButton(
-                          onTap: () async {
-                            print("[SEND OTP BUTTON PRESSED]");
+                        child: Obx(() {
+                          return loginController.loading.value
+                              ? SizedBox(
+                                  height: 40.h,
+                                  width: 150.w,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.primaryColor,
+                                      strokeWidth: 2.5,
+                                    ),
+                                  ),
+                                )
+                              : appButton(
+                                  onTap: () async {
+                                    print("[SEND OTP BUTTON PRESSED]");
 
-                            if (!loginController.validateInputs()) {
-                              print("Validation Failed");
-                              return;
-                            }
+                                    if (!loginController.validateInputs()) {
+                                      print("Validation Failed");
+                                      return;
+                                    }
 
-                            print("✔ Validation Passed");
-                            print(
-                                "Phone Number = ${loginController.fullPhoneNumber}");
+                                    loginController.loading.value =
+                                        true; // START LOADING
 
-                            bool isSent = await AuthService.sendOTP(
-                                loginController.fullPhoneNumber);
+                                    print("✔ Validation Passed");
+                                    print(
+                                        "Phone Number = ${loginController.fullPhoneNumber}");
 
-                            print("📨 sendOTP Result: $isSent");
+                                    bool isSent = await AuthService.sendOTP(
+                                      loginController.fullPhoneNumber,
+                                    );
 
-                            if (isSent) {
-                              print("Navigating to VerifyOTPScreen");
-                              Get.to(() => VerifyOTPScreen(
-                                    phoneNumber:
-                                        loginController.fullPhoneNumber,
-                                    referral:
-                                        loginController.referrelController.text,
-                                    username:
-                                        loginController.emailController.text,
-                                  ));
-                            }
-                          },
-                          buttonColor: AppColors.primaryColor,
-                          buttonText: AppStrings.send_otp,
-                          textColor: AppColors.white,
-                          height: 40.h,
-                          width: 150.w,
-                        ),
+                                    print("📨 sendOTP Result: $isSent");
+
+                                    loginController.loading.value =
+                                        false; // STOP LOADING
+
+                                    if (isSent) {
+                                      print("Navigating to VerifyOTPScreen");
+                                      Get.to(() => VerifyOTPScreen(
+                                            phoneNumber:
+                                                loginController.fullPhoneNumber,
+                                            referral: loginController
+                                                .referrelController.text,
+                                            username: loginController
+                                                .emailController.text,
+                                          ));
+                                    }
+                                  },
+                                  buttonColor: AppColors.primaryColor,
+                                  buttonText: AppStrings.send_otp,
+                                  textColor: AppColors.white,
+                                  height: 40.h,
+                                  width: 150.w,
+                                );
+                        }),
                       ),
                       SizedBox(height: 15.h),
                       Row(

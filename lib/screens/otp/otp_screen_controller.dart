@@ -6,6 +6,7 @@ import 'package:saoirse_app/constants/app_urls.dart';
 import '../../main.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/login_service.dart';
 import '../../widgets/app_snackbar.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
@@ -43,23 +44,26 @@ class VerifyOtpController extends GetxController {
     print("Firebase ID Token Received!");
 
     /// STEP 2 — Login via Backend API
-    String? userId = await loginUsingMobile(
-      idToken: idToken,
-      phone: phoneNumber,
-      username: username,
-      referral: referral,
-    );
+    final res = await AuthService.loginWithIdToken(idToken);
 
-    if (userId == null) {
-      isLoading.value = false;
+    if (res == null || res.success != true) {
+      appSnackbar(content: "Login failed", error: true);
       return;
     }
 
-    print("Backend Login Successful → userId: $userId");
+    final data = res.data!;
+    storage.write("userId", data.userId);
+    storage.write("accessToken", data.accessToken);
+    storage.write("refreshToken", data.refreshToken);
+
+    print("✔ SAVED userId: ${storage.read("userId")}");
+    print("✔ SAVED accessToken: ${storage.read("accessToken")}");
+    print("✔ SAVED refreshToken: ${storage.read("refreshToken")}");
+    print("Backend Login Successful → userId: ${data.userId}");
 
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
     bool updated = await updateUser(
-      userId: userId,
+      userId: data.userId!,
       referralCode: referral,
       username: username,
       phone: phoneNumber,
@@ -77,44 +81,6 @@ class VerifyOtpController extends GetxController {
     appSnackbar(content: "Login Successful!");
 
     isLoading.value = false;
-  }
-
-  Future<String?> loginUsingMobile({
-    required String idToken,
-    required String phone,
-    required String username,
-    required String referral,
-  }) async {
-    try {
-      print("Sending ID Token to Backend...");
-      final result = await APIService.postRequest(
-        url: AppURLs.LOGIN_API,
-        body: {
-          "idToken": idToken
-          // "phone": phone,
-          // "username": username,
-          // "referral": referral,
-        },
-        onSuccess: (json) => json,
-      );
-      print("Backend Login Response: $result");
-      if (result!["success"] != true) {
-        appSnackbar(content: result["message"], error: true);
-        return null;
-      }
-
-      final data = result["data"];
-
-      storage.write("accessToken", data["accessToken"]);
-      storage.write("refreshToken", data["refreshToken"]);
-      storage.write("userId", data["userId"]);
-
-      return data["userId"];
-    } catch (e) {
-      print("LOGIN ERROR: $e");
-      appSnackbar(content: e.toString(), error: true);
-      return null;
-    }
   }
 
   /// UPDATE USER API
@@ -179,32 +145,6 @@ class VerifyOtpController extends GetxController {
       return null;
     }
   }
-  // /// --- Verify OTP (Local Validation Only) for temp ---
-  // Future<void> verifyOtp() async {
-  //   final otp = otpControllers.map((c) => c.text).join();
-
-  //   //Validation
-  //   if (otp.isEmpty) {
-  //     appToast(message: "Please enter the OTP code.", error: true);
-
-  //     return;
-  //   }
-
-  //   if (otp.length != 4) {
-  //     appToast(message: "Please enter all 4 digits of the OTP.", error: true);
-
-  //     return;
-  //   }
-
-  //   // Success Message + Navigate
-  //   appToast(message: "OTP Verified Successfully!");
-
-  //   // Small delay just for UX
-  //   await Future.delayed(const Duration(seconds: 1));
-
-  //   //Temporary navigation to HomeScreen
-  //   Get.offAll(() => DashboardScreen());
-  // }
 
   /// --- Resend OTP (Local mock) ---
   Future<void> resendOtp() async {

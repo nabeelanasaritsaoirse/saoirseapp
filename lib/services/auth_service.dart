@@ -1,13 +1,67 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:saoirse_app/repository/authrepo.dart';
 
+import '../constants/app_urls.dart';
 import '../main.dart';
+import '../models/LoginAuth/login_response/login_response.dart';
 import '../widgets/app_snackbar.dart';
+import 'api_service.dart';
 
-class AuthService {
+class AuthService implements AuthRepository {
   static FirebaseAuth auth = FirebaseAuth.instance;
   static GoogleSignInAccount? googleUser;
   static String? verificationId;
+  // REQUIRED METHOD FROM AuthRepository
+  @override
+  Future<LoginResponse?> authlogin({required String idToken}) {
+    return loginWithIdToken(idToken);
+  }
+
+  static Future<LoginResponse?> loginWithIdToken(String idToken) async {
+    try {
+      print("============================================");
+      print(" [LOGIN SERVICE] Starting login process...");
+      print("ID Token:");
+      print(idToken);
+      print("============================================");
+
+      final response = await APIService.postRequest(
+        url: AppURLs.LOGIN_API,
+        body: {"idToken": idToken},
+        onSuccess: (json) => LoginResponse.fromJson(json),
+      );
+
+      print("[RAW RESPONSE] $response");
+
+      if (response == null) {
+        print("[LOGIN ERROR] Response NULL");
+        return null;
+      }
+
+      print(" [LOGIN SUCCESS FLAG] ${response.success}");
+      print(" [LOGIN MESSAGE] ${response.message}");
+
+      if (response.success != true) {
+        print(" [LOGIN FAIL MESSAGE] ${response.message}");
+        return null;
+      }
+
+      final data = response.data!;
+
+      print("============================================");
+      print(" [LOGIN SUCCESS - PARSED DATA]");
+      print("   ➤ userId: ${data.userId}");
+      print("   ➤ accessToken: ${data.accessToken}");
+      print("   ➤ refreshToken: ${data.refreshToken}");
+      print("============================================");
+
+      return response;
+    } catch (e) {
+      print(" [LOGIN EXCEPTION] $e");
+      return null;
+    }
+  }
 
   /// STEP 1: SEND OTP
   static Future<bool> sendOTP(String phone) async {
