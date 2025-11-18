@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
 import '../../main.dart';
 import '../../services/api_service.dart';
@@ -84,13 +85,13 @@ class LoginController extends GetxController {
     }
 
     final data = res.data!;
-    storage.write("userId", data.userId);
-    storage.write("accessToken", data.accessToken);
-    storage.write("refreshToken", data.refreshToken);
+    storage.write(AppConst.USER_ID, data.userId);
+    storage.write(AppConst.ACCESS_TOKEN, data.accessToken);
+    storage.write(AppConst.REFRESH_TOKEN, data.refreshToken);
 
-    print("✔ SAVED userId: ${storage.read("userId")}");
-    print("✔ SAVED accessToken: ${storage.read("accessToken")}");
-    print("✔ SAVED refreshToken: ${storage.read("refreshToken")}");
+    print("✔ SAVED userId: ${storage.read(AppConst.USER_ID)}");
+    print("✔ SAVED accessToken: ${storage.read(AppConst.ACCESS_TOKEN)}");
+    print("✔ SAVED refreshToken: ${storage.read(AppConst.REFRESH_TOKEN)}");
 
     // Step 3: Update user with FCM + referral
     bool updated = await updateUser(
@@ -155,7 +156,7 @@ class LoginController extends GetxController {
           "deviceToken": deviceToken ?? "",
         },
         headers: {
-          "Authorization": "Bearer ${storage.read("accessToken")}",
+          "Authorization": "Bearer ${storage.read(AppConst.ACCESS_TOKEN)}",
           "Content-Type": "application/json"
         },
         onSuccess: (json) => json,

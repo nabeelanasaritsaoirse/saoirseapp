@@ -180,10 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                                   height: 40.h,
                                   width: 150.w,
                                   child: Center(
-                                    child: CircularProgressIndicator(
-                                      color: AppColors.primaryColor,
-                                      strokeWidth: 2.5,
-                                    ),
+                                    child: appLoader(),
                                   ),
                                 )
                               : appButton(

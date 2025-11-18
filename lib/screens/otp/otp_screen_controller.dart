@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
 import '../../main.dart';
 import '../../services/api_service.dart';
@@ -53,13 +54,13 @@ class VerifyOtpController extends GetxController {
     }
 
     final data = res.data!;
-    storage.write("userId", data.userId);
-    storage.write("accessToken", data.accessToken);
-    storage.write("refreshToken", data.refreshToken);
+    storage.write(AppConst.USER_ID, data.userId);
+    storage.write(AppConst.ACCESS_TOKEN, data.accessToken);
+    storage.write(AppConst.REFRESH_TOKEN, data.refreshToken);
 
-    print("✔ SAVED userId: ${storage.read("userId")}");
-    print("✔ SAVED accessToken: ${storage.read("accessToken")}");
-    print("✔ SAVED refreshToken: ${storage.read("refreshToken")}");
+    print("✔ SAVED userId: ${storage.read(AppConst.USER_ID)}");
+    print("✔ SAVED accessToken: ${storage.read(AppConst.ACCESS_TOKEN)}");
+    print("✔ SAVED refreshToken: ${storage.read(AppConst.REFRESH_TOKEN)}");
     print("Backend Login Successful → userId: ${data.userId}");
 
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
@@ -113,7 +114,7 @@ class VerifyOtpController extends GetxController {
         url: AppURLs.USER_UPDATE_API + userId,
         body: body,
         headers: {
-          "Authorization": "Bearer ${storage.read("accessToken")}",
+          "Authorization": "Bearer ${storage.read(AppConst.ACCESS_TOKEN)}",
           "Content-Type": "application/json"
         },
         onSuccess: (json) => json,
