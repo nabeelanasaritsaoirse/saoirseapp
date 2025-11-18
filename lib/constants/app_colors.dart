@@ -30,7 +30,9 @@ class AppColors {
   static final Color lightBlack = Colors.black.withValues(alpha: 0.15);
   static const Color green = Colors.green;
   static const Color red = Colors.red;
+   static const Color blueshade = Color.fromARGB(255, 175, 214, 246);
   static const Color blue = Colors.blue;
+  static const Color mediumBlue = Color.fromARGB(255, 29, 16, 211);
   static const Color skyBlue = Color(0xFF9BBBFC);
   static const Color lightRed = Color(0xFFFF5B5B);
   static const Color lightGreen = Color(0xFFE8F5E9);
