@@ -67,8 +67,7 @@ class ProfileScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               image: DecorationImage(
-                                image: AssetImage(
-                                    AppAssets.facebook), // your profile image
+                                image: AssetImage(AppAssets.facebook),
                                 fit: BoxFit.cover,
                               ),
                             ),
