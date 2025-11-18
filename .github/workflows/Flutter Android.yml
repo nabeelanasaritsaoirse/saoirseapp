@@ -100,7 +100,7 @@ jobs:
           echo "## 🧩 Flutter CI Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          echo "### 🔍 Lint Warnings" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Lint Errors" >> $GITHUB_STEP_SUMMARY
           flutter analyze --no-fatal-infos --no-fatal-warnings | sed -n '1,20p' >> $GITHUB_STEP_SUMMARY
 
           echo "" >> $GITHUB_STEP_SUMMARY
