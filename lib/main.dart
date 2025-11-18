@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:saoirse_app/screens/Select_Address/select_address.dart';
 import 'package:saoirse_app/screens/add_address/add_address.dart';
 import 'package:saoirse_app/screens/my_wallet/my_wallet.dart';
+import 'package:saoirse_app/screens/withdtraw/withdraw_screen.dart';
 import 'package:saoirse_app/screens/transaction_history/transaction_history.dart';
 
 import 'constants/app_colors.dart';
