@@ -94,28 +94,66 @@ jobs:
       # ------------------------------
       # Summary
       # ------------------------------
-      - name: 🧾 Add Lint + Test Summary (Readable)
+      - name: 🧾 Add Lint + Test + Build Summary
         if: always()
         run: |
-          echo "## 🧩 Flutter CI Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 🤖 Flutter Android CI Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          echo "### 🔍 Lint Errors" >> $GITHUB_STEP_SUMMARY
-          flutter analyze --no-fatal-infos --no-fatal-warnings | sed -n '1,20p' >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Lint Issues" >> $GITHUB_STEP_SUMMARY
+
+          # Run analyze without crashing CI
+          flutter analyze --no-fatal-warnings --no-fatal-infos > lint.log || true
+
+          # Show only meaningful issues
+          if grep -E "error •|warning •|info •" lint.log >/dev/null; then
+            grep -E "error •|warning •|info •" lint.log | head -n 20 >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No lint issues found" >> $GITHUB_STEP_SUMMARY
+          fi
 
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🧪 Test Summary" >> $GITHUB_STEP_SUMMARY
 
-          TOTAL=$(grep -o "<testcase" test-results.xml | wc -l)
-          FAILED=$(grep -o "<failure" test-results.xml | wc -l)
-          PASSED=$((TOTAL - FAILED))
+          if [ ! -f test-results.xml ]; then
+            echo "⚠️ No test results found — tests may have crashed." >> $GITHUB_STEP_SUMMARY
+            TOTAL=0
+            FAILED=0
+            PASSED=0
+          else
+            TOTAL=$(grep -o "<testcase" test-results.xml | wc -l)
+            FAILED=$(grep -o "<failure" test-results.xml | wc -l)
+            PASSED=$((TOTAL - FAILED))
+          fi
 
           echo "- **Total Tests:** $TOTAL" >> $GITHUB_STEP_SUMMARY
           echo "- **Passed:** 🟢 $PASSED" >> $GITHUB_STEP_SUMMARY
           echo "- **Failed:** 🔴 $FAILED" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-          echo "**Failed Tests:**" >> $GITHUB_STEP_SUMMARY
-          grep -oP '(?<=testcase name=").*?(?=")' test-results.xml | head -n 10 >> $GITHUB_STEP_SUMMARY
+          if [ "$FAILED" -gt 0 ]; then
+            echo "**Failed Tests (Top 10):**" >> $GITHUB_STEP_SUMMARY
+            grep -oP '(?<=testcase name=").*?(?=")' test-results.xml | head -n 10 >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Build Summary" >> $GITHUB_STEP_SUMMARY
+
+          # APK
+          if [ -f build/app/outputs/flutter-apk/app-release.apk ]; then
+            APK_SIZE=$(du -h build/app/outputs/flutter-apk/app-release.apk | cut -f1)
+            echo "- **APK Size:** $APK_SIZE" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- APK: ❌ Not Found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # AAB
+          if [ -f build/app/outputs/bundle/release/app-release.aab ]; then
+            AAB_SIZE=$(du -h build/app/outputs/bundle/release/app-release.aab | cut -f1)
+            echo "- **AAB Size:** $AAB_SIZE" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- AAB: ❌ Not Found" >> $GITHUB_STEP_SUMMARY
+          fi
 
 
       # ------------------------------
@@ -130,6 +168,11 @@ jobs:
           else
             echo "✅ Lint & Tests Passed — deploy allowed"
           fi
+
+      - name: 🏗️ Build Android APK & AAB
+        run: |
+          flutter build apk --release
+          flutter build appbundle --release
 
       - name: 📤 Upload Build Artifacts
         uses: actions/upload-artifact@v4
