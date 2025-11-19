@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_colors.dart';
-import 'package:saoirse_app/screens/order_delivered/order_delivered_controller.dart';
-import 'package:saoirse_app/widgets/app_text.dart';
-import 'package:saoirse_app/widgets/order_card.dart';
+
+import '../../constants/app_colors.dart';
+import '../../widgets/app_text.dart';
+import '../../widgets/order_card.dart';
+import 'order_delivered_controller.dart';
 
 class OrderDeliveredScreen extends StatelessWidget {
   OrderDeliveredScreen({super.key});

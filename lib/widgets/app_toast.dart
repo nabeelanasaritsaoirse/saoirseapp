@@ -1,4 +1,5 @@
 import 'package:fluttertoast/fluttertoast.dart';
+
 import '../constants/app_colors.dart';
 
 appToast({

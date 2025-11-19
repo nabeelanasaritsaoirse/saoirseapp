@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../constants/app_strings.dart';
+import '../../widgets/custom_appbar.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
 
-class MyWallet extends StatefulWidget {
-  const MyWallet({super.key});
+class WalletScreen extends StatefulWidget {
+  const WalletScreen({super.key});
 
   @override
-  State<MyWallet> createState() => _MyWalletState();
+  State<WalletScreen> createState() => _WalletScreenState();
 }
 
-class _MyWalletState extends State<MyWallet> {
+class _WalletScreenState extends State<WalletScreen> {
   @override
   Widget build(BuildContext context) {
     final history = [
@@ -39,21 +42,9 @@ class _MyWalletState extends State<MyWallet> {
     ];
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        leading: GestureDetector(
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: AppColors.white,
-            size: 30.sp,
-          ),
-          onTap: () => Navigator.pop(context),
-        ),
-        title: appText("My Wallet",
-            color: AppColors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 20.sp),
+      appBar: CustomAppBar(
+        title: AppStrings.wallet_title,
+        showBack: true,
         actions: [
           GestureDetector(
             child: Container(
@@ -69,11 +60,7 @@ class _MyWalletState extends State<MyWallet> {
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 )),
-            onTap: () {
-              //
-              //             ADD MONEY BUTTON FUNCTION
-              //
-            },
+            onTap: () {},
           ),
         ],
       ),

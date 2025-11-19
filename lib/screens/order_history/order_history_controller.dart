@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/order_model.dart';
+
+import '../../models/order_model.dart';
 
 class OrderHistoryController extends GetxController {
   var orders = <OrderModel>[].obs;

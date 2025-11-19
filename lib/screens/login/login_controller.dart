@@ -6,7 +6,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
+
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
 import '../../main.dart';
@@ -14,6 +14,8 @@ import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/app_snackbar.dart';
 import '../dashboard/dashboard_screen.dart';
+
+import 'package:http/http.dart' as http;
 
 class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();

@@ -2,13 +2,14 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/widgets/product_card.dart';
 
+import '../../widgets/product_card.dart';
 import '../../widgets/warning_dialog.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_text.dart';
+import '../select_Address/select_address.dart';
 import 'product_details_controller.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
@@ -580,7 +581,7 @@ class ProductDetailsScreen extends StatelessWidget {
                     return;
                   }
 
-                  controller.handleCheckout();
+                  Get.to(SelectAddress());
                 },
                 child: Text(
                   AppStrings.addToCart,

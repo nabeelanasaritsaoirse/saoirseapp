@@ -156,7 +156,6 @@ class ProductDetailsController extends GetxController {
 
   // 🛒 Button Actions
   // void handleSelectPlan() {
-  //   // TODO: Implement plan selection logic
   //   Get.snackbar(
   //     'Select Plan',
   //     'Plan selection feature coming soon',
@@ -175,12 +174,5 @@ class ProductDetailsController extends GetxController {
     );
   }
 
-  void handleCheckout() {
-    Get.snackbar(
-      'Checkout',
-      'Proceeding to checkout',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: Duration(seconds: 2),
-    );
-  }
+  void handleCheckout() {}
 }

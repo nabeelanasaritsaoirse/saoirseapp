@@ -2,11 +2,11 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:saoirse_app/repository/authrepo.dart';
 
 import '../constants/app_urls.dart';
 import '../main.dart';
 import '../models/LoginAuth/login_response/login_response.dart';
+import '../repository/authrepo.dart';
 import '../widgets/app_snackbar.dart';
 import 'api_service.dart';
 

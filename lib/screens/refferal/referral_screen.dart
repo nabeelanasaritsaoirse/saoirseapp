@@ -6,8 +6,10 @@ import '../../constants/app_strings.dart';
 import '../../screens/refferal/referral_controller.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
+import '../../widgets/custom_appbar.dart';
 import '../invite_friend/invite_friend_details_screen.dart';
 
 class ReferralScreen extends StatelessWidget {
@@ -38,15 +40,8 @@ class ReferralScreen extends StatelessWidget {
       backgroundColor: AppColors.white,
       resizeToAvoidBottomInset:
           false, // Prevent layout jump when keyboard appears
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        title: appText(
-          AppStrings.refferalTitle,
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.white,
-        ),
+      appBar: CustomAppBar(
+        title: AppStrings.refferalTitle,
         actions: [
           iconBox(image: AppAssets.notification, padding: 3),
           SizedBox(width: 8.w),
@@ -55,6 +50,7 @@ class ReferralScreen extends StatelessWidget {
           iconBox(image: AppAssets.message, padding: 5),
         ],
       ),
+
       body: SizedBox.expand(
         child: Stack(
           children: [
@@ -423,10 +419,11 @@ class ReferralScreen extends StatelessWidget {
         // Referral list / empty state / loading
         Obx(() {
           if (controller.isDashboardLoading.value) {
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.all(20.w),
-                child: CircularProgressIndicator(),
+            return SizedBox(
+              height: 40.h,
+              width: 150.w,
+              child: Center(
+                child: appLoader(),
               ),
             );
           }

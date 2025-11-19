@@ -4,8 +4,15 @@ import 'package:get/get.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 import '../../widgets/app_text.dart';
+import '../../widgets/custom_appbar.dart';
 import '../../widgets/profile_menu_card.dart';
+import '../edit_profile/edit_profile_screen.dart';
+import '../order_history/order_history_screen.dart';
+import '../pendingTransaction/pendingTrancation.dart';
+import '../transaction_history/transaction_history.dart';
+import '../wishlist/wishlist_screen.dart';
 import 'profile_controller.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -17,19 +24,9 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.paperColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        title: appText(
-          "Profile",
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.white,
-        ),
-        leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: Icon(Icons.arrow_back, color: AppColors.white),
-        ),
+      appBar: CustomAppBar(
+        title: AppStrings.profile_title,
+        showBack: false,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -42,7 +39,7 @@ class ProfileScreen extends StatelessWidget {
                 // BACKGROUND CONTAINER
                 Container(
                   width: double.infinity,
-                  height: 200.h,
+                  height: 175.h,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage(AppAssets.profile_bg),
@@ -62,8 +59,8 @@ class ProfileScreen extends StatelessWidget {
                       Stack(
                         children: [
                           Container(
-                            width: 90.w,
-                            height: 90.w,
+                            width: 85.w,
+                            height: 85.h,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               image: DecorationImage(
@@ -77,17 +74,20 @@ class ProfileScreen extends StatelessWidget {
                           Positioned(
                             right: 0,
                             bottom: 0,
-                            child: Container(
-                              width: 28.w,
-                              height: 28.w,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.primaryColor,
-                              ),
-                              child: Icon(
-                                Icons.edit,
-                                color: AppColors.white,
-                                size: 14.sp,
+                            child: InkWell(
+                              onTap: () => Get.to(EditProfileScreen()),
+                              child: Container(
+                                width: 25.w,
+                                height: 25.h,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppColors.primaryColor,
+                                ),
+                                child: Icon(
+                                  Icons.edit,
+                                  color: AppColors.white,
+                                  size: 14.sp,
+                                ),
                               ),
                             ),
                           )
@@ -129,22 +129,32 @@ class ProfileScreen extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12.w),
               child: GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: controller.myOrders.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: .90,
-                  crossAxisSpacing: 12.w,
-                  mainAxisSpacing: 12.h,
-                ),
-                itemBuilder: (_, index) {
-                  return ProfileMenuCard(
-                    icon: controller.myOrders[index]["icon"]!,
-                    title: controller.myOrders[index]["title"]!,
-                  );
-                },
-              ),
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: controller.myOrders.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    childAspectRatio: 1.0,
+                    crossAxisSpacing: 15.w,
+                    mainAxisSpacing: 15.h,
+                  ),
+                  itemBuilder: (_, index) {
+                    return ProfileMenuCard(
+                      icon: controller.myOrders[index]["icon"]!,
+                      title: controller.myOrders[index]["title"]!,
+                      onTap: () {
+                        if (index == 0) {
+                          Get.to(Pendingtrancation());
+                        } else if (index == 1) {
+                          Get.to(OrderHistoryScreen());
+                        } else if (index == 2) {
+                          Get.to(WishlistScreen());
+                        } else if (index == 3) {
+                          Get.to(TransactionHistory());
+                        } else {}
+                      },
+                    );
+                  }),
             ),
 
             SizedBox(height: 20.h),
@@ -171,9 +181,9 @@ class ProfileScreen extends StatelessWidget {
                 itemCount: controller.settings.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
-                  childAspectRatio: .90,
-                  crossAxisSpacing: 12.w,
-                  mainAxisSpacing: 12.h,
+                  childAspectRatio: 1.0,
+                  crossAxisSpacing: 15.w,
+                  mainAxisSpacing: 15.h,
                 ),
                 itemBuilder: (_, index) {
                   return ProfileMenuCard(

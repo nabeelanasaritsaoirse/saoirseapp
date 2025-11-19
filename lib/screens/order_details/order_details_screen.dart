@@ -5,11 +5,11 @@ import 'package:get/get.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
-
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
-
+import '../../widgets/custom_appbar.dart';
+import '../booking_confirmation/booking_confirmation_screen.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   const OrderDetailsScreen({super.key});
@@ -19,19 +19,9 @@ class OrderDetailsScreen extends StatelessWidget {
     final couponController = TextEditingController();
     return Scaffold(
       backgroundColor: AppColors.paperColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.white, size: 24.sp),
-          onPressed: () => Get.back(),
-        ),
-        title: appText(
-          AppStrings.editLabel,
-          color: AppColors.white,
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-        ),
+      appBar: CustomAppBar(
+        title: AppStrings.order_details,
+        showBack: true,
       ),
       body: SingleChildScrollView(
           child: Padding(
@@ -364,7 +354,7 @@ class OrderDetailsScreen extends StatelessWidget {
             // -------------------- PAY NOW BUTTON SECTION -----------------------
 
             appButton(
-                onTap: () {},
+                onTap: () => Get.to(BookingConfirmationScreen()),
                 width: double.infinity,
                 height: 45.h,
                 buttonColor: AppColors.lightAmber,

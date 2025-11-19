@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:saoirse_app/constants/app_colors.dart';
-import 'package:saoirse_app/widgets/app_text.dart';
+
+import '../constants/app_colors.dart';
 import '../models/order_model.dart';
+import 'app_text.dart';
 
 class OrderCard extends StatelessWidget {
   final OrderModel order;
@@ -11,10 +12,10 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     //----------chekking order status for dynamic color---------
     final statusLower = order.status.toLowerCase();
-    final statusColor = statusLower == 'delivered' ? Colors.green[700] : Colors.orange[700];
+    final statusColor =
+        statusLower == 'delivered' ? Colors.green[700] : Colors.orange[700];
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
@@ -124,8 +125,18 @@ class OrderCard extends StatelessWidget {
                     RichText(
                       text: TextSpan(
                         children: [
-                          TextSpan(text: 'Status : ', style: TextStyle(fontSize: 15.sp, color: AppColors.textGray, fontWeight: FontWeight.w500)),
-                          TextSpan(text: order.status, style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500, color: statusColor)),
+                          TextSpan(
+                              text: 'Status : ',
+                              style: TextStyle(
+                                  fontSize: 15.sp,
+                                  color: AppColors.textGray,
+                                  fontWeight: FontWeight.w500)),
+                          TextSpan(
+                              text: order.status,
+                              style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: statusColor)),
                         ],
                       ),
                     ),
@@ -148,13 +159,23 @@ class OrderCard extends StatelessWidget {
     return RichText(
       text: TextSpan(
         children: [
-          TextSpan(text: label, style: TextStyle(fontSize: 15.sp, color: AppColors.textGray, fontWeight: FontWeight.w500)),
-          TextSpan(text: value, style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500, color: AppColors.textBlack)),
+          TextSpan(
+              text: label,
+              style: TextStyle(
+                  fontSize: 15.sp,
+                  color: AppColors.textGray,
+                  fontWeight: FontWeight.w500)),
+          TextSpan(
+              text: value,
+              style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textBlack)),
         ],
       ),
-       maxLines: maxLines,
-        overflow: TextOverflow.ellipsis,
-        textAlign: TextAlign.start,
+      maxLines: maxLines,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.start,
     );
   }
 }

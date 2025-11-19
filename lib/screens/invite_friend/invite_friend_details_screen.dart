@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/friend_details_response.dart';
-
-import 'package:saoirse_app/widgets/product_details_dialog.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../../models/friend_details_response.dart';
 import '../../screens/invite_friend/invite_friend_controller.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
+import '../../widgets/custom_appbar.dart';
+import '../../widgets/product_details_dialog.dart';
 
 class InviteFriendDetailsScreen extends StatelessWidget {
   final String userId;
@@ -23,19 +23,9 @@ class InviteFriendDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        title: appText(
-          AppStrings.refferal_details,
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.white,
-        ),
-        leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: Icon(Icons.arrow_back, color: AppColors.white),
-        ),
+      appBar: CustomAppBar(
+        title: AppStrings.refferal_details,
+        showBack: true,
       ),
 
       // ---------------- BODY ----------------
@@ -205,7 +195,7 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                 separatorBuilder: (_, __) => SizedBox(height: 10.h),
                 itemBuilder: (context, index) {
                   final product = user.products[index];
-                  return _buildProductCard(context, product , controller);
+                  return _buildProductCard(context, product, controller);
                 },
               ),
             ],

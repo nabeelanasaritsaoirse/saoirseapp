@@ -26,4 +26,13 @@ class AppGradients {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
+
+  static final LinearGradient primaryGradient =  LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Color(0xFF5B5FE9),
+                      Color(0xFF0A0E8C),
+                    ],
+                  );
 }

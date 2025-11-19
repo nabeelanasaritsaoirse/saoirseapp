@@ -3,13 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_colors.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
-import 'package:saoirse_app/screens/otp/otp_screen_controller.dart';
-import 'package:saoirse_app/widgets/app_button.dart';
-import 'package:saoirse_app/widgets/app_text.dart';
 
+import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
+import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
+import '../../widgets/app_text.dart';
+import 'otp_screen_controller.dart';
 
 class VerifyOTPScreen extends StatelessWidget {
   final String phoneNumber;
@@ -160,7 +160,7 @@ class VerifyOTPScreen extends StatelessWidget {
           ),
         ),
         Obx(() {
-         return Visibility(
+          return Visibility(
             visible: controller.isLoading.value,
             child: appLoader(),
           );

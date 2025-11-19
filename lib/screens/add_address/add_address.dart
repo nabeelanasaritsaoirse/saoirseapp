@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import '/constants/app_strings.dart';
-import '/screens/add_address/add_address_validation.dart';
 
+import '../../constants/app_strings.dart';
+import '../../widgets/custom_appbar.dart';
 import '/screens/add_address/add_address_controller.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
 import '/widgets/app_text_field.dart';
+import 'add_address_validation.dart';
 
 class AddAddress extends StatefulWidget {
   const AddAddress({super.key});
@@ -24,24 +25,9 @@ class _AddAddressState extends State<AddAddress> {
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        leading: GestureDetector(
-          child: Icon(
-            Icons.arrow_back,
-            color: AppColors.white,
-            size: 30.sp,
-          ),
-          onTap: () => Navigator.pop(context),
-        ),
-        title: appText(
-          AppStrings.Add_Address,
-          color: AppColors.white,
-          fontWeight: FontWeight.w600,
-          fontSize: 18.sp,
-        ),
-        centerTitle: true,
+      appBar: CustomAppBar(
+        title: AppStrings.add_address_label,
+        showBack: true,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
@@ -171,9 +157,7 @@ class _AddAddressState extends State<AddAddress> {
                   color: AppColors.white),
               buttonColor: AppColors.primaryColor,
               onTap: () {
-                //
-                //    SAVE BUTTON FUNCTION M
-                //
+                Get.back();
               },
             ),
           ],

@@ -22,6 +22,12 @@ class AppStrings {
   //Onboard Screen
   static String onboard_note = "INVEST SMALL, DREAM BIG, \nOWN IT";
 
+  // Notification
+  static String notification_titile = "Notification";
+
+  // Wallet Screen
+  static String wallet_title = "My Wallet";
+
   // Home Screen
   static String card_discription =
       "Turn your savings into success\ninvest today and secure the future you’ve always wanted!";
@@ -115,6 +121,9 @@ class AppStrings {
   // Wishlist Screen
   static String wishlist = "Whishlist";
 
+  // select address screen
+  static String select_address = "Select Address";
+
   //snackbars
   static String no_internet = 'No internet connection';
   static String something_went_wrong =
@@ -149,6 +158,7 @@ class AppStrings {
   static String ZipCode = 'Zip Code';
   static String PhoneNumber = 'Phone Number';
   static String Save = 'Save';
+  static String profile_title = "Profile";
 
   // Edit Profile screen
   static String editLabel = 'Edit Profile';
@@ -157,7 +167,11 @@ class AppStrings {
   static String saveChanges = "Save Changes";
   static String email = 'Email';
 
+  // Category screen
+  static String category_title = "Categories";
+
   // Order Details screen
+  static String order_details = "Order Details";
   static String address = "ADDRESS";
   static String phone = "Phone :";
   static String change = "CHANGE";
@@ -174,4 +188,21 @@ class AppStrings {
   static String your_plan = "Your Plan";
   static String pay_now = "Pay Now";
   static String total_ex_tax = "Total (ex of tax)";
+
+  // Add adress screen
+  static String add_address_label = "Add Address";
+
+  // Booking confirmed screen
+  static String confirm_content =
+      "Your order is confirmed and being prepared.\nTrack it anytime in your history.";
+  static String confirm_title = "Your booking is Confirmed!";
+
+  // Pending Transaction
+  static String pending_transaction = "Pending Transaction";
+
+  // Order history
+  static String order_history_label = "Order History";
+
+  // Transaction History
+  static String transaction_history_label = "Transaction History";
 }
