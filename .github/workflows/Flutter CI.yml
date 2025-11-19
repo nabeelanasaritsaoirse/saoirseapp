@@ -1,0 +1,135 @@
+name: 🤖 Flutter Android CI
+run-name: "🚀 Android Build by ${{ github.actor }} on ${{ github.ref_name }}"
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+on:
+  push:
+    branches: [ deep ]
+    paths:
+      - "android/**"
+      - "lib/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "assets/**"
+
+  pull_request:
+    branches: [ deep ]
+    paths:
+      - "android/**"
+      - "lib/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "assets/**"
+
+jobs:
+  android-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Flutter (3.35.7 Stable)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.7'
+          channel: 'stable'
+
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      # ------------------------------
+      # LINT (With success flag)
+      # ------------------------------
+      - name: 🔍 Lint Check
+        id: lint
+        run: |
+          flutter analyze
+          if [ $? -eq 0 ]; then
+            echo "success=true" >> $GITHUB_OUTPUT
+          else
+            echo "success=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      # ------------------------------
+      # Install junitreport
+      # ------------------------------
+      - name: 📦 Install junitreport
+        run: dart pub global activate junitreport
+
+      # ------------------------------
+      # TEST (JSON + Convert to JUnit)
+      # ------------------------------
+      - name: 🧪 Run Tests (JUnit Output)
+        id: test
+        run: |
+          export PATH="$HOME/.pub-cache/bin:$PATH"
+
+          flutter test --machine --no-pub > test_output.json || true
+
+          dart pub global run junitreport:tojunit < test_output.json > test-results.xml || true
+
+          if grep -q "<failure" test-results.xml; then
+            echo "success=false" >> $GITHUB_OUTPUT
+          else
+            echo "success=true" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      # ------------------------------
+      # Publish Tests
+      # ------------------------------
+      - name: 📈 Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Flutter Test Results
+          path: test-results.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      # ------------------------------
+      # Summary
+      # ------------------------------
+      - name: 🧾 Add Lint + Test Summary
+        if: always()
+        run: |
+          echo "## 🍎 iOS CI Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Lint Errors" >> $GITHUB_STEP_SUMMARY
+      
+          # Capture only error/warning/info related to Dart rules
+          flutter analyze --no-fatal-warnings --no-fatal-infos > lint.log || true
+      
+          # Extract only analyzer messages (avoid_print, unnecessary_container, etc)
+          grep -E "error •|warning •|info •" lint.log >> $GITHUB_STEP_SUMMARY || \
+            echo "No lint issues found 🎉" >> $GITHUB_STEP_SUMMARY
+      
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🧪 Tests" >> $GITHUB_STEP_SUMMARY
+          TOTAL=$(grep -o "<testcase" test-results.xml | wc -l)
+          FAILED=$(grep -o "<failure" test-results.xml | wc -l)
+          PASSED=$((TOTAL - FAILED))
+      
+          echo "- **Total Tests:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+          echo "- **Passed:** 🟢 $PASSED" >> $GITHUB_STEP_SUMMARY
+          echo "- **Failed:** 🔴 $FAILED" >> $GITHUB_STEP_SUMMARY
+
+
+      # ------------------------------
+      # FINAL GATE — BLOCK DEPLOY IF FAILED
+      # ------------------------------
+      - name: ❌ Fail CI if Lint or Tests Failed
+        if: always()
+        run: |
+          if [ "${{ steps.lint.outputs.success }}" != "true" ] || [ "${{ steps.test.outputs.success }}" != "true" ]; then
+            echo "❌ Lint or Tests Failed — stopping deploy"
+            exit 1
+          else
+            echo "✅ Lint & Tests Passed — deploy allowed"
+          fi
