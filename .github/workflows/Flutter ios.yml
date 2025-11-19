@@ -151,7 +151,7 @@ jobs:
     needs: ios-ci
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
-      name: ios-deploy   # make sure this environment exists
+      name: ios-deploy
 
     steps:
       - name: 📥 Checkout Repository
@@ -161,3 +161,36 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ios-build
+          path: ios-build/
+
+      - name: 🍎 Setup Xcode
+        run: sudo xcode-select -switch /Applications/Xcode.app
+
+      - name: 🚀 Install Fastlane
+        run: sudo gem install fastlane
+
+      - name: 🔧 Setup App Store Authentication
+        run: |
+          mkdir -p ~/.fastlane
+          echo "{
+            \"apple_id\": \"${{ secrets.APPLE_ID }}\",
+            \"app_identifier\": \"${{ secrets.IOS_BUNDLE_ID }}\",
+            \"itc_team_id\": \"${{ secrets.APP_STORE_TEAM_ID }}\"
+          }" > ~/.fastlane/app_store_connect.json
+
+      - name: 📦 Package Runner.app into IPA
+        run: |
+          mkdir Payload
+          cp -R ios-build/Runner.app Payload/
+          zip -r app.ipa Payload
+
+      - name: 🚀 Upload to TestFlight
+        run: |
+          fastlane pilot upload \
+            --ipa app.ipa \
+            --apple_id "${{ secrets.APPLE_ID }}" \
+            --app_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
+            --itc_provider "${{ secrets.APP_STORE_TEAM_ID }}" \
+            --skip_waiting_for_build_processing true
+        env:
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
