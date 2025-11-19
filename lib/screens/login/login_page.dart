@@ -80,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: 28.h),
                       appText(
-                        "Referrel code",
+                        AppStrings.Referral_code,
                         fontWeight: FontWeight.w500,
                         color: AppColors.primaryColor,
                         fontSize: 15.sp,
@@ -89,12 +89,13 @@ class _LoginPageState extends State<LoginPage> {
                       appTextField(
                         controller: loginController.referrelController,
                         prefixWidth: 20.w,
-                        hintText: "Referrel code",
+                        hintText: AppStrings.Referral_code,
                         hintColor: AppColors.black,
                         textColor: AppColors.black,
                         hintSize: 15.sp,
                         validator: (value) {
-                          return LoginService.emailValidation(email: value!);
+                          return LoginService.referralValidation(
+                              referral: value!);
                         },
                       ),
                       SizedBox(height: 15.h),
@@ -117,12 +118,13 @@ class _LoginPageState extends State<LoginPage> {
                         textColor: AppColors.black,
                         hintSize: 15.sp,
                         validator: (value) {
-                          return null;
+                          return LoginService.usernameValidation(
+                              username: value!);
                         },
                       ),
                       SizedBox(height: 15.h),
                       appText(
-                        "Phone Number",
+                        AppStrings.phoneNumber,
                         fontWeight: FontWeight.w500,
                         color: AppColors.primaryColor,
                         fontSize: 15.sp,
@@ -146,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                             ).showSnackBar(SnackBar(content: Text(fullNumber)));
                           },
                           prefixWidth: 70.w,
-                          hintText: "Phone Number",
+                          hintText: AppStrings.phoneNumber,
                           hintColor: AppColors.black,
                           textColor: AppColors.black,
                           hintSize: 15.sp,
@@ -272,7 +274,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               SizedBox(width: 10.w),
                               appText(
-                                "Login with Google",
+                                AppStrings.LoginWithGoogle,
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.primaryColor,

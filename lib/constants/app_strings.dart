@@ -11,9 +11,13 @@ class AppStrings {
   static String send_otp = "Send OTP";
   static String login = 'LOGIN';
   static String sign_up = "SIGN UP";
+  static String Referral_code = "Referrel code";
+  static String LoginWithGoogle = "Login with Google";
   static String login_title = "Let’s you log in";
   static String login_note = "Welcome back you have been missed";
   static String Forgot_password = "Forgot Password..?";
+  static String invalid_username = 'Please enter valid username';
+  static String invalid_referral = 'Please enter valid referral code';
 
   //Onboard Screen
   static String onboard_note = "INVEST SMALL, DREAM BIG, \nOWN IT";
@@ -104,6 +108,7 @@ class AppStrings {
   static String start_on = "Start On";
   static String end_on = "Start On";
   static String selected = "Selected";
+
   //Cart page
   static String carttitle = "Cart";
 
@@ -127,6 +132,23 @@ class AppStrings {
   static String payment_Sucsess_note =
       "Thank you for your payment!\nStay consistent with your daily payments and get your product when the plan completes.";
   static String payment_Sucsess = "Payment success!";
+
+  // Add Address Page
+  static String Add_Address = 'Add Address ';
+  static String invalid_name = 'Please enter valid name';
+  static String invalid_street = 'Please enter valid street';
+  static String invalid_city = 'Please enter valid city';
+  static String invalid_state = 'Please enter valid state';
+  static String invalid_country = 'Please enter valid country';
+  static String invalid_zip = 'Please enter valid zipcode';
+  static String Name = 'Name ';
+  static String StreetName = 'Street Name';
+  static String City = 'City';
+  static String State = 'State / Province';
+  static String Country = 'country';
+  static String ZipCode = 'Zip Code';
+  static String PhoneNumber = 'Phone Number';
+  static String Save = 'Save';
 
   // Edit Profile screen
   static String editLabel = 'Edit Profile';
