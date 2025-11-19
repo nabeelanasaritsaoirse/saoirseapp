@@ -88,20 +88,31 @@ jobs:
       # ------------------------------
       # Summary
       # ------------------------------
+      
       - name: 🧾 Add Lint + Test Summary
         if: always()
         run: |
           echo "## 🍎 iOS CI Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🔍 Lint" >> $GITHUB_STEP_SUMMARY
-          flutter analyze --no-fatal-infos --no-fatal-warnings | sed -n '1,20p' >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Lint Errors" >> $GITHUB_STEP_SUMMARY
+      
+          # Capture only error/warning/info related to Dart rules
+          flutter analyze --no-fatal-warnings --no-fatal-infos > lint.log || true
+      
+          # Extract only analyzer messages (avoid_print, unnecessary_container, etc)
+          grep -E "error •|warning •|info •" lint.log >> $GITHUB_STEP_SUMMARY || \
+            echo "No lint issues found 🎉" >> $GITHUB_STEP_SUMMARY
+      
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🧪 Tests" >> $GITHUB_STEP_SUMMARY
           TOTAL=$(grep -o "<testcase" test-results.xml | wc -l)
           FAILED=$(grep -o "<failure" test-results.xml | wc -l)
           PASSED=$((TOTAL - FAILED))
+      
           echo "- **Total Tests:** $TOTAL" >> $GITHUB_STEP_SUMMARY
           echo "- **Passed:** 🟢 $PASSED" >> $GITHUB_STEP_SUMMARY
           echo "- **Failed:** 🔴 $FAILED" >> $GITHUB_STEP_SUMMARY
+      
 
       # ------------------------------
       # Fail if lint or tests failed
