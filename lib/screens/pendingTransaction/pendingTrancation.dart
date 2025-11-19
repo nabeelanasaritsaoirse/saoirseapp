@@ -2,6 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
+import 'package:saoirse_app/screens/transaction_succsess/transactionSuccsess.dart';
+import 'package:saoirse_app/widgets/custom_appbar.dart';
 
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
@@ -69,23 +73,9 @@ class _PendingtrancationState extends State<Pendingtrancation> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightGrey,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.arrow_back_ios_new,
-              color: AppColors.white, size: 30.sp),
-        ),
-        title: appText(
-          "Pending Transaction",
-          fontSize: 20.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.white,
-          fontFamily: "poppins",
-        ),
+      appBar: CustomAppBar(
+        title: AppStrings.pending_transaction,
+        showBack: true,
       ),
       body: Column(
         children: [
@@ -153,25 +143,20 @@ class _PendingtrancationState extends State<Pendingtrancation> {
                                 SizedBox(height: 6.h),
                                 Row(
                                   children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        // PAY NOW BUTTON (BLUE)
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10.w, vertical: 4.h),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primaryColor,
-                                          borderRadius:
-                                              BorderRadius.circular(6.r),
-                                        ),
-                                        child: appText(
-                                          "Pay Now",
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.white,
-                                          fontFamily: "poppins",
-                                        ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w, vertical: 4.h),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primaryColor,
+                                        borderRadius:
+                                            BorderRadius.circular(6.r),
+                                      ),
+                                      child: appText(
+                                        "Pay Now",
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.white,
+                                        fontFamily: "poppins",
                                       ),
                                     ),
                                     SizedBox(width: 10.w),
@@ -242,7 +227,7 @@ class _PendingtrancationState extends State<Pendingtrancation> {
                 ),
                 appButton(
                   onTap: () {
-                    //   PAYNOW BUTTON FUNCTION (YELLOW)
+                    Get.to(Transactionsuccsess());
                   },
                   child: Center(
                     child: appText(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
+import 'package:saoirse_app/widgets/custom_appbar.dart';
 
 import '/screens/add_address/add_address_controller.dart';
 import '/constants/app_colors.dart';
@@ -22,24 +24,9 @@ class _AddAddressState extends State<AddAddress> {
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        leading: GestureDetector(
-          child: Icon(
-            Icons.arrow_back,
-            color: AppColors.white,
-            size: 30.sp,
-          ),
-          onTap: () => Navigator.pop(context),
-        ),
-        title: appText(
-          "Add Address",
-          color: AppColors.white,
-          fontWeight: FontWeight.w600,
-          fontSize: 18.sp,
-        ),
-        centerTitle: true,
+      appBar: CustomAppBar(
+        title: AppStrings.add_address_label,
+        showBack: true,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
@@ -141,7 +128,9 @@ class _AddAddressState extends State<AddAddress> {
                   fontWeight: FontWeight.w800,
                   color: AppColors.white),
               buttonColor: AppColors.primaryColor,
-              onTap: () {},
+              onTap: () {
+                Get.back();
+              },
             ),
           ],
         ),

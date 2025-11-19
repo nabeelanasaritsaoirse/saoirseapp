@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/app_loader.dart';
+import 'package:saoirse_app/widgets/custom_appbar.dart';
 
 import '../../constants/app_strings.dart';
 import '../../screens/refferal/referral_controller.dart';
@@ -38,23 +40,18 @@ class ReferralScreen extends StatelessWidget {
       backgroundColor: AppColors.white,
       resizeToAvoidBottomInset:
           false, // Prevent layout jump when keyboard appears
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        title: appText(
-          AppStrings.refferalTitle,
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.white,
-        ),
+      appBar:
+       CustomAppBar(
+        title: AppStrings.refferalTitle,
         actions: [
-          iconBox(image: AppAssets.notification, padding: 3),
-          SizedBox(width: 8.w),
-          iconBox(image: AppAssets.wallet, padding: 5),
-          SizedBox(width: 12.w),
-          iconBox(image: AppAssets.message, padding: 5),
+           iconBox(image: AppAssets.notification, padding: 3),
+           SizedBox(width: 8.w),
+           iconBox(image: AppAssets.wallet, padding: 5),
+           SizedBox(width: 12.w),
+           iconBox(image: AppAssets.message, padding: 5),
         ],
-      ),
+       ),
+     
       body: SizedBox.expand(
         child: Stack(
           children: [
@@ -423,12 +420,13 @@ class ReferralScreen extends StatelessWidget {
         // Referral list / empty state / loading
         Obx(() {
           if (controller.isDashboardLoading.value) {
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.all(20.w),
-                child: CircularProgressIndicator(),
-              ),
-            );
+            return SizedBox(
+                                  height: 40.h,
+                                  width: 150.w,
+                                  child: Center(
+                                    child: appLoader(),
+                                  ),
+                                );
           }
 
           if (controller.filteredReferrals.isEmpty) {

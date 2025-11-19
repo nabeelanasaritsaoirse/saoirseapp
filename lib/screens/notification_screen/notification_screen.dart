@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
+import 'package:saoirse_app/widgets/custom_appbar.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_text.dart';
 
@@ -45,19 +47,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
     ];
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 1,
-        title: appText("Notifications",
-            color: AppColors.white, fontSize: 20.sp, fontFamily: "poppins"),
-        leading: GestureDetector(
-          child: Icon(
-            Icons.arrow_back,
-            color: AppColors.white,
-            size: 35.sp,
-          ),
-          onTap: () => Navigator.pop(context),
-        ),
+      appBar: CustomAppBar(
+        title: AppStrings.notification_titile,
+        showBack: true,
       ),
       body: ListView.builder(
         padding: EdgeInsets.all(16.r),
@@ -84,12 +76,23 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      appText(
-                        item["title"],
-                        overflow: TextOverflow.ellipsis,
-                        color: AppColors.black,
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          appText(
+                            item["title"],
+                            overflow: TextOverflow.ellipsis,
+                            color: AppColors.black,
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          appText(
+                            item["date"],
+                            color: AppColors.darkGray,
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ],
                       ),
                       SizedBox(height: 4.h),
                       appText(
@@ -102,12 +105,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       ),
                     ],
                   ),
-                ),
-                appText(
-                  item["date"],
-                  color: AppColors.darkGray,
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w500,
                 ),
               ],
             ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
+import 'package:saoirse_app/widgets/custom_appbar.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_text.dart';
 
@@ -47,21 +49,10 @@ class _TransactionHistoryState extends State<TransactionHistory> {
     ];
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-          backgroundColor: AppColors.primaryColor,
-          elevation: 0,
-          leading: GestureDetector(
-            child: Icon(
-              Icons.arrow_back_ios,
-              color: AppColors.white,
-              size: 25.sp,
-            ),
-            onTap: () => Navigator.pop(context),
-          ),
-          title: appText("Transaction History",
-              color: AppColors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 20.sp)),
+      appBar: CustomAppBar(
+        title: AppStrings.transaction_history_label,
+        showBack: true,
+      ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         child: ListView.builder(

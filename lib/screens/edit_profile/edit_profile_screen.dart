@@ -2,6 +2,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/custom_appbar.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -34,20 +35,12 @@ class EditProfileScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.white, size: 24.sp),
-          onPressed: () => Get.back(),
-        ),
-        title: appText(
-          AppStrings.editLabel,
-          color: AppColors.white,
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-        ),
+      appBar: 
+      CustomAppBar(
+        title: AppStrings.editLabel,
+        showBack: true,
       ),
+     
       body: SingleChildScrollView(
         child: Form(
           key: controller.formKey,

@@ -432,6 +432,154 @@ class APIService {
     }
   }
 
+  // Delete Method
+  static Future<T?> deleteRequest<T>({
+  required String url,
+  Map<String, dynamic>? body,
+  required T Function(Map<String, dynamic>) onSuccess,
+  Map<String, String>? headers,
+  int timeoutSeconds = 15,
+}) async {
+  try {
+    log("delete: $url");
+    if (body != null) {
+      debugPrint("body: $body", wrapWidth: 1024);
+    }
+
+    final request = http.Request('DELETE', Uri.parse(url));
+    
+  
+    request.headers.addAll(headers ?? {"Content-Type": "application/json"});
+    
+   
+    if (body != null) {
+      request.body = jsonEncode(body);
+    }
+
+    final response = await http.Response.fromStream(
+      await request.send().timeout(Duration(seconds: timeoutSeconds))
+    );
+
+    log("Response [${response.statusCode}]: ${response.body}");
+
+    // Handle response codes
+    switch (response.statusCode) {
+      case 200:
+      case 201:
+      case 202:
+      case 204:
+       
+        if (response.statusCode == 204) {
+          return onSuccess({});
+        }
+        
+        // For other success codes, parse response
+        if (response.body.isEmpty) {
+          return onSuccess({});
+        }
+        
+        final data = jsonDecode(response.body);
+
+        if (data is! Map<String, dynamic>) {
+          appSnackbar(
+            title: "Error",
+            content: "Invalid response format received from server.",
+            error: true,
+          );
+          return null;
+        }
+
+        return onSuccess(data);
+
+      case 400:
+        appSnackbar(
+          content: "Bad request. Check parameters.",
+          error: true,
+        );
+        return null;
+
+      case 401:
+        appSnackbar(
+          content: "Unauthorized. Please log in again.",
+          error: true,
+        );
+        return null;
+
+      case 403:
+        appSnackbar(
+          content: "Forbidden. Access denied.",
+          error: true,
+        );
+        return null;
+
+      case 404:
+        appSnackbar(
+          content: "Resource not found (404).",
+          error: true,
+        );
+        return null;
+
+      case 408:
+        appSnackbar(
+          content: "Request timeout. Try again later.",
+          error: true,
+        );
+        return null;
+
+      case 429:
+        appSnackbar(
+          content: "Too many requests. Try again later.",
+          error: true,
+        );
+        return null;
+
+      default:
+        if (response.statusCode >= 500) {
+          appSnackbar(
+            content: "Server error (${response.statusCode}). Try later.",
+            error: true,
+          );
+        } else {
+          appSnackbar(
+            content: "Unexpected error (${response.statusCode}). Please try again.",
+            error: true,
+          );
+        }
+        return null;
+    }
+  } on SocketException {
+    appSnackbar(
+      content: "No internet connection. Check your network.",
+      error: true,
+    );
+    return null;
+  } on FormatException {
+    appSnackbar(
+      content: "Invalid response format.",
+      error: true,
+    );
+    return null;
+  } on TimeoutException {
+    appSnackbar(
+      content: "Request timed out. Please try again.",
+      error: true,
+    );
+    return null;
+  } on http.ClientException catch (e) {
+    appSnackbar(
+      content: "Network error occurred: $e",
+      error: true,
+    );
+    return null;
+  } catch (e) {
+    appSnackbar(
+      content: "Something went wrong: ${e.toString()}",
+      error: true,
+    );
+    return null;
+  }
+}
+
   static checkConnection(BuildContext context) {
     Connectivity().checkConnectivity().then((result) {
       if (result == ConnectivityResult.none) {

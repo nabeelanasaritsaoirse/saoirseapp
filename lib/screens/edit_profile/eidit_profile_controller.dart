@@ -153,6 +153,7 @@ class EditProfileController extends GetxController {
     });
 
     appSnackbar(title: "Success", content: "Profile updated successfully");
+    Get.back();
   }
 
   // ------------------ CLEANUP ------------------

@@ -2,6 +2,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/add_address/add_address.dart';
+import 'package:saoirse_app/screens/select_Address/select_address.dart';
 import 'package:saoirse_app/widgets/product_card.dart';
 
 import '../../widgets/warning_dialog.dart';
@@ -580,7 +582,7 @@ class ProductDetailsScreen extends StatelessWidget {
                     return;
                   }
 
-                  controller.handleCheckout();
+                  Get.to(SelectAddress());
                 },
                 child: Text(
                   AppStrings.addToCart,

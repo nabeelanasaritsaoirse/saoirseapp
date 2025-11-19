@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/app_snackbar.dart';
 
 import '../../constants/app_assets.dart';
 import '../../models/product_details_model.dart';
@@ -175,12 +176,5 @@ class ProductDetailsController extends GetxController {
     );
   }
 
-  void handleCheckout() {
-    Get.snackbar(
-      'Checkout',
-      'Proceeding to checkout',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: Duration(seconds: 2),
-    );
-  }
+  void handleCheckout() {}
 }

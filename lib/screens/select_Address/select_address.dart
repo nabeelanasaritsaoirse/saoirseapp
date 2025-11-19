@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
+import 'package:saoirse_app/screens/order_details/order_details_screen.dart';
+import 'package:saoirse_app/widgets/custom_appbar.dart';
 import '/screens/add_address/add_address.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
@@ -25,24 +30,9 @@ class _SelectAddressState extends State<SelectAddress> {
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        leading: GestureDetector(
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-            size: 30.sp,
-          ),
-          onTap: () => Navigator.pop(context),
-        ),
-        title: appText(
-          "Select Address",
-          color: AppColors.white,
-          fontSize: 20.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        centerTitle: true,
+      appBar: CustomAppBar(
+        title: AppStrings.select_address,
+        showBack: true,
       ),
       body: SafeArea(
         child: Column(
@@ -59,11 +49,7 @@ class _SelectAddressState extends State<SelectAddress> {
                     fontWeight: FontWeight.w600,
                   ),
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddAddress(),
-                        ));
+                    Get.to(AddAddress());
                   },
                 )),
             SizedBox(height: 10.h),
@@ -97,9 +83,7 @@ class _SelectAddressState extends State<SelectAddress> {
                     fontWeight: FontWeight.w600,
                   ),
                   onTap: () {
-//
-// Continue Button function
-//
+                    Get.to(OrderDetailsScreen());
                   },
                 )),
           ],
