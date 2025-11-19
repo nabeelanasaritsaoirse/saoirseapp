@@ -9,22 +9,10 @@ permissions:
 on:
   push:
     branches: [ deep ]
-    paths:
-      - "android/**"
-      - "lib/**"
-      - "pubspec.yaml"
-      - "pubspec.lock"
-      - "assets/**"
 
   pull_request:
     branches: [ deep ]
-    paths:
-      - "android/**"
-      - "lib/**"
-      - "pubspec.yaml"
-      - "pubspec.lock"
-      - "assets/**"
-
+    
 jobs:
   android-ci:
     runs-on: ubuntu-latest
