@@ -220,6 +220,14 @@ jobs:
         with:
           name: flutter-build
 
+      - name: 🗃️ List downloaded files
+        run: ls -R .
+
+      - name: 📦 Move AAB and APK to root for Fastlane
+        run: |
+          find . -name "*.aab" -exec mv {} app-release.aab \;
+          find . -name "*.apk" -exec mv {} app-release.apk \;
+
       - name: 🔐 Decode Android Keystore
         run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > android.keystore
 
