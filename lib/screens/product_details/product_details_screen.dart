@@ -1,9 +1,10 @@
+// ignore_for_file: unused_local_variable, body_might_complete_normally_nullable
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../widgets/product_card.dart';
 import '../../widgets/warning_dialog.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -478,7 +479,7 @@ class ProductDetailsScreen extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final product =
                                   controller.mostPopularProducts[index];
-                              return ProductCard(product: product);
+                              // return ProductCard(product: product);
                             },
                           ),
                         ),
@@ -497,7 +498,7 @@ class ProductDetailsScreen extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final product =
                                   controller.mostPopularProducts[index];
-                              return ProductCard(product: product);
+                              // return ProductCard(product: product);
                             },
                           ),
                         ),

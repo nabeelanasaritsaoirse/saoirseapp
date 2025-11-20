@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/dummy/products_model.dart';
 
 import '../../constants/app_assets.dart';
 import '../../models/product_details_model.dart';
-import '../../models/product_model.dart';
+
 import '../../widgets/select_plan_sheet.dart';
 
 class ProductDetailsController extends GetxController {
@@ -48,28 +49,30 @@ class ProductDetailsController extends GetxController {
     super.onClose();
   }
 
+  
+
   // 🧾 Product list for "Most Popular"
-  final RxList<Product> mostPopularProducts = <Product>[
-    Product(
+  final RxList<Products> mostPopularProducts = <Products>[
+    Products(
       name: 'Modern Chair',
       image: "assets/images/chair.png",
       price: 12500,
       hasDiscount: true,
     ),
-    Product(
+    Products(
       name: 'Sony Ear Buds',
       image: 'assets/images/product_image_2.png',
       price: 69999,
       isFavorite: true,
       hasDiscount: true,
     ),
-    Product(
+    Products(
       name: 'Modern Chair',
       image: "assets/images/chair.png",
       price: 12500,
       hasDiscount: true,
     ),
-    Product(
+    Products(
       name: 'Sony Ear Buds',
       image: 'assets/images/product_image_2.png',
       price: 69999,
@@ -176,3 +179,6 @@ class ProductDetailsController extends GetxController {
 
   void handleCheckout() {}
 }
+
+
+
