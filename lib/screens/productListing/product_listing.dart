@@ -107,7 +107,9 @@ class _ProductListingState extends State<ProductListing> {
 
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
+      appBar:
+      
+       AppBar(
         backgroundColor: AppColors.primaryColor,
         elevation: 0,
         titleSpacing: 0,

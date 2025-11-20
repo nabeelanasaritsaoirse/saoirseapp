@@ -2,23 +2,16 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
 import '../constants/app_urls.dart';
 import '../main.dart';
 import '../models/LoginAuth/login_response/login_response.dart';
-import '../repository/authrepo.dart';
 import '../widgets/app_snackbar.dart';
 import 'api_service.dart';
 
-class AuthService implements AuthRepository {
+class AuthService {
   static FirebaseAuth auth = FirebaseAuth.instance;
   static GoogleSignInAccount? googleUser;
   static String? verificationId;
-  // REQUIRED METHOD FROM AuthRepository
-  @override
-  Future<LoginResponse?> authlogin({required String idToken}) {
-    return loginWithIdToken(idToken);
-  }
 
   static Future<LoginResponse?> loginWithIdToken(String idToken) async {
     try {
@@ -101,6 +94,14 @@ class AuthService implements AuthRepository {
   /// STEP 2: VERIFY OTP
   static Future<String?> verifyOTP(String otp) async {
     print("[VERIFY OTP] Verifying OTP: $otp");
+
+    if (verificationId == null) {
+      print("[ERROR] verificationId is NULL!");
+      appSnackbar(
+          content: "OTP expired or not sent. Please send OTP again.",
+          error: true);
+      return null;
+    }
 
     try {
       print("Using verificationId: $verificationId");
