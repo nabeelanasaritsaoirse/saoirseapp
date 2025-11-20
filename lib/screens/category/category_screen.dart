@@ -4,8 +4,11 @@ import 'package:get/get.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 import '../../models/category_model.dart';
 import '../../widgets/app_text.dart';
+import '../../widgets/custom_appbar.dart';
+import '../wishlist/wishlist_screen.dart';
 import 'category_controller.dart';
 
 class CategoryScreen extends StatelessWidget {
@@ -13,39 +16,19 @@ class CategoryScreen extends StatelessWidget {
 
   final CategoryController controller = Get.put(CategoryController());
 
-  Widget _iconBox({required String image, required double padding}) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 7.h),
-      width: 36.w,
-      height: 36.h,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(10.r),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(padding),
-        child: Image.asset(image),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        title: appText(
-          "Categories",
-          fontSize: 19.sp,
-          color: AppColors.white,
-          fontWeight: FontWeight.w600,
-        ),
+      appBar: CustomAppBar(
+        title: AppStrings.category_title,
         actions: [
-          _iconBox(image: AppAssets.search, padding: 9.w),
+          IconBox(image: AppAssets.search, padding: 9.w, onTap: () {}),
           SizedBox(width: 8.w),
-          _iconBox(image: AppAssets.wish, padding: 8.w),
+          IconBox(
+              image: AppAssets.wish,
+              padding: 8.w,
+              onTap: () => Get.to(WishlistScreen())),
           SizedBox(width: 8.w),
         ],
       ),
@@ -117,7 +100,7 @@ class CategoryScreen extends StatelessWidget {
                   crossAxisCount: 2,
                   crossAxisSpacing: 11.w,
                   mainAxisSpacing: 12.h,
-                  childAspectRatio: 0.77, 
+                  childAspectRatio: 0.77,
                 ),
                 itemCount: controller.selectedSubCategories.length,
                 itemBuilder: (context, index) {

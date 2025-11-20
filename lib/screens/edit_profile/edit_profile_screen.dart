@@ -8,7 +8,7 @@ import '../../constants/app_strings.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
-
+import '../../widgets/custom_appbar.dart';
 import 'eidit_profile_controller.dart';
 
 class EditProfileScreen extends StatelessWidget {
@@ -34,19 +34,9 @@ class EditProfileScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.white, size: 24.sp),
-          onPressed: () => Get.back(),
-        ),
-        title: appText(
-          AppStrings.editLabel,
-          color: AppColors.white,
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-        ),
+      appBar: CustomAppBar(
+        title: AppStrings.editLabel,
+        showBack: true,
       ),
       body: SingleChildScrollView(
         child: Form(

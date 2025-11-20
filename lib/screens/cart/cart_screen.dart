@@ -4,10 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:saoirse_app/constants/app_colors.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
-import 'package:saoirse_app/screens/cart/cart_controller.dart';
-import 'package:saoirse_app/widgets/app_text.dart';
+
+import '../../constants/app_assets.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_text.dart';
+import '../../widgets/custom_appbar.dart';
+import '../select_Address/select_address.dart';
+import 'cart_controller.dart';
 
 class CartScreen extends StatelessWidget {
   CartScreen({super.key});
@@ -18,36 +23,14 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        title: appText(
-          AppStrings.carttitle,
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.white,
-        ),
-        centerTitle: false,
+      appBar: CustomAppBar(
+        title: AppStrings.carttitle,
         actions: [
-          GestureDetector(
+          IconBox(
+            image: AppAssets.delete,
+            padding: 5.w,
             onTap: () => controller.cartItems.clear(),
-            child: Container(
-              margin: EdgeInsets.only(right: 15.w),
-              width: 36.w,
-              height: 36.h,
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Center(
-                child: Icon(
-                  Iconsax.trash,
-                  color: AppColors.primaryColor,
-                  size: 22.sp,
-                ),
-              ),
-            ),
-          ),
+          )
         ],
       ),
       body: Column(
@@ -69,10 +52,10 @@ class CartScreen extends StatelessWidget {
 
                   return Container(
                     margin: EdgeInsets.only(bottom: 15.h),
-                    padding: EdgeInsets.all(12.w),
+                    padding: EdgeInsets.all(10.w),
                     decoration: BoxDecoration(
                       color: AppColors.white,
-                      borderRadius: BorderRadius.circular(25.r),
+                      borderRadius: BorderRadius.circular(20.r),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.2), // light shadow
@@ -90,8 +73,8 @@ class CartScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10.r),
                           child: Image.asset(
                             item.image,
-                            width: 80.w,
-                            height: 80.w,
+                            width: 70.w,
+                            height: 70.h,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -103,25 +86,17 @@ class CartScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(item.name,
-                                  style: TextStyle(
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w600)),
+                              appText(item.name,
+                                  fontSize: 16.sp, fontWeight: FontWeight.w600),
                               SizedBox(height: 3.h),
-                              Text("${item.color}   |   ${item.storage}",
-                                  style: TextStyle(
-                                      fontSize: 13.sp,
-                                      color: AppColors.black54)),
+                              appText("${item.color}   |   ${item.storage}",
+                                  fontSize: 13.sp, color: AppColors.black54),
                               SizedBox(height: 3.h),
-                              Text("₹ ${item.price}",
-                                  style: TextStyle(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.bold)),
+                              appText("₹ ${item.price}",
+                                  fontSize: 14.sp, fontWeight: FontWeight.bold),
                               SizedBox(height: 3.h),
-                              Text("Plan - ${item.plan}",
-                                  style: TextStyle(
-                                      fontSize: 12.sp,
-                                      color: AppColors.black87)),
+                              appText("Plan - ${item.plan}",
+                                  fontSize: 12.sp, color: AppColors.black87)
                             ],
                           ),
                         ),
@@ -154,10 +129,11 @@ class CartScreen extends StatelessWidget {
                                         size: 15.sp, color: AppColors.black),
                                   ),
                                   SizedBox(width: 10.w),
-                                  Text("${item.quantity}",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 10.sp)),
+                                  appText(
+                                    "${item.quantity}",
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                   SizedBox(width: 10.w),
                                   GestureDetector(
                                     onTap: () => controller.increaseQty(index),
@@ -188,33 +164,31 @@ class CartScreen extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Total Amount",
-                        style: TextStyle(
-                            fontSize: 14.sp,
-                            color: AppColors.black,
-                            fontWeight: FontWeight.bold)),
+                    appText(
+                      "Total Amount",
+                      color: AppColors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.sp,
+                    ),
                     Obx(() => Text("₹ ${controller.totalAmount}",
                         style: TextStyle(
                             fontSize: 14.sp, fontWeight: FontWeight.w700))),
                   ],
                 ),
 
-                /// Check Out Button
-                Container(
-                  height: 35.h,
-                  width: 140.w,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor,
+                appButton(
+                    onTap: () => Get.to(SelectAddress()),
+                    width: 140.w,
+                    height: 35.h,
+                    buttonColor: AppColors.primaryColor,
+                    padding: EdgeInsets.all(0.w),
                     borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  child: Center(
-                    child: Text("Check Out",
-                        style: TextStyle(
-                            color: AppColors.white,
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                ),
+                    child: Center(
+                      child: appText(AppStrings.checkout,
+                          color: AppColors.white,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.bold),
+                    ))
               ],
             ),
           ),

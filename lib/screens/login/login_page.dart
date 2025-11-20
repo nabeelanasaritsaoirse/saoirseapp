@@ -80,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: 28.h),
                       appText(
-                        "Referrel code",
+                        AppStrings.Referral_code,
                         fontWeight: FontWeight.w500,
                         color: AppColors.primaryColor,
                         fontSize: 15.sp,
@@ -89,12 +89,13 @@ class _LoginPageState extends State<LoginPage> {
                       appTextField(
                         controller: loginController.referrelController,
                         prefixWidth: 20.w,
-                        hintText: "Referrel code",
+                        hintText: AppStrings.Referral_code,
                         hintColor: AppColors.black,
                         textColor: AppColors.black,
                         hintSize: 15.sp,
                         validator: (value) {
-                          return LoginService.emailValidation(email: value!);
+                          return LoginService.referralValidation(
+                              referral: value!);
                         },
                       ),
                       SizedBox(height: 15.h),
@@ -117,12 +118,13 @@ class _LoginPageState extends State<LoginPage> {
                         textColor: AppColors.black,
                         hintSize: 15.sp,
                         validator: (value) {
-                          return null;
+                          return LoginService.usernameValidation(
+                              username: value!);
                         },
                       ),
                       SizedBox(height: 15.h),
                       appText(
-                        "Phone Number",
+                        AppStrings.phoneNumber,
                         fontWeight: FontWeight.w500,
                         color: AppColors.primaryColor,
                         fontSize: 15.sp,
@@ -146,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                             ).showSnackBar(SnackBar(content: Text(fullNumber)));
                           },
                           prefixWidth: 70.w,
-                          hintText: "Phone Number",
+                          hintText: AppStrings.phoneNumber,
                           hintColor: AppColors.black,
                           textColor: AppColors.black,
                           hintSize: 15.sp,
@@ -174,42 +176,59 @@ class _LoginPageState extends State<LoginPage> {
                       }),
                       SizedBox(height: 15.h),
                       Center(
-                        child: appButton(
-                          onTap: () async {
-                            print("[SEND OTP BUTTON PRESSED]");
+                        child: Obx(() {
+                          return loginController.loading.value
+                              ? SizedBox(
+                                  height: 40.h,
+                                  width: 150.w,
+                                  child: Center(
+                                    child: appLoader(),
+                                  ),
+                                )
+                              : appButton(
+                                  onTap: () async {
+                                    print("[SEND OTP BUTTON PRESSED]");
 
-                            if (!loginController.validateInputs()) {
-                              print("Validation Failed");
-                              return;
-                            }
+                                    if (!loginController.validateInputs()) {
+                                      print("Validation Failed");
+                                      return;
+                                    }
 
-                            print("✔ Validation Passed");
-                            print(
-                                "Phone Number = ${loginController.fullPhoneNumber}");
+                                    loginController.loading.value =
+                                        true; // START LOADING
 
-                            bool isSent = await AuthService.sendOTP(
-                                loginController.fullPhoneNumber);
+                                    print("✔ Validation Passed");
+                                    print(
+                                        "Phone Number = ${loginController.fullPhoneNumber}");
 
-                            print("📨 sendOTP Result: $isSent");
+                                    bool isSent = await AuthService.sendOTP(
+                                      loginController.fullPhoneNumber,
+                                    );
 
-                            if (isSent) {
-                              print("Navigating to VerifyOTPScreen");
-                              Get.to(() => VerifyOTPScreen(
-                                    phoneNumber:
-                                        loginController.fullPhoneNumber,
-                                    referral:
-                                        loginController.referrelController.text,
-                                    username:
-                                        loginController.emailController.text,
-                                  ));
-                            }
-                          },
-                          buttonColor: AppColors.primaryColor,
-                          buttonText: AppStrings.send_otp,
-                          textColor: AppColors.white,
-                          height: 40.h,
-                          width: 150.w,
-                        ),
+                                    print("📨 sendOTP Result: $isSent");
+
+                                    loginController.loading.value =
+                                        false; // STOP LOADING
+
+                                    if (isSent) {
+                                      print("Navigating to VerifyOTPScreen");
+                                      Get.to(() => VerifyOTPScreen(
+                                            phoneNumber:
+                                                loginController.fullPhoneNumber,
+                                            referral: loginController
+                                                .referrelController.text,
+                                            username: loginController
+                                                .emailController.text,
+                                          ));
+                                    }
+                                  },
+                                  buttonColor: AppColors.primaryColor,
+                                  buttonText: AppStrings.send_otp,
+                                  textColor: AppColors.white,
+                                  height: 40.h,
+                                  width: 150.w,
+                                );
+                        }),
                       ),
                       SizedBox(height: 15.h),
                       Row(
@@ -255,7 +274,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               SizedBox(width: 10.w),
                               appText(
-                                "Login with Google",
+                                AppStrings.LoginWithGoogle,
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.primaryColor,
@@ -275,10 +294,12 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          Visibility(
-            visible: loginController.loading.value,
-            child: appLoader(),
-          ),
+          Obx(() {
+            return Visibility(
+              visible: loginController.loading.value,
+              child: appLoader(),
+            );
+          }),
         ],
       ),
     );

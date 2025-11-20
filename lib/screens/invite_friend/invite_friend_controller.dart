@@ -1,10 +1,10 @@
 import 'dart:developer';
 
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/friend_details_response.dart';
-import 'package:saoirse_app/models/product_detiails_response.dart';
 
-import 'package:saoirse_app/services/refferal_service.dart';
+import '../../models/friend_details_response.dart';
+import '../../models/product_detiails_response.dart';
+import '../../services/refferal_service.dart';
 
 class InviteFriendController extends GetxController {
   final String userId;

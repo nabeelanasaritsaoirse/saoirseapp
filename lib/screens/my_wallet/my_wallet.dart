@@ -1,109 +1,227 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
+
+import '../../constants/app_strings.dart';
+import '../../widgets/custom_appbar.dart';
 import '/constants/app_colors.dart';
-import '/screens/my_wallet/my_wallet_controller.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
-import '/widgets/app_text_field.dart';
 
-class MyWallet extends StatefulWidget {
-  const MyWallet({super.key});
+class WalletScreen extends StatefulWidget {
+  const WalletScreen({super.key});
 
   @override
-  State<MyWallet> createState() => _MyWalletState();
+  State<WalletScreen> createState() => _WalletScreenState();
 }
 
-class _MyWalletState extends State<MyWallet> {
+class _WalletScreenState extends State<WalletScreen> {
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(MyWalletController());
-
+    final history = [
+      {
+        "title": "Investment P1",
+        "date": "Today 12:32",
+        "amount": "- ₹100",
+        "isCredit": false,
+        "icon": "💰",
+      },
+      {
+        "title": "Commission",
+        "date": "Yesterday 02:12",
+        "amount": "+ ₹299",
+        "isCredit": true,
+        "icon": "📈",
+      },
+      {
+        "title": "Referral Bonus",
+        "date": "Yesterday 13:53",
+        "amount": "+ ₹1200",
+        "isCredit": true,
+        "icon": "🎁",
+      },
+    ];
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        leading: GestureDetector(
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: AppColors.white,
-            size: 25.sp,
-          ),
-          onTap: () {},
-        ),
-        title: appText("Withdraw",
-            fontWeight: FontWeight.w600,
-            color: AppColors.white,
-            fontSize: 20.sp),
-        centerTitle: false,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            appText("Enter the account details",
-                fontWeight: FontWeight.w600,
-                color: AppColors.black,
-                fontSize: 16.sp),
-            SizedBox(height: 15.h),
-            appText("Account holder name",
-                color: AppColors.grey, fontSize: 15.sp),
-            appTextField(
-                controller: controller.nameController,
-                hintText: "Name",
-                hintColor: AppColors.grey,
-                textColor: AppColors.black),
-            SizedBox(height: 15.h),
-            appText("Account number", color: AppColors.grey, fontSize: 15.sp),
-            appTextField(
-                controller: controller.accController,
-                hintText: "Account number",
-                hintColor: AppColors.grey,
-                textColor: AppColors.black),
-            SizedBox(height: 15.h),
-            appText("Confirm account number",
-                color: AppColors.grey, fontSize: 15.sp),
-            appTextField(
-                controller: controller.confirmAccController,
-                hintText: "Account number",
-                hintColor: AppColors.grey,
-                textColor: AppColors.black),
-            SizedBox(height: 15.h),
-            appText("IFSC code", color: AppColors.grey, fontSize: 15.sp),
-            appTextField(
-              controller: controller.ifscController,
-              hintText: "IFSC code",
-              hintColor: AppColors.grey,
-              textColor: AppColors.black,
-            ),
-            SizedBox(height: 30.h),
-            Center(
-              child: appText("Enter Amount",
-                  color: AppColors.black, fontSize: 15.sp),
-            ),
-            SizedBox(height: 5.h),
-            Center(
-              child: appText("₹1,252.00",
-                  color: AppColors.black,
+      appBar: CustomAppBar(
+        title: AppStrings.wallet_title,
+        showBack: true,
+        actions: [
+          GestureDetector(
+            child: Container(
+                margin: EdgeInsets.only(right: 16.w),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(25.r),
+                ),
+                child: appText(
+                  "Add Money",
+                  color: AppColors.primaryColor,
                   fontWeight: FontWeight.bold,
-                  fontSize: 30.sp),
-            ),
-            SizedBox(height: 40.h),
-            appButton(
+                  fontSize: 14,
+                )),
+            onTap: () {},
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          walletCard(),
+          SizedBox(height: 8.h),
+          Center(
               child: appText(
-                "Transfer",
-                color: AppColors.white,
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
-              ),
-              onTap: () {},
+            "Wallet History",
+            color: AppColors.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 16.sp,
+          )),
+          SizedBox(height: 8.h),
+          Expanded(
+              child: ListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
+            itemCount: history.length,
+            itemBuilder: (context, index) {
+              final item = history[index];
+
+              return Container(
+                margin: EdgeInsets.only(bottom: 16.h),
+                child: Row(
+                  children: [
+                    Container(
+                        padding: EdgeInsets.all(12.r),
+                        decoration: BoxDecoration(
+                          color: AppColors.blueshade,
+                          borderRadius: BorderRadius.circular(14.r),
+                        ),
+                        child: appText(
+                          "${item["icon"]!}",
+                          fontSize: 30.sp,
+                        )),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          appText(
+                            "${item["title"]!}",
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          SizedBox(height: 3.h),
+                          appText(
+                            "${item["date"]!}",
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ],
+                      ),
+                    ),
+                    appText(
+                      " ${item["amount"]!}",
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          item["isCredit"] == true ? Colors.green : Colors.red,
+                    ),
+                  ],
+                ),
+              );
+            },
+          )),
+          Padding(
+            padding: EdgeInsetsGeometry.all(10),
+            child: appButton(
               buttonColor: AppColors.primaryColor,
+              child: Center(
+                child: appText(
+                  "Withdraw",
+                  color: AppColors.white,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () {
+                //
+                //    WITHDRAW BUTTON FUNCTION
+                //
+              },
             ),
+          ),
+          SizedBox(height: 5.h),
+        ],
+      ),
+    );
+  }
+
+  Widget walletCard() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 15.h),
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20.r),
+        gradient: const LinearGradient(
+          colors: [
+            AppColors.mediumBlue,
+            AppColors.primaryColor,
           ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
       ),
+      child: Column(
+        children: [
+          appText("Main balance",
+              color: AppColors.white,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w500),
+          SizedBox(height: 2.h),
+          appText("₹12,560",
+              color: AppColors.white,
+              fontSize: 30.sp,
+              fontWeight: FontWeight.w500),
+          SizedBox(height: 15.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              balanceColumn("13850", "Total Balance"),
+              divider(),
+              balanceColumn("1280", "Referral Bonus"),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              balanceColumn("13850", "Hold Balance"),
+              divider(),
+              balanceColumn("1280", "10% Invest Daily"),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget balanceColumn(String value, String label) {
+    return Column(
+      children: [
+        appText(
+          "₹ $value",
+          color: AppColors.white,
+          fontSize: 18.sp,
+          fontWeight: FontWeight.bold,
+        ),
+        SizedBox(height: 5.h),
+        appText(label, color: AppColors.white, fontSize: 13.sp),
+      ],
+    );
+  }
+
+  Widget divider() {
+    return Container(
+      width: 1.w,
+      height: 40.h,
+      color: AppColors.grey,
     );
   }
 }

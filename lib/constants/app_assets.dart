@@ -5,6 +5,9 @@ class AppAssets {
   static String icon_path = 'assets/icons/';
   static String app_logo = "assets/logo/app_logo.png";
 
+  // animation
+  static String booking_confirm = "assets/lottie/confirmed.json";
+
   //images
   static String onBoard_img = image_path + 'onBoard_img.jpg';
   static String game_product = "assets/images/ad_image_1.png";
@@ -15,6 +18,7 @@ class AppAssets {
   static String success_image_3 = "assets/images/success_image_3.jpeg";
   static String refer_image = "assets/images/refer_image.png";
   static String notification = "assets/icons/notification.png";
+  static String add_banner = "assets/images/add_banner.jpeg";
 
   //icons
   static String google_icon = "assets/icons/google_icon.webp";
@@ -24,6 +28,7 @@ class AppAssets {
   static String wallet = "assets/icons/wallet.png";
   static String wish = "assets/icons/wish.png";
   static String share = "assets/icons/share.png";
+  static String delete = "assets/icons/delete.png";
 
   // Product details page
   static String iphone = "assets/images/phone.png";
@@ -65,5 +70,3 @@ class AppAssets {
   // Edit Profile Screen
   static String edit_profile_bg = "assets/images/dummy_profile.jpg";
 }
-
-

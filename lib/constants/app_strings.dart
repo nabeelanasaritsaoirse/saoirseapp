@@ -11,12 +11,22 @@ class AppStrings {
   static String send_otp = "Send OTP";
   static String login = 'LOGIN';
   static String sign_up = "SIGN UP";
+  static String Referral_code = "Referrel code";
+  static String LoginWithGoogle = "Login with Google";
   static String login_title = "Let’s you log in";
   static String login_note = "Welcome back you have been missed";
   static String Forgot_password = "Forgot Password..?";
+  static String invalid_username = 'Please enter valid username';
+  static String invalid_referral = 'Please enter valid referral code';
 
   //Onboard Screen
   static String onboard_note = "INVEST SMALL, DREAM BIG, \nOWN IT";
+
+  // Notification
+  static String notification_titile = "Notification";
+
+  // Wallet Screen
+  static String wallet_title = "My Wallet";
 
   // Home Screen
   static String card_discription =
@@ -104,11 +114,15 @@ class AppStrings {
   static String start_on = "Start On";
   static String end_on = "Start On";
   static String selected = "Selected";
+
   //Cart page
   static String carttitle = "Cart";
 
   // Wishlist Screen
   static String wishlist = "Whishlist";
+
+  // select address screen
+  static String select_address = "Select Address";
 
   //snackbars
   static String no_internet = 'No internet connection';
@@ -128,6 +142,24 @@ class AppStrings {
       "Thank you for your payment!\nStay consistent with your daily payments and get your product when the plan completes.";
   static String payment_Sucsess = "Payment success!";
 
+  // Add Address Page
+  static String Add_Address = 'Add Address ';
+  static String invalid_name = 'Please enter valid name';
+  static String invalid_street = 'Please enter valid street';
+  static String invalid_city = 'Please enter valid city';
+  static String invalid_state = 'Please enter valid state';
+  static String invalid_country = 'Please enter valid country';
+  static String invalid_zip = 'Please enter valid zipcode';
+  static String Name = 'Name ';
+  static String StreetName = 'Street Name';
+  static String City = 'City';
+  static String State = 'State / Province';
+  static String Country = 'country';
+  static String ZipCode = 'Zip Code';
+  static String PhoneNumber = 'Phone Number';
+  static String Save = 'Save';
+  static String profile_title = "Profile";
+
   // Edit Profile screen
   static String editLabel = 'Edit Profile';
   static String fullName = "Full name";
@@ -135,4 +167,42 @@ class AppStrings {
   static String saveChanges = "Save Changes";
   static String email = 'Email';
 
+  // Category screen
+  static String category_title = "Categories";
+
+  // Order Details screen
+  static String order_details = "Order Details";
+  static String address = "ADDRESS";
+  static String phone = "Phone :";
+  static String change = "CHANGE";
+  static String item = "ITEMS 1";
+  static String qty = "QTY :";
+  static String apply = "Apply";
+  static String premoCode = "Available Promo Code";
+  static String apply_coupen = "Apply Coupon";
+  static String coupen_hint = "Enter the coupon code";
+  static String tax = "Tax";
+  static String market_fee = "Market Place Fee";
+  static String shipping_charge = "Shipping Charge";
+  static String total_amount = "Total Amount";
+  static String your_plan = "Your Plan";
+  static String pay_now = "Pay Now";
+  static String total_ex_tax = "Total (ex of tax)";
+
+  // Add adress screen
+  static String add_address_label = "Add Address";
+
+  // Booking confirmed screen
+  static String confirm_content =
+      "Your order is confirmed and being prepared.\nTrack it anytime in your history.";
+  static String confirm_title = "Your booking is Confirmed!";
+
+  // Pending Transaction
+  static String pending_transaction = "Pending Transaction";
+
+  // Order history
+  static String order_history_label = "Order History";
+
+  // Transaction History
+  static String transaction_history_label = "Transaction History";
 }

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:saoirse_app/models/product_detiails_response.dart';
-
 import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
-
+import '../models/product_detiails_response.dart';
 import 'app_button.dart';
 import 'app_text.dart';
 

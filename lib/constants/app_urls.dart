@@ -16,4 +16,14 @@ class AppURLs {
   static String FRIEND_DETAILS = BASE_API + "api/referral/friend/";
   static String PRODUCT_DETAILS = BASE_API + "/api/referral/product/";
   static String FETCH_REFERRAL = BASE_API + "/api/referral/list/";
+
+  // Wishlist api
+  static String GET_FULL_WISHLIST = BASE_API + "/api/wishlist";
+  static String GET_ITEM_COUNT = BASE_API + "/api/wishlist/count";
+  static String CHECK_IF_WISHLIST = BASE_API + "/wishlist/check/productId";
+  static String ADD_TO_WISH = BASE_API + "/wishlist/add/productId";
+  static String DELETE_WISHLIST = BASE_API + "/wishlist/remove/productId";
+  static String MOVE_TO_CART = BASE_API + "/wishlist/move-to-cart/productId";
+  static String TOGGLE_WISHLIST = BASE_API + "/wishlist/check/productId";
+  static String CLEAR_CART_WISHLIST = BASE_API + "/wishlist/clear";
 }

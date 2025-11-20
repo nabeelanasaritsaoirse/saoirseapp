@@ -2,8 +2,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:saoirse_app/widgets/product_card.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -11,6 +9,10 @@ import '../../constants/app_gradient.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../../constants/app_strings.dart';
+import '../../widgets/custom_appbar.dart';
+import '../../widgets/product_card.dart';
+import '../my_wallet/my_wallet.dart';
+import '../notification_screen/notification_screen.dart';
 import 'home_controller.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,22 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Refactored Icon box
 
-  Widget _iconBox({String? image, double? padding}) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 7.h),
-      width: 36.w,
-      height: 36.h,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(10.r),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(padding!),
-        child: Image.asset(image!),
-      ),
-    );
-  }
-
   final List<String> imageList = [
     AppAssets.success_image_1,
     AppAssets.success_image_2,
@@ -49,664 +35,598 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColors.white,
-        // Header Section (app-bar)
-        appBar: PreferredSize(
-          preferredSize: Size(0, 54.h),
-          child: AppBar(
-            backgroundColor: AppColors.primaryColor,
-            elevation: 0,
-            leadingWidth: 70.w,
-            leading: Padding(
-              padding: EdgeInsets.only(left: 12.w),
-              child: Padding(
-                padding: EdgeInsets.only(top: 1.h),
-                child: Image.asset(
-                  AppAssets.app_logo,
-                  height: 35.h,
-                  width: 35.w,
-                ),
-              ),
-            ),
-            titleSpacing: 0,
-            actions: [
-              _iconBox(image: AppAssets.notification, padding: 3.w),
-              SizedBox(width: 8.w),
-              _iconBox(image: AppAssets.search, padding: 7.w),
-              SizedBox(width: 8.w),
-              _iconBox(image: AppAssets.wallet, padding: 5.w),
-              SizedBox(width: 12.w),
-            ],
-          ),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: 15.h),
+    return Scaffold(
+      backgroundColor: AppColors.white,
+      // Header Section (app-bar)
+      appBar: CustomAppBar(
+        showLogo: true,
+        actions: [
+          IconBox(
+              image: AppAssets.notification,
+              padding: 3.w,
+              onTap: () => Get.to(NotificationScreen())),
+          SizedBox(width: 8.w),
+          IconBox(image: AppAssets.search, padding: 7.w, onTap: () {}),
+          SizedBox(width: 8.w),
+          IconBox(
+              image: AppAssets.wallet,
+              padding: 5.w,
+              onTap: () => Get.to(WalletScreen())),
+          SizedBox(width: 12.w),
+        ],
+      ),
 
-              //  Carousel Section
-              Obx(
-                () => Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: [
-                    CarouselSlider(
-                      items: homeController.carouselImages.map((imagePath) {
-                        return Builder(
-                          builder: (BuildContext context) {
-                            return Container(
-                              margin: EdgeInsets.symmetric(horizontal: 8.w),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20.r),
-                                image: DecorationImage(
-                                  image: NetworkImage(imagePath),
-                                  fit: BoxFit.cover,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 15.h),
+
+            //  Carousel Section
+            Obx(
+              () => Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  CarouselSlider(
+                    items: homeController.carouselImages.map((imagePath) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Container(
+                            margin: EdgeInsets.symmetric(horizontal: 8.w),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.r),
+                              image: DecorationImage(
+                                image: NetworkImage(imagePath),
+                                fit: BoxFit.cover,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.lightBlack,
+                                  blurRadius: 8.r,
+                                  offset: const Offset(0, 4),
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.lightBlack,
-                                    blurRadius: 8.r,
-                                    offset: const Offset(0, 4),
+                              ],
+                            ),
+                            child: Stack(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    gradient: AppGradients.topCarosalGradient,
                                   ),
-                                ],
-                              ),
-                              child: Stack(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      gradient: AppGradients.topCarosalGradient,
-                                    ),
+                                ),
+
+                                // Text and Button overlay
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 24.w,
+                                    vertical: 10.h,
                                   ),
-
-                                  // Text and Button overlay
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 24.w,
-                                      vertical: 10.h,
-                                    ),
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          appText(
-                                            "Stylish",
-                                            fontSize: 24.sp,
-                                            color: AppColors.white,
-                                            fontWeight: FontWeight.w800,
-                                            fontStyle: FontStyle.italic,
-                                            fontFamily: "Times New Roman",
-                                          ),
-                                          SizedBox(height: 2.h),
-                                          appText(
-                                            AppStrings.card_discription,
-                                            maxLines: 2,
-                                            fontSize: 11.sp,
-                                            textAlign: TextAlign.left,
-                                            color: AppColors.white,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          SizedBox(height: 5.h),
-                                          appButton(
-                                            width: 150.w,
-                                            height: 35.h,
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 15.w,
-                                                vertical: 5.h),
-                                            onTap: () {},
-                                            buttonColor: AppColors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(8.r),
-                                            child: appText(
-                                              AppStrings.btton_lebel,
-                                              color: AppColors.textBlack,
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      }).toList(),
-                      options: CarouselOptions(
-                        autoPlay: true,
-                        autoPlayInterval: const Duration(seconds: 5),
-                        enlargeCenterPage: true,
-                        viewportFraction: 1.0,
-                        height: 170.h,
-                        onPageChanged: (index, reason) {
-                          homeController.currentCarouselIndex.value = index;
-                        },
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 8.h,
-                      child: Obx(
-                        () => Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: homeController.carouselImages
-                              .asMap()
-                              .entries
-                              .map((entry) {
-                            return Container(
-                              width:
-                                  homeController.currentCarouselIndex.value ==
-                                          entry.key
-                                      ? 24.w
-                                      : 8.w,
-                              height: 8.h,
-                              margin: EdgeInsets.symmetric(horizontal: 4.w),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4.r),
-                                color:
-                                    homeController.currentCarouselIndex.value ==
-                                            entry.key
-                                        ? AppColors.white
-                                        : AppColors.transparentWhite,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 10.h),
-
-              // Category Section
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: ['Technology', 'Fashion', 'Sports', 'Digital']
-                        .map((category) {
-                      // final isFirst = category == 'Technology';
-                      return Container(
-                        margin: EdgeInsets.only(right: 10.w),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20.w,
-                          vertical: 6.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(15.r),
-                          border: Border.all(color: Colors.grey.shade400),
-                        ),
-                        child: appText(
-                          category,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textBlack,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              SizedBox(height: 10.h),
-
-              // Most Popular Product Section
-              Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        appText(
-                          AppStrings.poular,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.06,
-                        ),
-                        appText(
-                          AppStrings.see_all,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.06,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  SizedBox(
-                    height: 195.h,
-                    child: Obx(
-                      () => ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 5.h,
-                        ),
-                        itemCount: homeController.mostPopularProducts.length,
-                        itemBuilder: (context, index) {
-                          final product =
-                              homeController.mostPopularProducts[index];
-                          return ProductCard(product: product);
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20.h),
-
-              // Best seller Product section
-              Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        appText(
-                          AppStrings.best_products,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.06,
-                        ),
-                        appText(
-                          AppStrings.see_all,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.06,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  SizedBox(
-                    height: 85.h,
-                    child: Obx(
-                      () => ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        itemCount: homeController.bestSellerProducts.length,
-                        itemBuilder: (context, index) {
-                          final product =
-                              homeController.bestSellerProducts[index];
-                          return Padding(
-                            padding: EdgeInsets.all(8.0.w),
-                            child: Container(
-                              width: 220.w,
-                              padding: EdgeInsets.all(5.sp),
-                              decoration: BoxDecoration(
-                                color: AppColors.white,
-                                borderRadius: BorderRadius.circular(12.sp),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.shadowColor,
-                                    blurRadius: 6.r,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  // Product Image
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.sp),
-                                    child: Image.asset(
-                                      product.image,
-                                      width: 70.w,
-                                      height: 70.w,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  SizedBox(width: 12.w),
-
-                                  // Product Info
-                                  Expanded(
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
                                     child: Column(
+                                      mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
                                       children: [
-                                        SizedBox(height: 5.h),
                                         appText(
-                                          product.name,
-                                          fontFamily: 'inter',
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w600,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        SizedBox(height: 4.h),
-                                        appText(
-                                          "₹ ${product.price.toStringAsFixed(0)}",
-                                          fontFamily: 'inter',
-                                          fontSize: 13.sp,
+                                          "Stylish",
+                                          fontSize: 24.sp,
+                                          color: AppColors.white,
                                           fontWeight: FontWeight.w800,
+                                          fontStyle: FontStyle.italic,
+                                          fontFamily: "Times New Roman",
+                                        ),
+                                        SizedBox(height: 2.h),
+                                        appText(
+                                          AppStrings.card_discription,
+                                          maxLines: 2,
+                                          fontSize: 11.sp,
+                                          textAlign: TextAlign.left,
+                                          color: AppColors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        SizedBox(height: 5.h),
+                                        appButton(
+                                          width: 150.w,
+                                          height: 35.h,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 15.w, vertical: 5.h),
+                                          onTap: () {},
+                                          buttonColor: AppColors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(8.r),
+                                          child: appText(
+                                            AppStrings.btton_lebel,
+                                            color: AppColors.textBlack,
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           );
                         },
-                      ),
+                      );
+                    }).toList(),
+                    options: CarouselOptions(
+                      autoPlay: true,
+                      autoPlayInterval: const Duration(seconds: 5),
+                      enlargeCenterPage: true,
+                      viewportFraction: 1.0,
+                      height: 170.h,
+                      onPageChanged: (index, reason) {
+                        homeController.currentCarouselIndex.value = index;
+                      },
                     ),
                   ),
-                ],
-              ),
-              SizedBox(height: 10.h),
-
-              // Trending Product section
-              Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        appText(
-                          AppStrings.trending,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.06,
-                        ),
-                        appText(
-                          AppStrings.see_all,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.06,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  SizedBox(
-                    height: 195.h,
+                  Positioned(
+                    bottom: 8.h,
                     child: Obx(
-                      () => ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.w,
-                          vertical: 5.h,
-                        ),
-                        itemCount: homeController.trendingProducts.length,
-                        itemBuilder: (context, index) {
-                          final product =
-                              homeController.trendingProducts[index];
-                          return ProductCard(product: product);
-                        },
+                      () => Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: homeController.carouselImages
+                            .asMap()
+                            .entries
+                            .map((entry) {
+                          return Container(
+                            width: homeController.currentCarouselIndex.value ==
+                                    entry.key
+                                ? 24.w
+                                : 8.w,
+                            height: 8.h,
+                            margin: EdgeInsets.symmetric(horizontal: 4.w),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4.r),
+                              color:
+                                  homeController.currentCarouselIndex.value ==
+                                          entry.key
+                                      ? AppColors.white
+                                      : AppColors.transparentWhite,
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 10.h),
+            ),
 
-              // Adverticement Section
-              Padding(
-                padding: EdgeInsets.all(8.w),
-                child: Container(
-                  width: double.infinity,
-                  height: 168.h,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(23.r),
-                    gradient: AppGradients.adverticementGradient,
-                  ),
-                  child: Stack(
+            SizedBox(height: 10.h),
+
+            // Category Section
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: ['Technology', 'Fashion', 'Sports', 'Digital']
+                      .map((category) {
+                    // final isFirst = category == 'Technology';
+                    return Container(
+                      margin: EdgeInsets.only(right: 10.w),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 6.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(15.r),
+                        border: Border.all(color: Colors.grey.shade400),
+                      ),
+                      child: appText(
+                        category,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textBlack,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            SizedBox(height: 10.h),
+
+            // Most Popular Product Section
+            Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Positioned(
-                        top: 24.h,
-                        left: 25.w,
-                        child: Text(
-                          AppStrings.explore,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 25.sp,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.lightAmber,
-                          ),
-                        ),
+                      appText(
+                        AppStrings.poular,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.06,
                       ),
-                      Positioned(
-                        top: 83.h,
-                        left: 24.w,
-                        child: appButton(
-                          onTap: () {},
-                          width: 140.w,
-                          height: 33.h,
-                          buttonColor: AppColors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          child: Center(
-                            child: appText(
-                              AppStrings.purchase,
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.gradientPink,
-                              fontFamily: "jakarta",
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 10.h,
-                        left: 24.w,
-                        child: SizedBox(
-                          width: 240.w,
-                          child: appText(
-                            AppStrings.Adverticement_content,
-                            fontSize: 15.sp,
-                            color: AppColors.white,
-                            fontWeight: FontWeight.w400,
-                            textAlign: TextAlign.start,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        right: 105.w,
-                        top: 5.h,
-                        child: Image.asset(
-                          AppAssets.remote_product,
-                          width: 100.w,
-                        ),
-                      ),
-                      Positioned(
-                        right: 5.w,
-                        child: Image.asset(
-                          AppAssets.game_product,
-                          width: 125.w,
-                        ),
-                      ),
-                      Positioned(
-                        right: -10,
-                        bottom: 18.h,
-                        child: Image.asset(
-                          AppAssets.earpod_product,
-                          width: 90.w,
-                        ),
+                      appText(
+                        AppStrings.see_all,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.06,
                       ),
                     ],
                   ),
                 ),
-              ),
-
-              // Success Section
-              Container(
-                width: double.infinity,
-                height: 420.h,
-                decoration: BoxDecoration(
-                  gradient: AppGradients.succesGradient,
+                SizedBox(height: 12.h),
+                SizedBox(
+                  height: 205.h,
+                  child: Obx(
+                    () => ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 5.h,
+                      ),
+                      itemCount: homeController.mostPopularProducts.length,
+                      itemBuilder: (context, index) {
+                        final product =
+                            homeController.mostPopularProducts[index];
+                        return ProductCard(product: product);
+                      },
+                    ),
+                  ),
                 ),
-                child: SingleChildScrollView(
-                  child: Column(
+              ],
+            ),
+            SizedBox(height: 20.h),
+
+            // Best seller Product section
+            Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SizedBox(height: 10.h),
-                      Stack(
-                        alignment: Alignment.bottomCenter,
-                        children: [
-                          CarouselSlider(
-                            items: homeController.successImages.map((
-                              imagePath,
-                            ) {
-                              return Builder(
-                                builder: (BuildContext context) {
-                                  return Container(
-                                    margin: EdgeInsets.symmetric(
-                                      horizontal: 8.w,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20.r),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: AppColors.lightBlack,
-                                          blurRadius: 8.r,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(20.r),
-                                      child: Image.asset(
-                                        imagePath,
-                                        fit: BoxFit.cover,
-                                        width: MediaQuery.of(
-                                          context,
-                                        ).size.width.w,
+                      appText(
+                        AppStrings.best_products,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.06,
+                      ),
+                      appText(
+                        AppStrings.see_all,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.06,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 12.h),
+                SizedBox(
+                  height: 85.h,
+                  child: Obx(
+                    () => ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      itemCount: homeController.bestSellerProducts.length,
+                      itemBuilder: (context, index) {
+                        final product =
+                            homeController.bestSellerProducts[index];
+                        return Padding(
+                          padding: EdgeInsets.all(8.0.w),
+                          child: Container(
+                            width: 220.w,
+                            padding: EdgeInsets.all(5.sp),
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              borderRadius: BorderRadius.circular(12.sp),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.shadowColor,
+                                  blurRadius: 6.r,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                // Product Image
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.sp),
+                                  child: Image.asset(
+                                    product.image,
+                                    width: 70.w,
+                                    height: 70.w,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                SizedBox(width: 12.w),
+
+                                // Product Info
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      SizedBox(height: 5.h),
+                                      appText(
+                                        product.name,
+                                        fontFamily: 'inter',
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    ),
-                                  );
-                                },
-                              );
-                            }).toList(),
-                            options: CarouselOptions(
-                              autoPlay: true,
-                              autoPlayInterval: const Duration(seconds: 5),
-                              enlargeCenterPage: true,
-                              viewportFraction: 1.0,
-                              height: 170.h,
-                              onPageChanged: (index, reason) {
-                                homeController
-                                    .currentBottomCarouselIndex.value = index;
-                              },
+                                      SizedBox(height: 4.h),
+                                      appText(
+                                        "₹ ${product.price.toStringAsFixed(0)}",
+                                        fontFamily: 'inter',
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          Positioned(
-                            bottom: 10.h,
-                            child: Obx(
-                              () => Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: homeController.successImages
-                                    .asMap()
-                                    .entries
-                                    .map((entry) {
-                                  return Container(
-                                    width: homeController
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10.h),
+
+            // Trending Product section
+            Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      appText(
+                        AppStrings.trending,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.06,
+                      ),
+                      appText(
+                        AppStrings.see_all,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.06,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 12.h),
+                SizedBox(
+                  height: 205.h,
+                  child: Obx(
+                    () => ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 5.h,
+                      ),
+                      itemCount: homeController.trendingProducts.length,
+                      itemBuilder: (context, index) {
+                        final product = homeController.trendingProducts[index];
+                        return ProductCard(product: product);
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10.h),
+
+            // Adverticement Section
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                width: double.infinity,
+                height: 153.h,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15.r),
+                    image: DecorationImage(
+                        image: AssetImage(AppAssets.add_banner),
+                        fit: BoxFit.contain)),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 15.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 75.h,
+                      ),
+                      appButton(
+                          onTap: () {},
+                          buttonColor: AppColors.white,
+                          borderRadius: BorderRadius.circular(5.r),
+                          padding: EdgeInsets.all(0),
+                          width: 120.w,
+                          height: 30.h,
+                          child: Center(
+                            child: appText(AppStrings.purchase,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.red),
+                          ))
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Success Section
+            Container(
+              width: double.infinity,
+              height: 420.h,
+              decoration: BoxDecoration(
+                gradient: AppGradients.succesGradient,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: 10.h),
+                    Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        CarouselSlider(
+                          items: homeController.successImages.map((
+                            imagePath,
+                          ) {
+                            return Builder(
+                              builder: (BuildContext context) {
+                                return Container(
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: 8.w,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20.r),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.lightBlack,
+                                        blurRadius: 8.r,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20.r),
+                                    child: Image.asset(
+                                      imagePath,
+                                      fit: BoxFit.cover,
+                                      width: MediaQuery.of(
+                                        context,
+                                      ).size.width.w,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }).toList(),
+                          options: CarouselOptions(
+                            autoPlay: true,
+                            autoPlayInterval: const Duration(seconds: 5),
+                            enlargeCenterPage: true,
+                            viewportFraction: 1.0,
+                            height: 170.h,
+                            onPageChanged: (index, reason) {
+                              homeController.currentBottomCarouselIndex.value =
+                                  index;
+                            },
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 10.h,
+                          child: Obx(
+                            () => Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: homeController.successImages
+                                  .asMap()
+                                  .entries
+                                  .map((entry) {
+                                return Container(
+                                  width: homeController
+                                              .currentBottomCarouselIndex
+                                              .value ==
+                                          entry.key
+                                      ? 24.w
+                                      : 8.w,
+                                  height: 8.h,
+                                  margin: EdgeInsets.symmetric(
+                                    horizontal: 4.w,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                      4.r,
+                                    ),
+                                    color: homeController
                                                 .currentBottomCarouselIndex
                                                 .value ==
                                             entry.key
-                                        ? 24.w
-                                        : 8.w,
-                                    height: 8.h,
-                                    margin: EdgeInsets.symmetric(
-                                      horizontal: 4.w,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(
-                                        4.r,
-                                      ),
-                                      color: homeController
-                                                  .currentBottomCarouselIndex
-                                                  .value ==
-                                              entry.key
-                                          ? AppColors.white
-                                          : AppColors.transparentWhite,
-                                    ),
-                                  );
-                                }).toList(),
+                                        ? AppColors.white
+                                        : AppColors.transparentWhite,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10.h),
+
+                    // Refer Section
+                    Container(
+                      width: double.infinity,
+                      height: 200.h,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(AppAssets.refer_image),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            right: 30.w,
+                            top: 37.h,
+                            child: appText(
+                              AppStrings.refer,
+                              fontSize: 25.sp,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.skyBlue,
+                              fontFamily: "jakarta",
+                            ),
+                          ),
+                          Positioned(
+                            right: 40.w,
+                            top: 75.h,
+                            child: appText(
+                              AppStrings.refer_heding,
+                              fontSize: 28.sp,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.white,
+                              fontFamily: "jakarta",
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 5.h,
+                            right: 35.w,
+                            child: appButton(
+                              onTap: () {},
+                              width: 195.w,
+                              height: 45.h,
+                              buttonColor: AppColors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              padding: EdgeInsets.symmetric(),
+                              // Simulate elevation using BoxShadow
+                              child: appText(
+                                AppStrings.refer_button_lebel,
+                                fontSize: 17.sp,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.gradientDarkBlue,
+                                fontFamily: "jakarta",
                               ),
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 10.h),
-
-                      // Refer Section
-                      Container(
-                        width: double.infinity,
-                        height: 200.h,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(AppAssets.refer_image),
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              right: 30.w,
-                              top: 37.h,
-                              child: appText(
-                                AppStrings.refer,
-                                fontSize: 25.sp,
-                                fontWeight: FontWeight.w900,
-                                color: AppColors.skyBlue,
-                                fontFamily: "jakarta",
-                              ),
-                            ),
-                            Positioned(
-                              right: 40.w,
-                              top: 75.h,
-                              child: appText(
-                                AppStrings.refer_heding,
-                                fontSize: 28.sp,
-                                fontWeight: FontWeight.w900,
-                                color: AppColors.white,
-                                fontFamily: "jakarta",
-                                textAlign: TextAlign.start,
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 5.h,
-                              right: 35.w,
-                              child: appButton(
-                                onTap: () {},
-                                width: 195.w,
-                                height: 45.h,
-                                buttonColor: AppColors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                padding: EdgeInsets.symmetric(),
-                                // Simulate elevation using BoxShadow
-                                child: appText(
-                                  AppStrings.refer_button_lebel,
-                                  fontSize: 17.sp,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.gradientDarkBlue,
-                                  fontFamily: "jakarta",
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(height: 30.h),
-            ],
-          ),
+            ),
+            SizedBox(height: 10.h),
+          ],
         ),
       ),
     );
   }
 }
-
-

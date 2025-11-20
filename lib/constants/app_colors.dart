@@ -15,6 +15,7 @@ class AppColors {
   static const Color black87 = Colors.black87;
   static const Color black26 = Colors.black26;
   static const Color textBlack = Color(0xFF303030);
+  static const Color textGray = Color(0xFF777E90);
   static const Color grey = Colors.grey;
   static const Color lightGrey = Color(0xFFF5F5F5);
   static const Color shadowColor = Colors.black12;
@@ -29,7 +30,9 @@ class AppColors {
   static final Color lightBlack = Colors.black.withValues(alpha: 0.15);
   static const Color green = Colors.green;
   static const Color red = Colors.red;
+   static const Color blueshade = Color.fromARGB(255, 175, 214, 246);
   static const Color blue = Colors.blue;
+  static const Color mediumBlue = Color.fromARGB(255, 29, 16, 211);
   static const Color skyBlue = Color(0xFF9BBBFC);
   static const Color lightRed = Color(0xFFFF5B5B);
   static const Color lightGreen = Color(0xFFE8F5E9);

@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../constants/app_strings.dart';
+import '../../widgets/custom_appbar.dart';
 import '/screens/add_address/add_address_controller.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
 import '/widgets/app_text_field.dart';
+import 'add_address_validation.dart';
 
 class AddAddress extends StatefulWidget {
   const AddAddress({super.key});
@@ -22,68 +25,67 @@ class _AddAddressState extends State<AddAddress> {
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        leading: GestureDetector(
-          child: Icon(
-            Icons.arrow_back,
-            color: AppColors.white,
-            size: 30.sp,
-          ),
-          onTap: () => Navigator.pop(context),
-        ),
-        title: appText(
-          "Add Address",
-          color: AppColors.white,
-          fontWeight: FontWeight.w600,
-          fontSize: 18.sp,
-        ),
-        centerTitle: true,
+      appBar: CustomAppBar(
+        title: AppStrings.add_address_label,
+        showBack: true,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            appText("Name", fontSize: 14.sp, fontWeight: FontWeight.w600),
+            appText(AppStrings.Name,
+                fontSize: 14.sp, fontWeight: FontWeight.w600),
             appTextField(
               controller: addAddressController.nameController,
               textColor: AppColors.black,
-              hintText: "Name",
+              hintText: AppStrings.Name,
               hintColor: AppColors.grey,
+              validator: (value) {
+                return AddAddressValidation.nameValidation(name: value!);
+              },
             ),
             SizedBox(
               height: 10.h,
             ),
-            appText("Street Name",
+            appText(AppStrings.StreetName,
                 fontSize: 14.sp, fontWeight: FontWeight.w600),
             appTextField(
               controller: addAddressController.streetNameController,
               textColor: AppColors.black,
-              hintText: "Street Name",
+              hintText: AppStrings.StreetName,
               hintColor: AppColors.grey,
+              validator: (value) {
+                return AddAddressValidation.streetValidation(street: value!);
+              },
             ),
             SizedBox(
               height: 10.h,
             ),
-            appText("City", fontSize: 14.sp, fontWeight: FontWeight.w600),
+            appText(AppStrings.City,
+                fontSize: 14.sp, fontWeight: FontWeight.w600),
             appTextField(
               controller: addAddressController.cityController,
               textColor: AppColors.black,
-              hintText: "City",
+              hintText: AppStrings.City,
               hintColor: AppColors.grey,
+              validator: (value) {
+                return AddAddressValidation.cityValidation(city: value!);
+              },
             ),
             SizedBox(
               height: 10.h,
             ),
-            appText("State / Province",
+            appText(AppStrings.State,
                 fontSize: 14.sp, fontWeight: FontWeight.w600),
             appTextField(
               controller: addAddressController.stateController,
               textColor: AppColors.black,
-              hintText: "State / Province",
+              hintText: AppStrings.State,
               hintColor: AppColors.grey,
+              validator: (value) {
+                return AddAddressValidation.stateValidation(state: value!);
+              },
             ),
             SizedBox(
               height: 10.h,
@@ -94,13 +96,17 @@ class _AddAddressState extends State<AddAddress> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      appText("Country",
+                      appText(AppStrings.Country,
                           fontSize: 14.sp, fontWeight: FontWeight.w600),
                       appTextField(
                         controller: addAddressController.countryController,
                         textColor: AppColors.black,
-                        hintText: "Country",
+                        hintText: AppStrings.Country,
                         hintColor: AppColors.grey,
+                        validator: (value) {
+                          return AddAddressValidation.countryValidation(
+                              country: value!);
+                        },
                       ),
                     ],
                   ),
@@ -110,13 +116,17 @@ class _AddAddressState extends State<AddAddress> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      appText("Zip Code",
+                      appText(AppStrings.ZipCode,
                           fontSize: 14.sp, fontWeight: FontWeight.w600),
                       appTextField(
                         controller: addAddressController.zipController,
                         textColor: AppColors.black,
-                        hintText: "Zip Code",
+                        hintText: AppStrings.ZipCode,
                         hintColor: AppColors.grey,
+                        validator: (value) {
+                          return AddAddressValidation.zipValidation(
+                              zip: value!);
+                        },
                       ),
                     ],
                   ),
@@ -126,22 +136,29 @@ class _AddAddressState extends State<AddAddress> {
             SizedBox(
               height: 10.h,
             ),
-            appText("Phone Number",
+            appText(AppStrings.phoneNumber,
                 fontSize: 14.sp, fontWeight: FontWeight.w600),
             appTextField(
               controller: addAddressController.phoneController,
               textColor: AppColors.black,
-              hintText: " Phone Number",
+              hintText: AppStrings.phoneNumber,
               hintColor: AppColors.grey,
+              validator: (value) {
+                return AddAddressValidation.phoneValidation(
+                        phone: int.parse(value!))
+                    .toString();
+              },
             ),
             SizedBox(height: 25.h),
             appButton(
-              child: appText("Save",
+              child: appText(AppStrings.Save,
                   fontSize: 20.sp,
                   fontWeight: FontWeight.w800,
                   color: AppColors.white),
               buttonColor: AppColors.primaryColor,
-              onTap: () {},
+              onTap: () {
+                Get.back();
+              },
             ),
           ],
         ),

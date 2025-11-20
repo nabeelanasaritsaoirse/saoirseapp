@@ -46,11 +46,35 @@
           }
         },
         {
+          "client_id": "486829564070-ed8pe5lcbilhmsqu86e2dookega8kggk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saoirse.epi",
+            "certificate_hash": "0e88ab628a8821e34c5b06510b79d84aa9d16f97"
+          }
+        },
+        {
+          "client_id": "486829564070-f7b3au4rppadr87r04pkhbdmoj568do6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saoirse.epi",
+            "certificate_hash": "042eb5d44ea0700e20c1834dd272151cb896e81f"
+          }
+        },
+        {
           "client_id": "486829564070-in0d5u1brce3364l4dv0ejtq1gofogms.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.saoirse.epi",
             "certificate_hash": "88cfbad6b6b483738ad8113d9f89f696ee9c9f36"
+          }
+        },
+        {
+          "client_id": "486829564070-rfttng73f2akk5k8rd1ll41f7vlskt2q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saoirse.epi",
+            "certificate_hash": "d7653fc543db2d1a614a2ae0fbcdb991fa5c0eb3"
           }
         },
         {

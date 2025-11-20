@@ -6,14 +6,16 @@ import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import '../../constants/app_strings.dart';
+
+import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
 import '../../main.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/app_snackbar.dart';
 import '../dashboard/dashboard_screen.dart';
+
+import 'package:http/http.dart' as http;
 
 class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();
@@ -62,104 +64,50 @@ class LoginController extends GetxController {
   }
 
   //google login
-  // googleLogin() async {
-  //   loading.value = true;
-
-  //   if (APIService.internet) {
-
-  //     String? idToken = await AuthService.googleLogin();
-  //     debugPrint(idToken, wrapWidth: 1024);
-
-  //     if (idToken != null) {
-  //       await userLogin(idToken);
-  //     }
-  //   } else {
-  //     appSnackbar(
-  //       error: true,
-  //       content: AppStrings.no_internet,
-  //     );
-  //   }
-
-  //   loading.value = false;
-  // }
-
   googleLogin() async {
-    try {
-      loading.value = true;
+    loading.value = true;
 
-      if (!APIService.internet) {
-        appSnackbar(error: true, content: AppStrings.no_internet);
-        return;
-      }
+    // Clear previous session
+    await AuthService.signOut();
 
-      // Clear previous session
-      await AuthService.signOut();
+    // Step 1: Google Login & ID token
+    String? idToken = await AuthService.googleLogin();
 
-      // Step 1: Google Login & ID token
-      String? idToken = await AuthService.googleLogin();
-
-      if (idToken == null) {
-        loading.value = false;
-        return;
-      }
-
-      // Step 2: Backend login → get userId
-      String? userId = await userLogin(idToken);
-
-      if (userId == null) {
-        loading.value = false;
-        return;
-      }
-
-      // Step 3: Update user with FCM + referral
-      bool updated = await updateUser(
-        userId,
-        referrelController.text.isNotEmpty
-            ? referrelController.text.trim()
-            : "",
-      );
-
-      if (updated) {
-        // Step 4: Navigate to Home
-        Get.offAll(() => DashboardScreen());
-        appSnackbar(content: "Login Successful!");
-      }
-    } catch (e) {
-      print("LOGIN FLOW ERROR: $e");
-      appSnackbar(content: "Login Error: $e", error: true);
-    } finally {
+    if (idToken == null) {
       loading.value = false;
+      return;
     }
-  }
 
-  //user login
-  Future<String?> userLogin(String idToken) async {
-    try {
-      final result = await APIService.postRequest(
-        url: AppURLs.LOGIN_API,
-        body: {"idToken": idToken},
-        onSuccess: (json) => json, // RETURN MAP
-      );
+    // Step 2: Backend login → get userId
+    final res = await AuthService.loginWithIdToken(idToken);
 
-      if (result == null) return null;
-
-      if (result["success"] != true) {
-        appSnackbar(content: result["message"], error: true);
-        return null;
-      }
-
-      final data = result["data"];
-
-      storage.write("accessToken", data["accessToken"]);
-      storage.write("refreshToken", data["refreshToken"]);
-      storage.write("userId", data["userId"]);
-
-      return data["userId"]; // return for next API
-    } catch (e) {
-      print("LOGIN ERROR::: $e");
-      appSnackbar(content: e.toString(), error: true);
-      return null;
+    if (res == null || res.success != true) {
+      appSnackbar(content: "Login failed", error: true);
+      return;
     }
+
+    final data = res.data!;
+    storage.write(AppConst.USER_ID, data.userId);
+    storage.write(AppConst.ACCESS_TOKEN, data.accessToken);
+    storage.write(AppConst.REFRESH_TOKEN, data.refreshToken);
+
+    print("✔ SAVED userId: ${storage.read(AppConst.USER_ID)}");
+    print("✔ SAVED accessToken: ${storage.read(AppConst.ACCESS_TOKEN)}");
+    print("✔ SAVED refreshToken: ${storage.read(AppConst.REFRESH_TOKEN)}");
+
+    // Step 3: Update user with FCM + referral
+    bool updated = await updateUser(
+      data.userId!,
+      referrelController.text.isNotEmpty ? referrelController.text.trim() : "",
+    );
+
+    if (updated) {
+      // Step 4: Navigate to Home
+      Get.offAll(() => DashboardScreen());
+      appSnackbar(content: "Login Successful!");
+    }
+
+    loading.value = false;
   }
 
   bool validateInputs() {
@@ -210,7 +158,7 @@ class LoginController extends GetxController {
           "deviceToken": deviceToken ?? "",
         },
         headers: {
-          "Authorization": "Bearer ${storage.read("accessToken")}",
+          "Authorization": "Bearer ${storage.read(AppConst.ACCESS_TOKEN)}",
           "Content-Type": "application/json"
         },
         onSuccess: (json) => json,

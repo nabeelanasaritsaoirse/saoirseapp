@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'package:saoirse_app/models/user_profile.dart';
-import 'package:saoirse_app/widgets/app_snackbar.dart';
+import '../../models/user_profile.dart';
+import '../../widgets/app_snackbar.dart';
 
 class EditProfileController extends GetxController {
   // ------------------ FORM KEYS ------------------
@@ -153,6 +153,7 @@ class EditProfileController extends GetxController {
     });
 
     appSnackbar(title: "Success", content: "Profile updated successfully");
+    Get.back();
   }
 
   // ------------------ CLEANUP ------------------
