@@ -40,4 +40,23 @@ class LoginService {
 
     return null;
   }
+
+  static String? usernameValidation({required String username}) {
+    if (username.isEmpty || !RegExp(r"^[a-zA-Z ]{3,}$").hasMatch(username)) {
+      appSnackbar(error: true, content: AppStrings.invalid_name);
+      return '';
+    }
+    return null;
+  }
+
+// referral code validation
+  static String? referralValidation({required String referral}) {
+    // Example: referral code must be 6–10 alphanumeric
+    if (referral.isEmpty ||
+        !RegExp(r"^[A-Za-z0-9]{6,10}$").hasMatch(referral)) {
+      appSnackbar(error: true, content: AppStrings.invalid_referral);
+      return '';
+    }
+    return null;
+  }
 }

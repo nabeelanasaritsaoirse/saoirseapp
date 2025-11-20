@@ -3,14 +3,11 @@ import 'package:flutter/material.dart';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
-
 import '../main.dart';
-
 import '../models/friend_details_response.dart';
 import '../models/product_detiails_response.dart';
 import '../models/referral_response_model.dart';
 import '../models/refferal_model.dart';
-
 import '../services/api_service.dart';
 
 class ReferralService {
