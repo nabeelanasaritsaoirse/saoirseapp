@@ -170,20 +170,18 @@ jobs:
           fi
           
       - name: 🔐 Decode Android Keystore
-        run: |
-          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > android/app/keystore.jks
+        run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > android.keystore
 
-      - name: ⚙️ Create key.properties
+      # Create key.properties
+      - name: 🔧 Configure Signing
         run: |
           cat > android/key.properties <<EOF
           storePassword=${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword=${{ secrets.KEY_PASSWORD }}
           keyAlias=${{ secrets.KEY_ALIAS }}
-          storeFile=app/keystore.jks
+          storeFile=../android.keystore
           EOF
-
-
-
+          
       - name: 🏗️ Build Android APK & AAB
         run: |
           flutter build apk --release
