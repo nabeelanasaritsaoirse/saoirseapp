@@ -1,15 +1,21 @@
-// ignore_for_file: library_prefixes
+// home_controller.dart
+import 'dart:developer';
 
 import 'package:get/get.dart';
-
 import '../../constants/app_assets.dart';
 import '../../models/product_model.dart';
+import '../../services/home_service.dart';
 
 class HomeController extends GetxController {
   RxBool loading = false.obs;
+  RxBool popularLoading = false.obs;
+  RxBool bestSellerLoading = false.obs;
+  RxBool trendingLoading = false.obs;
+  
   RxInt currentCarouselIndex = 0.obs;
   RxInt currentBottomCarouselIndex = 0.obs;
-  // Fot the custom  images
+  
+  // For the custom images
   final RxList<String> carouselImages = <String>[
     'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800',
     'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800',
@@ -22,72 +28,75 @@ class HomeController extends GetxController {
     AppAssets.success_image_3,
   ].obs;
 
-  final RxList<Product> mostPopularProducts = <Product>[
-    Product(
-      name: 'Modern Chair',
-      image: "assets/images/chair.png",
-      price: 12500,
-      hasDiscount: true,
-    ),
-    Product(
-      name: 'Sony Ear Buds',
-      image: 'assets/images/product_image_2.png',
-      price: 69999,
-      isFavorite: true,
-      hasDiscount: true,
-    ),
-    Product(
-      name: 'Modern Chair',
-      image: "assets/images/chair.png",
-      price: 12500,
-      hasDiscount: true,
-    ),
-    Product(
-      name: 'Sony Ear Buds',
-      image: 'assets/images/product_image_2.png',
-      price: 69999,
-      isFavorite: true,
-      hasDiscount: true,
-    ),
-  ].obs;
+  final RxList<Product> mostPopularProducts = <Product>[].obs;
+  final RxList<Product> bestSellerProducts = <Product>[].obs;
+  final RxList<Product> trendingProducts = <Product>[].obs;
 
-  final RxList<Product> bestSellerProducts = <Product>[
-    Product(
-      name: 'Marine Crystal Bag',
-      image: "assets/images/bag.png",
-      price: 7999,
-    ),
-    Product(
-      name: 'Black Cotton dress',
-      image: 'assets/images/dress.png',
-      price: 24999,
-    ),
-  ].obs;
+  @override
+  void onInit() {
+    super.onInit();
+    fetchAllProducts();
+  }
 
-  final RxList<Product> trendingProducts = <Product>[
-    Product(
-      name: 'Iphone 16',
-      image: "assets/images/phone.png",
-      price: 669999,
-      hasDiscount: true,
-    ),
-    Product(
-      name: 'Pixel Watch',
-      image: "assets/images/watch.png",
-      price: 96999,
-      hasDiscount: true,
-    ),
-    Product(
-      name: 'Iphone 16',
-      image: "assets/images/phone.png",
-      price: 669999,
-      hasDiscount: true,
-    ),
-    Product(
-      name: 'Pixel Watch',
-      image: "assets/images/watch.png",
-      price: 96999,
-      hasDiscount: true,
-    ),
-  ].obs;
+  // Fetch all products
+  Future<void> fetchAllProducts() async {
+    await Future.wait([
+      fetchPopularProducts(),
+      fetchBestSellerProducts(),
+      fetchTrendingProducts(),
+    ]);
+  }
+
+  // Fetch Popular Products
+  Future<void> fetchPopularProducts() async {
+    try {
+      popularLoading.value = true;
+      final products = await HomeService.fetchPopularProducts(page: 1, limit: 10);
+      
+      if (products != null && products.isNotEmpty) {
+        mostPopularProducts.value = products;
+      }
+    } catch (e) {
+      log('Error fetching popular products: $e');
+    } finally {
+      popularLoading.value = false;
+    }
+  }
+
+  // // Fetch Best Seller Products
+  Future<void> fetchBestSellerProducts() async {
+    try {
+      bestSellerLoading.value = true;
+      final products = await HomeService.fetchBestSellerProducts(page: 1, limit: 10);
+      
+      if (products != null && products.isNotEmpty) {
+        bestSellerProducts.value = products;
+      }
+    } catch (e) {
+      log('Error fetching best seller products: $e');
+    } finally {
+      bestSellerLoading.value = false;
+    }
+  }
+
+  // Fetch Trending Products
+  Future<void> fetchTrendingProducts() async {
+    try {
+      trendingLoading.value = true;
+      final products = await HomeService.fetchTrendingProducts(page: 1, limit: 10);
+      
+      if (products != null && products.isNotEmpty) {
+        trendingProducts.value = products;
+      }
+    } catch (e) {
+      log('Error fetching trending products: $e');
+    } finally {
+      trendingLoading.value = false;
+    }
+  }
+
+  // Refresh all data
+  Future<void> refreshAllData() async {
+    await fetchAllProducts();
+  }
 }

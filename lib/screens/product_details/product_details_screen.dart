@@ -478,7 +478,7 @@ class ProductDetailsScreen extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final product =
                                   controller.mostPopularProducts[index];
-                              return ProductCard(product: product);
+                              // return ProductCard(product: product);
                             },
                           ),
                         ),
@@ -497,7 +497,7 @@ class ProductDetailsScreen extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final product =
                                   controller.mostPopularProducts[index];
-                              return ProductCard(product: product);
+                              // return ProductCard(product: product);
                             },
                           ),
                         ),

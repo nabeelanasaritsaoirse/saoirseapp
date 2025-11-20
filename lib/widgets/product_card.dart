@@ -34,25 +34,37 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Image section
             Stack(
               children: [
                 Container(
                   height: 120.h,
-                  margin: EdgeInsets.symmetric(
-                    horizontal: 5.w,
-                    vertical: 5.h,
-                  ),
+                  margin: EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.h),
                   decoration: BoxDecoration(
                     color: AppColors.lightGrey,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
-                    child: Image.asset(
-                      product.image,
-                      width: 80.w,
-                      height: 80.h,
-                      fit: BoxFit.cover,
-                    ),
+                    child: product.image.startsWith('http')
+                        ? Image.network(
+                            product.image,
+                            width: 80.w,
+                            height: 80.h,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(
+                                Icons.broken_image,
+                                size: 40.sp,
+                                color: AppColors.grey,
+                              );
+                            },
+                          )
+                        : Image.asset(
+                            product.image,
+                            width: 80.w,
+                            height: 80.h,
+                            fit: BoxFit.cover,
+                          ),
                   ),
                 ),
                 Positioned(
@@ -77,37 +89,39 @@ class ProductCard extends StatelessWidget {
                 ),
               ],
             ),
+
+            // Text Section
             Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 10.w,
-                vertical: 2.h,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      appText(
-                        product.name,
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textBlack,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Spacer(),
-                    ],
-                  ),
-                  SizedBox(height: 2.h),
+                  // Title Row (Fix overflow)
                   appText(
                     product.name,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textBlack,
+                    textAlign: TextAlign.left,
+                    maxLines: 2, 
+                    overflow: TextOverflow.ellipsis,
+                  ),
+
+                  SizedBox(height: 2.h),
+
+                  // subtitle
+                  appText(
+                    product.brand,
                     fontFamily: 'inter',
                     fontSize: 10.sp,
                     fontWeight: FontWeight.w400,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+
                   SizedBox(height: 2.h),
+
+                  // price
                   appText(
                     '₹ ${product.price.toStringAsFixed(0)}',
                     fontFamily: 'inter',
@@ -123,3 +137,13 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
