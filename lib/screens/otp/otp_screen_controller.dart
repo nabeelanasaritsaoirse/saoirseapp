@@ -57,11 +57,13 @@ class VerifyOtpController extends GetxController {
     storage.write(AppConst.USER_ID, data.userId);
     storage.write(AppConst.ACCESS_TOKEN, data.accessToken);
     storage.write(AppConst.REFRESH_TOKEN, data.refreshToken);
+    storage.write(AppConst.REFERRAL_CODE, data.referralCode);
 
     print("✔ SAVED userId: ${storage.read(AppConst.USER_ID)}");
     print("✔ SAVED accessToken: ${storage.read(AppConst.ACCESS_TOKEN)}");
     print("✔ SAVED refreshToken: ${storage.read(AppConst.REFRESH_TOKEN)}");
     print("Backend Login Successful → userId: ${data.userId}");
+    print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
 
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
     bool updated = await updateUser(
