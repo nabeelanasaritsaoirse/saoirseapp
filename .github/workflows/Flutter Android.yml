@@ -1,4 +1,4 @@
-name: 🤖 Flutter Android CI
+name: 🤖 Flutter Android Build and Deploy
 run-name: "🚀 Android Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
 permissions:
