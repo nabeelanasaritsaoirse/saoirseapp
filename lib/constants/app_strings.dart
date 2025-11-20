@@ -43,6 +43,10 @@ class AppStrings {
   static String refer = "Refer EPI";
   static String refer_heding = "Earn Money\nEveryday";
   static String refer_button_lebel = "Refer A Friend Now";
+  static String no_popular_products = 'No popular products available';
+  static String no_best_seller_products = "No products available";
+  static String no_trending_products = "No Trending products available";
+
 
   // Product Details page
   static String freeShiping = "Free shipping";
