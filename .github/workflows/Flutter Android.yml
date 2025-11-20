@@ -170,7 +170,7 @@ jobs:
           fi
           
       - name: 🔐 Decode Android Keystore
-        run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > android/android.keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > android/app/android.keystore
 
       # Create key.properties
       - name: 🔧 Configure Signing
