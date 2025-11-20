@@ -42,10 +42,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(keystoreProperties["KEYSTORE_FILE"] as String)
-            storePassword = keystoreProperties["KEYSTORE_PASSWORD"] as String
-            keyAlias = keystoreProperties["KEY_ALIAS"] as String
-            keyPassword = keystoreProperties["KEY_PASSWORD"] as String
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
         }
     }
 
