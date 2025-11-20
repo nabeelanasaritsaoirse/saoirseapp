@@ -1,5 +1,5 @@
 name: 🤖 Flutter Android CI
-run-name: "🚀 Android Build by ${{ github.actor }} on ${{ github.ref_name }}"
+run-name: "🚀 Lint and Test Check by ${{ github.actor }} on ${{ github.ref_name }}"
 
 permissions:
   contents: read
