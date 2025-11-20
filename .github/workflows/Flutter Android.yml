@@ -168,6 +168,21 @@ jobs:
           else
             echo "✅ Lint & Tests Passed — deploy allowed"
           fi
+          
+      - name: 🔐 Decode Android Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > android/app/keystore.jks
+
+      - name: ⚙️ Create key.properties
+        run: |
+          cat > android/key.properties <<EOF
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=keystore.jks
+          EOF
+
+
 
       - name: 🏗️ Build Android APK & AAB
         run: |
