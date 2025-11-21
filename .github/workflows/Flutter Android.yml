@@ -8,20 +8,20 @@ permissions:
 
 on:
   push:
-    branches: [ main, developer ]
-    paths:
-      - "android/**"
-      - "lib/**"
-      - "pubspec.yaml"
-      - "pubspec.lock"
+    branches: [ main ]
+  #   paths:
+  #     - "android/**"
+  #     - "lib/**"
+  #     - "pubspec.yaml"
+  #     - "pubspec.lock"
 
-  pull_request:
-    branches: [ main, developer ]
-    paths:
-      - "android/**"
-      - "lib/**"
-      - "pubspec.yaml"
-      - "pubspec.lock"
+  # pull_request:
+  #   branches: [ main, developer ]
+  #   paths:
+  #     - "android/**"
+  #     - "lib/**"
+  #     - "pubspec.yaml"
+  #     - "pubspec.lock"
 
 jobs:
   android-ci:
@@ -223,10 +223,17 @@ jobs:
       - name: 🗃️ List downloaded files
         run: ls -R .
 
+   
       - name: 📦 Move AAB and APK to root for Fastlane
         run: |
           find . -name "*.aab" -exec mv {} app-release.aab \;
           find . -name "*.apk" -exec mv {} app-release.apk \;
+  
+      - name: 🧼 Remove APK (Google Play only accepts AAB)
+        run: |
+          if [ -f app-release.apk ]; then
+            rm app-release.apk
+          fi
 
       - name: 🔐 Decode Android Keystore
         run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > android.keystore
