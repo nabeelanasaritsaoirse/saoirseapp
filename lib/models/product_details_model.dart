@@ -1,55 +1,197 @@
-import 'package:flutter/material.dart';
+class ProductDetailsResponse {
+  final bool success;
+  final ProductDetailsData? data;
 
-class ProductDetailsModel {
+  ProductDetailsResponse({
+    required this.success,
+    required this.data,
+  });
+
+  factory ProductDetailsResponse.fromJson(Map<String, dynamic> json) {
+    return ProductDetailsResponse(
+      success: json['success'] ?? false,
+      data: json['data'] != null
+          ? ProductDetailsData.fromJson(json['data'])
+          : null,
+    );
+  }
+}
+
+class ProductDetailsData {
+  final String id;
+  final String productId;
   final String name;
   final String brand;
-  final double price;
-  final double originalPrice;
-  final String discount;
-  final List<String> images;
-  final List<ProductColor> colors;
-  final List<String> storageOptions;
-  final List<OfferPlan> offerPlans;
-  final String description;
-  final double rating;
-  final int reviewCount;
+  final String sku;
+  final Description description;
+  final Category category;
+  final Availability availability;
+  final Pricing pricing;
+  final Warranty warranty;
+  final List<ImageData> images;
 
-  ProductDetailsModel({
+  final bool isPopular;
+  final bool isBestSeller;
+  final bool isTrending;
+
+  ProductDetailsData({
+    required this.id,
+    required this.productId,
     required this.name,
     required this.brand,
-    required this.price,
-    required this.originalPrice,
-    required this.discount,
-    required this.images,
-    required this.colors,
-    required this.storageOptions,
-    required this.offerPlans,
+    required this.sku,
     required this.description,
-    required this.rating,
-    required this.reviewCount,
+    required this.category,
+    required this.availability,
+    required this.pricing,
+    required this.warranty,
+    required this.images,
+    required this.isPopular,
+    required this.isBestSeller,
+    required this.isTrending,
   });
+
+  factory ProductDetailsData.fromJson(Map<String, dynamic> json) {
+    return ProductDetailsData(
+      id: json["_id"] ?? "",
+      productId: json["productId"] ?? "",
+      name: json["name"] ?? "",
+      brand: json["brand"] ?? "",
+      sku: json["sku"] ?? "",
+
+      /// SAFE: description can have extra fields (features, seo, etc.)
+      description: Description.fromJson(json["description"] ?? {}),
+
+      category: Category.fromJson(json["category"] ?? {}),
+      availability: Availability.fromJson(json["availability"] ?? {}),
+      pricing: Pricing.fromJson(json["pricing"] ?? {}),
+
+      /// FIXED: warranty can be NULL from API
+      warranty: json["warranty"] != null
+          ? Warranty.fromJson(json["warranty"])
+          : Warranty(period: 0),
+
+      images: (json["images"] ?? [])
+          .map<ImageData>((x) => ImageData.fromJson(x))
+          .toList(),
+
+      isPopular: json["isPopular"] ?? false,
+      isBestSeller: json["isBestSeller"] ?? false,
+      isTrending: json["isTrending"] ?? false,
+    );
+  }
 }
 
-class ProductColor {
-  final String name;
-  final Color color;
-  final String image;
+class Description {
+  final String short;
+  final String long;
 
-  ProductColor({
-    required this.name,
-    required this.color,
-    required this.image,
+  Description({
+    required this.short,
+    required this.long,
   });
+
+  factory Description.fromJson(Map<String, dynamic> json) {
+    return Description(
+      short: json["short"] ?? "",
+      long: json["long"] ?? "",
+    );
+  }
 }
 
-class OfferPlan {
-  final String image;
-  final String discount;
-  final Color bgColor;
+class Category {
+  final String mainCategoryId;
+  final String mainCategoryName;
+  final String subCategoryName;
 
-  OfferPlan({
-    required this.image,
-    required this.discount,
-    required this.bgColor,
+  Category({
+    required this.mainCategoryId,
+    required this.mainCategoryName,
+    required this.subCategoryName,
   });
+
+  factory Category.fromJson(Map<String, dynamic> json) {
+    return Category(
+      mainCategoryId: json["mainCategoryId"] ?? "",
+      mainCategoryName: json["mainCategoryName"] ?? "",
+      subCategoryName: json["subCategoryName"] ?? "",
+    );
+  }
 }
+
+class Availability {
+  final bool isAvailable;
+  final int stockQuantity;
+  final int lowStockLevel;
+  final String stockStatus;
+
+  Availability({
+    required this.isAvailable,
+    required this.stockQuantity,
+    required this.lowStockLevel,
+    required this.stockStatus,
+  });
+
+  factory Availability.fromJson(Map<String, dynamic> json) {
+    return Availability(
+      isAvailable: json["isAvailable"] ?? false,
+      stockQuantity: json["stockQuantity"] ?? 0,
+      lowStockLevel: json["lowStockLevel"] ?? 0,
+      stockStatus: json["stockStatus"] ?? "",
+    );
+  }
+}
+
+class Pricing {
+  final double regularPrice;
+  final double salePrice;
+  final double finalPrice;
+  final String currency;
+
+  Pricing({
+    required this.regularPrice,
+    required this.salePrice,
+    required this.finalPrice,
+    required this.currency,
+  });
+
+  factory Pricing.fromJson(Map<String, dynamic> json) {
+    return Pricing(
+      regularPrice: (json["regularPrice"] ?? 0).toDouble(),
+      salePrice: (json["salePrice"] ?? 0).toDouble(),
+      finalPrice: (json["finalPrice"] ?? 0).toDouble(),
+      currency: json["currency"] ?? "USD",
+    );
+  }
+}
+
+class Warranty {
+  final int period;
+
+  Warranty({required this.period});
+
+  factory Warranty.fromJson(Map<String, dynamic> json) {
+    return Warranty(period: json["period"] ?? 0);
+  }
+}
+
+class ImageData {
+  final String url;
+  final String? altText;
+  final bool isPrimary;
+
+  ImageData({
+    required this.url,
+    required this.altText,
+    required this.isPrimary,
+  });
+
+  factory ImageData.fromJson(Map<String, dynamic> json) {
+    return ImageData(
+      url: json["url"] ?? "",
+      altText: json["altText"],
+      isPrimary: json["isPrimary"] ?? false,
+    );
+  }
+}
+

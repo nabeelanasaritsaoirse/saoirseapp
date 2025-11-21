@@ -26,14 +26,14 @@ class AppURLs {
   static String FETCH_REFERRAL = BASE_API + "/api/referral/list/";
 
   // Wishlist api
-  static String GET_FULL_WISHLIST = BASE_API + "/api/wishlist";
-  static String GET_ITEM_COUNT = BASE_API + "/api/wishlist/count";
-  static String CHECK_IF_WISHLIST = BASE_API + "/wishlist/check/productId";
-  static String ADD_TO_WISH = BASE_API + "/wishlist/add/productId";
-  static String DELETE_WISHLIST = BASE_API + "/wishlist/remove/productId";
-  static String MOVE_TO_CART = BASE_API + "/wishlist/move-to-cart/productId";
-  static String TOGGLE_WISHLIST = BASE_API + "/wishlist/check/productId";
-  static String CLEAR_CART_WISHLIST = BASE_API + "/wishlist/clear";
+  static String GET_WISHLIST = BASE_API + "api/wishlist";
+  static String GET_ITEM_COUNT = BASE_API + "api/wishlist/count";
+  static String CHECK_IF_WISHLIST = BASE_API + "api/wishlist/check";
+  static String ADD_TO_WISH = BASE_API + "api/wishlist/add";
+  static String DELETE_WISHLIST = BASE_API + "api/wishlist/remove";
+  static String MOVE_TO_CART = BASE_API + "api/wishlist/move-to-cart";
+  static String TOGGLE_WISHLIST = BASE_API + "api/wishlist/check";
+  static String CLEAR_CART_WISHLIST = BASE_API + "api/wishlist/clear";
 
   //Wallet api
   static String Wallet = BASE_API + "api/wallet";
@@ -41,4 +41,7 @@ class AppURLs {
   // Category api
   static String CATEGORY_API =
       BASE_API + "api/categories?parentCategoryId=null&isActive=true";
+
+  // Product Details
+  static String PRODUCT_DETAILS_API = BASE_API + "api/products/";
 }
