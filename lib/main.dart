@@ -35,6 +35,7 @@ Future<void> main() async {
           messagingSenderId: '486829564070',
           projectId: 'saoirse-epi',
         ));
+
   String? lang = storage.read('language') ?? 'en';
 Locale locale = Locale(lang);
 

@@ -31,4 +31,7 @@ class AppURLs {
   static String MOVE_TO_CART = BASE_API + "/wishlist/move-to-cart/productId";
   static String TOGGLE_WISHLIST = BASE_API + "/wishlist/check/productId";
   static String CLEAR_CART_WISHLIST = BASE_API + "/wishlist/clear";
+
+  // Category api
+  static String CATEGORY_API = BASE_API + "api/categories?parentCategoryId=null&isActive=true";
 }
