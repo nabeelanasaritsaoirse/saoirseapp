@@ -1,70 +1,65 @@
-import '/constants/app_strings.dart';
-import '/widgets/app_snackbar.dart';
-
 class AddAddressValidation {
+
   // Phone validation
-  static int? phoneValidation({required int phone}) {
-    if (phone.toString().length != 10) {
-      appSnackbar(error: true, content: AppStrings.invalid_phone);
-
-      return 0;
+  static String? phoneValidation({required String phone}) {
+    if (phone.trim().isEmpty) return "Phone number is required";
+    if (!RegExp(r'^[0-9]{10}$').hasMatch(phone)) {
+      return "Enter a valid 10 digit phone number";
     }
-
     return null;
   }
 
-// Name validation
+  // Name validation
   static String? nameValidation({required String name}) {
-    if (name.isEmpty || !RegExp(r"^[a-zA-Z ]{3,}$").hasMatch(name)) {
-      appSnackbar(error: true, content: AppStrings.invalid_name);
-      return '';
+    if (name.trim().isEmpty) return "Name is required";
+    if (name.length < 3) return "Enter a valid name";
+    if (!RegExp(r"^[a-zA-Z\s.'-]+$").hasMatch(name)) {
+      return "Invalid name format";
     }
     return null;
   }
 
-// Street Name Validatioin
+  // Street Name Validation
   static String? streetValidation({required String street}) {
-    if (street.isEmpty ||
-        !RegExp(r"^[a-zA-Z0-9\s.,'-]{3,}$").hasMatch(street)) {
-      appSnackbar(error: true, content: AppStrings.invalid_street);
-      return '';
-    }
+    if (street.trim().isEmpty) return "Street name is required";
+    if (street.length < 3) return "Enter a valid street name";
     return null;
   }
 
-// City Validation
+  // City Validation
   static String? cityValidation({required String city}) {
-    if (city.isEmpty || !RegExp(r"^[a-zA-Z\s'-]{2,}$").hasMatch(city)) {
-      appSnackbar(error: true, content: AppStrings.invalid_city);
-      return '';
+    if (city.trim().isEmpty) return "City is required";
+    if (!RegExp(r"^[a-zA-Z\s.'-]+$").hasMatch(city)) {
+      return "Invalid city name";
     }
     return null;
   }
 
-// State Valiadtion
+  // State Validation
   static String? stateValidation({required String state}) {
-    if (state.isEmpty || !RegExp(r"^[a-zA-Z\s'-]{2,}$").hasMatch(state)) {
-      appSnackbar(error: true, content: AppStrings.invalid_state);
-      return '';
+    if (state.trim().isEmpty) return "State is required";
+    if (!RegExp(r"^[a-zA-Z\s.'-]+$").hasMatch(state)) {
+      return "Invalid state name";
     }
     return null;
   }
 
-// Country Validation
+  // Country Validation
   static String? countryValidation({required String country}) {
-    if (country.isEmpty || !RegExp(r"^[a-zA-Z\s'-]{2,}$").hasMatch(country)) {
-      appSnackbar(error: true, content: AppStrings.invalid_country);
-      return '';
+    if (country.trim().isEmpty) return "Country is required";
+    if (!RegExp(r"^[a-zA-Z\s.'-]+$").hasMatch(country)) {
+      return "Invalid country name";
     }
     return null;
   }
 
-// ZipCode Validation
+  // Zip Code Validation
   static String? zipValidation({required String zip}) {
-    if (zip.isEmpty || !RegExp(r"^[0-9]{4,10}$").hasMatch(zip)) {
-      appSnackbar(error: true, content: AppStrings.invalid_zip);
-      return '';
+    if (zip.trim().isEmpty) return "Zip code is required";
+    if (!RegExp(r"^[0-9]{4,10}$").hasMatch(zip)) {
+      return "Enter valid zip code";
     }
     return null;
   }
 }
+

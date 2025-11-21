@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/address_response.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -12,7 +13,8 @@ import '../../widgets/custom_appbar.dart';
 import '../booking_confirmation/booking_confirmation_screen.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
-  const OrderDetailsScreen({super.key});
+  final Address addresses;
+  const OrderDetailsScreen({super.key, required this.addresses});
 
   @override
   Widget build(BuildContext context) {

@@ -10,7 +10,7 @@ import '../../widgets/warning_dialog.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_text.dart';
-import '../select_Address/select_address.dart';
+import '../select_address/select_address.dart';
 import 'product_details_controller.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
@@ -403,11 +403,17 @@ class ProductDetailsScreen extends StatelessWidget {
                     padding: EdgeInsets.symmetric(vertical: 10.h),
                   ),
                   onPressed: () {
-                    if (controller.selectedPlanIndex.value == -1) {
+                    bool hasSelectedRecommendedPlan =
+                        controller.selectedPlanIndex.value != -1;
+
+                    bool hasCustomPlan = controller.customDays.value > 0 &&
+                        controller.customAmount.value > 0;
+
+                    if (!hasSelectedRecommendedPlan && !hasCustomPlan) {
                       WarningDialog.show(
-                        title: "Please Select Your Plan",
+                        title: AppStrings.warning_label,
                         message:
-                            "You haven’t selected a plan yet. Please choose a plan before proceeding to Add to Cart.",
+                           AppStrings.warning_body,
                       );
                       return;
                     }
