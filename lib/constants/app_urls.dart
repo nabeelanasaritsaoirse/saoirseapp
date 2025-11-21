@@ -37,4 +37,8 @@ class AppURLs {
 
   //Wallet api
   static String Wallet = BASE_API + "api/wallet";
+
+  // Category api
+  static String CATEGORY_API =
+      BASE_API + "api/categories?parentCategoryId=null&isActive=true";
 }
