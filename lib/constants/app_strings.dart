@@ -47,7 +47,6 @@ class AppStrings {
   static String no_best_seller_products = "No products available";
   static String no_trending_products = "No Trending products available";
 
-
   // Product Details page
   static String freeShiping = "Free shipping";
   static String ColorAvailable = "Color Available";
@@ -123,7 +122,7 @@ class AppStrings {
   static String carttitle = "Cart";
 
   // Wishlist Screen
-  static String wishlist = "Whishlist";
+  static String wishlist = "Wishlist";
 
   // select address screen
   static String select_address = "Select Address";

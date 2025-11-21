@@ -1,184 +1,143 @@
+// FILE: lib/controllers/product_details_controller.dart
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/dummy/products_model.dart';
 
-import '../../constants/app_assets.dart';
-import '../../models/product_details_model.dart';
-
-import '../../widgets/select_plan_sheet.dart';
+import 'package:saoirse_app/models/product_details_model.dart';
+import 'package:saoirse_app/services/product_service.dart';
+import 'package:saoirse_app/services/wishlist_service.dart';
+import 'package:saoirse_app/widgets/app_snackbar.dart';
 
 class ProductDetailsController extends GetxController {
-  // UI States
-  final RxInt currentImageIndex = 0.obs;
-  final RxInt selectedColorIndex = 0.obs;
-  final RxInt selectedStorageIndex = 0.obs;
-  final RxBool isFavorite = false.obs;
-  final RxInt selectedPlanIndex = (-1).obs;
+  final String productId;
+  final String id;
 
-  // Bottom buttons visibility
-  final RxBool showBottomButtons = false.obs;
+  ProductDetailsController(this.productId, this.id);
+
+  final WishlistService wishlistService = WishlistService();
+  final ProductService productService = ProductService();
+
+  RxBool isLoading = true.obs;
+  Rx<ProductDetailsData?> product = Rx<ProductDetailsData?>(null);
+
+  RxInt currentImageIndex = 0.obs;
+  RxBool isFavorite = false.obs;
+  RxInt selectedPlanIndex = (-1).obs;
+
+  RxBool showBottomButtons = false.obs;
   final ScrollController scrollController = ScrollController();
 
   @override
   void onInit() {
     super.onInit();
     scrollController.addListener(_scrollListener);
+    fetchProductDetails();
+    checkIfInWishlist();
   }
 
-  void _scrollListener() {
-    // Calculate scroll percentage
-    final maxScroll = scrollController.position.maxScrollExtent;
-    final currentScroll = scrollController.position.pixels;
-    final scrollPercentage = (currentScroll / maxScroll * 100);
-
-    // Show buttons when scrolled 60% or more
-    if (scrollPercentage >= 60) {
-      if (!showBottomButtons.value) {
-        showBottomButtons.value = true;
-      }
-    } else {
-      if (showBottomButtons.value) {
-        showBottomButtons.value = false;
-      }
+  // ----------------------------------------------------------
+  // FETCH PRODUCT DETAILS
+  // ----------------------------------------------------------
+  Future<void> fetchProductDetails() async {
+    try {
+      isLoading(true);
+      final result = await productService.fetchProductDetails(productId);
+      product.value = result;
+    } catch (e) {
+      log("ERROR FETCHING PRODUCT DETAILS: $e");
+      appSnackbar(content: "Failed to load product details");
+    } finally {
+      isLoading(false);
     }
   }
 
-  @override
-  void onClose() {
-    scrollController.dispose();
-    super.onClose();
+  // ----------------------------------------------------------
+  // CHECK IF PRODUCT IS IN WISHLIST
+  // ----------------------------------------------------------
+  Future<void> checkIfInWishlist() async {
+    final exists = await wishlistService.checkWishlist(id);
+    isFavorite.value = exists;
   }
 
-  
+// TOGGLE WISHLIST (ADD OR REMOVE)
+// ----------------------------------------------------------
+  Future<void> toggleFavorite() async {
+    final productData = product.value;
 
-  // 🧾 Product list for "Most Popular"
-  final RxList<Products> mostPopularProducts = <Products>[
-    Products(
-      name: 'Modern Chair',
-      image: "assets/images/chair.png",
-      price: 12500,
-      hasDiscount: true,
-    ),
-    Products(
-      name: 'Sony Ear Buds',
-      image: 'assets/images/product_image_2.png',
-      price: 69999,
-      isFavorite: true,
-      hasDiscount: true,
-    ),
-    Products(
-      name: 'Modern Chair',
-      image: "assets/images/chair.png",
-      price: 12500,
-      hasDiscount: true,
-    ),
-    Products(
-      name: 'Sony Ear Buds',
-      image: 'assets/images/product_image_2.png',
-      price: 69999,
-      isFavorite: true,
-      hasDiscount: true,
-    ),
-  ].obs;
+    if (productData == null) {
+      appSnackbar(content: "Product not loaded");
+      return;
+    }
 
-  // 🧠 Product details data
-  final ProductDetailsModel product = ProductDetailsModel(
-    name: 'iPhone 14',
-    brand: 'Apple',
-    price: 55399,
-    originalPrice: 59999,
-    discount: '20% OFF',
-    images: [
-      AppAssets.iphone,
-      AppAssets.iphoneRed,
-      AppAssets.iphoneYellow,
-      AppAssets.iphoneblack,
-    ],
-    colors: [
-      ProductColor(
-        name: 'Purple',
-        color: Color(0xFFE6D5F5),
-        image: AppAssets.iphone,
-      ),
-      ProductColor(
-        name: 'Red',
-        color: Color(0xFFFF6B6B),
-        image: AppAssets.iphoneRed,
-      ),
-      ProductColor(
-        name: 'Yellow',
-        color: Color(0xFFFFF59D),
-        image: AppAssets.iphoneYellow,
-      ),
-      ProductColor(
-        name: 'Green',
-        color: Color(0xFF4CAF50),
-        image: AppAssets.iphoneblack,
-      ),
-    ],
-    storageOptions: ['500 GB', '1 TB', '2 TB'],
-    offerPlans: [
-      OfferPlan(
-        image: AppAssets.upiImage,
-        discount: '₹50 off',
-        bgColor: Color(0xFFE3F2FD),
-      ),
-      OfferPlan(
-        image: AppAssets.paytmImage,
-        discount: '₹15 off',
-        bgColor: Color(0xFFE3F2FD),
-      ),
-      OfferPlan(
-        image: AppAssets.paypalImage,
-        discount: '₹10 off',
-        bgColor: Color(0xFFE3F2FD),
-      ),
-    ],
-    description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-    rating: 4.9,
-    reviewCount: 47,
-  );
+    // If currently favorite → remove it
+    if (isFavorite.value) {
+      final removed = await wishlistService.removeFromWishlist(id);
 
-  // 🖼️ Handlers
+      if (removed) {
+        isFavorite(false);
+        appSnackbar(content: "Removed from wishlist");
+      } else {
+        appSnackbar(content: "Failed to remove from wishlist", error: true);
+      }
+
+      return;
+    }
+
+    // If NOT favorite → add it
+    final added = await wishlistService.addToWishlist(id);
+
+    if (added) {
+      isFavorite(true);
+      appSnackbar(content: "Added to wishlist");
+    } else {
+      appSnackbar(content: "Failed to add wishlist", error: true);
+    }
+  }
+
+  // ----------------------------------------------------------
+  // SCROLL LISTENER (BOTTOM BUTTON ANIMATION)
+  // ----------------------------------------------------------
+  void _scrollListener() {
+    if (!scrollController.hasClients) return;
+
+    final maxScroll = scrollController.position.maxScrollExtent;
+    final current = scrollController.position.pixels;
+
+    if (maxScroll <= 0) return;
+
+    final percent = (current / maxScroll) * 100;
+
+    showBottomButtons.value = percent >= 60;
+  }
+
+  // ----------------------------------------------------------
+  // IMAGE INDICATOR
+  // ----------------------------------------------------------
   void updateImageIndex(int index) {
     currentImageIndex.value = index;
   }
 
-  void selectColor(int index) {
-    selectedColorIndex.value = index;
-  }
-
-  void selectStorage(int index) {
-    selectedStorageIndex.value = index;
-  }
-
-  void toggleFavorite() {
-    isFavorite.value = !isFavorite.value;
-  }
-
-  // 🛒 Button Actions
-  // void handleSelectPlan() {
-  //   Get.snackbar(
-  //     'Select Plan',
-  //     'Plan selection feature coming soon',
-  //     snackPosition: SnackPosition.BOTTOM,
-  //     duration: Duration(seconds: 2),
-  //   );
-  // }
+  // ----------------------------------------------------------
+  // PLAN SELECT
+  // ----------------------------------------------------------
   void openSelectPlanSheet() {
     Get.bottomSheet(
-      SelectPlanSheet(),
+      Container(
+        height: 300,
+        color: Colors.white,
+        child: const Center(
+          child: Text('Select plan sheet'),
+        ),
+      ),
       isScrollControlled: true,
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
     );
   }
 
-  void handleCheckout() {}
+  void selectPlan(int index) {
+    selectedPlanIndex.value = index;
+  }
 }
-
-
-

@@ -18,9 +18,7 @@ class SelectPlanSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextEditingController dayController = TextEditingController();
     final TextEditingController amountController = TextEditingController();
-    final ProductDetailsController controller = Get.put(
-      ProductDetailsController(),
-    );
+   final ProductDetailsController controller = Get.find();
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,

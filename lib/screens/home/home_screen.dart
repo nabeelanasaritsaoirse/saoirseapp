@@ -2,7 +2,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/product_detiails_response.dart';
 import 'package:saoirse_app/screens/productListing/product_listing.dart';
+import 'package:saoirse_app/screens/product_details/product_details_screen.dart';
 import 'package:saoirse_app/widgets/app_loader.dart';
 
 import '../../constants/app_assets.dart';
@@ -260,7 +262,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 SizedBox(height: 12.h),
-                // In HomeScreen, update the Most Popular Product Section:
                 SizedBox(
                   height: 205.h,
                   child: Obx(() {
@@ -288,7 +289,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         final product =
                             homeController.mostPopularProducts[index];
                         return ProductCard(
-                          product: product,
+                          productId: product.productId,
+                          id: product.id,
+                          name: product.name,
+                          image: product.images.isNotEmpty
+                              ? product.images[1].url
+                              : '',
+                          brand: product.brand,
+                          price: product.price.toStringAsFixed(0),
+                          isFavorite: product.isFavorite,
+                          margin: EdgeInsets.only(right: 12.w),
                         );
                       },
                     );
@@ -350,78 +360,99 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           return Padding(
                             padding: EdgeInsets.all(8.0.w),
-                            child: Container(
-                              width: 220.w,
-                              padding: EdgeInsets.all(5.sp),
-                              decoration: BoxDecoration(
-                                color: AppColors.white,
-                                borderRadius: BorderRadius.circular(12.sp),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.shadowColor,
-                                    blurRadius: 6.r,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
+                            child: InkWell(
+                              onTap: () => Get.to(
+                                ProductDetailsScreen(
+                                  productId: product.productId,
+                                  id: product.id,
+                                ),
                               ),
-                              child: Row(
-                                children: [
-                                  // --- PRODUCT IMAGE --- //
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.sp),
-                                    child: Image.network(
-                                      product.image, // <-- FROM API
-                                      width: 70.w,
-                                      height: 70.w,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) =>
-                                          Icon(Icons.broken_image, size: 40.w),
-                                      loadingBuilder:
-                                          (context, child, loadingProgress) {
-                                        if (loadingProgress == null) {
-                                          return child;
-                                        }
-                                        return Center(
-                                          child: SizedBox(
-                                            width: 25.w,
-                                            height: 25.w,
-                                            child: CircularProgressIndicator(
-                                                strokeWidth: 2),
+                              child: Container(
+                                width: 220.w,
+                                padding: EdgeInsets.all(5.sp),
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(12.sp),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.shadowColor,
+                                      blurRadius: 6.r,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    // --- PRODUCT IMAGE --- //
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      child: Image.network(
+                                        product.image, 
+                                        width: 70.w,
+                                        height: 70.w,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) {
+                                          return Container(
+                                            width: 70.w,
+                                            height: 70.w,
+                                            color: Colors.grey.shade200,
+                                            child: Icon(
+                                              Icons.broken_image,
+                                              size: 28.sp,
+                                              color: Colors.grey,
+                                            ),
+                                          );
+                                        },
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
+
+                                          return Center(
+                                            child: SizedBox(
+                                              width: 24.w,
+                                              height: 24.w,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+
+                                    SizedBox(width: 12.w),
+
+                                    // --- PRODUCT TEXT --- //
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          SizedBox(height: 5.h),
+                                          appText(
+                                            product.name,
+                                            fontFamily: 'inter',
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w600,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                        );
-                                      },
+                                          SizedBox(height: 4.h),
+                                          appText(
+                                            "₹ ${product.price.toStringAsFixed(0)}",
+                                            fontFamily: 'inter',
+                                            fontSize: 13.sp,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-
-                                  SizedBox(width: 12.w),
-
-                                  // --- PRODUCT TEXT --- //
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        SizedBox(height: 5.h),
-                                        appText(
-                                          product.name,
-                                          fontFamily: 'inter',
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w600,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        SizedBox(height: 4.h),
-                                        appText(
-                                          "₹ ${product.price.toStringAsFixed(0)}",
-                                          fontFamily: 'inter',
-                                          fontSize: 13.sp,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -486,7 +517,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemCount: homeController.trendingProducts.length,
                       itemBuilder: (context, index) {
                         final product = homeController.trendingProducts[index];
-                        return ProductCard(product: product);
+                        return ProductCard(
+                          productId: product.productId,
+                          id: product.id,
+                          name: product.name,
+                          image: product.images.isNotEmpty
+                              ? product.images[1].url
+                              : '',
+                          brand: product.brand,
+                          price: product.price.toStringAsFixed(0),
+                          isFavorite: product.isFavorite,
+                          margin: EdgeInsets.only(right: 12.w),
+                        );
                       },
                     );
                   }),

@@ -184,16 +184,19 @@ class APIService {
         case 201:
           final data = jsonDecode(response.body);
 
-          if (data is! Map<String, dynamic>) {
-            appSnackbar(
-              title: "Error",
-              content: "Invalid response format received from server.",
-              error: true,
-            );
-            return null;
-          }
+          if (data is Map<String, dynamic>) {
+  return onSuccess(data);
+} else {
+  appSnackbar(
+    title: "Error",
+    content: "Invalid response format. Expected JSON object.",
+    error: true,
+  );
+  return null;
+}
 
-          return onSuccess(data);
+
+         
 
         case 204:
           appSnackbar(
@@ -284,6 +287,7 @@ class APIService {
       );
       return null;
     } catch (e) {
+      log("Error =====> ${e.toString()}");
       appSnackbar(
         content: "Something went wrong: ${e.toString()}",
         error: true,
