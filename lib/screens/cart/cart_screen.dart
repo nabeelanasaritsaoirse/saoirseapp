@@ -17,7 +17,7 @@ import 'cart_controller.dart';
 class CartScreen extends StatelessWidget {
   CartScreen({super.key});
 
-  final CartController controller = Get.put(CartController());
+  final CartController controller = Get.find<CartController>();
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,9 @@ class CartScreen extends StatelessWidget {
           IconBox(
             image: AppAssets.delete,
             padding: 5.w,
-            onTap: () => controller.cartItems.clear(),
+            onTap: () {
+              controller.clearCartItems();
+            },
           )
         ],
       ),
@@ -40,15 +42,25 @@ class CartScreen extends StatelessWidget {
           /// CART LIST
           Expanded(
             child: Obx(() {
-              if (controller.cartItems.isEmpty) {
-                return const Center(child: Text("Your cart is empty"));
+              if (controller.cartData.value == null ||
+                  controller.cartData.value!.products.isEmpty) {
+                return ListView(
+                  children: const [
+                    SizedBox(
+                      height: 300,
+                      child: Center(
+                        child: Text("Your cart is empty"),
+                      ),
+                    )
+                  ],
+                );
               }
 
               return ListView.builder(
                 padding: EdgeInsets.symmetric(horizontal: 15.w),
-                itemCount: controller.cartItems.length,
+                itemCount: controller.cartData.value!.products.length,
                 itemBuilder: (context, index) {
-                  final item = controller.cartItems[index];
+                  final item = controller.cartData.value!.products[index];
 
                   return Container(
                     margin: EdgeInsets.only(bottom: 15.h),
@@ -71,12 +83,26 @@ class CartScreen extends StatelessWidget {
                         /// IMAGE
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10.r),
-                          child: Image.asset(
-                            item.image,
-                            width: 70.w,
-                            height: 70.h,
-                            fit: BoxFit.cover,
-                          ),
+                          child: item.images.first.url.startsWith('http')
+                              ? Image.network(
+                                  item.images.first.url,
+                                  width: 80.w,
+                                  height: 80.h,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(
+                                      Icons.broken_image,
+                                      size: 80.sp,
+                                      color: AppColors.grey,
+                                    );
+                                  },
+                                )
+                              : Image.asset(
+                                  item.images.first.url,
+                                  width: 80.w,
+                                  height: 80.h,
+                                  fit: BoxFit.cover,
+                                ),
                         ),
 
                         SizedBox(width: 12.w),
@@ -86,16 +112,20 @@ class CartScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              appText(item.name,
-                                  fontSize: 16.sp, fontWeight: FontWeight.w600),
+                              appText(
+                                item.name,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                                textAlign: TextAlign.start,
+                              ),
                               SizedBox(height: 3.h),
-                              appText("${item.color}   |   ${item.storage}",
+                              appText("red   |   512gb",
                                   fontSize: 13.sp, color: AppColors.black54),
                               SizedBox(height: 3.h),
                               appText("₹ ${item.price}",
                                   fontSize: 14.sp, fontWeight: FontWeight.bold),
                               SizedBox(height: 3.h),
-                              appText("Plan - ${item.plan}",
+                              appText("Plan - ₹100/200 Day",
                                   fontSize: 12.sp, color: AppColors.black87)
                             ],
                           ),
@@ -106,7 +136,9 @@ class CartScreen extends StatelessWidget {
                           children: [
                             /// DELETE ICON
                             GestureDetector(
-                              onTap: () => controller.removeItem(index),
+                              onTap: () {
+                                controller.removeCartItem(item.productId);
+                              },
                               child: const Icon(Iconsax.trash,
                                   color: AppColors.black),
                             ),

@@ -44,4 +44,12 @@ class AppURLs {
 
   // Product Details
   static String PRODUCT_DETAILS_API = BASE_API + "api/products/";
+
+  //Cart Api
+  static String GET_FULL_CART = BASE_API + "api/cart";
+  static String GET_CART_COUNT = BASE_API + "api/cart/count";
+  static String ADD_TO_CART = BASE_API + "api/cart/add/";
+  static String REMOVE_FROM_CART = BASE_API + "api/cart/remove/";
+  static String UPDATE_CART = BASE_API + "api/cart/update/";
+  static String CLEAR_CART = BASE_API + "api/cart/clear";
 }

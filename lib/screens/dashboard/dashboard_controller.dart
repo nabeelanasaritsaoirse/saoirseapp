@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../cart/cart_controller.dart';
+
 class DashboardController extends GetxController {
   // Observable index to track current tab
   var selectedIndex = 0.obs;
@@ -7,5 +9,10 @@ class DashboardController extends GetxController {
   // Function to change tab
   void changeTab(int index) {
     selectedIndex.value = index;
+
+    /// If user goes to Cart tab → refresh cart
+    if (index == 3) {
+      Get.find<CartController>().fetchCart();
+    }
   }
 }
