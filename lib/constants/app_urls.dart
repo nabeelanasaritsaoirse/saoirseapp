@@ -11,9 +11,12 @@ class AppURLs {
   static String USER_UPDATE_API = BASE_API + "api/auth/profiles/";
 
   // home screen api
-  static String POPULAR_PRODUCT_API = BASE_API + "api/products/featured/popular?";
-  static String BEST_SELLER_PRODUCT_API = BASE_API + "api/products/featured/best-sellers?";
-  static String TRENDING_PRODUCT_API = BASE_API + "api/products/featured/trending?";
+  static String POPULAR_PRODUCT_API =
+      BASE_API + "api/products/featured/popular?";
+  static String BEST_SELLER_PRODUCT_API =
+      BASE_API + "api/products/featured/best-sellers?";
+  static String TRENDING_PRODUCT_API =
+      BASE_API + "api/products/featured/trending?";
 
   //refferal api
   static String getRefferal_API = BASE_API + "api/referrals/generate-code";
@@ -31,4 +34,12 @@ class AppURLs {
   static String MOVE_TO_CART = BASE_API + "/wishlist/move-to-cart/productId";
   static String TOGGLE_WISHLIST = BASE_API + "/wishlist/check/productId";
   static String CLEAR_CART_WISHLIST = BASE_API + "/wishlist/clear";
+
+  //Cart Api
+  static String GET_FULL_CART = BASE_API + "api/cart";
+  static String GET_CART_COUNT = BASE_API + "api/cart/count";
+  static String ADD_TO_CART = BASE_API + "api/cart/add/";
+  static String REMOVE_FROM_CART = BASE_API + "api/cart/remove/";
+  static String UPDATE_CART = BASE_API + "api/cart/update/";
+  static String CLEAR_CART = BASE_API + "api/cart/clear";
 }
