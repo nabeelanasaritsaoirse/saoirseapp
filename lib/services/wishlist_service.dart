@@ -7,7 +7,7 @@ import '../models/wishlist_response_model.dart';
 import 'api_service.dart';
 
 class WishlistService {
-  Future<String?> _token() async => await storage.read(AppConst.ACCESS_TOKEN);
+  Future<String?> _token() async => storage.read(AppConst.ACCESS_TOKEN);
 
   // ----------------------------------------------------------
   // GET /wishlist

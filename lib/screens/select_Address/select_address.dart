@@ -6,16 +6,18 @@ import 'package:get/get.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
-import '../../widgets/app_loader.dart';
-import '../../widgets/custom_appbar.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
+import '../../widgets/custom_appbar.dart';
+import '../../widgets/app_loader.dart';
 import '../add_address/add_address.dart';
 import '../order_details/order_details_screen.dart';
-import '../select_address/select_address_controller.dart';
+import 'select_address_controller.dart';
+import '../../models/product_details_model.dart';
 
 class SelectAddress extends StatelessWidget {
-  SelectAddress({super.key});
+  final ProductDetailsData? product;
+  SelectAddress({super.key, this.product});
 
   final SelectAddressController controller = Get.put(SelectAddressController());
 
@@ -94,7 +96,10 @@ class SelectAddress extends StatelessWidget {
                   final selectedAddress =
                       controller.addressList[controller.selectedIndex.value];
 
-                  Get.to(() => OrderDetailsScreen(addresses: selectedAddress));
+                  Get.to(() => OrderDetailsScreen(
+                        addresses: selectedAddress,
+                        product: product!,
+                      ));
                 },
               ),
             ),

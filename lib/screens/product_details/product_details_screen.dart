@@ -412,13 +412,14 @@ class ProductDetailsScreen extends StatelessWidget {
                     if (!hasSelectedRecommendedPlan && !hasCustomPlan) {
                       WarningDialog.show(
                         title: AppStrings.warning_label,
-                        message:
-                           AppStrings.warning_body,
+                        message: AppStrings.warning_body,
                       );
                       return;
                     }
 
-                    Get.to(SelectAddress());
+                    Get.to(SelectAddress(
+                      product: product,
+                    ));
                   },
                   child: Text(
                     AppStrings.addToCart,
