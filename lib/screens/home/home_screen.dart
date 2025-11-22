@@ -2,7 +2,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/notification_screen/notification_controller.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -14,7 +13,8 @@ import '../../constants/app_strings.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/product_card.dart';
 import '../my_wallet/my_wallet.dart';
-import '../notification_screen/notification_screen.dart';
+import '../notification/notification_controller.dart';
+import '../notification/notification_screen.dart';
 import '../productListing/product_listing.dart';
 import '../product_details/product_details_screen.dart';
 import 'home_controller.dart';

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+
 import '../../models/notification_response.dart';
 import '../../services/notification_service.dart';
 
@@ -7,8 +8,8 @@ class NotificationController extends GetxController {
 
   var notifications = <AppNotification>[].obs;
   var isLoading = false.obs;
-  
-   /// unread count
+
+  /// unread count
   var unreadCount = 0.obs;
 
   int page = 1;
@@ -43,9 +44,9 @@ class NotificationController extends GetxController {
       isLoading(false);
     }
   }
-    
+
   // Fetch Unread Count
-    Future<void> fetchUnreadCount() async {
+  Future<void> fetchUnreadCount() async {
     final count = await service.getUnreadCount();
     if (count != null) unreadCount.value = count;
   }

@@ -1,14 +1,16 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/notification_screen/notification_controller.dart';
-import 'package:saoirse_app/widgets/app_loader.dart';
 
 import '../../constants/app_strings.dart';
 import '../../models/notification_response.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../constants/app_colors.dart';
 import '../../widgets/app_text.dart';
+import 'notification_controller.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});

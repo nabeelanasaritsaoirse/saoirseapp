@@ -1,4 +1,4 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -31,10 +31,10 @@ class ProductlistingController extends GetxController {
 
     try {
       if (page == 1) {
-      isLoading(true); // first page loader
-    } else {
-      isMoreLoading(true); // bottom loader
-    }
+        isLoading(true); // first page loader
+      } else {
+        isMoreLoading(true); // bottom loader
+      }
 
       final response = await service.getProducts(page, limit);
 
@@ -47,7 +47,7 @@ class ProductlistingController extends GetxController {
       print("Fetch product error: $e");
     } finally {
       isLoading(false);
-       isMoreLoading(false);
+      isMoreLoading(false);
     }
   }
 }

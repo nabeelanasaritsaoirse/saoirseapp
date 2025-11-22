@@ -56,8 +56,7 @@ class Data {
     this.refreshToken,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) =>
-      _$DataFromJson(json);
+  factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
 
   Map<String, dynamic> toJson() => _$DataToJson(this);
 
@@ -97,8 +96,7 @@ class Wallet {
 
   Wallet({this.balance, this.transactions});
 
-  factory Wallet.fromJson(Map<String, dynamic> json) =>
-      _$WalletFromJson(json);
+  factory Wallet.fromJson(Map<String, dynamic> json) => _$WalletFromJson(json);
 
   Map<String, dynamic> toJson() => _$WalletToJson(this);
 

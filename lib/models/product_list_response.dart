@@ -12,13 +12,12 @@ class ProductListResponse {
   factory ProductListResponse.fromJson(Map<String, dynamic> json) {
     return ProductListResponse(
       success: json["success"] ?? false,
-      data: (json["data"] as List)
-          .map((e) => Product.fromJson(e))
-          .toList(),
+      data: (json["data"] as List).map((e) => Product.fromJson(e)).toList(),
       pagination: Pagination.fromJson(json["pagination"]),
     );
   }
 }
+
 class Product {
   final String id;
   final String productId;
@@ -67,9 +66,7 @@ class Product {
       hasVariants: json["hasVariants"] ?? false,
       variants: json["variants"] == null
           ? []
-          : (json["variants"] as List)
-              .map((e) => Variant.fromJson(e))
-              .toList(),
+          : (json["variants"] as List).map((e) => Variant.fromJson(e)).toList(),
       images: json["images"] == null
           ? []
           : (json["images"] as List)
@@ -78,6 +75,7 @@ class Product {
     );
   }
 }
+
 class Description {
   final String short;
   final String long;
@@ -94,6 +92,7 @@ class Description {
     );
   }
 }
+
 class Category {
   final String mainCategoryId;
   final String mainCategoryName;
@@ -110,6 +109,7 @@ class Category {
     );
   }
 }
+
 class Availability {
   final bool isAvailable;
   final int stockQuantity;
@@ -126,6 +126,7 @@ class Availability {
     );
   }
 }
+
 class Pricing {
   final int regularPrice;
   final int salePrice;
@@ -148,6 +149,7 @@ class Pricing {
     );
   }
 }
+
 class Variant {
   final Map<String, dynamic> attributes;
   final String variantId;
@@ -176,6 +178,7 @@ class Variant {
     );
   }
 }
+
 class ProductImage {
   final String url;
   final bool isPrimary;
@@ -192,6 +195,7 @@ class ProductImage {
     );
   }
 }
+
 class Pagination {
   final int current;
   final int pages;
