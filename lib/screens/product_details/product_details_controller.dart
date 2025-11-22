@@ -1,4 +1,5 @@
 // FILE: lib/controllers/product_details_controller.dart
+
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,7 @@ import '../../models/product_details_model.dart';
 import '../../services/product_service.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_snackbar.dart';
+import '../../widgets/select_plan_sheet.dart';
 
 class ProductDetailsController extends GetxController {
   final String productId;
@@ -16,6 +18,7 @@ class ProductDetailsController extends GetxController {
 
   final WishlistService wishlistService = WishlistService();
   final ProductService productService = ProductService();
+  bool isUpdating = false;
 
   RxBool isLoading = true.obs;
   Rx<ProductDetailsData?> product = Rx<ProductDetailsData?>(null);
@@ -23,6 +26,10 @@ class ProductDetailsController extends GetxController {
   RxInt currentImageIndex = 0.obs;
   RxBool isFavorite = false.obs;
   RxInt selectedPlanIndex = (-1).obs;
+
+  /// Custom plan values
+  RxInt customDays = 0.obs;
+  RxDouble customAmount = 0.0.obs;
 
   RxBool showBottomButtons = false.obs;
   final ScrollController scrollController = ScrollController();
@@ -35,9 +42,7 @@ class ProductDetailsController extends GetxController {
     checkIfInWishlist();
   }
 
-  // ----------------------------------------------------------
   // FETCH PRODUCT DETAILS
-  // ----------------------------------------------------------
   Future<void> fetchProductDetails() async {
     try {
       isLoading(true);
@@ -51,16 +56,13 @@ class ProductDetailsController extends GetxController {
     }
   }
 
-  // ----------------------------------------------------------
   // CHECK IF PRODUCT IS IN WISHLIST
-  // ----------------------------------------------------------
   Future<void> checkIfInWishlist() async {
     final exists = await wishlistService.checkWishlist(id);
     isFavorite.value = exists;
   }
 
-// TOGGLE WISHLIST (ADD OR REMOVE)
-// ----------------------------------------------------------
+  // TOGGLE WISHLIST
   Future<void> toggleFavorite() async {
     final productData = product.value;
 
@@ -69,7 +71,6 @@ class ProductDetailsController extends GetxController {
       return;
     }
 
-    // If currently favorite → remove it
     if (isFavorite.value) {
       final removed = await wishlistService.removeFromWishlist(id);
 
@@ -83,7 +84,6 @@ class ProductDetailsController extends GetxController {
       return;
     }
 
-    // If NOT favorite → add it
     final added = await wishlistService.addToWishlist(id);
 
     if (added) {
@@ -94,9 +94,7 @@ class ProductDetailsController extends GetxController {
     }
   }
 
-  // ----------------------------------------------------------
-  // SCROLL LISTENER (BOTTOM BUTTON ANIMATION)
-  // ----------------------------------------------------------
+  // SCROLL LISTENER
   void _scrollListener() {
     if (!scrollController.hasClients) return;
 
@@ -110,34 +108,83 @@ class ProductDetailsController extends GetxController {
     showBottomButtons.value = percent >= 60;
   }
 
-  // ----------------------------------------------------------
-  // IMAGE INDICATOR
-  // ----------------------------------------------------------
   void updateImageIndex(int index) {
     currentImageIndex.value = index;
   }
 
-  // ----------------------------------------------------------
-  // PLAN SELECT
-  // ----------------------------------------------------------
   void openSelectPlanSheet() {
     Get.bottomSheet(
-      Container(
-        height: 300,
-        color: Colors.white,
-        child: const Center(
-          child: Text('Select plan sheet'),
-        ),
-      ),
+      const SelectPlanSheet(),
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
     );
   }
 
-  void selectPlan(int index) {
-    selectedPlanIndex.value = index;
+  void updateAmountFromDays(
+    TextEditingController daysController,
+    TextEditingController amountController,
+  ) {
+    if (isUpdating) return;
+    isUpdating = true;
+
+    final data = product.value;
+    if (data == null) {
+      isUpdating = false;
+      return;
+    }
+
+    final double totalPrice = data.pricing.finalPrice;
+    final int days = int.tryParse(daysController.text.trim()) ?? 0;
+
+    if (days <= 0) {
+      amountController.text = "";
+      isUpdating = false;
+      return;
+    }
+
+    final double perDayAmount = totalPrice / days;
+
+    amountController.text = perDayAmount.toStringAsFixed(2);
+
+    isUpdating = false;
+  }
+
+  void updateDaysFromAmount(
+    TextEditingController daysController,
+    TextEditingController amountController,
+  ) {
+    if (isUpdating) return;
+    isUpdating = true;
+
+    final data = product.value;
+    if (data == null) {
+      isUpdating = false;
+      return;
+    }
+
+    final double totalPrice = data.pricing.finalPrice;
+    final double perDayAmount =
+        double.tryParse(amountController.text.trim()) ?? 0;
+
+    if (perDayAmount <= 0) {
+      daysController.text = "";
+      isUpdating = false;
+      return;
+    }
+
+    final int days = (totalPrice / perDayAmount).round();
+
+    daysController.text = days.toString();
+
+    isUpdating = false;
+  }
+
+  void setCustomPlan(int days, double amount) {
+    customDays.value = days;
+    customAmount.value = amount;
+
+    selectedPlanIndex.value = -1;
+
+    Get.back();
   }
 }

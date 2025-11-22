@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../../models/address_response.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
@@ -12,7 +13,8 @@ import '../../widgets/custom_appbar.dart';
 import '../booking_confirmation/booking_confirmation_screen.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
-  const OrderDetailsScreen({super.key});
+  final Address addresses;
+  const OrderDetailsScreen({super.key, required this.addresses});
 
   @override
   Widget build(BuildContext context) {

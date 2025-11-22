@@ -108,8 +108,8 @@ class AppStrings {
   // select planning sheet
   static String select_plan = "Select Your Plan";
   static String costomize_plan = "Customize My Plan";
-  static String enter_days = "Enter the days";
-  static String enter_amount = "Enter the Amount";
+  static String enter_days = "days";
+  static String enter_amount = "amount";
   static String convert = "Convert";
   static String auto_generated = "Auto generated";
   static String recommented = "Recommended";
@@ -117,6 +117,9 @@ class AppStrings {
   static String start_on = "Start On";
   static String end_on = "Start On";
   static String selected = "Selected";
+  static String warning_label = "Please Select Your Plan";
+  static String warning_body =
+      "You haven’t selected a plan yet. Please choose a plan before proceeding to Add to Cart.";
 
   //Cart page
   static String carttitle = "Cart";
