@@ -11,7 +11,7 @@ import '../../constants/app_strings.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
-import '../select_address/select_address.dart';
+import '../select_Address/select_address.dart';
 import 'cart_controller.dart';
 
 class CartScreen extends StatelessWidget {

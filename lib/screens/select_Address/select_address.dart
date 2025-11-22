@@ -12,7 +12,7 @@ import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../add_address/add_address.dart';
 import '../order_details/order_details_screen.dart';
-import '../select_Address/select_address_controller.dart';
+import '../select_address/select_address_controller.dart';
 
 class SelectAddress extends StatelessWidget {
   SelectAddress({super.key});
