@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:saoirse_app/models/address_response.dart';
+import 'package:saoirse_app/models/product_details_model.dart';
+import 'package:saoirse_app/screens/order_details/order_details_controller.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -14,11 +16,16 @@ import '../booking_confirmation/booking_confirmation_screen.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final Address addresses;
-  const OrderDetailsScreen({super.key, required this.addresses});
+  final ProductDetailsData? product;
+
+   OrderDetailsScreen({super.key, required this.addresses, this.product});
+  final orderController = Get.put(OrderDetailsController());
+
 
   @override
   Widget build(BuildContext context) {
     final couponController = TextEditingController();
+    final pricing = product!.pricing;
     return Scaffold(
       backgroundColor: AppColors.paperColor,
       appBar: CustomAppBar(
@@ -62,7 +69,7 @@ class OrderDetailsScreen extends StatelessWidget {
                             fontSize: 11.sp, fontWeight: FontWeight.w600),
                       ),
                       appText(
-                        "Albert Dan J",
+                        addresses.name,
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w700,
                       )
@@ -76,8 +83,27 @@ class OrderDetailsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 2.h,
                         children: [
-                          appText(
-                              "United State\n1234 Maplewood Lane\nSpringfeild,IL 62704",
+                          appText(addresses.addressLine1,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                              height: 1.3.h,
+                              textAlign: TextAlign.left),
+                          Row(
+                            spacing: 5.w,
+                            children: [
+                              appText("${addresses.city},",
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.3.h,
+                                  textAlign: TextAlign.left),
+                              appText(addresses.pincode,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.3.h,
+                                  textAlign: TextAlign.left),
+                            ],
+                          ),
+                          appText(addresses.country,
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w600,
                               height: 1.3.h,
@@ -89,7 +115,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.grey),
                               appText(
-                                "+45 5696566",
+                                addresses.phoneNumber,
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -103,7 +129,9 @@ class OrderDetailsScreen extends StatelessWidget {
                           appButton(
                               width: 75.w,
                               height: 27.h,
-                              onTap: () {},
+                              onTap: () {
+                                Get.back();
+                              },
                               padding: EdgeInsets.all(0.w),
                               buttonColor: AppColors.primaryColor,
                               borderRadius: BorderRadius.circular(8.r),
@@ -124,17 +152,20 @@ class OrderDetailsScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(15.w),
-              height: 130.h,
+              constraints: BoxConstraints(
+                minHeight: 130.h, // ⬅️ instead of fixed height
+              ),
               decoration: BoxDecoration(
-                  color: AppColors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadowColor,
-                      blurRadius: 6.r,
-                      offset: Offset(0, 2),
-                    )
-                  ],
-                  borderRadius: BorderRadius.circular(8.r)),
+                color: AppColors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.shadowColor,
+                    blurRadius: 6.r,
+                    offset: Offset(0, 2),
+                  )
+                ],
+                borderRadius: BorderRadius.circular(8.r),
+              ),
               child: Column(
                 spacing: 6.h,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,9 +177,11 @@ class OrderDetailsScreen extends StatelessWidget {
                   ),
                   Container(
                     width: double.infinity,
-                    height: 80.h,
                     padding:
                         EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
+                    constraints: BoxConstraints(
+                      minHeight: 80.h, // ⬅️ instead of fixed height
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8.r),
                       border: Border.all(color: AppColors.grey),
@@ -159,10 +192,8 @@ class OrderDetailsScreen extends StatelessWidget {
                         SizedBox(
                           width: 55.w,
                           height: 55.h,
-                          child: Image.asset(
-                            AppAssets.iphone,
-                            fit: BoxFit.cover,
-                          ),
+                          child:
+                              Image.asset(AppAssets.iphone, fit: BoxFit.cover),
                         ),
                         Expanded(
                           child: Column(
@@ -173,10 +204,15 @@ class OrderDetailsScreen extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  appText(
-                                    "IPhone 14",
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w600,
+                                  Expanded(
+                                    child: appText(
+                                      product!.name,
+                                      fontSize: 12.sp,
+                                      textAlign: TextAlign.left,
+                                      fontWeight: FontWeight.w600,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                   appText(
                                     "${AppStrings.qty} 1",
@@ -185,30 +221,22 @@ class OrderDetailsScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              appText(
-                                "Red | 1TB",
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              appText(
-                                "₹ 53999",
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              appText(
-                                "Plan - ₹100/200 Days",
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                              )
+                              appText("Red | 1TB",
+                                  fontSize: 12.sp, fontWeight: FontWeight.w600),
+                              appText("₹ ${product!.pricing.finalPrice}",
+                                  fontSize: 12.sp, fontWeight: FontWeight.w600),
+                              appText("Plan - ₹100/200 Days",
+                                  fontSize: 12.sp, fontWeight: FontWeight.w600),
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
+
             // -------------------- PRODUCT DETAILS -----------------------
 
             // -------------------- COUPON SECTION -----------------------
@@ -331,8 +359,7 @@ class OrderDetailsScreen extends StatelessWidget {
                     ),
                   ),
                   buildPriceInfo(
-                      label: "Iphone 14 ${AppStrings.total_ex_tax}",
-                      content: "₹ 52999"),
+                      label: product!.name, content: "₹ ${pricing.finalPrice}"),
                   buildPriceInfo(label: AppStrings.tax, content: "₹ 950"),
                   buildPriceInfo(label: AppStrings.market_fee, content: "₹ 50"),
                   buildPriceInfo(
@@ -341,7 +368,8 @@ class OrderDetailsScreen extends StatelessWidget {
                     color: AppColors.grey,
                   ),
                   buildPriceInfo(
-                      label: AppStrings.total_amount, content: "₹ 53999"),
+                      label: AppStrings.total_amount,
+                      content: "₹ ${pricing.finalPrice}"),
                   buildPriceInfo(
                       label: AppStrings.your_plan, content: "₹ 100/200 Days"),
                   buildPriceInfo(
@@ -355,20 +383,35 @@ class OrderDetailsScreen extends StatelessWidget {
             ),
             // -------------------- PAY NOW BUTTON SECTION -----------------------
 
-            appButton(
-                onTap: () => Get.to(BookingConfirmationScreen()),
-                width: double.infinity,
-                height: 45.h,
-                buttonColor: AppColors.lightAmber,
-                borderRadius: BorderRadius.circular(20.r),
-                child: Center(
-                  child: appText(
-                    AppStrings.pay_now,
-                    fontSize: 15.sp,
-                    color: AppColors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ))
+           appButton(
+  onTap: () {
+    orderController.placeOrder(
+      productId: product!.id,
+      totalDays: 30,   
+      deliveryAddress: {
+        "name": addresses.name,
+        "phoneNumber": addresses.phoneNumber,
+        "addressLine1": addresses.addressLine1,
+        "city": addresses.city,
+        "state": addresses.state,
+        "pincode": addresses.pincode,
+      },
+    );
+  },
+  width: double.infinity,
+  height: 45.h,
+  buttonColor: AppColors.lightAmber,
+  borderRadius: BorderRadius.circular(20.r),
+  child: Center(
+    child: appText(
+      AppStrings.pay_now,
+      fontSize: 15.sp,
+      color: AppColors.white,
+      fontWeight: FontWeight.w600,
+    ),
+  ),
+)
+
           ],
         ),
       )),
@@ -378,17 +421,25 @@ class OrderDetailsScreen extends StatelessWidget {
   Widget buildPriceInfo({
     required String label,
     required String content,
+    bool isProductName = false,
   }) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        appText(
-          label,
-          fontSize: 12.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.grey,
-          maxLines: 2,
+        Expanded(
+          child: appText(
+            label,
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w600,
+            textAlign: TextAlign.left,
+            color: AppColors.grey,
+            maxLines: isProductName ? 2 : 1,
+            softWrap: isProductName,
+            overflow:
+                isProductName ? TextOverflow.visible : TextOverflow.ellipsis,
+          ),
         ),
+        SizedBox(width: 10.w),
         appText(
           content,
           fontSize: 12.sp,

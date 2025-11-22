@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/product_details_model.dart';
 import 'package:saoirse_app/widgets/app_loader.dart';
 
 import '../../constants/app_colors.dart';
@@ -14,7 +15,8 @@ import '../order_details/order_details_screen.dart';
 import 'select_address_controller.dart';
 
 class SelectAddress extends StatelessWidget {
-  SelectAddress({super.key});
+ final  ProductDetailsData? product;
+  SelectAddress({super.key, this.product});
 
   final SelectAddressController controller = Get.put(SelectAddressController());
 
@@ -93,7 +95,7 @@ class SelectAddress extends StatelessWidget {
                   final selectedAddress =
                       controller.addressList[controller.selectedIndex.value];
 
-                  Get.to(() => OrderDetailsScreen(addresses: selectedAddress));
+                  Get.to(() => OrderDetailsScreen(addresses: selectedAddress , product: product!,));
                 },
               ),
             ),

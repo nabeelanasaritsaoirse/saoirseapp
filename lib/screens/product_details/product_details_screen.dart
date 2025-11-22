@@ -418,7 +418,7 @@ class ProductDetailsScreen extends StatelessWidget {
                       return;
                     }
 
-                    Get.to(SelectAddress());
+                    Get.to(SelectAddress(product: product,));
                   },
                   child: Text(
                     AppStrings.addToCart,

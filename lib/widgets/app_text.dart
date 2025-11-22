@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../constants/app_colors.dart';
+import 'package:saoirse_app/constants/app_colors.dart';
 
 Widget appText(
   String text, {
@@ -16,6 +15,7 @@ Widget appText(
   FontWeight? fontWeight,
   FontStyle? fontStyle,
   Color? color,
+  bool softWrap = true, // ← ADDED PARAMETER
   String fontFamily = 'poppins',
 }) {
   TextStyle fontStyleSelected;
@@ -42,9 +42,11 @@ Widget appText(
     case 'poppins':
       fontStyleSelected = GoogleFonts.poppins(textStyle: baseStyle);
       break;
+
     case 'inter':
       fontStyleSelected = GoogleFonts.inter(textStyle: baseStyle);
       break;
+
     default:
       fontStyleSelected = baseStyle.copyWith(fontFamily: fontFamily);
   }
@@ -52,7 +54,7 @@ Widget appText(
   return Text(
     text,
     overflow: overflow,
-    softWrap: true,
+    softWrap: softWrap, // ← APPLIED HERE
     maxLines: maxLines,
     textAlign: textAlign ?? TextAlign.center,
     style: fontStyleSelected,

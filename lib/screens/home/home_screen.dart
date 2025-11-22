@@ -2,7 +2,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/product_detiails_response.dart';
 import 'package:saoirse_app/screens/productListing/product_listing.dart';
 import 'package:saoirse_app/screens/product_details/product_details_screen.dart';
 import 'package:saoirse_app/widgets/app_loader.dart';
