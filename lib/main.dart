@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:saoirse_app/screens/notification_screen/notification_controller.dart';
 
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
@@ -38,7 +39,7 @@ Future<void> main() async {
 
   String? lang = storage.read('language') ?? 'en';
   Locale locale = Locale(lang);
-
+  Get.put(NotificationController(), permanent: true);
   runApp(MyApp(locale: locale));
 }
 

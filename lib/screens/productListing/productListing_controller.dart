@@ -3,6 +3,51 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../models/product_list_response.dart';
+import '../../services/product_service.dart';
+
 class ProductlistingController extends GetxController {
   TextEditingController nameContoller = TextEditingController();
+
+  final ProductService service = ProductService();
+
+  var products = <Product>[].obs;
+
+  var isLoading = false.obs;
+  var isMoreLoading = false.obs;
+  int page = 1;
+  final int limit = 5;
+
+  var hasNextPage = true.obs;
+
+  @override
+  void onInit() {
+    fetchProducts();
+    super.onInit();
+  }
+
+  Future<void> fetchProducts() async {
+    if (!hasNextPage.value) return;
+
+    try {
+      if (page == 1) {
+      isLoading(true); // first page loader
+    } else {
+      isMoreLoading(true); // bottom loader
+    }
+
+      final response = await service.getProducts(page, limit);
+
+      if (response != null && response.success) {
+        products.addAll(response.data);
+        hasNextPage.value = response.pagination.hasNext;
+        page++;
+      }
+    } catch (e) {
+      print("Fetch product error: $e");
+    } finally {
+      isLoading(false);
+       isMoreLoading(false);
+    }
+  }
 }
