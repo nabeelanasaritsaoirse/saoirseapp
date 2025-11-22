@@ -1,6 +1,9 @@
+// ignore_for_file: file_names
+
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/address_response.dart';
-import 'package:saoirse_app/services/address_service.dart';
+
+import '../../models/address_response.dart';
+import '../../services/address_service.dart';
 
 class SelectAddressController extends GetxController {
   var isLoading = false.obs;
