@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/booking_confirmation/booking_confirmation_screen.dart';
+import 'package:saoirse_app/screens/razorpay/razorpay_controller.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -19,6 +21,7 @@ class OrderDetailsScreen extends StatelessWidget {
 
   OrderDetailsScreen({super.key, required this.addresses, this.product});
   final orderController = Get.put(OrderDetailsController());
+  final razorpayController = Get.put(RazorpayController());
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +43,6 @@ class OrderDetailsScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(15.w),
-              height: 120.h,
               decoration: BoxDecoration(
                   color: AppColors.white,
                   boxShadow: [
@@ -333,7 +335,6 @@ class OrderDetailsScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(15.w),
-              height: 190.h,
               decoration: BoxDecoration(
                   color: AppColors.white,
                   boxShadow: [
@@ -383,18 +384,20 @@ class OrderDetailsScreen extends StatelessWidget {
 
             appButton(
               onTap: () {
-                orderController.placeOrder(
-                  productId: product!.id,
-                  totalDays: 30,
-                  deliveryAddress: {
-                    "name": addresses.name,
-                    "phoneNumber": addresses.phoneNumber,
-                    "addressLine1": addresses.addressLine1,
-                    "city": addresses.city,
-                    "state": addresses.state,
-                    "pincode": addresses.pincode,
-                  },
-                );
+                 Get.to(() => BookingConfirmationScreen());
+                // orderController.placeOrder(
+                //   productId: "6921572684a050c6a94f89da",
+                //   paymentOption: "daily",
+                //   totalDays: 30,
+                //   deliveryAddress: {
+                //     "name": addresses.name,
+                //     "phoneNumber": addresses.phoneNumber,
+                //     "addressLine1": addresses.addressLine1,
+                //     "city": addresses.city,
+                //     "state": addresses.state,
+                //     "pincode": addresses.pincode,
+                //   },
+                // );
               },
               width: double.infinity,
               height: 45.h,

@@ -183,7 +183,7 @@ class ReferralScreen extends StatelessWidget {
                     ),
                     SizedBox(width: 10.w),
                     InkWell(
-                      onTap: controller.getReferralCode,
+                      
                       child: Icon(
                         Icons.refresh_rounded,
                         size: 20.sp,

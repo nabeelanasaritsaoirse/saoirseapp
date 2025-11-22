@@ -1,6 +1,9 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_constant.dart';
+import 'package:saoirse_app/main.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/referral_response_model.dart';
@@ -21,8 +24,8 @@ class ReferralController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getReferralCode();
-    fetchReferralData();
+    loadReferralFromStorage();
+    // fetchReferralData();
   }
 
   // ---------------------------------------------------------------------------
@@ -47,6 +50,18 @@ class ReferralController extends GetxController {
       appSnackbar(error: true, content: e.toString());
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<void> loadReferralFromStorage() async {
+    try {
+      final storedCode = await storage.read(AppConst.REFERRAL_CODE);
+
+      if (storedCode != null && storedCode.toString().isNotEmpty) {
+        referralCode.value = storedCode.toString();
+      }
+    } catch (e) {
+      log("Error reading referral code from storage: $e");
     }
   }
 
