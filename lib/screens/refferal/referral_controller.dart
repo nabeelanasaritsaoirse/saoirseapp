@@ -70,13 +70,11 @@ class ReferralController extends GetxController {
   //---------------------------------------------------------------------------
 
   String _referralLink() {
-    
-    const base = 'https://inviteapp.onelink.me/VDIY?af_xp=referral&pid=User_invite&c=referral';
-    
+    const base =
+        'https://inviteapp.onelink.me/VDIY?af_xp=referral&pid=User_invite&c=referral';
+
     return '$base&deep_link_value=${referralCode.value}';
   }
-
-
 
   // ---------------------------------------------------------------------------
   // Fetch Referral List (Dashboard Data)
@@ -113,11 +111,9 @@ class ReferralController extends GetxController {
   // ---------------------------------------------------------------------------
 
   Future<void> shareToWhatsApp() async {
-
     final link = _referralLink();
 
-    final message =
-        "Hey! Join me on this app using my referral code: $link";
+    final message = "Hey! Join me on this app using my referral code: $link";
 
     final whatsappUrl = "whatsapp://send?text=${Uri.encodeComponent(message)}";
 
@@ -132,11 +128,9 @@ class ReferralController extends GetxController {
   }
 
   Future<void> shareToFacebook() async {
-
     final link = _referralLink();
 
-    final message =
-        "Hey! Join me on this app using my referral code: $link";
+    final message = "Hey! Join me on this app using my referral code: $link";
 
     final fbUrl =
         "fb://faceweb/f?href=https://facebook.com/sharer/sharer.php?u=${Uri.encodeComponent(message)}";
@@ -152,11 +146,9 @@ class ReferralController extends GetxController {
   }
 
   Future<void> shareToTelegram() async {
-
     final link = _referralLink();
 
-    final message =
-        "Hey! Join me on this app using my referral code: $link";
+    final message = "Hey! Join me on this app using my referral code: $link";
 
     final telegramUrl = "tg://msg?text=${Uri.encodeComponent(message)}";
 
@@ -171,11 +163,9 @@ class ReferralController extends GetxController {
   }
 
   Future<void> shareToTwitter() async {
-
     final link = _referralLink();
 
-    final message =
-        "Hey! Join me on this app using my referral code: $link";
+    final message = "Hey! Join me on this app using my referral code: $link";
 
     final twitterUrl = "twitter://post?message=${Uri.encodeComponent(message)}";
 
@@ -190,7 +180,6 @@ class ReferralController extends GetxController {
   }
 
   Future<void> shareToGmail() async {
-    
     final link = _referralLink();
 
     final subject = "Join me on this app!";
@@ -226,11 +215,9 @@ class ReferralController extends GetxController {
   }
 
   Future<void> shareMore() async {
-
     final link = _referralLink();
 
-    final message =
-        "Hey! Join me on this app using my referral code: $link";
+    final message = "Hey! Join me on this app using my referral code: $link";
 
     final smsUrl = "sms:?body=${Uri.encodeComponent(message)}";
 

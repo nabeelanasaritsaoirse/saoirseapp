@@ -13,17 +13,36 @@ import '../../widgets/app_text.dart';
 import '../select_address/select_address.dart';
 import 'product_details_controller.dart';
 
-class ProductDetailsScreen extends StatelessWidget {
-  final String? productId;
+class ProductDetailsScreen extends StatefulWidget {
+  final String productId;
   final String? id;
 
-  const ProductDetailsScreen({super.key, this.productId, this.id});
+  const ProductDetailsScreen({
+    super.key,
+    required this.productId,
+    this.id,
+  });
+
+  @override
+  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
+}
+
+class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  late ProductDetailsController controller;
+
+  @override
+  void initState() {
+    controller = Get.put(
+      ProductDetailsController(
+        productId: widget.productId,
+        id: widget.id,
+      ),
+    );
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final ProductDetailsController controller =
-        Get.put(ProductDetailsController(productId!, id!));
-
     return Obx(() {
       /// -------------------------
       /// 1. LOADING STATE

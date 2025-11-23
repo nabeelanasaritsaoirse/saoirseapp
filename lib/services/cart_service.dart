@@ -3,7 +3,7 @@
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
-import '../models/cart_count_response.dart';
+import '../models/LoginAuth/cart_count_response.dart';
 import '../models/add_to_cart_response.dart';
 import '../models/cart_response_model.dart';
 import '../models/remove_cart_response.dart';

@@ -11,7 +11,6 @@ import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
-import '../booking_confirmation/booking_confirmation_screen.dart';
 import '../razorpay/razorpay_controller.dart';
 import 'order_details_controller.dart';
 
@@ -384,20 +383,19 @@ class OrderDetailsScreen extends StatelessWidget {
 
             appButton(
               onTap: () {
-                Get.to(() => BookingConfirmationScreen());
-                // orderController.placeOrder(
-                //   productId: "6921572684a050c6a94f89da",
-                //   paymentOption: "daily",
-                //   totalDays: 30,
-                //   deliveryAddress: {
-                //     "name": addresses.name,
-                //     "phoneNumber": addresses.phoneNumber,
-                //     "addressLine1": addresses.addressLine1,
-                //     "city": addresses.city,
-                //     "state": addresses.state,
-                //     "pincode": addresses.pincode,
-                //   },
-                // );
+                orderController.placeOrder(
+                  productId: "6921572684a050c6a94f89da",
+                  paymentOption: "daily",
+                  totalDays: 200,
+                  deliveryAddress: {
+                    "name": addresses.name,
+                    "phoneNumber": addresses.phoneNumber,
+                    "addressLine1": addresses.addressLine1,
+                    "city": addresses.city,
+                    "state": addresses.state,
+                    "pincode": addresses.pincode,
+                  },
+                );
               },
               width: double.infinity,
               height: 45.h,
