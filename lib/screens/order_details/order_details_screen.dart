@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/booking_confirmation/booking_confirmation_screen.dart';
 import 'package:saoirse_app/screens/razorpay/razorpay_controller.dart';
 
 import '../../constants/app_assets.dart';
@@ -388,7 +387,7 @@ class OrderDetailsScreen extends StatelessWidget {
                 orderController.placeOrder(
                   productId: "6921572684a050c6a94f89da",
                   paymentOption: "daily",
-                  totalDays: 30,
+                  totalDays: 200,
                   deliveryAddress: {
                     "name": addresses.name,
                     "phoneNumber": addresses.phoneNumber,

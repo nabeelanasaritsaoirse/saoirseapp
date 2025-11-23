@@ -262,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 12.h),
                 SizedBox(
-                  height: 205.h,
+                  height: 213.h,
                   child: Obx(() {
                     if (homeController.loading.value &&
                         homeController.mostPopularProducts.isEmpty) {
@@ -492,7 +492,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 12.h),
                 SizedBox(
-                  height: 205.h,
+                  height: 213.h,
                   child: Obx(() {
                     if (homeController.loading.value &&
                         homeController.trendingProducts.isEmpty) {

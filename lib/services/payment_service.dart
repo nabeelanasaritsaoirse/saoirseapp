@@ -1,10 +1,12 @@
 import 'dart:developer';
+import 'package:saoirse_app/constants/app_urls.dart';
+
 import '../services/api_service.dart';
 import '../main.dart';
 import '../constants/app_constant.dart';
 
 class PaymentService {
-  static const processUrl = "https://api.example.com/api/payments/process";
+ 
 
   static Future<Map<String, dynamic>?> processPayment(
       Map<String, dynamic> body) async {
@@ -15,7 +17,7 @@ class PaymentService {
 
       final response =
           await APIService.postRequest<Map<String, dynamic>>(
-        url: processUrl,
+        url: AppURLs.PAYMENT_PROCESS_API,
         body: body,
         headers: {
           "Authorization": "Bearer $token",

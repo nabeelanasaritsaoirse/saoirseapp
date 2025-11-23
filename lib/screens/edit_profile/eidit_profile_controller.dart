@@ -5,6 +5,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../models/user_profile.dart';
 import '../../widgets/app_snackbar.dart';
@@ -41,22 +42,36 @@ class EditProfileController extends GetxController {
   }
 
   // ------------------ IMAGE PICK ------------------
-  Future<void> pickProfileImage() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 80,
-      );
+ Future<void> pickProfileImage() async {
+  try {
+    // Request Permission
+    bool granted = await _requestGalleryPermission();
 
-      if (image != null) {
-        profileImage.value = File(image.path);
-      }
-    } catch (e) {
-      Get.snackbar("Error", "Unable to open gallery",
-          backgroundColor: Colors.red, colorText: Colors.white);
-      print("Image Picker Error: $e");
+    if (!granted) {
+      appSnackbar(
+        error: true,
+        title: "Permission Required",
+        content: "Please allow gallery access to upload profile picture",
+      );
+      return;
     }
+
+   
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+
+    if (image != null) {
+      profileImage.value = File(image.path);
+    }
+
+  } catch (e) {
+    appSnackbar(error: true, title: "Error", content: "Unable to open gallery");
+    print("Image Picker Error: $e");
   }
+}
+
 
   // ------------------ COUNTRY SETUP ------------------
   void _setInitialCountryFromCode(String code) {
@@ -155,6 +170,37 @@ class EditProfileController extends GetxController {
     appSnackbar(title: "Success", content: "Profile updated successfully");
     Get.back();
   }
+
+//  Permission For access the gallery
+  Future<bool> _requestGalleryPermission() async {
+  if (Platform.isAndroid) {
+    // Android 13+ uses READ_MEDIA_IMAGES
+    final photosStatus = await Permission.photos.request();
+    if (photosStatus.isGranted) return true;
+
+    // Android 12 and below use READ_EXTERNAL_STORAGE
+    final storageStatus = await Permission.storage.request();
+    if (storageStatus.isGranted) return true;
+
+    if (photosStatus.isPermanentlyDenied ||
+        storageStatus.isPermanentlyDenied) {
+      openAppSettings();
+    }
+
+    return false;
+  }
+
+  // iOS
+  final iosStatus = await Permission.photos.request();
+  if (iosStatus.isGranted) return true;
+
+  if (iosStatus.isPermanentlyDenied) {
+    openAppSettings();
+  }
+
+  return false;
+}
+
 
   // ------------------ CLEANUP ------------------
   @override

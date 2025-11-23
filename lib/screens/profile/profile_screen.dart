@@ -15,13 +15,24 @@ import '../transaction_history/transaction_history.dart';
 import '../wishlist/wishlist_screen.dart';
 import 'profile_controller.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(ProfileController());
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
 
+class _ProfileScreenState extends State<ProfileScreen> {
+  late final ProfileController controller;
+
+  @override
+  void initState() {
+    controller = Get.put(ProfileController());
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.paperColor,
       appBar: CustomAppBar(
@@ -127,8 +138,8 @@ class ProfileScreen extends StatelessWidget {
 
             // -------------------- MY ORDERS GRID -----------------------
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.w),
-              child: GridView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                child: GridView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
                   itemCount: controller.myOrders.length,
@@ -139,23 +150,33 @@ class ProfileScreen extends StatelessWidget {
                     mainAxisSpacing: 15.h,
                   ),
                   itemBuilder: (_, index) {
+                    // Only Wishlist tile should use Obx
+                    if (index == 2) {
+                      return Obx(() => ProfileMenuCard(
+                            icon: controller.myOrders[index]["icon"]!,
+                            title: controller.myOrders[index]["title"]!,
+                            count:
+                                controller.wishlistCount.value, // 🔥 reactive
+                            onTap: () {
+                              Get.to(WishlistScreen())?.then((_) {
+                                controller.fetchWishlistCount();
+                              });
+                            },
+                          ));
+                    }
+
+                    // All other tiles do NOT use Obx
                     return ProfileMenuCard(
                       icon: controller.myOrders[index]["icon"]!,
                       title: controller.myOrders[index]["title"]!,
                       onTap: () {
-                        if (index == 0) {
-                          Get.to(Pendingtrancation());
-                        } else if (index == 1) {
-                          Get.to(OrderHistoryScreen());
-                        } else if (index == 2) {
-                          Get.to(WishlistScreen());
-                        } else if (index == 3) {
-                          Get.to(TransactionHistory());
-                        } else {}
+                        if (index == 0) Get.to(Pendingtrancation());
+                        if (index == 1) Get.to(OrderHistoryScreen());
+                        if (index == 3) Get.to(TransactionHistory());
                       },
                     );
-                  }),
-            ),
+                  },
+                )),
 
             SizedBox(height: 20.h),
 

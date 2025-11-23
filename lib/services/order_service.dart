@@ -1,11 +1,13 @@
 import 'dart:developer';
 
+import 'package:saoirse_app/constants/app_urls.dart';
+
 import '../constants/app_constant.dart';
 import '../main.dart';
 import '../services/api_service.dart';
 
 class OrderService {
-  static const String ordersUrl = "https://api.epielio.com/api/orders";
+ 
 
   static Future<Map<String, dynamic>?> createOrder(
       Map<String, dynamic> body) async {
@@ -14,7 +16,7 @@ class OrderService {
     log("🔐 Access Token = $token"); // <--- PRINT HERE
 
     return await APIService.postRequest<Map<String, dynamic>>(
-      url: ordersUrl,
+      url: AppURLs.CREATE_ORDER_API,
       body: body,
       headers: {
         "Authorization": "Bearer $token",

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/payment_model.dart';
+import 'package:saoirse_app/models/order_response_model.dart';
 
 import '../../services/order_service.dart';
 import '../../widgets/app_loader.dart';
@@ -10,6 +10,7 @@ import '../../widgets/app_snackbar.dart';
 import '../razorpay/razorpay_controller.dart';
 
 class OrderDetailsController extends GetxController {
+   String orderid = "";
   Future<void> placeOrder({
     required String productId,
     required String paymentOption,
@@ -55,9 +56,10 @@ class OrderDetailsController extends GetxController {
 
     log("ORDER API SUCCESS: $response");
 
-    final paymentJson = response["payment"];
+    // final paymentJson = response["payment"];
+    final paymentOrder = response["order"];
 
-    if (paymentJson == null) {
+    if (paymentOrder == null) {
       appSnackbar(
         error: true,
         content: "Payment info missing from server!",
@@ -65,24 +67,33 @@ class OrderDetailsController extends GetxController {
       return;
     }
 
-    final payment = PaymentModel.fromJson(paymentJson);
+    final payment = OrderResponseModel.fromJson(response);
 
     // Validate
-    if (payment.orderId.isEmpty || payment.amount == 0) {
+    if (payment.order.id.isEmpty) {
       appSnackbar(
         error: true,
         content: "Invalid payment details!",
       );
       return;
     }
+    if (payment.payment.orderId.isEmpty) {
+      appSnackbar(
+        error: true,
+        content: "Invalid Razorpay Order ID!",
+      );
+      return;
+    }
+
+    orderid = payment.order.id;
+    log("orderid is : $orderid");
 
     // Open Razorpay
     Get.find<RazorpayController>().openCheckout(
-      orderId: payment.orderId,
-      amount: payment.amount,
-      key: payment.keyId,
+      razorpayOrderId: payment.payment.orderId,
+      orderId: payment.order.id,
+      amount: payment.payment.amount,
+      key: payment.payment.keyId,
     );
   }
 }
-
-

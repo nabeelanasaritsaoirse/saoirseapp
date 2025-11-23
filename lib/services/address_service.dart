@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:saoirse_app/constants/app_urls.dart';
+
 import '../constants/app_constant.dart';
 import '../main.dart';
 import '../models/address_response.dart';
@@ -15,7 +17,7 @@ class AddressService {
       return null;
     }
 
-    final String url = "https://api.epielio.com/api/users/$userId/addresses";
+    final String url = "${AppURLs.ADDRESS_API}$userId/addresses";
 
     return await APIService.getRequest<AddressResponse>(
       url: url,
@@ -34,7 +36,7 @@ class AddressService {
       return false;
     }
 
-    String url = "https://api.epielio.com/api/users/$userId/addresses";
+    String url = "${AppURLs.ADDRESS_API}$userId/addresses";
 
     final result = await APIService.postRequest<bool>(
       url: url,

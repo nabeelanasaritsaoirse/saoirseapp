@@ -46,7 +46,7 @@ class WishlistScreen extends StatelessWidget {
             ),
             itemBuilder: (context, index) {
               final product = controller.wishlistProducts[index];
-
+          
               return ProductCard(
                 productId: product.productId,
                 name: product.name,
@@ -58,6 +58,7 @@ class WishlistScreen extends StatelessWidget {
                 onFavoriteTap: () {
                   controller.removeItem(product.productId);
                 },
+                
               );
             },
           ),
