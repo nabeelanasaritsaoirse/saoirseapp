@@ -8,6 +8,8 @@ import '../../services/product_service.dart';
 
 class ProductlistingController extends GetxController {
   TextEditingController nameContoller = TextEditingController();
+  var searchQuery = "".obs;
+  var isSearching = false.obs;
 
   final ProductService service = ProductService();
 
@@ -36,7 +38,11 @@ class ProductlistingController extends GetxController {
         isMoreLoading(true); // bottom loader
       }
 
-      final response = await service.getProducts(page, limit);
+      final response = await service.getProducts(
+        page,
+        limit,
+        search: searchQuery.value.isEmpty ? null : searchQuery.value,
+      );
 
       if (response != null && response.success) {
         products.addAll(response.data);
@@ -49,5 +55,17 @@ class ProductlistingController extends GetxController {
       isLoading(false);
       isMoreLoading(false);
     }
+  }
+
+  /// User typing search
+  void performSearch(String query) {
+    searchQuery.value = query.trim();
+
+    // RESET DATA
+    page = 1;
+    products.clear();
+    hasNextPage.value = true;
+
+    fetchProducts(); // reload with search
   }
 }

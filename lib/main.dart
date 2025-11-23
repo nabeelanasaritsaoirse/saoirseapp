@@ -39,7 +39,7 @@ Future<void> main() async {
 
   String? lang = storage.read('language') ?? 'en';
   Locale locale = Locale(lang);
-  Get.put(NotificationController(), permanent: true);
+  
 
   runApp(MyApp(locale: locale));
 }

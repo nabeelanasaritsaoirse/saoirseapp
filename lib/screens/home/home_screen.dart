@@ -28,8 +28,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   HomeController homeController = Get.put(HomeController());
-  final NotificationController notificationController =
-      Get.find<NotificationController>();
+  NotificationController notificationController =
+      Get.put(NotificationController());
 
   // Refactored Icon box
 

@@ -48,6 +48,7 @@ class AppURLs {
   // Products List
   static String PRODUCTS_LISTING = BASE_API + "api/products";
 
+
   //Cart Api
   static String GET_FULL_CART = BASE_API + "api/cart";
   static String GET_CART_COUNT = BASE_API + "api/cart/count";
