@@ -7,7 +7,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:saoirse_app/services/appsflyer_service.dart';
 
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
@@ -15,6 +14,7 @@ import 'l10n/app_localizations.dart';
 import 'screens/notification/notification_controller.dart';
 import 'screens/splash/splash_screen.dart';
 import 'services/api_service.dart';
+import 'services/appsflyer_service.dart';
 
 //storage instance
 GetStorage storage = GetStorage();

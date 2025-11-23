@@ -6,12 +6,12 @@ import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/services/appsflyer_service.dart';
 
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
 import '../../main.dart';
 import '../../services/api_service.dart';
+import '../../services/appsflyer_service.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/app_snackbar.dart';
 import '../dashboard/dashboard_screen.dart';
@@ -45,7 +45,9 @@ class LoginController extends GetxController {
 
   Future<void> fetchCountryCode() async {
     try {
-      final response = await http.get(Uri.parse("http://ip-api.com/json")).timeout(Duration(seconds: 3));
+      final response = await http
+          .get(Uri.parse("http://ip-api.com/json"))
+          .timeout(Duration(seconds: 3));
 
       if (response.statusCode == 200) {
         final body = json.decode(response.body);
@@ -170,7 +172,10 @@ class LoginController extends GetxController {
           "referral": referralCode ?? "",
           "deviceToken": deviceToken ?? "",
         },
-        headers: {"Authorization": "Bearer ${storage.read(AppConst.ACCESS_TOKEN)}", "Content-Type": "application/json"},
+        headers: {
+          "Authorization": "Bearer ${storage.read(AppConst.ACCESS_TOKEN)}",
+          "Content-Type": "application/json"
+        },
         onSuccess: (json) => json,
       );
 
