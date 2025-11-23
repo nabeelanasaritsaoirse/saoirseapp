@@ -7,7 +7,6 @@ import '../../models/product_list_response.dart';
 import '../../widgets/app_loader.dart';
 import '../product_details/product_details_screen.dart';
 import '/screens/productListing/productListing_controller.dart';
-import '/widgets/app_text_field.dart';
 import '../../constants/app_colors.dart';
 import '../../widgets/app_text.dart';
 
@@ -53,31 +52,46 @@ class _ProductListingState extends State<ProductListing> {
           child: Icon(Icons.arrow_back, size: 30.sp, color: AppColors.white),
         ),
         title: Container(
-          height: 30.h,
+          height: 35.h,
           margin: EdgeInsets.only(right: 12.w),
+          padding: EdgeInsets.symmetric(horizontal: 8.w),
           decoration: BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.circular(20.r),
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: appTextField(
-                  prefixWidth: 12.w,
-
-                  borderRadius: BorderRadius.circular(20.r),
-                  controller: productlistingController.nameContoller,
-                  hintText: "Search",
-                  hintColor: AppColors.black,
-                  textColor: AppColors.black,
-
-                  // Need validation for search field
-                  validator: (value) {
-                    return null;
-                  },
+          child: Center(
+            child: TextField(
+              controller: productlistingController.nameContoller,
+              textAlignVertical: TextAlignVertical.center,
+              onChanged: (value) {
+                productlistingController.performSearch(value);
+              },
+              decoration: InputDecoration(
+                hintText: "Search",
+                border: InputBorder.none,
+                hintStyle: TextStyle(
+                  color: AppColors.grey,
+                  fontSize: 14.sp,
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 12.w,
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: AppColors.grey,
+                  size: 20.sp,
+                ),
+                prefixIconConstraints: BoxConstraints(
+                  minWidth: 35.w,
+                  minHeight: 35.h,
                 ),
               ),
-            ],
+              style: TextStyle(
+                color: AppColors.black,
+                fontSize: 14.sp,
+              ),
+            ),
           ),
         ),
         actions: [

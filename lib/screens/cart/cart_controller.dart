@@ -64,7 +64,8 @@ class CartController extends GetxController {
     if (response['success'] == true) {
       product.quantity = newQty;
       cartData.refresh();
-      fetchCart(); // refresh total
+      fetchCart();
+      fetchCartCount(); // refresh total
     } else {
       appSnackbar(content: response["message"], error: true);
     }
@@ -95,6 +96,7 @@ class CartController extends GetxController {
       product.quantity = newQty;
       cartData.refresh();
       fetchCart();
+      fetchCartCount();
     } else {
       appSnackbar(content: response["message"], error: true);
     }
@@ -119,6 +121,7 @@ class CartController extends GetxController {
 
         // refresh cart after adding item
         fetchCart();
+        fetchCartCount();
       } else {
         appSnackbar(content: response.message, error: true);
       }
@@ -149,7 +152,7 @@ class CartController extends GetxController {
           totalPrice: 0.0,
           subtotal: 0.0,
         );
-
+        fetchCartCount();
         cartCount.value = 0; // Reset badge count
         cartData.refresh();
 
@@ -185,6 +188,7 @@ class CartController extends GetxController {
 
         // Re-fetch cart if needed
         fetchCart();
+        fetchCartCount();
       } else {
         appSnackbar(content: response.message, error: true);
       }
@@ -200,8 +204,14 @@ class CartController extends GetxController {
     try {
       final response = await service.getCartCount();
 
+      print("Fetching Cart Count...");
+
       if (response != null && response.success) {
         cartCount.value = response.count;
+
+        print("Cart Count Updated: ${response.count}");
+      } else {
+        print(" Failed to fetch cart count!");
       }
     } catch (e) {
       print("Count fetch error: $e");
