@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
 import 'l10n/app_localizations.dart';
+import 'screens/notification/notification_controller.dart';
 import 'screens/splash/splash_screen.dart';
 import 'services/api_service.dart';
 
@@ -35,8 +36,10 @@ Future<void> main() async {
           messagingSenderId: '486829564070',
           projectId: 'saoirse-epi',
         ));
+
   String? lang = storage.read('language') ?? 'en';
-Locale locale = Locale(lang);
+  Locale locale = Locale(lang);
+  Get.put(NotificationController(), permanent: true);
 
   runApp(MyApp(locale: locale));
 }

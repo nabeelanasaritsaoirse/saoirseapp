@@ -74,5 +74,8 @@
        <string>tg</string>
        <string>twitter</string>
 	</array>
+	<!-- Gallery Permissions for images -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>EPI requires access to your photo library to select images.</string>
 </dict>
 </plist>

@@ -14,3 +14,5 @@ class DummyAssets {
   static String washingMachine = "assets/images/washing_mechine.png";
   static String mobile = "assets/images/phone.png";
 }
+
+

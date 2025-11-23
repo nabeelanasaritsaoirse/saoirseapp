@@ -4,13 +4,15 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/widgets/app_snackbar.dart';
+
 import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
+import '../widgets/app_snackbar.dart';
 import '../widgets/app_text.dart';
 import 'package:http/http.dart' as http;
 
@@ -184,16 +186,16 @@ class APIService {
         case 201:
           final data = jsonDecode(response.body);
 
-          if (data is! Map<String, dynamic>) {
+          if (data is Map<String, dynamic>) {
+            return onSuccess(data);
+          } else {
             appSnackbar(
               title: "Error",
-              content: "Invalid response format received from server.",
+              content: "Invalid response format. Expected JSON object.",
               error: true,
             );
             return null;
           }
-
-          return onSuccess(data);
 
         case 204:
           appSnackbar(
@@ -284,6 +286,7 @@ class APIService {
       );
       return null;
     } catch (e) {
+      log("Error =====> ${e.toString()}");
       appSnackbar(
         content: "Something went wrong: ${e.toString()}",
         error: true,
