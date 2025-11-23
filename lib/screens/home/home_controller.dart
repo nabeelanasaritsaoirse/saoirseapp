@@ -11,10 +11,10 @@ class HomeController extends GetxController {
   RxBool popularLoading = false.obs;
   RxBool bestSellerLoading = false.obs;
   RxBool trendingLoading = false.obs;
-  
+
   RxInt currentCarouselIndex = 0.obs;
   RxInt currentBottomCarouselIndex = 0.obs;
-  
+
   // For the custom images
   final RxList<String> carouselImages = <String>[
     'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800',
@@ -51,8 +51,9 @@ class HomeController extends GetxController {
   Future<void> fetchPopularProducts() async {
     try {
       popularLoading.value = true;
-      final products = await HomeService.fetchPopularProducts(page: 1, limit: 10);
-      
+      final products =
+          await HomeService.fetchPopularProducts(page: 1, limit: 10);
+
       if (products != null && products.isNotEmpty) {
         mostPopularProducts.value = products;
       }
@@ -67,8 +68,9 @@ class HomeController extends GetxController {
   Future<void> fetchBestSellerProducts() async {
     try {
       bestSellerLoading.value = true;
-      final products = await HomeService.fetchBestSellerProducts(page: 1, limit: 10);
-      
+      final products =
+          await HomeService.fetchBestSellerProducts(page: 1, limit: 10);
+
       if (products != null && products.isNotEmpty) {
         bestSellerProducts.value = products;
       }
@@ -83,8 +85,9 @@ class HomeController extends GetxController {
   Future<void> fetchTrendingProducts() async {
     try {
       trendingLoading.value = true;
-      final products = await HomeService.fetchTrendingProducts(page: 1, limit: 10);
-      
+      final products =
+          await HomeService.fetchTrendingProducts(page: 1, limit: 10);
+
       if (products != null && products.isNotEmpty) {
         trendingProducts.value = products;
       }

@@ -47,7 +47,6 @@ class AppStrings {
   static String no_best_seller_products = "No products available";
   static String no_trending_products = "No Trending products available";
 
-
   // Product Details page
   static String freeShiping = "Free shipping";
   static String ColorAvailable = "Color Available";
@@ -109,8 +108,8 @@ class AppStrings {
   // select planning sheet
   static String select_plan = "Select Your Plan";
   static String costomize_plan = "Customize My Plan";
-  static String enter_days = "Enter the days";
-  static String enter_amount = "Enter the Amount";
+  static String enter_days = "days";
+  static String enter_amount = "amount";
   static String convert = "Convert";
   static String auto_generated = "Auto generated";
   static String recommented = "Recommended";
@@ -118,12 +117,15 @@ class AppStrings {
   static String start_on = "Start On";
   static String end_on = "Start On";
   static String selected = "Selected";
+  static String warning_label = "Please Select Your Plan";
+  static String warning_body =
+      "You haven’t selected a plan yet. Please choose a plan before proceeding to Add to Cart.";
 
   //Cart page
   static String carttitle = "Cart";
 
   // Wishlist Screen
-  static String wishlist = "Whishlist";
+  static String wishlist = "Wishlist";
 
   // select address screen
   static String select_address = "Select Address";

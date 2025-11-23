@@ -3,27 +3,41 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_strings.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/product_card.dart';
-import '../home/home_controller.dart';
+import 'wishlist_controller.dart';
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    HomeController homeController = Get.put(HomeController());
+    WishlistController controller = Get.put(WishlistController());
 
     return Scaffold(
       appBar: CustomAppBar(
         title: AppStrings.wishlist,
         showBack: true,
       ),
-      body: Obx(
-        () => Padding(
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(child: appLoader());
+        }
+
+        if (controller.wishlistProducts.isEmpty) {
+          return Center(
+            child: Text(
+              "Your wishlist is empty",
+              style: TextStyle(fontSize: 16.sp),
+            ),
+          );
+        }
+
+        return Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
           child: GridView.builder(
-            itemCount: homeController.trendingProducts.length,
+            itemCount: controller.wishlistProducts.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 12.w,
@@ -31,15 +45,24 @@ class WishlistScreen extends StatelessWidget {
               childAspectRatio: 0.77,
             ),
             itemBuilder: (context, index) {
-              final product = homeController.trendingProducts[index];
+              final product = controller.wishlistProducts[index];
+
               return ProductCard(
-                product: product,
-                margin: EdgeInsets.all(0.w),
+                productId: product.productId,
+                name: product.name,
+                brand: product.brand.isNotEmpty ? product.brand : "Brand",
+                image:
+                    product.images.isNotEmpty ? product.images.first.url : "",
+                price: product.finalPrice.toStringAsFixed(0),
+                isFavorite: true,
+                onFavoriteTap: () {
+                  controller.removeItem(product.productId);
+                },
               );
             },
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }

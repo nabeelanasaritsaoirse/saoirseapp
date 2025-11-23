@@ -10,17 +10,27 @@ import '../../screens/product_details/product_details_controller.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/app_text.dart';
+import '../screens/select_address/select_address.dart';
+import 'app_snackbar.dart';
 
 class SelectPlanSheet extends StatelessWidget {
   const SelectPlanSheet({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final ProductDetailsController controller = Get.find();
+
     final TextEditingController dayController = TextEditingController();
     final TextEditingController amountController = TextEditingController();
-    final ProductDetailsController controller = Get.put(
-      ProductDetailsController(),
-    );
+
+    /// LISTENERS FOR AUTO UPDATE
+    dayController.addListener(() {
+      controller.updateAmountFromDays(dayController, amountController);
+    });
+
+    amountController.addListener(() {
+      controller.updateDaysFromAmount(dayController, amountController);
+    });
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
@@ -44,17 +54,16 @@ class SelectPlanSheet extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   spacing: 60.w,
                   children: [
-                    appText(AppStrings.select_plan,
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                        textAlign: TextAlign.center),
+                    appText(
+                      AppStrings.select_plan,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      textAlign: TextAlign.center,
+                    ),
                     IconButton(
-                      icon: Icon(
-                        Icons.close,
-                        size: 25.sp,
-                      ),
+                      icon: Icon(Icons.close, size: 25.sp),
                       onPressed: () => Get.back(),
-                    )
+                    ),
                   ],
                 ),
 
@@ -69,56 +78,139 @@ class SelectPlanSheet extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+
                 SizedBox(height: 12.h),
 
-                /// Input Row
+                /// Input Row (Days + Amount + Convert)
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
+                    /// Days Column
                     Expanded(
-                      child: appTextField(
-                        controller: dayController,
-                        hintText: AppStrings.enter_days,
-                        hintColor: AppColors.grey,
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 11.w, vertical: 8.h),
-                        maxLines: 1,
-                        hintSize: 10.sp,
-                        hintWeight: FontWeight.w500,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          appText(
+                            "Days",
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          SizedBox(height: 6.h),
+                          appTextField(
+                            controller: dayController,
+                            textInputType: TextInputType.datetime,
+                            hintText: AppStrings.enter_days,
+                            textColor: AppColors.textBlack,
+                            textSize: 13.sp,
+                            textWeight: FontWeight.w600,
+                            hintColor: AppColors.grey,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12.w,
+                              vertical: 11.h,
+                            ),
+                            maxLines: 1,
+                            hintSize: 12.sp,
+                            hintWeight: FontWeight.w400,
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(width: 5.w),
-                    Expanded(
-                      child: appTextField(
-                        controller: amountController,
-                        hintText: AppStrings.enter_amount,
-                        hintColor: AppColors.grey,
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 11.w, vertical: 8.h),
-                        maxLines: 1,
-                        hintSize: 10.sp,
-                        hintWeight: FontWeight.w500,
-                      ),
-                    ),
+
                     SizedBox(width: 10.w),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 18.w, vertical: 12.h),
-                      decoration: BoxDecoration(
-                        color: AppColors.gradientDarkBlue,
-                        borderRadius: BorderRadius.circular(10.r),
+
+                    /// Amount Column
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          appText(
+                            "Amount",
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          SizedBox(height: 6.h),
+                          appTextField(
+                            controller: amountController,
+                            textInputType: TextInputType.number,
+                            hintText: AppStrings.enter_amount,
+                            textColor: AppColors.textBlack,
+                            textSize: 13.sp,
+                            textWeight: FontWeight.w600,
+                            hintColor: AppColors.grey,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12.w,
+                              vertical: 11.h,
+                            ),
+                            maxLines: 1,
+                            hintSize: 12.sp,
+                            hintWeight: FontWeight.w400,
+                          ),
+                        ],
                       ),
-                      child: Center(
-                          child: appText(AppStrings.convert,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.white)),
-                    )
+                    ),
+
+                    SizedBox(width: 12.w),
+
+                    /// Convert Button
+                    GestureDetector(
+                      onTap: () {
+                        final int days =
+                            int.tryParse(dayController.text.trim()) ?? 0;
+                        final double amount =
+                            double.tryParse(amountController.text.trim()) ??
+                                0.0;
+
+                        // VALIDATION
+                        if (days <= 0 || amount <= 0) {
+                          appSnackbar(
+                              error: true,
+                              title: "Invalid Input",
+                              content: "Please enter valid days and amount");
+                          return;
+                        }
+
+                        if (days > 5) {
+                          appSnackbar(
+                              error: true,
+                              title: "Invalid Days",
+                              content: "Days cannot be more than 5");
+                          return;
+                        }
+
+                        if (amount > 50) {
+                          appSnackbar(
+                              error: true,
+                              title: "Invalid Amount",
+                              content: "Amount cannot be more than 50");
+
+                          return;
+                        }
+
+                        controller.setCustomPlan(days, amount);
+
+                        Get.to(SelectAddress());
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 18.w, vertical: 12.h),
+                        decoration: BoxDecoration(
+                          color: AppColors.gradientDarkBlue,
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: appText(
+                          AppStrings.convert,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.white,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
 
                 SizedBox(height: 10.h),
 
-                /// --- List of Plans ---
+                /// --- List of Plans (Same UI) ---
                 Obx(() {
                   return Column(
                     children: List.generate(5, (index) {
@@ -135,13 +227,17 @@ class SelectPlanSheet extends StatelessWidget {
                                   controller.selectedPlanIndex.value = value!;
                                 },
                               ),
-                              // the content will be get fromt the api
-                              appText("Pay INR 100 for 570 Days",
-                                  fontSize: 14.sp, fontWeight: FontWeight.w600),
+                              appText(
+                                "Pay INR 100 for 570 Days",
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
                               Spacer(),
                               Container(
                                 padding: EdgeInsets.symmetric(
-                                    horizontal: 8.w, vertical: 4.h),
+                                  horizontal: 8.w,
+                                  vertical: 4.h,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppColors.yellow,
                                   borderRadius: BorderRadius.circular(8.r),
@@ -152,9 +248,11 @@ class SelectPlanSheet extends StatelessWidget {
                                       : AppStrings.recommented,
                                   style: TextStyle(fontSize: 10.sp),
                                 ),
-                              )
+                              ),
                             ],
                           ),
+
+                          /// Details under each plan
                           Padding(
                             padding: EdgeInsets.only(left: 45.w),
                             child: Column(
@@ -164,14 +262,18 @@ class SelectPlanSheet extends StatelessWidget {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    appText(AppStrings.equivalent_time,
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.grey),
-                                    appText("570 ${AppStrings.days}",
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.grey),
+                                    appText(
+                                      AppStrings.equivalent_time,
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.grey,
+                                    ),
+                                    appText(
+                                      "570 ${AppStrings.days}",
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.grey,
+                                    ),
                                   ],
                                 ),
                                 Row(
@@ -179,40 +281,48 @@ class SelectPlanSheet extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     appText(
-                                        "${AppStrings.start_on} 11 Nov 2025",
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.grey),
-                                    appText("${AppStrings.end_on} 13 May 2026",
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w400,
-                                        color: AppColors.grey),
+                                      "${AppStrings.start_on} 11 Nov 2025",
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.grey,
+                                    ),
+                                    appText(
+                                      "${AppStrings.end_on} 13 May 2026",
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.grey,
+                                    ),
                                   ],
                                 ),
                               ],
                             ),
                           ),
+
                           Divider(),
                         ],
                       );
                     }),
                   );
                 }),
+
                 SizedBox(height: 15.h),
 
                 /// --- Final Selected Button ---
                 appButton(
-                    onTap: () {},
-                    buttonColor: AppColors.primaryColor,
-                    width: 170.w,
-                    height: 40.h,
-                    borderRadius: BorderRadius.circular(8.r),
-                    child: Center(
-                      child: appText(AppStrings.selected,
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.white),
-                    ))
+                  onTap: () {},
+                  buttonColor: AppColors.primaryColor,
+                  width: 170.w,
+                  height: 40.h,
+                  borderRadius: BorderRadius.circular(8.r),
+                  child: Center(
+                    child: appText(
+                      AppStrings.selected,
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.white,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
