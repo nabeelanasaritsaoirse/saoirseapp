@@ -384,20 +384,20 @@ class OrderDetailsScreen extends StatelessWidget {
 
             appButton(
               onTap: () {
-                 Get.to(() => BookingConfirmationScreen());
-                // orderController.placeOrder(
-                //   productId: "6921572684a050c6a94f89da",
-                //   paymentOption: "daily",
-                //   totalDays: 30,
-                //   deliveryAddress: {
-                //     "name": addresses.name,
-                //     "phoneNumber": addresses.phoneNumber,
-                //     "addressLine1": addresses.addressLine1,
-                //     "city": addresses.city,
-                //     "state": addresses.state,
-                //     "pincode": addresses.pincode,
-                //   },
-                // );
+                 
+                orderController.placeOrder(
+                  productId: "6921572684a050c6a94f89da",
+                  paymentOption: "daily",
+                  totalDays: 30,
+                  deliveryAddress: {
+                    "name": addresses.name,
+                    "phoneNumber": addresses.phoneNumber,
+                    "addressLine1": addresses.addressLine1,
+                    "city": addresses.city,
+                    "state": addresses.state,
+                    "pincode": addresses.pincode,
+                  },
+                );
               },
               width: double.infinity,
               height: 45.h,

@@ -1,8 +1,12 @@
 import 'dart:developer';
-import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:saoirse_app/models/razorpay_payment_response.dart';
+import 'package:saoirse_app/screens/booking_confirmation/booking_confirmation_screen.dart';
+import 'package:saoirse_app/services/payment_service.dart';
 import 'package:saoirse_app/widgets/app_loader.dart';
+
 import 'package:saoirse_app/widgets/app_snackbar.dart';
 
 class RazorpayController extends GetxController {
@@ -28,52 +32,48 @@ class RazorpayController extends GetxController {
     }
   }
 
-  Future<void> openTestCheckout() async {
+  // 🚀 Use this for REAL PAYMENT (orderId, amount, key from API)
+  void openCheckout({
+    required String orderId,
+    required int amount, // already in paise
+    required String key,
+  }) {
     try {
-      log("Opening Razorpay Checkout...");
-
-      // Show loader
-      appLoader();
-      await Future.delayed(const Duration(milliseconds: 150));
+      log("Opening Razorpay Checkout with Order ID: $orderId");
 
       final options = {
-        'key': 'rzp_live_rqOS9AG74ADgsB',
-        'amount': 5000,
-        "order_id": "order_Rin4b9mnKPURak",
+        'key': "rzp_live_rqOS9AG74ADgsB",
+        'amount': amount,
+        'order_id': orderId,
         'currency': 'INR',
-        'name': 'Test Payment',
-        'description': 'Testing Razorpay Integration',
+        'name': 'Epielio',
+        'description': 'Product EMI Payment',
         'prefill': {
           'contact': '9876543210',
           'email': 'test@gmail.com',
         },
       };
 
-      log("Razorpay Checkout Options: $options");
+      //  final options = {
+      //   'key': '',
+      //   'amount': '',
+      //   "order_id": "",
+      //   'currency': 'INR',
+      //   'name': 'Test Payment',
+      //   'description': 'Testing Razorpay Integration',
+      //   'prefill': {
+      //     'contact': '9876543210',
+      //     'email': 'test@gmail.com',
+      //   },
+      // };
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        try {
-          razorpay.open(options);
-          log("Razorpay Checkout Opened Successfully");
-        } catch (e, s) {
-          log("ERROR opening Razorpay: $e");
-          log("STACKTRACE: $s");
-          appSnackbar(error: true, content: "Failed to open payment window");
-        }
-      });
+      log("Razorpay Options = $options");
 
-      // Ensure loader closes after opening
-      Future.delayed(const Duration(milliseconds: 700), () {
-        if (Get.isDialogOpen ?? false) {
-          Get.back();
-          log("Loader closed");
-        }
-      });
+      razorpay.open(options);
     } catch (e, s) {
-      log("Exception in openTestCheckout(): $e");
+      log("ERROR opening Razorpay: $e");
       log("STACKTRACE: $s");
-      appSnackbar(
-          error: true, content: "Something went wrong while starting payment.");
+      appSnackbar(error: true, content: "Could not open payment window");
     }
   }
 
@@ -81,14 +81,21 @@ class RazorpayController extends GetxController {
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     log("PAYMENT SUCCESS");
-    log(response.data.toString());
+
     log("Payment ID: ${response.paymentId}");
     log("Order ID: ${response.orderId}");
     log("Signature: ${response.signature}");
 
-    appSnackbar(
-      content: "Payment Success: ${response.paymentId}",
+    appSnackbar(content: "Payment Success: ${response.paymentId}");
+
+      final paymentData = RazorpayPaymentResponse(
+      orderId: response.orderId ?? "",
+      paymentId: response.paymentId ?? "",
+      signature: response.signature ?? "",
     );
+
+    _verifyPayment(paymentData);
+    
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
@@ -110,6 +117,41 @@ class RazorpayController extends GetxController {
     );
   }
 
+
+   Future<void> _verifyPayment(RazorpayPaymentResponse data) async {
+    try {
+      appLoader();
+
+      final body = {
+        "orderId": data.orderId,
+        "paymentMethod": "RAZORPAY",
+        "razorpayOrderId": data.orderId,
+        "razorpayPaymentId": data.paymentId,
+        "razorpaySignature": data.signature,
+      };
+
+      log("VERIFY PAYMENT BODY => $body");
+
+      final response = await PaymentService.processPayment(body);
+
+      if (Get.isDialogOpen ?? false) Get.back();
+
+      if (response != null && (response["success"] == true || response["status"] == "success")) {
+        // Payment is verified
+        Get.offAll(() => BookingConfirmationScreen());
+      } else {
+        appSnackbar(
+            error: true,
+            content:
+                response?["message"] ?? "Payment verification failed! Please contact support.");
+      }
+    } catch (e, s) {
+      if (Get.isDialogOpen ?? false) Get.back();
+      log("Verify Payment Error: $e\n$s");
+      appSnackbar(error: true, content: "Payment verification failed unexpectedly!");
+    }
+  }
+
   @override
   void onClose() {
     razorpay.clear();
@@ -117,3 +159,6 @@ class RazorpayController extends GetxController {
     super.onClose();
   }
 }
+
+
+
