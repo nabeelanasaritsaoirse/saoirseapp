@@ -26,7 +26,6 @@ class AppURLs {
   static String FETCH_REFERRAL = BASE_API + "/api/referral/list/";
 
   // Wishlist api
-
   static String GET_WISHLIST = BASE_API + "api/wishlist";
   static String GET_ITEM_COUNT = BASE_API + "api/wishlist/count";
   static String CHECK_IF_WISHLIST = BASE_API + "api/wishlist/check";
@@ -65,4 +64,9 @@ class AppURLs {
 
   // Payment Api
   static String PAYMENT_PROCESS_API = BASE_API + "api/payments/process";
+
+  // Notifications
+  static String NOTIFICATIONS = BASE_API + "api/notifications";
+  static String UNREAD_NOTIFICATIONS =
+      BASE_API + "api/notifications/unread-count";
 }
