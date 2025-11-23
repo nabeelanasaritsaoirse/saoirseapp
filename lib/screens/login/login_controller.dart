@@ -6,6 +6,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/services/appsflyer_service.dart';
 
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
@@ -28,13 +29,23 @@ class LoginController extends GetxController {
   void onInit() {
     super.onInit();
     fetchCountryCode();
+    loadReferralCode();
+  }
+
+  void loadReferralCode() {
+    final referralFromDeepLink = AppsFlyerService.instance.referralFromDeepLink;
+    final storedReferral = storage.read('pending_referral_code');
+
+    final referralCode = referralFromDeepLink ?? storedReferral;
+
+    if (referralCode != null && referralCode.isNotEmpty) {
+      referrelController.text = referralCode;
+    }
   }
 
   Future<void> fetchCountryCode() async {
     try {
-      final response = await http
-          .get(Uri.parse("http://ip-api.com/json"))
-          .timeout(Duration(seconds: 3));
+      final response = await http.get(Uri.parse("http://ip-api.com/json")).timeout(Duration(seconds: 3));
 
       if (response.statusCode == 200) {
         final body = json.decode(response.body);
@@ -159,10 +170,7 @@ class LoginController extends GetxController {
           "referral": referralCode ?? "",
           "deviceToken": deviceToken ?? "",
         },
-        headers: {
-          "Authorization": "Bearer ${storage.read(AppConst.ACCESS_TOKEN)}",
-          "Content-Type": "application/json"
-        },
+        headers: {"Authorization": "Bearer ${storage.read(AppConst.ACCESS_TOKEN)}", "Content-Type": "application/json"},
         onSuccess: (json) => json,
       );
 
