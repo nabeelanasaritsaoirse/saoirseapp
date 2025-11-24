@@ -42,7 +42,7 @@ class WishlistScreen extends StatelessWidget {
               crossAxisCount: 2,
               crossAxisSpacing: 12.w,
               mainAxisSpacing: 12.h,
-              childAspectRatio: 0.77,
+              childAspectRatio: 0.72,
             ),
             itemBuilder: (context, index) {
               final product = controller.wishlistProducts[index];
