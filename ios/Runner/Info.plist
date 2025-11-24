@@ -77,5 +77,15 @@
 	<!-- Gallery Permissions for images -->
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>EPI requires access to your photo library to select images.</string>
+	<!-- <key>NSUserTrackingUsageDescription</key>
+	<string>This identifier will be used to deliver personalized ads.</string>
+	<dict>
+    	<key>CFBundleTypeRole</key>
+    	<string>Editor</string>
+    	<key>CFBundleURLSchemes</key>
+    	<array>
+      		<string>inviteapp.onelink.me</string>
+    	</array>
+  	</dict> -->
 </dict>
 </plist>

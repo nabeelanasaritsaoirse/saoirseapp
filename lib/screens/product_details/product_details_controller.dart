@@ -12,9 +12,12 @@ import '../../widgets/select_plan_sheet.dart';
 
 class ProductDetailsController extends GetxController {
   final String productId;
-  final String id;
+  final String? id;
 
-  ProductDetailsController(this.productId, this.id);
+  ProductDetailsController({
+    required this.productId,
+    this.id,
+  });
 
   final WishlistService wishlistService = WishlistService();
   final ProductService productService = ProductService();
@@ -56,13 +59,21 @@ class ProductDetailsController extends GetxController {
     }
   }
 
-  // CHECK IF PRODUCT IS IN WISHLIST
   Future<void> checkIfInWishlist() async {
-    final exists = await wishlistService.checkWishlist(id);
-    isFavorite.value = exists;
+    // ✅ Check if id is null before using it
+    if (id == null) {
+      log("ID is null, skipping wishlist check");
+      return;
+    }
+
+    try {
+      final exists = await wishlistService.checkWishlist(id!);
+      isFavorite.value = exists;
+    } catch (e) {
+      log("ERROR CHECKING WISHLIST: $e");
+    }
   }
 
-  // TOGGLE WISHLIST
   Future<void> toggleFavorite() async {
     final productData = product.value;
 
@@ -71,8 +82,14 @@ class ProductDetailsController extends GetxController {
       return;
     }
 
+    // Check if id is null
+    if (id == null) {
+      appSnackbar(content: "Product ID not available", error: true);
+      return;
+    }
+
     if (isFavorite.value) {
-      final removed = await wishlistService.removeFromWishlist(id);
+      final removed = await wishlistService.removeFromWishlist(id!);
 
       if (removed) {
         isFavorite(false);
@@ -84,7 +101,7 @@ class ProductDetailsController extends GetxController {
       return;
     }
 
-    final added = await wishlistService.addToWishlist(id);
+    final added = await wishlistService.addToWishlist(id!);
 
     if (added) {
       isFavorite(true);

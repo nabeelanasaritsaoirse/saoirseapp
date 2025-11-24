@@ -25,33 +25,12 @@ class ReferralController extends GetxController {
   void onInit() {
     super.onInit();
     loadReferralFromStorage();
-    // fetchReferralData();
+    fetchReferralData();
   }
 
   // ---------------------------------------------------------------------------
   // Fetch Referral Code
   // ---------------------------------------------------------------------------
-
-  Future<void> getReferralCode() async {
-    try {
-      isLoading(true);
-
-      final response = await _referralService.fetchReferralCode();
-
-      if (response != null && response.success) {
-        referralCode.value = response.referralCode;
-      } else {
-        appSnackbar(
-          error: true,
-          content: response?.message ?? "Failed to fetch referral code",
-        );
-      }
-    } catch (e) {
-      appSnackbar(error: true, content: e.toString());
-    } finally {
-      isLoading(false);
-    }
-  }
 
   Future<void> loadReferralFromStorage() async {
     try {
@@ -63,6 +42,17 @@ class ReferralController extends GetxController {
     } catch (e) {
       log("Error reading referral code from storage: $e");
     }
+  }
+
+  //---------------------------------------------------------------------------
+  // Referral Link From Appfyer Onelink with referral code(Defferred Deep Linking)
+  //---------------------------------------------------------------------------
+
+  String _referralLink() {
+    const base =
+        'https://inviteapp.onelink.me/VDIY?af_xp=referral&pid=User_invite&c=referral';
+
+    return '$base&deep_link_value=${referralCode.value}';
   }
 
   // ---------------------------------------------------------------------------
@@ -100,8 +90,9 @@ class ReferralController extends GetxController {
   // ---------------------------------------------------------------------------
 
   Future<void> shareToWhatsApp() async {
-    final message =
-        "Hey! Join me on this app using my referral code: ${referralCode.value}";
+    final link = _referralLink();
+
+    final message = "Hey! Join me on this app using my referral code: $link";
 
     final whatsappUrl = "whatsapp://send?text=${Uri.encodeComponent(message)}";
 
@@ -116,7 +107,9 @@ class ReferralController extends GetxController {
   }
 
   Future<void> shareToFacebook() async {
-    final message = "Join me using my referral code: ${referralCode.value}";
+    final link = _referralLink();
+
+    final message = "Hey! Join me on this app using my referral code: $link";
 
     final fbUrl =
         "fb://faceweb/f?href=https://facebook.com/sharer/sharer.php?u=${Uri.encodeComponent(message)}";
@@ -132,7 +125,9 @@ class ReferralController extends GetxController {
   }
 
   Future<void> shareToTelegram() async {
-    final message = "Join me using my referral code: ${referralCode.value}";
+    final link = _referralLink();
+
+    final message = "Hey! Join me on this app using my referral code: $link";
 
     final telegramUrl = "tg://msg?text=${Uri.encodeComponent(message)}";
 
@@ -147,7 +142,9 @@ class ReferralController extends GetxController {
   }
 
   Future<void> shareToTwitter() async {
-    final message = "Join me using my referral code: ${referralCode.value}";
+    final link = _referralLink();
+
+    final message = "Hey! Join me on this app using my referral code: $link";
 
     final twitterUrl = "twitter://post?message=${Uri.encodeComponent(message)}";
 
@@ -162,8 +159,10 @@ class ReferralController extends GetxController {
   }
 
   Future<void> shareToGmail() async {
+    final link = _referralLink();
+
     final subject = "Join me on this app!";
-    final body = "Hey! Use my referral code: ${referralCode.value}";
+    final body = "Hey! Use my referral code: $link";
 
     if (Platform.isAndroid) {
       try {
@@ -195,7 +194,9 @@ class ReferralController extends GetxController {
   }
 
   Future<void> shareMore() async {
-    final message = "Join me using my referral code: ${referralCode.value}";
+    final link = _referralLink();
+
+    final message = "Hey! Join me on this app using my referral code: $link";
 
     final smsUrl = "sms:?body=${Uri.encodeComponent(message)}";
 

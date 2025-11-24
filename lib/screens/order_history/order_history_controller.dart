@@ -1,44 +1,36 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../models/order_model.dart';
+import '../../models/order_history_model.dart';
+import '../../services/order_history_service.dart';
 
 class OrderHistoryController extends GetxController {
-  var orders = <OrderModel>[].obs;
+  final OrderHistoryService service = OrderHistoryService();
+
+  RxBool isLoading = false.obs;
+  RxList<OrderHistoryItem> orders = <OrderHistoryItem>[].obs;
 
   @override
   void onInit() {
     super.onInit();
+    fetchOrderHistory();
+  }
 
-    //--------Temporary Data--------
-    orders.value = [
-      OrderModel(
-        id: 'IKD384',
-        name: 'Iphone 12',
-        color: 'Red',
-        storage: '512GB',
-        price: 53000,
-        qty: 1,
-        image: 'assets/images/iphone_red.png',
-        dailyPlan: '₹100/120 Days',
-        status: 'Investing',
-        openDate: '30/10/2025',
-        closeDate: '30/10/2027',
-        invested: 5100,
-      ),
-      OrderModel(
-        id: 'IKD385',
-        name: 'Iphone 12',
-        color: 'Red',
-        storage: '512GB',
-        price: 53000,
-        qty: 1,
-        image: 'assets/images/iphone_red.png',
-        dailyPlan: '₹100/120 Days',
-        status: 'Investing',
-        openDate: '30/10/2025',
-        closeDate: '30/10/2027',
-        invested: 5100,
-      ),
-    ];
+  //---------FETCH ORDER HISTORY----------------//
+
+  Future<void> fetchOrderHistory() async {
+    try {
+      isLoading.value = true;
+
+      final response = await service.fetchOrders();
+
+      if (response != null && response.success) {
+        orders.value = response.orders;
+      }
+    } catch (e) {
+      debugPrint("Error fetching order history: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

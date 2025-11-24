@@ -23,7 +23,7 @@ class AppStrings {
   static String onboard_note = "INVEST SMALL, DREAM BIG, \nOWN IT";
 
   // Notification
-  static String notification_titile = "Notification";
+  static String notification_titile = "Notifications";
 
   // Wallet Screen
   static String wallet_title = "My Wallet";
@@ -46,6 +46,9 @@ class AppStrings {
   static String no_popular_products = 'No popular products available';
   static String no_best_seller_products = "No products available";
   static String no_trending_products = "No Trending products available";
+  static String investment_label = "My Investment Status";
+  static String balance = "Balance";
+  static String days_left = "Days Left";
 
   // Product Details page
   static String freeShiping = "Free shipping";

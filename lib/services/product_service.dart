@@ -9,6 +9,7 @@ import 'api_service.dart';
 
 class ProductService {
   final token = storage.read(AppConst.ACCESS_TOKEN);
+
   Future<ProductDetailsData?> fetchProductDetails(String productId) async {
     final url = "${AppURLs.PRODUCT_DETAILS_API}$productId";
 
@@ -24,9 +25,15 @@ class ProductService {
   }
 
   // Fetch productslisting with pagination
-  Future<ProductListResponse?> getProducts(int page, int limit) async {
+  Future<ProductListResponse?> getProducts(
+    int page,
+    int limit, {
+    String? search,
+  }) async {
     try {
-      final url = "${AppURLs.PRODUCTS_LISTING}?page=$page&limit=$limit";
+      final query =
+          search != null && search.isNotEmpty ? "&search=$search" : "";
+      final url = "${AppURLs.PRODUCTS_LISTING}?page=$page&limit=$limit$query";
 
       print("GET PRODUCTS: $url");
 

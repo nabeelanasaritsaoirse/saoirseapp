@@ -11,9 +11,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
 import 'l10n/app_localizations.dart';
-import 'screens/notification/notification_controller.dart';
 import 'screens/splash/splash_screen.dart';
 import 'services/api_service.dart';
+import 'services/appsflyer_service.dart';
 
 //storage instance
 GetStorage storage = GetStorage();
@@ -21,6 +21,7 @@ GetStorage storage = GetStorage();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  await AppsFlyerService.instance.init();
   Platform.isIOS
       ? await Firebase.initializeApp(
           options: const FirebaseOptions(
@@ -39,7 +40,6 @@ Future<void> main() async {
 
   String? lang = storage.read('language') ?? 'en';
   Locale locale = Locale(lang);
-  Get.put(NotificationController(), permanent: true);
 
   runApp(MyApp(locale: locale));
 }

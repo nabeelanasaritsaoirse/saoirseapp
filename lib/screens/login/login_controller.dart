@@ -11,6 +11,7 @@ import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
 import '../../main.dart';
 import '../../services/api_service.dart';
+import '../../services/appsflyer_service.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/app_snackbar.dart';
 import '../dashboard/dashboard_screen.dart';
@@ -28,6 +29,18 @@ class LoginController extends GetxController {
   void onInit() {
     super.onInit();
     fetchCountryCode();
+    loadReferralCode();
+  }
+
+  void loadReferralCode() {
+    final referralFromDeepLink = AppsFlyerService.instance.referralFromDeepLink;
+    final storedReferral = storage.read('pending_referral_code');
+
+    final referralCode = referralFromDeepLink ?? storedReferral;
+
+    if (referralCode != null && referralCode.isNotEmpty) {
+      referrelController.text = referralCode;
+    }
   }
 
   Future<void> fetchCountryCode() async {

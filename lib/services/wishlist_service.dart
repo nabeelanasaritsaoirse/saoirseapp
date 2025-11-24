@@ -14,7 +14,7 @@ class WishlistService {
   // ----------------------------------------------------------
   Future<WishlistResponse?> fetchWishlist() async {
     final token = await _token();
-    final url = "https://api.epielio.com/api/wishlist";
+    final url = AppURLs.GET_WISHLIST;
     return APIService.getRequest<WishlistResponse>(
       url: url,
       headers: {"Authorization": "Bearer $token"},
@@ -28,10 +28,13 @@ class WishlistService {
   Future<int?> getWishlistCount() async {
     final token = await _token();
     final url = AppURLs.GET_ITEM_COUNT;
+
     return APIService.getRequest<int>(
       url: url,
       headers: {"Authorization": "Bearer $token"},
-      onSuccess: (json) => json["count"] ?? 0,
+      onSuccess: (json) {
+        return json["data"]?["count"] ?? 0;
+      },
     );
   }
 

@@ -11,6 +11,7 @@ import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/investment_status_card.dart';
 import '../../widgets/product_card.dart';
 import '../my_wallet/my_wallet.dart';
 import '../notification/notification_controller.dart';
@@ -28,8 +29,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   HomeController homeController = Get.put(HomeController());
-  final NotificationController notificationController =
-      Get.find<NotificationController>();
+  NotificationController notificationController =
+      Get.put(NotificationController());
 
   // Refactored Icon box
 
@@ -47,47 +48,17 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: CustomAppBar(
         showLogo: true,
         actions: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              IconBox(
-                image: AppAssets.notification,
-                padding: 3.w,
-                onTap: () {
-                  Get.to(() => NotificationScreen());
-                },
-              ),
-
-              /// BADGE ONLY IF unreadCount > 0
-              Obx(() {
-                final count =
-                    Get.find<NotificationController>().unreadCount.value;
-                if (count == 0) return const SizedBox();
-
-                return Positioned(
-                  right: -2,
-                  top: -2,
-                  child: Container(
-                    padding: EdgeInsets.all(4.r),
-                    decoration: BoxDecoration(
-                      color: AppColors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      count > 9 ? "9+" : count.toString(),
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontSize: 9.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ],
-          ),
+          IconBox(
+              image: AppAssets.notification,
+              padding: 3.w,
+              onTap: () => Get.to(NotificationScreen())),
           SizedBox(width: 8.w),
-          IconBox(image: AppAssets.search, padding: 7.w, onTap: () {}),
+          IconBox(
+              image: AppAssets.search,
+              padding: 7.w,
+              onTap: () {
+                Get.to(() => const ProductListing());
+              }),
           SizedBox(width: 8.w),
           IconBox(
               image: AppAssets.wallet,
@@ -271,6 +242,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SizedBox(height: 10.h),
+
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: InvestmentStatusCard(
+                balanceAmount: 12000,
+                daysLeft: 64,
+                progress: 0.45,
+                onPayNow: () {},
+              ),
+            ),
 
             // Most Popular Product Section
             Column(

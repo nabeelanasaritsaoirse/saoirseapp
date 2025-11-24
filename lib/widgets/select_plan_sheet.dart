@@ -160,7 +160,6 @@ class SelectPlanSheet extends StatelessWidget {
                             double.tryParse(amountController.text.trim()) ??
                                 0.0;
 
-                        // VALIDATION
                         if (days <= 0 || amount <= 0) {
                           appSnackbar(
                               error: true,
@@ -182,13 +181,17 @@ class SelectPlanSheet extends StatelessWidget {
                               error: true,
                               title: "Invalid Amount",
                               content: "Amount cannot be more than 50");
-
                           return;
                         }
 
-                        controller.setCustomPlan(days, amount);
+                        // SAVE PLAN IN PRODUCT CONTROLLER
+                        final productCtrl =
+                            Get.find<ProductDetailsController>();
+                        productCtrl.customDays.value = days;
+                        productCtrl.customAmount.value = amount;
 
-                        Get.to(SelectAddress());
+                        Get.to(() =>
+                            SelectAddress(product: productCtrl.product.value));
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(

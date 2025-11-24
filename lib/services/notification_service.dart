@@ -1,9 +1,8 @@
 // ignore_for_file: avoid_print
 
-import 'package:saoirse_app/main.dart';
-
-import '../constants/app_constant.dart' show AppConst;
+import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
+import '../main.dart';
 import '../models/notification_response.dart';
 import '../services/api_service.dart';
 

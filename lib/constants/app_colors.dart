@@ -11,6 +11,7 @@ class AppColors {
   static const Color white = Colors.white;
   static const Color transparentWhite = Color.fromRGBO(255, 255, 255, 0.5);
   static const Color black = Colors.black;
+  static const Color white70 = Colors.white70;
   static const Color black54 = Colors.black54;
   static const Color black87 = Colors.black87;
   static const Color black26 = Colors.black26;
@@ -30,7 +31,7 @@ class AppColors {
   static final Color lightBlack = Colors.black.withValues(alpha: 0.15);
   static const Color green = Colors.green;
   static const Color red = Colors.red;
-   static const Color blueshade = Color.fromARGB(255, 175, 214, 246);
+  static const Color blueshade = Color.fromARGB(255, 175, 214, 246);
   static const Color blue = Colors.blue;
   static const Color mediumBlue = Color.fromARGB(255, 29, 16, 211);
   static const Color skyBlue = Color(0xFF9BBBFC);
@@ -44,4 +45,5 @@ class AppColors {
   static const Color gradientBlue = Color(0xFF4D0A8E);
   static const Color gradientPink = Color(0xFFCE048C);
   static const Color gradientDarkBlue = Color(0xFF000062);
+  static const Color whiteGradient = Color(0x40FFFFFF);
 }
