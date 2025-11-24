@@ -24,7 +24,7 @@ class InvestmentStatusCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(20.r),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 13.h),
       decoration: BoxDecoration(
         gradient: AppGradients.progressIndicatoryGradient,
         borderRadius: BorderRadius.circular(20.r),
