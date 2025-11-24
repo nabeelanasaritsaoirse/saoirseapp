@@ -33,48 +33,44 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Get.to(() => ProductDetailsScreen(
-            productId: productId,
-            id: id,
-          )),
-      child: AspectRatio(
-        aspectRatio: 3 / 4,
-        child: Container(
-          width: 160.w,
-          margin: margin ?? EdgeInsets.only(right: 10.w),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(12.r),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowColor,
-                blurRadius: 6.r,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ------------------ PRODUCT IMAGE + HEART ------------------
-              Stack(
+      onTap: () => Get.to(
+        () => ProductDetailsScreen(productId: productId, id: id),
+      ),
+      child: Container(
+        width: 150.w,
+        height: 220.h, // 🔥 FIXED, RESPONSIVE SAFE HEIGHT
+        margin: margin ?? EdgeInsets.only(right: 10.w),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowColor,
+              blurRadius: 6.r,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// ---------------- IMAGE AREA ----------------
+            SizedBox(
+              height: 120.h,
+              child: Stack(
                 children: [
-                  // Product Image
                   Container(
-                    height: 120.h,
-                    margin:
-                        EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.h),
+                    margin: EdgeInsets.all(6.w),
                     decoration: BoxDecoration(
                       color: AppColors.lightGrey,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: Center(
                       child: image.startsWith('http')
                           ? Image.network(
                               image,
-                              width: 80.w,
-                              height: 80.h,
-                              fit: BoxFit.cover,
+                              fit: BoxFit.contain,
                               errorBuilder: (_, __, ___) => Icon(
                                 Icons.broken_image,
                                 size: 40.sp,
@@ -83,72 +79,70 @@ class ProductCard extends StatelessWidget {
                             )
                           : Image.asset(
                               image,
-                              width: 80.w,
-                              height: 80.h,
-                              fit: BoxFit.cover,
+                              fit: BoxFit.contain,
                             ),
                     ),
                   ),
-
-                  // ------------------ HEART ICON BUTTON ------------------
                   Positioned(
-                    top: 8.h,
-                    right: 8.w,
+                    top: 6,
+                    right: 6,
                     child: GestureDetector(
-                      behavior: HitTestBehavior
-                          .opaque, // ← prevents InkWell from triggering
                       onTap: onFavoriteTap,
                       child: Container(
-                        width: 28.w,
-                        height: 28.h,
+                        width: 26.w,
+                        height: 26.w,
                         decoration: const BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           isFavorite ? Icons.favorite : Icons.favorite_border,
-                          size: 16.sp,
-                          color: isFavorite ? AppColors.red : AppColors.grey,
+                          size: 14.sp,
+                          color: isFavorite ? Colors.red : Colors.grey,
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
+            ),
 
-              // ------------------ TEXT INFO ------------------
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    appText(
-                      name,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textBlack,
-                      textAlign: TextAlign.left,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 2.h),
-                    appText(
-                      brand,
-                      fontSize: 10.sp,
-                      color: AppColors.grey,
-                      maxLines: 1,
-                    ),
-                    SizedBox(height: 2.h),
-                    appText(
-                      "₹ $price",
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ],
-                ),
+            /// ---------------- TEXT AREA ----------------
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 4.h),
+                  appText(
+                    name,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w700,
+                    textAlign: TextAlign.left,
+                    height: 1.2,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 2.h),
+                  appText(
+                    brand,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 10.sp,
+                    color: AppColors.grey,
+                    textAlign: TextAlign.left,
+                  ),
+                  SizedBox(height: 4.h),
+                  appText(
+                    "₹ $price",
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textBlack,
+                  )
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

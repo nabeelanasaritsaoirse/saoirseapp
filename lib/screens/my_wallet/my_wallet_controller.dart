@@ -1,12 +1,17 @@
+// ignore_for_file: avoid_print
+
 import 'dart:developer';
 
 import 'package:get/get.dart';
-import '../../models/wallet_response.dart';
+import '../../models/wallet_response.dart' hide WalletTransaction;
+import '../../models/wallet_transcation_model.dart';
 import '/services/wallet_service.dart';
 
 class MyWalletController extends GetxController {
   final WalletService serviceData = WalletService();
 
+  var transactions = <WalletTransaction>[].obs;
+  var summary = Rxn<WalletSummary>();
   var wallet = Rxn<WalletmModels>();
   var isLoading = true.obs;
   var errorMessage = ''.obs;
@@ -14,6 +19,7 @@ class MyWalletController extends GetxController {
   @override
   void onInit() {
     fetchWallet();
+    fetchWalletTransactions();
     super.onInit();
   }
 
@@ -36,6 +42,32 @@ class MyWalletController extends GetxController {
       }
     } catch (e) {
       errorMessage('Something went wrong: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> fetchWalletTransactions() async {
+    try {
+      isLoading(true);
+      errorMessage("");
+
+      print("🔄 Fetching wallet transactions...");
+
+      final response = await serviceData.fetchTransactions();
+
+      if (response == null || !response.success) {
+        errorMessage("Failed to load transactions");
+        return;
+      }
+
+      transactions.assignAll(response.transactions);
+      summary.value = response.summary;
+
+      print("✅ Loaded transactions: ${transactions.length}");
+    } catch (e) {
+      errorMessage("Something went wrong: $e");
+      print("❌ Wallet transaction error: $e");
     } finally {
       isLoading(false);
     }

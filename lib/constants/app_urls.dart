@@ -9,6 +9,7 @@ class AppURLs {
 
   //user details api
   static String USER_UPDATE_API = BASE_API + "api/auth/profiles/";
+  static String PROFILE_UPDATE_API = BASE_API + "api/users/";
 
   // home screen api
   static String POPULAR_PRODUCT_API =
@@ -22,8 +23,8 @@ class AppURLs {
   static String getRefferal_API = BASE_API + "api/referrals/generate-code";
   static String getDashboard_API = BASE_API + "api/referrals/dashboard?userId=";
   static String FRIEND_DETAILS = BASE_API + "api/referral/friend/";
-  static String PRODUCT_DETAILS = BASE_API + "/api/referral/product/";
-  static String FETCH_REFERRAL = BASE_API + "/api/referral/list/";
+  static String PRODUCT_DETAILS = BASE_API + "api/referral/product/";
+  static String FETCH_REFERRAL = BASE_API + "api/referral/list/";
 
   // Wishlist api
   static String GET_WISHLIST = BASE_API + "api/wishlist";
@@ -37,6 +38,7 @@ class AppURLs {
 
   //Wallet api
   static String Wallet = BASE_API + "api/wallet";
+  static String WALLET_TRANSACTIONS = BASE_API + "api/wallet/transactions";
 
   // Category api
   static String CATEGORY_API =
@@ -56,8 +58,22 @@ class AppURLs {
   static String UPDATE_CART = BASE_API + "api/cart/update/";
   static String CLEAR_CART = BASE_API + "api/cart/clear";
 
+  // Address api
+  static String ADDRESS_API = BASE_API + "api/users/";
+
+  // Order api
+  static String CREATE_ORDER_API = BASE_API + "api/orders";
+
+  // Payment Api
+  static String PAYMENT_PROCESS_API = BASE_API + "api/payments/process";
+
   // Notifications
   static String NOTIFICATIONS = BASE_API + "api/notifications";
   static String UNREAD_NOTIFICATIONS =
       BASE_API + "api/notifications/unread-count";
+
+  // Orders History
+  static String ORDER_HISTORY_API = BASE_API + "api/orders/user/history";
+  static String ORDER_DELIVERED_HISTORY_API =
+      BASE_API + "api/orders/user/delivered";
 }

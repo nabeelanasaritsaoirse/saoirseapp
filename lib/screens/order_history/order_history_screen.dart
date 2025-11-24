@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/order_card.dart';
 import 'order_history_controller.dart';
@@ -25,14 +26,28 @@ class OrderHistoryScreen extends StatelessWidget {
 
       //--------------------- BODY -----------------------
       body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(child: appLoader());
+        }
+
+        if (controller.orders.isEmpty) {
+          return Center(
+            child: Text(
+              "No orders found",
+              style: TextStyle(
+                fontSize: 16.sp,
+                color: AppColors.textBlack,
+              ),
+            ),
+          );
+        }
+
         return ListView.builder(
           padding: EdgeInsets.only(top: 7.h),
           itemCount: controller.orders.length,
           itemBuilder: (context, index) {
             final order = controller.orders[index];
-            return OrderCard(
-              order: order,
-            );
+            return OrderCard(order: order);
           },
         );
       }),

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 import '../cart/cart_controller.dart';
+import '../profile/profile_controller.dart';
 
 class DashboardController extends GetxController {
   // Observable index to track current tab
@@ -13,6 +14,10 @@ class DashboardController extends GetxController {
     /// If user goes to Cart tab → refresh cart
     if (index == 3) {
       Get.find<CartController>().fetchCart();
+    }
+
+    if (index == 4) {
+      Get.put(ProfileController()).fetchWishlistCount();
     }
   }
 }

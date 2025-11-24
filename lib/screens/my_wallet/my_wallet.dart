@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:saoirse_app/widgets/app_loader.dart';
-import '/screens/my_wallet/my_wallet_controller.dart';
 
 import '../../constants/app_strings.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
+import 'my_wallet_controller.dart';
 
 class WalletScreen extends StatelessWidget {
   WalletScreen({super.key});
@@ -124,7 +124,7 @@ class WalletScreen extends StatelessWidget {
                               ),
                               SizedBox(height: 3.h),
                               appText(
-                                item.createdAt,
+                                item.status,
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w400,
                               ),

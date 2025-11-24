@@ -14,6 +14,7 @@ import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
 import '../widgets/app_snackbar.dart';
 import '../widgets/app_text.dart';
+
 import 'package:http/http.dart' as http;
 
 class APIService {
@@ -639,5 +640,46 @@ class APIService {
         Get.closeAllSnackbars();
       }
     });
+  }
+
+  static Future<http.Response?> uploadImageRequest({
+    required String url,
+    required String method, // POST / PUT / PATCH
+    required http.MultipartFile file,
+    Map<String, String>? headers,
+    Map<String, String>? body,
+    int timeoutSeconds = 20,
+  }) async {
+    try {
+      var request = http.MultipartRequest(method, Uri.parse(url));
+
+      // Files
+      request.files.add(file);
+
+      // Headers
+      if (headers != null) {
+        request.headers.addAll(headers);
+      }
+
+      // Fields
+      if (body != null) {
+        request.fields.addAll(body);
+      }
+
+      // Send request
+      var streamedResponse = await request.send().timeout(
+            Duration(seconds: timeoutSeconds),
+          );
+
+      var response = await http.Response.fromStream(streamedResponse);
+
+      log("Image Upload Response: ${response.statusCode}");
+      log("Body: ${response.body}");
+
+      return response;
+    } catch (e) {
+      log("UPLOAD ERROR => $e");
+      return null;
+    }
   }
 }
