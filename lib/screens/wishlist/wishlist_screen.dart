@@ -49,6 +49,7 @@ class WishlistScreen extends StatelessWidget {
 
               return ProductCard(
                 productId: product.productId,
+                margin: EdgeInsets.all(0),
                 name: product.name,
                 brand: product.brand.isNotEmpty ? product.brand : "Brand",
                 image:
