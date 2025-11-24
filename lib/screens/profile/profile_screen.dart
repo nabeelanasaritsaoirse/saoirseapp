@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/order_delivered/order_delivered_screen.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -170,9 +171,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: controller.myOrders[index]["icon"]!,
                       title: controller.myOrders[index]["title"]!,
                       onTap: () {
-                        if (index == 0) Get.to(Pendingtrancation());
-                        if (index == 1) Get.to(OrderHistoryScreen());
-                        if (index == 3) Get.to(TransactionHistory());
+                        if (index == 0) {
+                          Get.to(Pendingtrancation());
+                        } else if (index == 1) {
+                          Get.to(OrderHistoryScreen());
+                        } else if (index == 2) {
+                          Get.to(WishlistScreen());
+                        } else if (index == 3) {
+                          Get.to(TransactionHistory());
+                        } else if (index == 4) {
+                          Get.to(OrderDeliveredScreen());
+                        } else {}
                       },
                     );
                   },

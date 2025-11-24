@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_colors.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/order_card.dart';
 import 'order_delivered_controller.dart';
@@ -34,6 +35,18 @@ class OrderDeliveredScreen extends StatelessWidget {
       ),
       //--------------------- BODY -----------------------
       body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(child: appLoader());
+        }
+        if (controller.orders.isEmpty) {
+          return Center(
+            child: appText(
+              "No delivered orders found",
+              fontSize: 16.sp,
+              color: AppColors.textBlack,
+            ),
+          );
+        }
         return ListView.builder(
           padding: EdgeInsets.only(top: 7.h),
           itemCount: controller.orders.length,
