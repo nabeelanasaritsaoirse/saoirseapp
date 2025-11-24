@@ -25,33 +25,14 @@ class ReferralController extends GetxController {
   void onInit() {
     super.onInit();
     loadReferralFromStorage();
-    // fetchReferralData();
+    fetchReferralData();
   }
 
   // ---------------------------------------------------------------------------
   // Fetch Referral Code
   // ---------------------------------------------------------------------------
 
-  Future<void> getReferralCode() async {
-    try {
-      isLoading(true);
 
-      final response = await _referralService.fetchReferralCode();
-
-      if (response != null && response.success) {
-        referralCode.value = response.referralCode;
-      } else {
-        appSnackbar(
-          error: true,
-          content: response?.message ?? "Failed to fetch referral code",
-        );
-      }
-    } catch (e) {
-      appSnackbar(error: true, content: e.toString());
-    } finally {
-      isLoading(false);
-    }
-  }
 
   Future<void> loadReferralFromStorage() async {
     try {

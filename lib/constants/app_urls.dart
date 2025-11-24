@@ -23,8 +23,8 @@ class AppURLs {
   static String getRefferal_API = BASE_API + "api/referrals/generate-code";
   static String getDashboard_API = BASE_API + "api/referrals/dashboard?userId=";
   static String FRIEND_DETAILS = BASE_API + "api/referral/friend/";
-  static String PRODUCT_DETAILS = BASE_API + "/api/referral/product/";
-  static String FETCH_REFERRAL = BASE_API + "/api/referral/list/";
+  static String PRODUCT_DETAILS = BASE_API + "api/referral/product/";
+  static String FETCH_REFERRAL = BASE_API + "api/referral/list/";
 
   // Wishlist api
   static String GET_WISHLIST = BASE_API + "api/wishlist";

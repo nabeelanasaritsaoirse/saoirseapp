@@ -7,39 +7,10 @@ import '../main.dart';
 import '../models/friend_details_response.dart';
 import '../models/product_detiails_response.dart';
 import '../models/referral_response_model.dart';
-import '../models/refferal_model.dart';
+
 import '../services/api_service.dart';
 
 class ReferralService {
-  //  To fetch referral code
-
-  Future<ReferralResponses?> fetchReferralCode() async {
-    final userId = await storage.read(AppConst.USER_ID);
-
-    if (userId == null || userId.isEmpty) {
-      throw Exception("User ID not found. Please log in again.");
-    }
-
-    final url = AppURLs.getRefferal_API;
-
-    return APIService.postRequest<ReferralResponses>(
-      url: url,
-      body: {
-        'userId': userId,
-      },
-      onSuccess: (json) {
-        final referral = ReferralResponses.fromJson(json);
-
-        if (!referral.success) {
-          throw Exception(referral.message);
-        }
-
-        debugPrint("Referral code fetched: ${referral.referralCode}");
-        return referral;
-      },
-    );
-  }
-
   //  To fetch referral User List & Data
 
   Future<ReferralResponse?> fetchReferralResponseFromServer() async {
