@@ -1,10 +1,3 @@
-import 'dart:convert';
-
-WalletmModels walletmModelsFromJson(String str) =>
-    WalletmModels.fromJson(json.decode(str));
-
-String walletmModelsToJson(WalletmModels data) => json.encode(data.toJson());
-
 class WalletmModels {
   bool success;
   String message;
@@ -16,7 +9,7 @@ class WalletmModels {
   int requiredInvestment;
   int availableBalance;
   int totalEarnings;
-  List<dynamic> transactions;
+  List<WalletTransaction> transactions;
 
   WalletmModels({
     required this.success,
@@ -32,31 +25,88 @@ class WalletmModels {
     required this.transactions,
   });
 
-  factory WalletmModels.fromJson(Map<String, dynamic> json) => WalletmModels(
-        success: json["success"],
-        message: json["message"],
-        walletBalance: json["walletBalance"],
-        totalBalance: json["totalBalance"],
-        holdBalance: json["holdBalance"],
-        referralBonus: json["referralBonus"],
-        investedAmount: json["investedAmount"],
-        requiredInvestment: json["requiredInvestment"],
-        availableBalance: json["availableBalance"],
-        totalEarnings: json["totalEarnings"],
-        transactions: List<dynamic>.from(json["transactions"].map((x) => x)),
-      );
+  factory WalletmModels.fromJson(Map<String, dynamic> json) {
+    return WalletmModels(
+      success: json["success"],
+      message: json["message"],
+      walletBalance: json["walletBalance"],
+      totalBalance: json["totalBalance"],
+      holdBalance: json["holdBalance"],
+      referralBonus: json["referralBonus"],
+      investedAmount: json["investedAmount"],
+      requiredInvestment: json["requiredInvestment"],
+      availableBalance: json["availableBalance"],
+      totalEarnings: json["totalEarnings"],
+      transactions: (json["transactions"] as List)
+          .map((e) => WalletTransaction.fromJson(e))
+          .toList(),
+    );
+  }
+}
 
-  Map<String, dynamic> toJson() => {
-        "success": success,
-        "message": message,
-        "walletBalance": walletBalance,
-        "totalBalance": totalBalance,
-        "holdBalance": holdBalance,
-        "referralBonus": referralBonus,
-        "investedAmount": investedAmount,
-        "requiredInvestment": requiredInvestment,
-        "availableBalance": availableBalance,
-        "totalEarnings": totalEarnings,
-        "transactions": List<dynamic>.from(transactions.map((x) => x)),
-      };
+class WalletTransaction {
+  final String id;
+  final String type;
+  final double amount;
+  final String status;
+  final String paymentMethod;
+  final String description;
+  final DateTime createdAt;
+
+  final PaymentDetails paymentDetails;
+
+  /// 🔥 THESE ARE JUST ID STRINGS IN API
+  final String product;
+  final String order;
+
+  WalletTransaction({
+    required this.id,
+    required this.type,
+    required this.amount,
+    required this.status,
+    required this.paymentMethod,
+    required this.description,
+    required this.createdAt,
+    required this.paymentDetails,
+    required this.product,
+    required this.order,
+  });
+
+  factory WalletTransaction.fromJson(Map<String, dynamic> json) {
+    return WalletTransaction(
+      id: json["_id"] ?? "",
+      type: json["type"] ?? "",
+      amount: (json["amount"] ?? 0).toDouble(),
+      status: json["status"] ?? "",
+      paymentMethod: json["paymentMethod"] ?? "",
+      description: json["description"] ?? "",
+      createdAt: DateTime.parse(json["createdAt"]),
+
+      paymentDetails: PaymentDetails.fromJson(json["paymentDetails"]),
+
+      /// ✔ product and order IDs only
+      product: json["product"] ?? "",
+      order: json["order"] ?? "",
+    );
+  }
+}
+
+class PaymentDetails {
+  final String orderId;
+  final int emiNumber;
+  final bool isCommissionProcessed;
+
+  PaymentDetails({
+    required this.orderId,
+    required this.emiNumber,
+    required this.isCommissionProcessed,
+  });
+
+  factory PaymentDetails.fromJson(Map<String, dynamic> json) {
+    return PaymentDetails(
+      orderId: json["orderId"] ?? "",
+      emiNumber: json["emiNumber"] ?? 0,
+      isCommissionProcessed: json["isCommissionProcessed"] ?? false,
+    );
+  }
 }

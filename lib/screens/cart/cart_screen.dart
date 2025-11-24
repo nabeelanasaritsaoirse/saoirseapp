@@ -186,44 +186,52 @@ class CartScreen extends StatelessWidget {
           ),
 
           /// TOTAL + CHECKOUT
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
-            color: AppColors.white,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                /// Total Amount
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    appText(
-                      "Total Amount",
-                      color: AppColors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp,
-                    ),
-                    Obx(() => Text("₹ ${controller.totalAmount}",
-                        style: TextStyle(
-                            fontSize: 14.sp, fontWeight: FontWeight.w700))),
-                  ],
-                ),
+          Obx(() {
+            final hasItems = controller.cartData.value != null &&
+                controller.cartData.value!.products.isNotEmpty;
 
-                appButton(
-                    onTap: () => Get.to(SelectAddress()),
-                    width: 140.w,
-                    height: 35.h,
-                    buttonColor: AppColors.primaryColor,
-                    padding: EdgeInsets.all(0.w),
-                    borderRadius: BorderRadius.circular(10.r),
-                    child: Center(
-                      child: appText(AppStrings.checkout,
-                          color: AppColors.white,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.bold),
-                    ))
-              ],
-            ),
-          ),
+            if (!hasItems) {
+              return const SizedBox(); // hide everything
+            }
+            return Container(
+              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 12.h),
+              color: AppColors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  /// Total Amount
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      appText(
+                        "Total Amount",
+                        color: AppColors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
+                      Obx(() => Text("₹ ${controller.totalAmount}",
+                          style: TextStyle(
+                              fontSize: 14.sp, fontWeight: FontWeight.w700))),
+                    ],
+                  ),
+
+                  appButton(
+                      onTap: () => Get.to(SelectAddress()),
+                      width: 140.w,
+                      height: 35.h,
+                      buttonColor: AppColors.primaryColor,
+                      padding: EdgeInsets.all(0.w),
+                      borderRadius: BorderRadius.circular(10.r),
+                      child: Center(
+                        child: appText(AppStrings.checkout,
+                            color: AppColors.white,
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.bold),
+                      ))
+                ],
+              ),
+            );
+          }),
           Divider(
             height: 2.h,
             color: AppColors.grey.withOpacity(0.1),

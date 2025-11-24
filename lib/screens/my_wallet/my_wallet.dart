@@ -124,7 +124,7 @@ class WalletScreen extends StatelessWidget {
                               ),
                               SizedBox(height: 3.h),
                               appText(
-                                item.createdAt,
+                                item.status,
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w400,
                               ),
