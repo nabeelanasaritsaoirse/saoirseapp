@@ -46,6 +46,9 @@ class AppStrings {
   static String no_popular_products = 'No popular products available';
   static String no_best_seller_products = "No products available";
   static String no_trending_products = "No Trending products available";
+  static String investment_label = "My Investment Status";
+  static String balance = "Balance";
+  static String days_left = "Days Left";
 
   // Product Details page
   static String freeShiping = "Free shipping";

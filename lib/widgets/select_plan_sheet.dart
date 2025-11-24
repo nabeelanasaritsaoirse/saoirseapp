@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/order_details/order_details_controller.dart';
 import 'package:saoirse_app/screens/select_address/select_address.dart';
 import 'package:saoirse_app/widgets/app_snackbar.dart';
 
@@ -153,43 +154,42 @@ class SelectPlanSheet extends StatelessWidget {
 
                     /// Convert Button
                     GestureDetector(
-                      onTap: () {
-                        final int days =
-                            int.tryParse(dayController.text.trim()) ?? 0;
-                        final double amount =
-                            double.tryParse(amountController.text.trim()) ??
-                                0.0;
+                     onTap: () {
+  final int days = int.tryParse(dayController.text.trim()) ?? 0;
+  final double amount = double.tryParse(amountController.text.trim()) ?? 0.0;
 
-                        // VALIDATION
-                        if (days <= 0 || amount <= 0) {
-                          appSnackbar(
-                              error: true,
-                              title: "Invalid Input",
-                              content: "Please enter valid days and amount");
-                          return;
-                        }
+  if (days <= 0 || amount <= 0) {
+    appSnackbar(
+        error: true,
+        title: "Invalid Input",
+        content: "Please enter valid days and amount");
+    return;
+  }
 
-                        if (days > 5) {
-                          appSnackbar(
-                              error: true,
-                              title: "Invalid Days",
-                              content: "Days cannot be more than 5");
-                          return;
-                        }
+  if (days > 5) {
+    appSnackbar(
+        error: true,
+        title: "Invalid Days",
+        content: "Days cannot be more than 5");
+    return;
+  }
 
-                        if (amount > 50) {
-                          appSnackbar(
-                              error: true,
-                              title: "Invalid Amount",
-                              content: "Amount cannot be more than 50");
+  if (amount > 50) {
+    appSnackbar(
+        error: true,
+        title: "Invalid Amount",
+        content: "Amount cannot be more than 50");
+    return;
+  }
 
-                          return;
-                        }
+  // SAVE PLAN IN PRODUCT CONTROLLER
+  final productCtrl = Get.find<ProductDetailsController>();
+  productCtrl.customDays.value = days;
+  productCtrl.customAmount.value = amount;
 
-                        controller.setCustomPlan(days, amount);
+  Get.to(() => SelectAddress(product: productCtrl.product.value));
+},
 
-                        Get.to(SelectAddress());
-                      },
                       child: Container(
                         padding: EdgeInsets.symmetric(
                             horizontal: 18.w, vertical: 12.h),

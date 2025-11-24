@@ -11,6 +11,7 @@ class AppColors {
   static const Color white = Colors.white;
   static const Color transparentWhite = Color.fromRGBO(255, 255, 255, 0.5);
   static const Color black = Colors.black;
+  static const Color white70 = Colors.white70;
   static const Color black54 = Colors.black54;
   static const Color black87 = Colors.black87;
   static const Color black26 = Colors.black26;
@@ -44,4 +45,6 @@ class AppColors {
   static const Color gradientBlue = Color(0xFF4D0A8E);
   static const Color gradientPink = Color(0xFFCE048C);
   static const Color gradientDarkBlue = Color(0xFF000062);
+  static const Color whiteGradient = Color(0x40FFFFFF);
+
 }

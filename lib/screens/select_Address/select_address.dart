@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/order_details/order_details_controller.dart';
+import 'package:saoirse_app/screens/product_details/product_details_controller.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -96,9 +98,25 @@ class SelectAddress extends StatelessWidget {
                   final selectedAddress =
                       controller.addressList[controller.selectedIndex.value];
 
+                  final productCtrl = Get.find<ProductDetailsController>();
+
+                  if (!Get.isRegistered<OrderDetailsController>()) {
+                    Get.put(OrderDetailsController());
+                  }
+
+                  final orderCtrl = Get.find<OrderDetailsController>();
+
+                 
+                  orderCtrl.selectedDays.value = productCtrl.customDays.value;
+                  orderCtrl.selectedAmount.value =
+                      productCtrl.customAmount.value;
+
+                  // Navigate
                   Get.to(() => OrderDetailsScreen(
                         addresses: selectedAddress,
-                        product: product!,
+                        product: product,
+                        selectedDays: productCtrl.customDays.value,
+                        selectedAmount: productCtrl.customAmount.value,
                       ));
                 },
               ),

@@ -35,4 +35,27 @@ class AppGradients {
                       Color(0xFF0A0E8C),
                     ],
                   );
+
+  static final LinearGradient progressIndicatoryGradient =  LinearGradient(
+          colors: [
+            Color(0xFF1F2CFF),
+            Color(0xFF4F5DFF),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+
+ static final LinearGradient progressbarGradient =  LinearGradient(
+                            colors: [
+                              Colors.white,
+                              Colors.lightBlue.shade200,
+                            ],
+                          );
+
+static final LinearGradient paynowGradient =  LinearGradient(
+                        colors: [
+                          Color(0xFF000000),
+                          Color(0xFF5A5A5A),
+                        ],
+                      );
 }

@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/investment_status_card.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -234,6 +235,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SizedBox(height: 10.h),
 
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: InvestmentStatusCard(
+                balanceAmount: 12000,
+                daysLeft: 64,
+                progress: 0.45,
+                onPayNow: () {},
+              ),
+            ),
+
             // Most Popular Product Section
             Column(
               children: [
@@ -262,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 12.h),
                 SizedBox(
-                  height: 213.h,
+                  height: 205.h,
                   child: Obx(() {
                     if (homeController.loading.value &&
                         homeController.mostPopularProducts.isEmpty) {
@@ -492,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 12.h),
                 SizedBox(
-                  height: 213.h,
+                  height: 205.h,
                   child: Obx(() {
                     if (homeController.loading.value &&
                         homeController.trendingProducts.isEmpty) {

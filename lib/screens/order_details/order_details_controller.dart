@@ -10,6 +10,8 @@ import '../../widgets/app_snackbar.dart';
 import '../razorpay/razorpay_controller.dart';
 
 class OrderDetailsController extends GetxController {
+  RxInt selectedDays = 0.obs;
+  RxDouble selectedAmount = 0.0.obs;
    String orderid = "";
   Future<void> placeOrder({
     required String productId,
@@ -95,5 +97,11 @@ class OrderDetailsController extends GetxController {
       amount: payment.payment.amount,
       key: payment.payment.keyId,
     );
+  }
+
+   void setCustomPlan(int days, double amount) {
+    selectedDays.value = days;
+    selectedAmount.value = amount;
+    log("CUSTOM PLAN SELECTED → $days Days | ₹$amount");
   }
 }
