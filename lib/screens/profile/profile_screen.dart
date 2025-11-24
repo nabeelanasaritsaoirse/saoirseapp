@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/order_delivered/order_delivered_screen.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -96,14 +97,8 @@ class ProfileScreen extends StatelessWidget {
 
                       SizedBox(height: 12.h),
 
-                      appText('Albert Dan',
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textBlack,
-                          fontSize: 18.sp),
-                      appText('albert.dan@gmail.com',
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textBlack,
-                          fontSize: 14.sp)
+                      appText('Albert Dan', fontWeight: FontWeight.w700, color: AppColors.textBlack, fontSize: 18.sp),
+                      appText('albert.dan@gmail.com', fontWeight: FontWeight.w400, color: AppColors.textBlack, fontSize: 14.sp)
                     ],
                   ),
                 ),
@@ -151,7 +146,9 @@ class ProfileScreen extends StatelessWidget {
                           Get.to(WishlistScreen());
                         } else if (index == 3) {
                           Get.to(TransactionHistory());
-                        } else {}
+                        } else if (index == 4) {
+                          Get.to(OrderDeliveredScreen());
+                        }else{}
                       },
                     );
                   }),

@@ -1,12 +1,15 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:saoirse_app/dummy/dummy_assets.dart';
+import 'package:saoirse_app/widgets/app_dateformatter.dart';
 
 import '../constants/app_colors.dart';
-import '../models/order_model.dart';
+import '../models/order_history_model.dart';
 import 'app_text.dart';
 
 class OrderCard extends StatelessWidget {
-  final OrderModel order;
+  final OrderHistoryItem order;
 
   const OrderCard({super.key, required this.order});
 
@@ -14,9 +17,16 @@ class OrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     //----------chekking order status for dynamic color---------
     final statusLower = order.status.toLowerCase();
-    final statusColor =
-        statusLower == 'delivered' ? Colors.green[700] : Colors.orange[700];
+    Color statusColor;
 
+    if (statusLower == 'delivered' || statusLower == 'completed') {
+      statusColor = Colors.green[700]!;
+    } else if (statusLower == 'cancelled') {
+      statusColor = Colors.red[700]!;
+    } else {
+      statusColor = Colors.orange[700]!;
+    }
+    //-----------------------------------------------------------
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
       decoration: BoxDecoration(
@@ -45,7 +55,7 @@ class OrderCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.lightGrey,
                     image: DecorationImage(
-                      image: AssetImage(order.image),
+                      image: AssetImage(DummyAssets.mobile),
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -61,21 +71,30 @@ class OrderCard extends StatelessWidget {
                       children: [
                         appText(
                           order.name,
-                          fontSize: 17.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
+                          color: AppColors.textBlack,
+                          maxLines: 2,
+                          textAlign: TextAlign.start
+                        ),
+                        SizedBox(height: 4.h),
+                        appText(
+                          order.color,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
                           color: AppColors.textBlack,
                         ),
                         SizedBox(height: 4.h),
                         appText(
-                          '${order.color}  |  ${order.storage}',
-                          fontSize: 15.sp,
+                          order.storage,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                           color: AppColors.textBlack,
                         ),
                         const SizedBox(height: 6),
                         appText(
-                          '₹ ${order.price.toString()}',
-                          fontSize: 16.sp,
+                          '${order.currency} ${order.price.toString()}',
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                           color: AppColors.textBlack,
                         ),
@@ -112,7 +131,7 @@ class OrderCard extends StatelessWidget {
                       SizedBox(height: 8.h),
                       _textSpan('Order ID : ', order.id),
                       SizedBox(height: 8.h),
-                      _textSpan('Invested : ', '₹ ${order.invested}'),
+                      _textSpan('Invested : ', '${order.currency} ${order.invested}'),
                     ],
                   ),
                 ),
@@ -141,9 +160,9 @@ class OrderCard extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 8.h),
-                    _textSpan('Open : ', order.openDate),
+                    _textSpan('Open : ', DateFormatter.format(order.openDate)),
                     SizedBox(height: 8.h),
-                    _textSpan('Close : ', order.closeDate),
+                    _textSpan('Close : ', DateFormatter.format(order.closeDate)),
                   ],
                 ),
               ],
