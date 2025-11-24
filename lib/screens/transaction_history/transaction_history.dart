@@ -23,7 +23,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.paperColor,
       appBar: CustomAppBar(
         title: AppStrings.transaction_history_label,
         showBack: true,
@@ -62,16 +62,17 @@ class _TransactionHistoryState extends State<TransactionHistory> {
 
     return Container(
       margin: EdgeInsets.only(bottom: 15.h),
-      padding: EdgeInsets.all(16.r),
+      padding: EdgeInsets.all(14.r),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.grey,
+            // ignore: deprecated_member_use
+            color: AppColors.grey.withOpacity(0.2),
             spreadRadius: 1,
             blurRadius: 7,
-            offset: const Offset(0, 3),
+            offset: const Offset(0, 0),
           ),
         ],
       ),
@@ -81,12 +82,14 @@ class _TransactionHistoryState extends State<TransactionHistory> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              appText(
-                productName,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
+              Expanded(
+                child: appText(
+                  productName,
+                  textAlign: TextAlign.start,
+                  maxLines: 2,
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               appText(
                 date,
