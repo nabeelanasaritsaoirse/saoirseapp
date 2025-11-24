@@ -18,7 +18,7 @@ class ProductlistingController extends GetxController {
   var isLoading = false.obs;
   var isMoreLoading = false.obs;
   int page = 1;
-  final int limit = 5;
+  final int limit = 20;
 
   var hasNextPage = true.obs;
 
