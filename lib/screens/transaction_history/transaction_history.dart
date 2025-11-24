@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 import '../../constants/app_strings.dart';
+import '../../models/wallet_transcation_model.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
+import '../my_wallet/my_wallet_controller.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_text.dart';
 
@@ -14,67 +18,47 @@ class TransactionHistory extends StatefulWidget {
 }
 
 class _TransactionHistoryState extends State<TransactionHistory> {
+  final MyWalletController controller = Get.put(MyWalletController());
+
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> data = [
-      {
-        "product": "GUCCI bag",
-        "status": "Successfully",
-        "amount": "₹45,599",
-        "date": "30/10/2025"
-      },
-      {
-        "product": "Boat wear",
-        "status": "Successfully",
-        "amount": "₹8,999",
-        "date": "30/10/2025"
-      },
-      {
-        "product": "Nike air",
-        "status": "unsuccessfully",
-        "amount": "₹12,500",
-        "date": "29/10/2015"
-      },
-      {
-        "product": "Sony Camera",
-        "status": "unsuccessfully",
-        "amount": "₹6,999",
-        "date": "29/10/2025"
-      },
-      {
-        "product": "BioGlow",
-        "status": "Successfully",
-        "amount": "₹999",
-        "date": "29/10/2025"
-      },
-    ];
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
         title: AppStrings.transaction_history_label,
         showBack: true,
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        child: ListView.builder(
-          itemCount: data.length,
-          itemBuilder: (context, index) {
-            final item = data[index];
-            return _transactionCard(
-              item["product"],
-              item["status"],
-              item["amount"],
-              item["date"],
-            );
-          },
-        ),
-      ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(child: appLoader());
+        }
+        if (controller.transactions.isEmpty) {
+          return const Center(
+            child: Text("No transactions found"),
+          );
+        }
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          child: ListView.builder(
+            itemCount: controller.transactions.length,
+            itemBuilder: (context, index) {
+              final item = controller.transactions[index];
+              return _transactionCard(item);
+            },
+          ),
+        );
+      }),
     );
   }
 
-  Widget _transactionCard(
-      String product, String status, String amount, String date) {
-    final bool isFailed = status.toLowerCase() == "unsuccessfully";
+  Widget _transactionCard(WalletTransaction item) {
+    final String productName = item.product?.name ?? "Unknown Product";
+    final String status = item.status;
+    final bool isFailed = status.toLowerCase() == "failed";
+    final String amount = "₹${item.amount.toStringAsFixed(2)}";
+
+    final String date =
+        "${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}";
 
     return Container(
       margin: EdgeInsets.only(bottom: 15.h),
@@ -98,7 +82,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               appText(
-                product,
+                productName,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 fontSize: 16.sp,
@@ -129,7 +113,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                     width: 2.w,
                   ),
                   appText(
-                    status,
+                    status.capitalizeFirst!,
                     color: isFailed ? AppColors.red : AppColors.green,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,

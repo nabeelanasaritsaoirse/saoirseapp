@@ -9,7 +9,7 @@ import '../../constants/app_strings.dart';
 import '../../models/category_model.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
-import '../wishlist/wishlist_screen.dart';
+import '../productListing/product_listing.dart';
 import 'category_controller.dart';
 
 class CategoryScreen extends StatelessWidget {
@@ -29,7 +29,9 @@ class CategoryScreen extends StatelessWidget {
             IconBox(
                 image: AppAssets.wish,
                 padding: 8.w,
-                onTap: () => Get.to(WishlistScreen())),
+                onTap: () {
+                  Get.to(() => const ProductListing());
+                }),
             SizedBox(width: 8.w),
           ],
         ),

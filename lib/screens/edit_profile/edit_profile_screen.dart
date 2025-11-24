@@ -9,7 +9,7 @@ import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
-import 'eidit_profile_controller.dart';
+import 'edit_profile_controller.dart';
 
 class EditProfileScreen extends StatelessWidget {
   // ignore: use_super_parameters

@@ -53,7 +53,12 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: 3.w,
               onTap: () => Get.to(NotificationScreen())),
           SizedBox(width: 8.w),
-          IconBox(image: AppAssets.search, padding: 7.w, onTap: () {}),
+          IconBox(
+              image: AppAssets.search,
+              padding: 7.w,
+              onTap: () {
+                Get.to(() => const ProductListing());
+              }),
           SizedBox(width: 8.w),
           IconBox(
               image: AppAssets.wallet,
