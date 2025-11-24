@@ -140,7 +140,7 @@ class RazorpayController extends GetxController {
       if (response != null &&
           (response["success"] == true || response["status"] == "success")) {
         // Payment is verified
-        Get.offAll(() => BookingConfirmationScreen());
+        Get.to(BookingConfirmationScreen());
       } else {
         appSnackbar(
             error: true,
