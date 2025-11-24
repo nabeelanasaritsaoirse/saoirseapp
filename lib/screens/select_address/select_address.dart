@@ -11,7 +11,9 @@ import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/app_loader.dart';
 import '../add_address/add_address.dart';
+import '../order_details/order_details_controller.dart';
 import '../order_details/order_details_screen.dart';
+import '../product_details/product_details_controller.dart';
 import 'select_address_controller.dart';
 import '../../models/product_details_model.dart';
 
@@ -96,9 +98,24 @@ class SelectAddress extends StatelessWidget {
                   final selectedAddress =
                       controller.addressList[controller.selectedIndex.value];
 
+                  final productCtrl = Get.find<ProductDetailsController>();
+
+                  if (!Get.isRegistered<OrderDetailsController>()) {
+                    Get.put(OrderDetailsController());
+                  }
+
+                  final orderCtrl = Get.find<OrderDetailsController>();
+
+                  orderCtrl.selectedDays.value = productCtrl.customDays.value;
+                  orderCtrl.selectedAmount.value =
+                      productCtrl.customAmount.value;
+
+                  // Navigate
                   Get.to(() => OrderDetailsScreen(
                         addresses: selectedAddress,
-                        product: product!,
+                        product: product,
+                        selectedDays: productCtrl.customDays.value,
+                        selectedAmount: productCtrl.customAmount.value,
                       ));
                 },
               ),

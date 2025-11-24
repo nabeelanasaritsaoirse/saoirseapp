@@ -33,124 +33,116 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () =>
-          Get.to(() => ProductDetailsScreen(productId: productId, id: id)),
+      onTap: () => Get.to(
+        () => ProductDetailsScreen(productId: productId, id: id),
+      ),
       child: Container(
-        width: 160.w,
+        width: 150.w,
+        height: 220.h, // 🔥 FIXED, RESPONSIVE SAFE HEIGHT
         margin: margin ?? EdgeInsets.only(right: 10.w),
         decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(12.r),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowColor,
-                blurRadius: 6.r,
-                offset: const Offset(0, 2),
-              ),
-            ]),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ------------------ PRODUCT IMAGE + HEART ------------------
-                Stack(
-                  children: [
-                    // Product Image
-                    Container(
-                      height: 120.h,
-                      margin:
-                          EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.h),
-                      decoration: BoxDecoration(
-                        color: AppColors.lightGrey,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Center(
-                        child: image.startsWith('http')
-                            ? Image.network(
-                                image,
-                                width: 80.w,
-                                height: 80.h,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Icon(
-                                  Icons.broken_image,
-                                  size: 40.sp,
-                                  color: AppColors.grey,
-                                ),
-                              )
-                            : Image.asset(
-                                image,
-                                width: 80.w,
-                                height: 80.h,
-                                fit: BoxFit.cover,
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowColor,
+              blurRadius: 6.r,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// ---------------- IMAGE AREA ----------------
+            SizedBox(
+              height: 120.h,
+              child: Stack(
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(6.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.lightGrey,
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    child: Center(
+                      child: image.startsWith('http')
+                          ? Image.network(
+                              image,
+                              fit: BoxFit.contain,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.broken_image,
+                                size: 40.sp,
+                                color: AppColors.grey,
                               ),
-                      ),
-                    ),
-
-                    // ------------------ HEART ICON BUTTON ------------------
-                    Positioned(
-                      top: 8.h,
-                      right: 8.w,
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: onFavoriteTap,
-                        child: Container(
-                          width: 28.w,
-                          height: 28.h,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            isFavorite ? Icons.favorite : Icons.favorite_border,
-                            size: 16.sp,
-                            color: isFavorite ? AppColors.red : AppColors.grey,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                // ------------------ TEXT INFO ------------------
-                Expanded(
-                  child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        appText(
-                          name,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textBlack,
-                          textAlign: TextAlign.left,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: 2.h),
-                        appText(
-                          brand,
-                          fontSize: 10.sp,
-                          color: AppColors.grey,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: 2.h),
-                        appText(
-                          "₹ $price",
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ],
+                            )
+                          : Image.asset(
+                              image,
+                              fit: BoxFit.contain,
+                            ),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: GestureDetector(
+                      onTap: onFavoriteTap,
+                      child: Container(
+                        width: 26.w,
+                        height: 26.w,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          size: 14.sp,
+                          color: isFavorite ? Colors.red : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            /// ---------------- TEXT AREA ----------------
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 4.h),
+                  appText(
+                    name,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w700,
+                    textAlign: TextAlign.left,
+                    height: 1.2,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 2.h),
+                  appText(
+                    brand,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 10.sp,
+                    color: AppColors.grey,
+                    textAlign: TextAlign.left,
+                  ),
+                  SizedBox(height: 4.h),
+                  appText(
+                    "₹ $price",
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textBlack,
+                  )
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

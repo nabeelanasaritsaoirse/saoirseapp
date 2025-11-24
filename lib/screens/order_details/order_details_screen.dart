@@ -17,9 +17,17 @@ import 'order_details_controller.dart';
 class OrderDetailsScreen extends StatelessWidget {
   final Address addresses;
   final ProductDetailsData? product;
+  final int selectedDays;
+  final double selectedAmount;
 
-  OrderDetailsScreen({super.key, required this.addresses, this.product});
-  final orderController = Get.put(OrderDetailsController());
+  OrderDetailsScreen({
+    super.key,
+    required this.addresses,
+    this.product,
+    required this.selectedDays,
+    required this.selectedAmount,
+  });
+  final orderController = Get.find<OrderDetailsController>();
   final razorpayController = Get.put(RazorpayController());
 
   @override
@@ -224,8 +232,13 @@ class OrderDetailsScreen extends StatelessWidget {
                                   fontSize: 12.sp, fontWeight: FontWeight.w600),
                               appText("₹ ${product!.pricing.finalPrice}",
                                   fontSize: 12.sp, fontWeight: FontWeight.w600),
-                              appText("Plan - ₹100/200 Days",
-                                  fontSize: 12.sp, fontWeight: FontWeight.w600),
+                              Obx(() {
+                                return appText(
+                                  "Plan - ₹${orderController.selectedAmount.value} / ${orderController.selectedDays.value} Days",
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
+                                );
+                              }),
                             ],
                           ),
                         ),
@@ -368,10 +381,18 @@ class OrderDetailsScreen extends StatelessWidget {
                   buildPriceInfo(
                       label: AppStrings.total_amount,
                       content: "₹ ${pricing.finalPrice}"),
-                  buildPriceInfo(
-                      label: AppStrings.your_plan, content: "₹ 100/200 Days"),
-                  buildPriceInfo(
-                      label: AppStrings.pay_now, content: "₹ 100 Only"),
+                  Obx(() {
+                    return buildPriceInfo(
+                        label: AppStrings.your_plan,
+                        content:
+                            "₹${orderController.selectedAmount.value}/ ${orderController.selectedDays.value} Days");
+                  }),
+                  Obx(() {
+                    return buildPriceInfo(
+                        label: AppStrings.pay_now,
+                        content:
+                            "₹${orderController.selectedAmount.value} Only");
+                  }),
                 ],
               ),
             ),
@@ -384,7 +405,7 @@ class OrderDetailsScreen extends StatelessWidget {
             appButton(
               onTap: () {
                 orderController.placeOrder(
-                  productId: "6921572684a050c6a94f89da",
+                  productId: product!.id,
                   paymentOption: "daily",
                   totalDays: 200,
                   deliveryAddress: {

@@ -11,6 +11,7 @@ import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/investment_status_card.dart';
 import '../../widgets/product_card.dart';
 import '../my_wallet/my_wallet.dart';
 import '../notification/notification_controller.dart';
@@ -237,6 +238,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SizedBox(height: 10.h),
 
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: InvestmentStatusCard(
+                balanceAmount: 12000,
+                daysLeft: 64,
+                progress: 0.45,
+                onPayNow: () {},
+              ),
+            ),
+
             // Most Popular Product Section
             Column(
               children: [
@@ -265,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 12.h),
                 SizedBox(
-                  height: 213.h,
+                  height: 205.h,
                   child: Obx(() {
                     if (homeController.loading.value &&
                         homeController.mostPopularProducts.isEmpty) {
@@ -495,7 +506,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 12.h),
                 SizedBox(
-                  height: 213.h,
+                  height: 205.h,
                   child: Obx(() {
                     if (homeController.loading.value &&
                         homeController.trendingProducts.isEmpty) {

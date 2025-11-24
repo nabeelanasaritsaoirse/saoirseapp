@@ -9,6 +9,7 @@ class AppURLs {
 
   //user details api
   static String USER_UPDATE_API = BASE_API + "api/auth/profiles/";
+  static String PROFILE_UPDATE_API = BASE_API + "api/users/";
 
   // home screen api
   static String POPULAR_PRODUCT_API =

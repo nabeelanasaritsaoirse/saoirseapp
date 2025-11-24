@@ -1,6 +1,7 @@
 // app_colors.dart or app_gradients.dart
 import 'package:flutter/material.dart';
-import 'package:saoirse_app/constants/app_colors.dart';
+
+import 'app_colors.dart';
 
 class AppGradients {
   static const LinearGradient blueVertical = LinearGradient(
@@ -27,12 +28,35 @@ class AppGradients {
     end: Alignment.bottomCenter,
   );
 
-  static final LinearGradient primaryGradient =  LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Color(0xFF5B5FE9),
-                      Color(0xFF0A0E8C),
-                    ],
-                  );
+  static final LinearGradient primaryGradient = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [
+      Color(0xFF5B5FE9),
+      Color(0xFF0A0E8C),
+    ],
+  );
+
+  static final LinearGradient progressIndicatoryGradient = LinearGradient(
+    colors: [
+      Color(0xFF1F2CFF),
+      Color(0xFF4F5DFF),
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static final LinearGradient progressbarGradient = LinearGradient(
+    colors: [
+      Colors.white,
+      Colors.lightBlue.shade200,
+    ],
+  );
+
+  static final LinearGradient paynowGradient = LinearGradient(
+    colors: [
+      Color(0xFF000000),
+      Color(0xFF5A5A5A),
+    ],
+  );
 }

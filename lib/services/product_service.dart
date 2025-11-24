@@ -9,6 +9,7 @@ import 'api_service.dart';
 
 class ProductService {
   final token = storage.read(AppConst.ACCESS_TOKEN);
+
   Future<ProductDetailsData?> fetchProductDetails(String productId) async {
     final url = "${AppURLs.PRODUCT_DETAILS_API}$productId";
 

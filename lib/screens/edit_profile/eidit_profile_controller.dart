@@ -1,14 +1,23 @@
-// ignore_for_file: prefer_conditional_assignment, avoid_print
+// ignore_for_file: prefer_conditional_assignment, avoid_print, depend_on_referenced_packages
 
+import 'dart:developer';
 import 'dart:io';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 
+import '../../constants/app_constant.dart';
+import '../../constants/app_urls.dart';
+import '../../main.dart';
 import '../../models/user_profile.dart';
+import '../../services/api_service.dart';
 import '../../widgets/app_snackbar.dart';
+
+import 'package:http/http.dart' as http;
 
 class EditProfileController extends GetxController {
   // ------------------ FORM KEYS ------------------
@@ -44,7 +53,6 @@ class EditProfileController extends GetxController {
   // ------------------ IMAGE PICK ------------------
   Future<void> pickProfileImage() async {
     try {
-      // Request Permission
       bool granted = await _requestGalleryPermission();
 
       if (!granted) {
@@ -63,11 +71,70 @@ class EditProfileController extends GetxController {
 
       if (image != null) {
         profileImage.value = File(image.path);
+
+        /// AUTO UPLOAD AFTER PICK
+        await uploadProfileImage();
       }
     } catch (e) {
       appSnackbar(
           error: true, title: "Error", content: "Unable to open gallery");
       print("Image Picker Error: $e");
+    }
+  }
+
+  // ------------------ UPLOAD PROFILE IMAGE (MAIN FUNCTION) ------------------
+  Future<void> uploadProfileImage() async {
+    if (profileImage.value == null) {
+      appSnackbar(error: true, title: "Error", content: "No image selected");
+      return;
+    }
+
+    // Read userId properly
+    String? userId = storage.read(AppConst.USER_ID);
+
+    if (userId == null || userId.isEmpty) {
+      log("❌ ERROR: User ID not found in storage");
+      return;
+    }
+
+    try {
+      final imageFile = profileImage.value!;
+
+      // Dynamic MIME type
+      final mime = lookupMimeType(imageFile.path)!.split('/');
+
+      // Create dynamic multipart file
+      final multipartFile = await http.MultipartFile.fromPath(
+        "image",
+        imageFile.path,
+        contentType: MediaType(mime[0], mime[1]),
+      );
+
+      final response = await APIService.uploadImageRequest(
+        url: "${AppURLs.PROFILE_UPDATE_API}$userId/profile-picture",
+        method: "PUT",
+        file: multipartFile,
+      );
+
+      if (response != null && response.statusCode == 200) {
+        appSnackbar(
+          title: "Success",
+          content: "Profile picture updated successfully",
+        );
+      } else {
+        appSnackbar(
+          error: true,
+          title: "Failed",
+          content: "Unable to upload image",
+        );
+      }
+    } catch (e) {
+      appSnackbar(
+        error: true,
+        title: "Error",
+        content: "Upload Failed",
+      );
+      print("UPLOAD IMAGE ERROR => $e");
     }
   }
 
@@ -104,8 +171,6 @@ class EditProfileController extends GetxController {
   }
 
   // ------------------ VALIDATIONS ------------------
-
-  /// FULL NAME VALIDATION
   String? validateFullName(String? value) {
     if (value == null || value.trim().isEmpty) {
       return "Full name is required";
@@ -119,7 +184,6 @@ class EditProfileController extends GetxController {
     return null;
   }
 
-  /// EMAIL VALIDATION
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return "Email is required";
@@ -131,7 +195,6 @@ class EditProfileController extends GetxController {
     return null;
   }
 
-  /// PHONE NUMBER VALIDATION
   String? validatePhone(String? value) {
     if (value == null || value.isEmpty) {
       return "Phone number is required";
@@ -149,9 +212,7 @@ class EditProfileController extends GetxController {
   }
 
   // ------------------ SAVE CHANGES ------------------
-
   void saveChanges() {
-    // Validate the form
     if (!formKey.currentState!.validate()) {
       appSnackbar(
           error: true, title: "Error", content: "Please correct the errors");
@@ -169,14 +230,12 @@ class EditProfileController extends GetxController {
     Get.back();
   }
 
-//  Permission For access the gallery
+  // ------------------ PERMISSION ------------------
   Future<bool> _requestGalleryPermission() async {
     if (Platform.isAndroid) {
-      // Android 13+ uses READ_MEDIA_IMAGES
       final photosStatus = await Permission.photos.request();
       if (photosStatus.isGranted) return true;
 
-      // Android 12 and below use READ_EXTERNAL_STORAGE
       final storageStatus = await Permission.storage.request();
       if (storageStatus.isGranted) return true;
 
@@ -188,7 +247,6 @@ class EditProfileController extends GetxController {
       return false;
     }
 
-    // iOS
     final iosStatus = await Permission.photos.request();
     if (iosStatus.isGranted) return true;
 
