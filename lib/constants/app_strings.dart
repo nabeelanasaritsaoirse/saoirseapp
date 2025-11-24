@@ -23,7 +23,7 @@ class AppStrings {
   static String onboard_note = "INVEST SMALL, DREAM BIG, \nOWN IT";
 
   // Notification
-  static String notification_titile = "Notification";
+  static String notification_titile = "Notifications";
 
   // Wallet Screen
   static String wallet_title = "My Wallet";
