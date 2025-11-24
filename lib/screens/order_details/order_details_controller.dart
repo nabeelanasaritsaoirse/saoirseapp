@@ -13,6 +13,7 @@ class OrderDetailsController extends GetxController {
   RxInt selectedDays = 0.obs;
   RxDouble selectedAmount = 0.0.obs;
   String orderid = "";
+
   Future<void> placeOrder({
     required String productId,
     required String paymentOption,
