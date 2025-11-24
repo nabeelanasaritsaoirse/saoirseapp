@@ -407,7 +407,7 @@ class OrderDetailsScreen extends StatelessWidget {
                 orderController.placeOrder(
                   productId: product!.id,
                   paymentOption: "daily",
-                  totalDays: 200,
+                  totalDays: orderController.selectedDays.value,
                   deliveryAddress: {
                     "name": addresses.name,
                     "phoneNumber": addresses.phoneNumber,
