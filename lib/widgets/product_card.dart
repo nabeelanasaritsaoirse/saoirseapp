@@ -84,8 +84,8 @@ class ProductCard extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    top: 6,
-                    right: 6,
+                    top: 8,
+                    right: 8,
                     child: GestureDetector(
                       onTap: onFavoriteTap,
                       child: Container(

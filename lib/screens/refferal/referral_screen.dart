@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/my_wallet/my_wallet.dart';
+import 'package:saoirse_app/screens/notification/notification_screen.dart';
 
 import '../../constants/app_strings.dart';
 import '../../screens/refferal/referral_controller.dart';
@@ -43,11 +45,22 @@ class ReferralScreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: AppStrings.refferalTitle,
         actions: [
-          iconBox(image: AppAssets.notification, padding: 3),
+          IconBox(
+              image: AppAssets.notification,
+              padding: 3.w,
+              onTap: () {
+                Get.to(NotificationScreen());
+              }),
           SizedBox(width: 8.w),
-          iconBox(image: AppAssets.wallet, padding: 5),
-          SizedBox(width: 12.w),
-          iconBox(image: AppAssets.message, padding: 5),
+          IconBox(
+              image: AppAssets.wallet,
+              padding: 5.w,
+              onTap: () {
+                Get.to(WalletScreen());
+              }),
+          SizedBox(
+            width: 12.w,
+          )
         ],
       ),
 

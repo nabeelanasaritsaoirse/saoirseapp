@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:saoirse_app/constants/app_assets.dart';
+import 'package:saoirse_app/widgets/app_text_field.dart';
+import 'package:saoirse_app/widgets/custom_appbar.dart';
+import 'package:saoirse_app/widgets/product_card.dart';
 
-import '../../models/product_list_response.dart';
+
 import '../../widgets/app_loader.dart';
 import '../product_details/product_details_screen.dart';
 import '/screens/productListing/productListing_controller.dart';
@@ -41,72 +45,35 @@ class _ProductListingState extends State<ProductListing> {
 
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        titleSpacing: 0,
-        leading: GestureDetector(
-          onTap: () {
-            Get.back();
-          },
-          child: Icon(Icons.arrow_back, size: 30.sp, color: AppColors.white),
-        ),
-        title: Container(
-          height: 35.h,
-          margin: EdgeInsets.only(right: 12.w),
-          padding: EdgeInsets.symmetric(horizontal: 8.w),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(20.r),
-          ),
-          child: Center(
-            child: TextField(
-              controller: productlistingController.nameContoller,
-              textAlignVertical: TextAlignVertical.center,
-              onChanged: (value) {
-                productlistingController.performSearch(value);
-              },
-              decoration: InputDecoration(
-                hintText: "Search",
-                border: InputBorder.none,
-                hintStyle: TextStyle(
-                  color: AppColors.grey,
-                  fontSize: 14.sp,
-                ),
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: 0,
-                  horizontal: 12.w,
-                ),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: AppColors.grey,
-                  size: 20.sp,
-                ),
-                prefixIconConstraints: BoxConstraints(
-                  minWidth: 35.w,
-                  minHeight: 35.h,
-                ),
-              ),
-              style: TextStyle(
-                color: AppColors.black,
-                fontSize: 14.sp,
-              ),
-            ),
-          ),
-        ),
-        actions: [
-          GestureDetector(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(54.h),
+        child: AppBar(
+          backgroundColor: AppColors.primaryColor,
+          elevation: 0,
+          titleSpacing: 0,
+          leading: GestureDetector(
             onTap: () {
-              //    FAVORITE BUTTON FUNCTION
+              Get.back();
             },
-            child: Icon(
-              Icons.favorite_border,
-              color: AppColors.white,
-              size: 30.sp,
+            child: Icon(Icons.arrow_back, size: 30.sp, color: AppColors.white),
+          ),
+          title: Padding(
+            padding: EdgeInsets.only(right: 15.w),
+            child: appTextField(
+              controller: productlistingController.nameContoller,
+              hintText: "Search",
+              hintColor: AppColors.textBlack,
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 20.w, vertical: 10),
+              fillColor: AppColors.white,
+              borderRadius: BorderRadius.circular(15.r),
             ),
           ),
-          SizedBox(width: 10.w),
-        ],
+          actions: [
+            IconBox(image: AppAssets.wish, padding: 8, onTap: () {}),
+            SizedBox(width: 12.w),
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -169,7 +136,7 @@ class _ProductListingState extends State<ProductListing> {
                 padding: EdgeInsets.all(12.w),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 0.60.r,
+                  childAspectRatio: 0.70.r,
                   mainAxisSpacing: 10.h,
                   crossAxisSpacing: 10.w,
                 ),
@@ -183,7 +150,15 @@ class _ProductListingState extends State<ProductListing> {
                               id: product.id,
                             ));
                       },
-                      child: productCard(product));
+                      child: ProductCard(
+                          productId: product.id,
+                          name: product.name,
+                          brand: product.brand,
+                          image: product.images.isNotEmpty
+                              ? product.images.last.url
+                              : "https://via.placeholder.com/200",
+                          price: product.pricing.finalPrice.toStringAsFixed(0),
+                          isFavorite: true));
                 },
               );
             }),
@@ -205,86 +180,5 @@ class _ProductListingState extends State<ProductListing> {
     );
   }
 
-  Widget productCard(Product product) {
-    final imageUrl = product.images.isNotEmpty
-        ? product.images.first.url
-        : "https://via.placeholder.com/200";
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(14.r),
-        boxShadow: [
-          BoxShadow(color: AppColors.grey, spreadRadius: 1.r, blurRadius: 3.r),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
-                child: Image.network(
-                  imageUrl,
-                  height: 115.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    height: 115.h,
-                    width: double.infinity,
-                    color: Colors.grey.shade200,
-                    child: Icon(Icons.broken_image, size: 40.sp),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 8.h,
-                right: 8.w,
-                child: Icon(
-                  product.hasVariants ? Icons.favorite : Icons.favorite_border,
-                  color: product.hasVariants ? Colors.red : Colors.grey,
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(10.w, 8.h, 10.w, 2.h),
-            child: appText(
-              product.name,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.h),
-            child: appText(
-              product.brand,
-              fontSize: 13.sp,
-              color: AppColors.grey,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.h, vertical: 6.w),
-            child: appText(
-              "₹ ${product.pricing.finalPrice}",
-              fontSize: 12.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          // Padding(
-          //   padding: EdgeInsets.symmetric(horizontal: 10.h),
-          //   child: Row(
-          //     children: [
-          //       Icon(Icons.star, color: AppColors.mediumAmber, size: 16.sp),
-          //       SizedBox(width: 4.w),
-          //       appText(product.id, fontSize: 13.sp),
-          //     ],
-          //   ),
-          // ),
-        ],
-      ),
-    );
-  }
+  
 }
