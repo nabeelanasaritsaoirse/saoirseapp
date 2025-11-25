@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+
 
 import '../../constants/app_assets.dart';
 import '../../widgets/app_loader.dart';
@@ -12,7 +12,7 @@ import '../product_details/product_details_screen.dart';
 import '../wishlist/wishlist_screen.dart';
 import '/screens/productListing/productListing_controller.dart';
 import '../../constants/app_colors.dart';
-import '../../widgets/app_text.dart';
+
 
 class ProductListing extends StatefulWidget {
   const ProductListing({super.key});
@@ -83,49 +83,49 @@ class _ProductListingState extends State<ProductListing> {
       ),
       body: Column(
         children: [
-          Container(
-            color: AppColors.lightGrey,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(LucideIcons.arrowUpDown, size: 18.sp),
-                        appText("sort", fontSize: 18.sp),
-                      ],
-                    ),
-                    onTap: () {
-                      //  SORT BUTTON FUNCTION
-                    },
-                  ),
-                ),
-                Container(
-                  width: 1.w,
-                  height: 40.h,
-                  color: AppColors.shadowColor,
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(LucideIcons.filter, size: 18.sp),
-                        appText("Filter", fontSize: 18.sp),
-                      ],
-                    ),
-                    onTap: () {
-                      //  FILTER  BUTTON FUNCTION
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Container(
+          //   color: AppColors.lightGrey,
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          //     children: [
+          //       Expanded(
+          //         child: GestureDetector(
+          //           child: Row(
+          //             crossAxisAlignment: CrossAxisAlignment.center,
+          //             mainAxisAlignment: MainAxisAlignment.center,
+          //             children: [
+          //               Icon(LucideIcons.arrowUpDown, size: 18.sp),
+          //               appText("sort", fontSize: 18.sp),
+          //             ],
+          //           ),
+          //           onTap: () {
+          //             //  SORT BUTTON FUNCTION
+          //           },
+          //         ),
+          //       ),
+          //       Container(
+          //         width: 1.w,
+          //         height: 40.h,
+          //         color: AppColors.shadowColor,
+          //       ),
+          //       Expanded(
+          //         child: GestureDetector(
+          //           child: Row(
+          //             crossAxisAlignment: CrossAxisAlignment.center,
+          //             mainAxisAlignment: MainAxisAlignment.center,
+          //             children: [
+          //               Icon(LucideIcons.filter, size: 18.sp),
+          //               appText("Filter", fontSize: 18.sp),
+          //             ],
+          //           ),
+          //           onTap: () {
+          //             //  FILTER  BUTTON FUNCTION
+          //           },
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
           Expanded(
             child: Obx(() {
               if (productlistingController.isLoading.value &&
