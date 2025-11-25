@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:saoirse_app/screens/withdtraw/withdraw_screen.dart';
 
 import '../../constants/app_strings.dart';
 import '../../widgets/app_loader.dart';
@@ -148,7 +149,7 @@ class WalletScreen extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: appButton(
                 buttonColor: AppColors.primaryColor,
-                onTap: () {},
+                onTap: () => Get.to(WithdrawScreen()),
                 child: Center(
                   child: appText(
                     "Withdraw",
@@ -186,6 +187,7 @@ class WalletScreen extends StatelessWidget {
         ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           appText("Main Balance", color: AppColors.white, fontSize: 18.sp),
           SizedBox(height: 2.h),
@@ -208,7 +210,10 @@ class WalletScreen extends StatelessWidget {
             children: [
               balanceColumn(holdBalance, "Hold Balance"),
               divider(),
-              balanceColumn(investDaily, "Invest Daily"),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 7.w),
+                child: balanceColumn(investDaily, "Invest Daily"),
+              ),
             ],
           ),
         ],

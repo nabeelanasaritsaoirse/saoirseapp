@@ -2,6 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:saoirse_app/screens/dashboard/dashboard_controller.dart';
 
 import '../../constants/app_strings.dart';
 import '/constants/app_colors.dart';
@@ -60,9 +63,8 @@ class _TransactionsuccsessState extends State<Transactionsuccsess> {
                 width: 300.w,
                 buttonColor: AppColors.primaryColor,
                 onTap: () {
-//
-//     CONFIRM BUTTON FUNCTION
-//
+                  final dashboard = Get.find<DashboardController>();
+                  dashboard.changeTab(0);
                 },
               )
             ],

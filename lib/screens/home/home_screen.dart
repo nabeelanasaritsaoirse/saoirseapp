@@ -2,7 +2,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/dashboard/dashboard_controller.dart';
 import 'package:saoirse_app/screens/pendingTransaction/pendingTrancation.dart';
+import 'package:saoirse_app/screens/refferal/referral_screen.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -735,13 +737,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             bottom: 5.h,
                             right: 35.w,
                             child: appButton(
-                              onTap: () {},
+                              onTap: () {
+                                final dashboard =
+                                    Get.find<DashboardController>();
+                                dashboard.changeTab(2);
+                              },
                               width: 195.w,
                               height: 45.h,
                               buttonColor: AppColors.white,
                               borderRadius: BorderRadius.circular(12),
                               padding: EdgeInsets.symmetric(),
-                              // Simulate elevation using BoxShadow
                               child: appText(
                                 AppStrings.refer_button_lebel,
                                 fontSize: 17.sp,

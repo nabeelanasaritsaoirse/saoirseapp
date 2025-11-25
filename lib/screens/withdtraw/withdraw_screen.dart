@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/custom_appbar.dart';
 
 import '../../constants/app_colors.dart';
 import 'withdraw_controller.dart';
@@ -22,22 +23,9 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        leading: GestureDetector(
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: AppColors.white,
-            size: 25.sp,
-          ),
-          onTap: () {},
-        ),
-        title: appText("Withdraw",
-            fontWeight: FontWeight.w600,
-            color: AppColors.white,
-            fontSize: 20.sp),
-        centerTitle: false,
+      appBar: CustomAppBar(
+        title: "Withdraw",
+        showBack: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
