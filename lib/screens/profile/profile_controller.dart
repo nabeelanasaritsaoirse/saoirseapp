@@ -20,15 +20,15 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.wishlist, "title": "Wishlist"},
     {"icon": AppAssets.transactions, "title": "Transactions"},
     {"icon": AppAssets.delivered, "title": "Delivered"},
-    {"icon": AppAssets.customer_care, "title": "Customer Care"},
+    // {"icon": AppAssets.customer_care, "title": "Customer Care"},
   ];
 
   final settings = [
-    {"icon": AppAssets.password_security, "title": "Password & security"},
+    // {"icon": AppAssets.password_security, "title": "Password & security"},
     {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
     {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
-    {"icon": AppAssets.faq, "title": "FAQ"},
-    {"icon": AppAssets.about, "title": "About EPI"},
+    // {"icon": AppAssets.faq, "title": "FAQ"},
+    // {"icon": AppAssets.about, "title": "About EPI"},
     {"icon": AppAssets.logout, "title": "Log Out"},
   ];
 

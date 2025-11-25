@@ -11,6 +11,8 @@ import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
 import '../invite_friend/invite_friend_details_screen.dart';
+import '../my_wallet/my_wallet.dart';
+import '../notification/notification_screen.dart';
 
 class ReferralScreen extends StatelessWidget {
   const ReferralScreen({super.key});
@@ -20,22 +22,6 @@ class ReferralScreen extends StatelessWidget {
     final ReferralController controller = Get.put(ReferralController());
     final TextEditingController searchController = TextEditingController();
 
-    Widget iconBox({String? image, double? padding}) {
-      return Container(
-        margin: EdgeInsets.symmetric(vertical: 7.h),
-        width: 36.w,
-        height: 36.h,
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(10.r),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(padding!.w),
-          child: Image.asset(image!),
-        ),
-      );
-    }
-
     return Scaffold(
       backgroundColor: AppColors.white,
       resizeToAvoidBottomInset:
@@ -43,11 +29,22 @@ class ReferralScreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: AppStrings.refferalTitle,
         actions: [
-          iconBox(image: AppAssets.notification, padding: 3),
+          IconBox(
+              image: AppAssets.notification,
+              padding: 3.w,
+              onTap: () {
+                Get.to(NotificationScreen());
+              }),
           SizedBox(width: 8.w),
-          iconBox(image: AppAssets.wallet, padding: 5),
-          SizedBox(width: 12.w),
-          iconBox(image: AppAssets.message, padding: 5),
+          IconBox(
+              image: AppAssets.wallet,
+              padding: 5.w,
+              onTap: () {
+                Get.to(WalletScreen());
+              }),
+          SizedBox(
+            width: 12.w,
+          )
         ],
       ),
 

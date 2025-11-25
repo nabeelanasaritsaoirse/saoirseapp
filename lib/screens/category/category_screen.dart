@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:saoirse_app/dummy/dummy_assets.dart';
+import 'package:saoirse_app/screens/wishlist/wishlist_screen.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -24,15 +25,20 @@ class CategoryScreen extends StatelessWidget {
         appBar: CustomAppBar(
           title: AppStrings.category_title,
           actions: [
-            IconBox(image: AppAssets.search, padding: 9.w, onTap: () {}),
+            IconBox(
+                image: AppAssets.search,
+                padding: 9.w,
+                onTap: () {
+                  Get.to(() => const ProductListing());
+                }),
             SizedBox(width: 8.w),
             IconBox(
                 image: AppAssets.wish,
                 padding: 8.w,
                 onTap: () {
-                  Get.to(() => const ProductListing());
+                  Get.to(() => const WishlistScreen());
                 }),
-            SizedBox(width: 8.w),
+            SizedBox(width: 12.w),
           ],
         ),
         body: Obx(() {
@@ -59,54 +65,98 @@ class CategoryScreen extends StatelessWidget {
               Container(
                 width: 80.h,
                 color: AppColors.white,
-                child: ListView.builder(
-                  controller: controller.scrollController.value,
-                  itemCount: controller.categoryGroups.length,
-                  itemBuilder: (context, index) {
-                    final isSelected = controller.selectedIndex.value == index;
-                    final category = controller.categoryGroups[index];
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        controller: controller.scrollController.value,
+                        itemCount: controller.categoryGroups.length,
+                        itemBuilder: (context, index) {
+                          final isSelected =
+                              controller.selectedIndex.value == index;
+                          final category = controller.categoryGroups[index];
 
-                    return GestureDetector(
-                      onTap: () => controller.selectCategory(index),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.lightGrey
-                              : AppColors.white,
-                          border: Border(
-                            left: BorderSide(
-                              color: isSelected
-                                  ? AppColors.primaryColor
-                                  : AppColors.transparent,
-                              width: 4.w,
+                          return GestureDetector(
+                            onTap: () => controller.selectCategory(index),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppColors.lightGrey
+                                    : AppColors.white,
+                                border: Border(
+                                  left: BorderSide(
+                                    color: isSelected
+                                        ? AppColors.primaryColor
+                                        : AppColors.transparent,
+                                    width: 4.w,
+                                  ),
+                                ),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15.h,
+                                horizontal: 7.w,
+                              ),
+                              child: Column(
+                                children: [
+                                  Image.asset(DummyAssets.washingMachine,
+                                      width: 70.w, height: 70.h),
+                                  SizedBox(height: 7.h),
+                                  appText(
+                                    category.name,
+                                    textAlign: TextAlign.center,
+                                    fontSize: 11.sp,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w700
+                                        : FontWeight.w600,
+                                    color: isSelected
+                                        ? AppColors.primaryColor
+                                        : AppColors.textBlack,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(() => const ProductListing());
+                      },
+                      child: Container(
                         padding: EdgeInsets.symmetric(
                           vertical: 15.h,
                           horizontal: 7.w,
                         ),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          border: Border(
+                            top: BorderSide(
+                              color: AppColors.lightGrey,
+                              width: 1.w,
+                            ),
+                          ),
+                        ),
                         child: Column(
                           children: [
-                            Image.asset(DummyAssets.washingMachine,
-                                width: 70.w, height: 70.h),
+                            Icon(
+                              Icons.grid_view_rounded,
+                              size: 24.sp,
+                              color: AppColors.primaryColor,
+                            ),
                             SizedBox(height: 7.h),
                             appText(
-                              category.name,
+                              'See All',
                               textAlign: TextAlign.center,
                               fontSize: 11.sp,
-                              fontWeight: isSelected
-                                  ? FontWeight.w700
-                                  : FontWeight.w600,
-                              color: isSelected
-                                  ? AppColors.primaryColor
-                                  : AppColors.textBlack,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textBlack,
                             ),
                           ],
                         ),
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ),
 
