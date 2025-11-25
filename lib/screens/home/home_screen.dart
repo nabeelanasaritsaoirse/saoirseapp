@@ -17,7 +17,7 @@ import '../dashboard/dashboard_controller.dart';
 import '../my_wallet/my_wallet.dart';
 import '../notification/notification_controller.dart';
 import '../notification/notification_screen.dart';
-import '../pendingTransaction/pendingTrancation.dart';
+import '../pending_transaction/pending_transaction_screen.dart';
 import '../productListing/product_listing.dart';
 import '../product_details/product_details_screen.dart';
 import 'home_controller.dart';
@@ -287,7 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 daysLeft: 64,
                 progress: 0.45,
                 onPayNow: () {
-                  Get.to(Pendingtrancation());
+                  Get.to(PendingTransaction());
                 },
               ),
             ),
