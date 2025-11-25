@@ -38,10 +38,7 @@ class AppGradients {
   );
 
   static final LinearGradient progressIndicatoryGradient = LinearGradient(
-    colors: [
-      Color(0xFF1F2CFF),
-      Color(0xFF4F5DFF),
-    ],
+    colors: [AppColors.mediumBlue, AppColors.primaryColor],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -55,8 +52,8 @@ class AppGradients {
 
   static final LinearGradient paynowGradient = LinearGradient(
     colors: [
-      Color(0xFF000000),
       Color(0xFF5A5A5A),
+      Color(0xFF000000),
     ],
   );
 }

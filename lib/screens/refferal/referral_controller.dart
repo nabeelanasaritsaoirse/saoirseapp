@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -221,6 +222,12 @@ class ReferralController extends GetxController {
   void copyReferralCode() {
     if (referralCode.isEmpty) return;
 
+    // Copy the text to clipboard
+    Clipboard.setData(
+      ClipboardData(text: referralCode.value),
+    );
+
+    // Show success message
     appSnackbar(
       error: false,
       title: "Copied!",
