@@ -81,4 +81,7 @@ class AppURLs {
   // Pending Transactions Api
   static String PENDING_TRANSACTIONS_API =
       BASE_API + "api/installments/payments/daily-pending";
+
+  // Investment Status Api
+  static String INVESTMENT_STATUS_API = BASE_API + "api/installments/orders/overall-status";    
 }
