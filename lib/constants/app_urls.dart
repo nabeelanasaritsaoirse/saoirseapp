@@ -76,4 +76,7 @@ class AppURLs {
   static String ORDER_HISTORY_API = BASE_API + "api/orders/user/history";
   static String ORDER_DELIVERED_HISTORY_API =
       BASE_API + "api/orders/user/delivered";
+
+  // Pending Transactions Api
+  static String PENDING_TRANSACTIONS_API = BASE_API + "api/installments/payments/daily-pending";
 }

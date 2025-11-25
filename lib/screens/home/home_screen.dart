@@ -2,7 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/pendingTransaction/pendingTrancation.dart';
+import 'package:saoirse_app/screens/pending_transaction/pending_transaction_screen.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
