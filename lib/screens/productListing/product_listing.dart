@@ -8,6 +8,7 @@ import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/product_card.dart';
 import '../product_details/product_details_screen.dart';
+import '../profile/profile_controller.dart';
 import '../wishlist/wishlist_screen.dart';
 import '/screens/productListing/productListing_controller.dart';
 import '../../constants/app_colors.dart';
@@ -25,19 +26,22 @@ class _ProductListingState extends State<ProductListing> {
   void initState() {
     super.initState();
 
+    if (!Get.isRegistered<ProductlistingController>()) {
+      Get.put(ProductlistingController());
+    }
+
     scrollController.addListener(() {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
-        Get.find<ProductlistingController>().fetchProducts(); // LOAD NEXT PAGE
+        Get.find<ProductlistingController>().fetchProducts();
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    ProductlistingController productlistingController = Get.put(
-      ProductlistingController(),
-    );
+    final ProductlistingController productlistingController =
+        Get.find<ProductlistingController>();
 
     productlistingController.products;
 
@@ -68,13 +72,44 @@ class _ProductListingState extends State<ProductListing> {
             ),
           ),
           actions: [
-            IconBox(
-              image: AppAssets.wish,
-              padding: 8,
-              onTap: () {
-                Get.to(WishlistScreen());
-              },
-            ),
+            Obx(() {
+              final count = Get.find<ProfileController>().wishlistCount.value;
+
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconBox(
+                    image: AppAssets.wish,
+                    padding: 8.w,
+                    onTap: () {
+                      Get.to(() => const WishlistScreen());
+                    },
+                  ),
+
+                  // Show badge only if count > 0
+                  if (count > 0)
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: Container(
+                        padding: EdgeInsets.all(4.r),
+                        decoration: BoxDecoration(
+                          color: AppColors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          count > 9 ? "9+" : count.toString(),
+                          style: TextStyle(
+                            color: AppColors.white,
+                            fontSize: 9.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            }),
             SizedBox(width: 12.w),
           ],
         ),
@@ -155,6 +190,7 @@ class _ProductListingState extends State<ProductListing> {
                             ));
                       },
                       child: ProductCard(
+                          margin: EdgeInsets.all(0),
                           productId: product.id,
                           name: product.name,
                           brand: product.brand,
@@ -162,7 +198,7 @@ class _ProductListingState extends State<ProductListing> {
                               ? product.images.last.url
                               : "https://via.placeholder.com/200",
                           price: product.pricing.finalPrice.toStringAsFixed(0),
-                          isFavorite: true));
+                          isFavorite: false));
                 },
               );
             }),

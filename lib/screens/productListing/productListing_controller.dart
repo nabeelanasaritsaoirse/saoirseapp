@@ -25,6 +25,7 @@ class ProductlistingController extends GetxController {
   @override
   void onInit() {
     fetchProducts();
+
     super.onInit();
   }
 

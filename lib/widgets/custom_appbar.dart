@@ -19,7 +19,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showLogo = false,
     this.showBack = false,
     this.actions,
-    this.height = 54,
+    this.height = 52,
   });
 
   Widget _buildLogo() {

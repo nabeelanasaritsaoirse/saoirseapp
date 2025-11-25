@@ -3,12 +3,12 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/plan_model.dart';
-import 'package:saoirse_app/widgets/app_loader.dart';
 
+import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
 import '../../services/product_service.dart';
 import '../../services/wishlist_service.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/app_snackbar.dart';
 import '../../widgets/select_plan_sheet.dart';
 
@@ -221,11 +221,7 @@ class ProductDetailsController extends GetxController {
 
     final result = await ProductService().fetchProductPlans(productId);
 
-    if (result != null) {
-      plans.value = result;
-    } else {
-      plans.clear();
-    }
+    plans.assignAll(result);
 
     isLoading.value = false;
   }
