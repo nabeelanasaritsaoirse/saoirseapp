@@ -58,33 +58,30 @@ class ProductService {
   }
 
   // Fetch investment plans for a product
-  Future<List<PlanModel>?> fetchProductPlans(String productId) async {
-    try {
-      final url = "${AppURLs.PRODUCT_PLAN_API}$productId/plans";
+ Future<List<PlanModel>> fetchProductPlans(String productId) async {
+  try {
+    final url = "${AppURLs.PRODUCT_PLAN_API}$productId/plans";
 
-      print("GET PRODUCT PLANS: $url");
+    print("GET PRODUCT PLANS: $url");
 
-      final response = await APIService.getRequest(
-        url: url,
-        onSuccess: (data) => data,
-        headers: {
-          "Authorization": "Bearer $token",
-        },
-      );
+    final response = await APIService.getRequest(
+      url: url,
+      onSuccess: (data) => data,
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+    );
 
-      if (response == null) return null;
+    if (response == null) return [];
 
-      if (response["success"] == true &&
-          response["data"] != null &&
-          response["data"]["plans"] != null) {
-        final list = response["data"]["plans"] as List;
-        return list.map((e) => PlanModel.fromJson(e)).toList();
-      }
+    // ✅ Parse using new model
+    final planResponse = PlanResponseModel.fromJson(response);
 
-      return null;
-    } catch (e) {
-      print("Plan fetch error: $e");
-      return null;
-    }
+    // ✅ Return list of plans
+    return planResponse.data.plans;
+  } catch (e) {
+    print("Plan fetch error: $e");
+    return [];
   }
+}
 }

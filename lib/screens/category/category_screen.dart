@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:saoirse_app/dummy/dummy_assets.dart';
+import 'package:saoirse_app/screens/profile/profile_controller.dart';
 import 'package:saoirse_app/screens/wishlist/wishlist_screen.dart';
 
 import '../../constants/app_assets.dart';
@@ -17,6 +18,7 @@ class CategoryScreen extends StatelessWidget {
   CategoryScreen({super.key});
 
   final CategoryController controller = Get.put(CategoryController());
+  final ProfileController profileController = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +34,44 @@ class CategoryScreen extends StatelessWidget {
                   Get.to(() => const ProductListing());
                 }),
             SizedBox(width: 8.w),
-            IconBox(
-                image: AppAssets.wish,
-                padding: 8.w,
-                onTap: () {
-                  Get.to(() => const WishlistScreen());
-                }),
+            Obx(() {
+              final count = Get.find<ProfileController>().wishlistCount.value;
+
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconBox(
+                    image: AppAssets.wish,
+                    padding: 8.w,
+                    onTap: () {
+                      Get.to(() => const WishlistScreen());
+                    },
+                  ),
+
+                  // Show badge only if count > 0
+                  if (count > 0)
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: Container(
+                        padding: EdgeInsets.all(4.r),
+                        decoration: BoxDecoration(
+                          color: AppColors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          count > 9 ? "9+" : count.toString(),
+                          style: TextStyle(
+                            color: AppColors.white,
+                            fontSize: 9.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            }),
             SizedBox(width: 12.w),
           ],
         ),

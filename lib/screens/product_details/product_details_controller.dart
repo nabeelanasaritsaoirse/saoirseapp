@@ -219,13 +219,10 @@ class ProductDetailsController extends GetxController {
   Future loadPlans(String productId) async {
     isLoading.value = true;
 
-    final result = await ProductService().fetchProductPlans(productId);
+   final result = await ProductService().fetchProductPlans(productId);
 
-    if (result != null) {
-      plans.value = result;
-    } else {
-      plans.clear();
-    }
+
+plans.assignAll(result);
 
     isLoading.value = false;
   }
