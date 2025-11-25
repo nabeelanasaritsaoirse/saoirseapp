@@ -38,7 +38,7 @@ class ProductCard extends StatelessWidget {
       ),
       child: Container(
         width: 150.w,
-        height: 220.h, // 🔥 FIXED, RESPONSIVE SAFE HEIGHT
+        height: 230.h, // 🔥 FIXED, RESPONSIVE SAFE HEIGHT
         margin: margin ?? EdgeInsets.only(right: 10.w),
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -57,7 +57,7 @@ class ProductCard extends StatelessWidget {
           children: [
             /// ---------------- IMAGE AREA ----------------
             SizedBox(
-              height: 120.h,
+              height: 110.h,
               child: Stack(
                 children: [
                   Container(
@@ -83,26 +83,26 @@ class ProductCard extends StatelessWidget {
                             ),
                     ),
                   ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: GestureDetector(
-                      onTap: onFavoriteTap,
-                      child: Container(
-                        width: 26.w,
-                        height: 26.w,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          size: 14.sp,
-                          color: isFavorite ? Colors.red : Colors.grey,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Positioned(
+                  //   top: 8,
+                  //   right: 8,
+                  //   child: GestureDetector(
+                  //     onTap: onFavoriteTap,
+                  //     child: Container(
+                  //       width: 26.w,
+                  //       height: 26.w,
+                  //       decoration: const BoxDecoration(
+                  //         color: Colors.white,
+                  //         shape: BoxShape.circle,
+                  //       ),
+                  //       child: Icon(
+                  //         isFavorite ? Icons.favorite : Icons.favorite_border,
+                  //         size: 14.sp,
+                  //         color: isFavorite ? Colors.red : Colors.grey,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
