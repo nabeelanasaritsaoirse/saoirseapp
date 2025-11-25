@@ -56,15 +56,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        child: Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: AppColors.primaryColor,
-                          size: 30.sp,
-                        ),
-                        onTap: () {},
-                      ),
-                      SizedBox(height: 12.h),
+                      SizedBox(height: 30.h),
                       appText(
                         AppStrings.login_title,
                         fontWeight: FontWeight.w600,

@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/pendingTransaction/pendingTrancation.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -233,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: appText(
                         category,
                         fontSize: 14.sp,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.textBlack,
                       ),
                     );
@@ -249,10 +250,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 balanceAmount: 12000,
                 daysLeft: 64,
                 progress: 0.45,
-                onPayNow: () {},
+                onPayNow: () {
+                  Get.to(Pendingtrancation());
+                },
               ),
             ),
-
+            SizedBox(height: 10.h),
             // Most Popular Product Section
             Column(
               children: [
@@ -279,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 12.h),
+                SizedBox(height: 8.h),
                 SizedBox(
                   height: 205.h,
                   child: Obx(() {
@@ -324,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 13.h),
 
             // Best seller Product section
             Column(
@@ -352,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 12.h),
+                SizedBox(height: 8.h),
                 SizedBox(
                   height: 85.h,
                   child: Obx(
