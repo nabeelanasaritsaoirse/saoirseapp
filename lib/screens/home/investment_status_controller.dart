@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/investment_status_card_model.dart';
-import 'package:saoirse_app/services/investment_status_service.dart';
+
+import '../../models/investment_status_card_model.dart';
+import '../../services/investment_status_service.dart';
 
 class InvestmentStatusController extends GetxController {
   final InvestmentStatusService service = InvestmentStatusService();
