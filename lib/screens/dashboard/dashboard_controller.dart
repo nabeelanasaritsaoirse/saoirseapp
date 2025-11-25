@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '../cart/cart_controller.dart';
 import '../profile/profile_controller.dart';
+import '../refferal/referral_controller.dart';
 
 class DashboardController extends GetxController {
   // Observable index to track current tab
@@ -10,6 +11,10 @@ class DashboardController extends GetxController {
   // Function to change tab
   void changeTab(int index) {
     selectedIndex.value = index;
+
+    if (index == 2) {
+      Get.put(ReferralController()).fetchReferralData();
+    }
 
     /// If user goes to Cart tab → refresh cart
     if (index == 3) {
