@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:saoirse_app/screens/dashboard/dashboard_controller.dart';
 import 'package:saoirse_app/screens/pendingTransaction/pendingTrancation.dart';
-import 'package:saoirse_app/screens/refferal/referral_screen.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';

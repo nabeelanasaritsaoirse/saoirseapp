@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/order_details/order_details_controller.dart';
+import 'package:saoirse_app/widgets/app_loader.dart';
 
 import '../../constants/app_strings.dart';
 import '../../constants/app_colors.dart';
@@ -69,7 +71,6 @@ class SelectPlanSheet extends StatelessWidget {
 
                 SizedBox(height: 10.h),
 
-                /// --- Customize My Plan ----
                 Align(
                   alignment: AlignmentGeometry.centerLeft,
                   child: appText(
@@ -81,7 +82,6 @@ class SelectPlanSheet extends StatelessWidget {
 
                 SizedBox(height: 12.h),
 
-                /// Input Row (Days + Amount + Convert)
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -168,19 +168,19 @@ class SelectPlanSheet extends StatelessWidget {
                           return;
                         }
 
-                        if (days > 5) {
+                        if (days < 5) {
                           appSnackbar(
                               error: true,
                               title: "Invalid Days",
-                              content: "Days cannot be more than 5");
+                              content: "Days cannot be less than 5");
                           return;
                         }
 
-                        if (amount > 50) {
+                        if (amount < 50) {
                           appSnackbar(
                               error: true,
                               title: "Invalid Amount",
-                              content: "Amount cannot be more than 50");
+                              content: "Amount must be at least 50");
                           return;
                         }
 
@@ -215,8 +215,18 @@ class SelectPlanSheet extends StatelessWidget {
 
                 /// --- List of Plans (Same UI) ---
                 Obx(() {
+                  if (controller.isLoading.value) {
+                    return Center(child: appLoader());
+                  }
+
+                  if (controller.plans.isEmpty) {
+                    return Center(child: appText("No plans available"));
+                  }
+
                   return Column(
-                    children: List.generate(5, (index) {
+                    children: List.generate(controller.plans.length, (index) {
+                      final plan = controller.plans[index];
+
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -225,82 +235,29 @@ class SelectPlanSheet extends StatelessWidget {
                               Radio<int>(
                                 value: index,
                                 groupValue: controller.selectedPlanIndex.value,
-                                activeColor: AppColors.gradientDarkBlue,
                                 onChanged: (value) {
-                                  controller.selectedPlanIndex.value = value!;
+                                  controller.selectApiPlan(value!);
                                 },
                               ),
                               appText(
-                                "Pay INR 100 for 570 Days",
+                                "${plan.name} - ₹${plan.totalAmount} for ${plan.days} Days",
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w600,
                               ),
                               Spacer(),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 8.w,
-                                  vertical: 4.h,
+                              if (plan.isRecommended)
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8.w, vertical: 4.h),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.yellow,
+                                    borderRadius: BorderRadius.circular(8.r),
+                                  ),
+                                  child: Text("Recommended",
+                                      style: TextStyle(fontSize: 10.sp)),
                                 ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.yellow,
-                                  borderRadius: BorderRadius.circular(8.r),
-                                ),
-                                child: Text(
-                                  index == 0
-                                      ? AppStrings.auto_generated
-                                      : AppStrings.recommented,
-                                  style: TextStyle(fontSize: 10.sp),
-                                ),
-                              ),
                             ],
                           ),
-
-                          /// Details under each plan
-                          Padding(
-                            padding: EdgeInsets.only(left: 45.w),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    appText(
-                                      AppStrings.equivalent_time,
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.grey,
-                                    ),
-                                    appText(
-                                      "570 ${AppStrings.days}",
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.grey,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    appText(
-                                      "${AppStrings.start_on} 11 Nov 2025",
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.grey,
-                                    ),
-                                    appText(
-                                      "${AppStrings.end_on} 13 May 2026",
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.grey,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-
                           Divider(),
                         ],
                       );
@@ -312,7 +269,25 @@ class SelectPlanSheet extends StatelessWidget {
 
                 /// --- Final Selected Button ---
                 appButton(
-                  onTap: () {},
+                  onTap: () {
+                    final selected = controller.getSelectedPlan();
+
+                    if (selected["days"] == 0 || selected["amount"] == 0) {
+                      appSnackbar(
+                          error: true, content: "Please select a plan!");
+                      return;
+                    }
+
+                    Get.back();
+
+                    Get.find<OrderDetailsController>().setCustomPlan(
+                      selected["days"],
+                      selected["amount"],
+                    );
+
+                    Get.to(
+                        () => SelectAddress(product: controller.product.value));
+                  },
                   buttonColor: AppColors.primaryColor,
                   width: 170.w,
                   height: 40.h,
