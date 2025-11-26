@@ -170,64 +170,48 @@ jobs:
         with:
           flutter-version: '3.35.7'
           channel: 'stable'
-
+          
       - name: 📦 Install Dependencies
         run: flutter pub get
-
+      
       - name: 🔐 Decode Android Keystore
         run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > android/app/android.keystore
-
-      # Create key.properties
+      
       - name: 🔧 Configure Signing
         run: |
-          cat > android/key.properties <<EOF
+          cat > android/app/key.properties <<EOF
           storePassword=${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword=${{ secrets.KEY_PASSWORD }}
           keyAlias=${{ secrets.KEY_ALIAS }}
           storeFile=android.keystore
           EOF
- 
+      
       - name: 🔢 Auto-increment versionCode
         run: |
           VERSION_LINE=$(grep "^version:" pubspec.yaml)
           VERSION_NAME=$(echo $VERSION_LINE | cut -d '+' -f 1 | awk '{print $2}')
           VERSION_CODE=$(echo $VERSION_LINE | cut -d '+' -f 2)
-
+      
           NEW_VERSION_CODE=$((VERSION_CODE + 1))
-
+      
           echo "Old versionCode: $VERSION_CODE"
           echo "New versionCode: $NEW_VERSION_CODE"
-
+      
           sed -i "s/version: $VERSION_NAME+$VERSION_CODE/version: $VERSION_NAME+$NEW_VERSION_CODE/" pubspec.yaml
-
+      
           grep version: pubspec.yaml
-
-      # -------------------------------------------
-      # 🏗️ BUILD AFTER VERSION UPDATE
-      # -------------------------------------------
+      
       - name: 🏗️ Build Android AAB
         run: flutter build appbundle --release
-
+      
       - name: 📦 Move AAB
         run: find build -name "*.aab" -exec mv {} app-release.aab \;
-
-      - name: 🔐 Decode Android Keystore
-        run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > android.keystore
-
-      - name: 🔧 Configure Signing
-        run: |
-          cat > android/key.properties <<EOF
-          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword=${{ secrets.KEY_PASSWORD }}
-          keyAlias=${{ secrets.KEY_ALIAS }}
-          storeFile=../android.keystore
-          EOF
-
+      
       - name: 🔧 Setup Fastlane
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2"
-
+      
       - run: gem install fastlane -N
 
       - name: 🚀 Deploy to Google Play
