@@ -183,8 +183,9 @@ jobs:
           storePassword=${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword=${{ secrets.KEY_PASSWORD }}
           keyAlias=${{ secrets.KEY_ALIAS }}
-          storeFile=android.keystore
+          storeFile=app/android.keystore
           EOF
+
       
       - name: 🔢 Auto version bump (Semantic + Unique Timestamp)
         run: |
