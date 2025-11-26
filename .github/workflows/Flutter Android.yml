@@ -155,30 +155,21 @@ jobs:
           storeFile=android.keystore
           EOF
 
-      # 👉 Auto-increment versionCode
-      - name: 🔢 Auto-increment versionCode
-        id: bump_version
+      - name: 🔢 Auto version bump using run number
         run: |
           VERSION_LINE=$(grep "^version:" pubspec.yaml)
           VERSION_NAME=$(echo "$VERSION_LINE" | cut -d '+' -f 1 | sed 's/version: //')
-          VERSION_CODE=$(echo "$VERSION_LINE" | cut -d '+' -f 2)
-          NEW_VERSION_CODE=$((VERSION_CODE + 1))
 
-          echo "NEW_VERSION_CODE=$NEW_VERSION_CODE" >> $GITHUB_OUTPUT
+          # Correct way
+          NEW_VERSION_CODE=$GITHUB_RUN_NUMBER
+
+          echo "🔧 versionName: $VERSION_NAME"
+          echo "🔧 New versionCode: $NEW_VERSION_CODE"
 
           sed -i "s/^version:.*/version: $VERSION_NAME+$NEW_VERSION_CODE/" pubspec.yaml
-          echo "Updated version: $(grep version: pubspec.yaml)"
 
-      # 👉 Commit version bump back to GitHub
-      - name: 📤 Commit updated versionCode
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          grep version: pubspec.yaml
 
-          git add pubspec.yaml
-          git commit -m "CI: Auto bump versionCode to ${{ steps.bump_version.outputs.NEW_VERSION_CODE }}" || echo "No changes to commit"
-          git push
-    
       - name: 🏗️ Build Android APK & AAB
         run: |
           flutter build apk --release
