@@ -34,7 +34,7 @@ class VerifyOtpController extends GetxController {
     String otp = otpControllers.map((c) => c.text).join();
 
     print("OTP ENTERED: $otp");
-    print("Phone: $phoneNumber, Username: $username, Referral: $referral");
+    print("PhoneNumber: $phoneNumber, name: $username, Referral: $referral");
 
     String? idToken = await AuthService.verifyOTP(otp);
 
@@ -52,7 +52,8 @@ class VerifyOtpController extends GetxController {
       appSnackbar(content: "Login failed", error: true);
       return;
     }
-
+    print("✔ SUCCESS FLAG: ${res.success}");
+    print("✔ LOGIN MESSAGE: ${res.message}");
     final data = res.data!;
     storage.write(AppConst.USER_ID, data.userId);
     storage.write(AppConst.ACCESS_TOKEN, data.accessToken);
@@ -69,8 +70,8 @@ class VerifyOtpController extends GetxController {
     bool updated = await updateUser(
       userId: data.userId!,
       referralCode: referral,
-      username: username,
-      phone: phoneNumber,
+      name: username,
+      phoneNumber: phoneNumber,
     );
 
     if (!updated) {
@@ -91,21 +92,21 @@ class VerifyOtpController extends GetxController {
   Future<bool> updateUser({
     required String userId,
     required String? referralCode,
-    required String username,
-    required String phone,
+    required String name,
+    required String phoneNumber,
   }) async {
     try {
       String? deviceToken = await getDeviceToken();
       deviceToken ??= "";
 
       print(" Updating User with:");
-      print("   Username: $username");
-      print("   Phone: $phone");
+      print("   name: $username");
+      print("   phoneNumber: $phoneNumber");
       print("   Referral: $referralCode");
       print("   DeviceToken: $deviceToken");
       Map<String, dynamic> body = {
         "deviceToken": deviceToken,
-        "username": username,
+        "name": username,
       };
 
       // add referral only when user entered it

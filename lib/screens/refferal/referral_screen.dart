@@ -16,6 +16,7 @@ import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
 import '../invite_friend/invite_friend_details_screen.dart';
 import '../my_wallet/my_wallet.dart';
+import '../notification/notification_controller.dart';
 import '../notification/notification_screen.dart';
 
 class ReferralScreen extends StatefulWidget {
@@ -81,12 +82,45 @@ class _ReferralScreenState extends State<ReferralScreen> {
       appBar: CustomAppBar(
         title: AppStrings.refferalTitle,
         actions: [
-          IconBox(
-              image: AppAssets.notification,
-              padding: 3.w,
-              onTap: () {
-                Get.to(NotificationScreen());
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconBox(
+                image: AppAssets.notification,
+                padding: 3.w,
+                onTap: () {
+                  Get.to(() => NotificationScreen());
+                },
+              ),
+
+              /// BADGE ONLY IF unreadCount > 0
+              Obx(() {
+                final count =
+                    Get.find<NotificationController>().unreadCount.value;
+                if (count == 0) return const SizedBox();
+
+                return Positioned(
+                  right: -2,
+                  top: -2,
+                  child: Container(
+                    padding: EdgeInsets.all(4.r),
+                    decoration: BoxDecoration(
+                      color: AppColors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      count > 9 ? "9+" : count.toString(),
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 9.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
               }),
+            ],
+          ),
           SizedBox(width: 8.w),
           IconBox(
               image: AppAssets.wallet,

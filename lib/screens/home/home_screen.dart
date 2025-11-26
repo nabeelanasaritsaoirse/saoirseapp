@@ -17,10 +17,11 @@ import '../dashboard/dashboard_controller.dart';
 import '../my_wallet/my_wallet.dart';
 import '../notification/notification_controller.dart';
 import '../notification/notification_screen.dart';
-import '../pendingTransaction/pendingTrancation.dart';
+import '../pending_transaction/pending_transaction_screen.dart';
 import '../productListing/product_listing.dart';
 import '../product_details/product_details_screen.dart';
 import 'home_controller.dart';
+import 'investment_status_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,6 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
   HomeController homeController = Get.put(HomeController());
   NotificationController notificationController =
       Get.put(NotificationController());
+  InvestmentStatusController investmentController =
+      Get.put(InvestmentStatusController());
 
   // Refactored Icon box
 
@@ -43,6 +46,15 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Future.delayed(Duration(milliseconds: 200), () {
+      Get.find<InvestmentStatusController>().fetchInvestmentStatus();
+      debugPrint("👍Investment Status Refreshed");
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -50,10 +62,45 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: CustomAppBar(
         showLogo: true,
         actions: [
-          IconBox(
-              image: AppAssets.notification,
-              padding: 3.w,
-              onTap: () => Get.to(NotificationScreen())),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconBox(
+                image: AppAssets.notification,
+                padding: 3.w,
+                onTap: () {
+                  Get.to(() => NotificationScreen());
+                },
+              ),
+
+              /// BADGE ONLY IF unreadCount > 0
+              Obx(() {
+                final count =
+                    Get.find<NotificationController>().unreadCount.value;
+                if (count == 0) return const SizedBox();
+
+                return Positioned(
+                  right: -2,
+                  top: -2,
+                  child: Container(
+                    padding: EdgeInsets.all(4.r),
+                    decoration: BoxDecoration(
+                      color: AppColors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      count > 9 ? "9+" : count.toString(),
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 9.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
           SizedBox(width: 8.w),
           IconBox(
               image: AppAssets.search,
@@ -244,18 +291,20 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SizedBox(height: 10.h),
-
+//----------------Progress Card Section----------------//
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: InvestmentStatusCard(
-                balanceAmount: 12000,
-                daysLeft: 64,
-                progress: 0.45,
-                onPayNow: () {
-                  Get.to(Pendingtrancation());
-                },
-              ),
-            ),
+                padding: const EdgeInsets.all(8.0),
+                child: Obx(() {
+                  final data = investmentController.overview.value;
+
+                  return InvestmentStatusCard(
+                    balanceAmount: data.totalRemainingAmount.toInt(),
+                    daysLeft: data.remainingDays,
+                    progress: data.progressPercent / 100, // (must be 0–1)
+                    onPayNow: () => Get.to(PendingTransaction()),
+                  );
+                })),
+//--------------------------------------------------------
             SizedBox(height: 10.h),
             // Most Popular Product Section
             Column(

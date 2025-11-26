@@ -49,12 +49,6 @@ class RazorpayController extends GetxController {
         'amount': amount,
         'order_id': razorpayOrderId,
         'currency': 'INR',
-        'name': 'Epielio',
-        'description': 'Product EMI Payment',
-        'prefill': {
-          'contact': '9876543210',
-          'email': 'test@gmail.com',
-        },
       };
 
       //  final options = {

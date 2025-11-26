@@ -46,6 +46,7 @@ class AppURLs {
 
   // Product Details
   static String PRODUCT_DETAILS_API = BASE_API + "api/products/";
+  static String PRODUCT_PLAN_API = BASE_API + "api/products/";
 
   // Products List
   static String PRODUCTS_LISTING = BASE_API + "api/products";
@@ -76,4 +77,12 @@ class AppURLs {
   static String ORDER_HISTORY_API = BASE_API + "api/orders/user/history";
   static String ORDER_DELIVERED_HISTORY_API =
       BASE_API + "api/orders/user/delivered";
+
+  // Pending Transactions Api
+  static String PENDING_TRANSACTIONS_API =
+      BASE_API + "api/installments/payments/daily-pending";
+
+  // Investment Status Api
+  static String INVESTMENT_STATUS_API =
+      BASE_API + "api/installments/orders/overall-status";
 }
