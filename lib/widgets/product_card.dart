@@ -83,26 +83,26 @@ class ProductCard extends StatelessWidget {
                             ),
                     ),
                   ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: GestureDetector(
-                      onTap: onFavoriteTap,
-                      child: Container(
-                        width: 26.w,
-                        height: 26.w,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          size: 14.sp,
-                          color: isFavorite ? Colors.red : Colors.grey,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Positioned(
+                  //   top: 8,
+                  //   right: 8,
+                  //   child: GestureDetector(
+                  //     onTap: onFavoriteTap,
+                  //     child: Container(
+                  //       width: 26.w,
+                  //       height: 26.w,
+                  //       decoration: const BoxDecoration(
+                  //         color: Colors.white,
+                  //         shape: BoxShape.circle,
+                  //       ),
+                  //       child: Icon(
+                  //         isFavorite ? Icons.favorite : Icons.favorite_border,
+                  //         size: 14.sp,
+                  //         color: isFavorite ? Colors.red : Colors.grey,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

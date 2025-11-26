@@ -96,7 +96,6 @@ class OrderDetailsController extends GetxController {
       razorpayOrderId: payment.payment.orderId,
       orderId: payment.order.id,
       amount: payment.payment.amount,
-      key: payment.payment.keyId,
     );
   }
 
