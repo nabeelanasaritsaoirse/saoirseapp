@@ -34,6 +34,17 @@ class OrderDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final couponController = TextEditingController();
     final pricing = product!.pricing;
+
+    final String? productImageUrl =
+        product != null && product!.images.isNotEmpty
+            ? product!.images
+                .firstWhere(
+                  (img) => img.isPrimary,
+                  orElse: () => product!.images.first,
+                )
+                .url
+            : null;
+
     return Scaffold(
       backgroundColor: AppColors.paperColor,
       appBar: CustomAppBar(
@@ -197,11 +208,51 @@ class OrderDetailsScreen extends StatelessWidget {
                       spacing: 15.w,
                       children: [
                         SizedBox(
-                          width: 55.w,
-                          height: 55.h,
-                          child:
-                              Image.asset(AppAssets.iphone, fit: BoxFit.cover),
-                        ),
+                            width: 55.w,
+                            height: 55.h,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.r),
+                              child: Image.network(
+                                product!.images.isNotEmpty
+                                    ? product!.images
+                                        .firstWhere(
+                                          (img) => img.isPrimary,
+                                          orElse: () => product!.images.first,
+                                        )
+                                        .url
+                                    : "", // empty triggers errorBuilder
+                                width: 70.w,
+                                height: 70.w,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) {
+                                  return Container(
+                                    width: 70.w,
+                                    height: 70.w,
+                                    color: Colors.grey.shade200,
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      size: 28.sp,
+                                      color: Colors.grey,
+                                    ),
+                                  );
+                                },
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+
+                                  return Center(
+                                    child: SizedBox(
+                                      width: 24.w,
+                                      height: 24.w,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            )),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -371,10 +422,8 @@ class OrderDetailsScreen extends StatelessWidget {
                   ),
                   buildPriceInfo(
                       label: product!.name, content: "₹ ${pricing.finalPrice}"),
-                  buildPriceInfo(label: AppStrings.tax, content: "₹ 950"),
-                  buildPriceInfo(label: AppStrings.market_fee, content: "₹ 50"),
                   buildPriceInfo(
-                      label: AppStrings.shipping_charge, content: "₹ Free"),
+                      label: AppStrings.shipping_charge, content: "Free"),
                   Divider(
                     color: AppColors.grey,
                   ),
@@ -390,8 +439,7 @@ class OrderDetailsScreen extends StatelessWidget {
                   Obx(() {
                     return buildPriceInfo(
                         label: AppStrings.pay_now,
-                        content:
-                            "₹${orderController.selectedAmount.value} Only");
+                        content: "₹${orderController.selectedAmount.value}");
                   }),
                 ],
               ),

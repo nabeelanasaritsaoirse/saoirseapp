@@ -40,7 +40,7 @@ class CartService {
     try {
       final url = "${AppURLs.ADD_TO_CART}$productId";
 
-      final response = await APIService.putRequest(
+      final response = await APIService.postRequest(
         url: url,
         body: {},
         onSuccess: (json) => json,

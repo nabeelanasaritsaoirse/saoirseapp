@@ -589,8 +589,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         final product = homeController.trendingProducts[index];
                         return ProductCard(
-                          productId: product.productId,
-                          id: product.id,
+                          productId: "PROD153075404",
+                          // product.productId,
+                          id: "69241051f747a104fdda4090",
+                          // product.id,
                           name: product.name,
                           image: product.images.isNotEmpty
                               ? product.images[1].url
