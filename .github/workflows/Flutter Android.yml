@@ -43,6 +43,9 @@ jobs:
       - name: 📦 Install Dependencies
         run: flutter pub get
 
+      - name: 🔐 Export Razorpay Secret
+        run: |
+          echo "RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}" >> $GITHUB_ENV
       # ------------------------------
       # LINT (With success flag)
       # ------------------------------
