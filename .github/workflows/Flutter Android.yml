@@ -186,23 +186,24 @@ jobs:
           storeFile=android.keystore
           EOF
       
-      - name: 🔢 Auto version bump (Name + Code)
+      - name: 🔢 Auto version bump (Semantic + Unique Timestamp)
         run: |
           VERSION_LINE=$(grep "^version:" pubspec.yaml)
-          OLD_VERSION_CODE=$(echo $VERSION_LINE | cut -d '+' -f 2)
           
+          # Extract current build number (after +)
+          OLD_VERSION_CODE=$(echo $VERSION_LINE | cut -d '+' -f 2)
           NEW_VERSION_CODE=$((OLD_VERSION_CODE + 1))
-
-          # Format: YYYY.MM.DD.HHMM (unique per pipeline)
-          NEW_VERSION_NAME=$(date +'%Y.%m.%d.%H%M')
-
-          echo "Old versionCode: $OLD_VERSION_CODE"
-          echo "New versionCode: $NEW_VERSION_CODE"
-          echo "New versionName: $NEW_VERSION_NAME"
-
-          # Update pubspec.yaml
+      
+          # Timestamp for unique versionName (valid as PATCH number)
+          TS=$(date +'%Y%m%d%H%M')
+      
+          NEW_VERSION_NAME="1.0.$TS"
+      
+          echo "🔧 New versionName: $NEW_VERSION_NAME"
+          echo "🔧 New versionCode: $NEW_VERSION_CODE"
+      
           sed -i "s/^version:.*/version: $NEW_VERSION_NAME+$NEW_VERSION_CODE/" pubspec.yaml
-
+      
           grep version: pubspec.yaml
       
       - name: 🏗️ Build Android AAB
