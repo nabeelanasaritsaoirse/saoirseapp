@@ -19,16 +19,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showLogo = false,
     this.showBack = false,
     this.actions,
-    this.height = 52,
+    this.height = 48,
   });
 
   Widget _buildLogo() {
     return Padding(
-      padding: EdgeInsets.only(left: 12.w, top: 1.h),
+      padding: EdgeInsets.only(left: 12.w,),
       child: Image.asset(
         AppAssets.app_logo,
-        height: 35.h,
-        width: 35.w,
+        height: 26.h,
+        width: 26.w,
       ),
     );
   }
@@ -51,7 +51,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         backgroundColor: AppColors.primaryColor,
         elevation: 0,
-        leadingWidth: showLogo ? 70.w : 45.w,
+        leadingWidth: showLogo ? 56.w : 45.w,
         leading: showBack
             ? _buildBackButton()
             : showLogo
@@ -78,27 +78,27 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 class IconBox extends StatelessWidget {
   final String image;
   final double padding;
-  final VoidCallback onTap; // required onTap function
+  final VoidCallback onTap;
 
   const IconBox({
     super.key,
     required this.image,
     required this.padding,
-    required this.onTap, // marked as required
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap, // added here
-      borderRadius: BorderRadius.circular(10.r),
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8.r),
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 7.h),
-        width: 36.w,
-        height: 36.h,
+        margin: EdgeInsets.symmetric(vertical: 6.h),
+        width: 33.w,
+        height: 29.h,
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(8.r),
         ),
         child: Padding(
           padding: EdgeInsets.all(padding),

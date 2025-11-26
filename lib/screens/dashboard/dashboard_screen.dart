@@ -54,7 +54,7 @@ class DashboardScreen extends StatelessWidget {
           child: SafeArea(
             top: false,
             child: Padding(
-              padding: EdgeInsets.only(top: 8.h, bottom: 4.h),
+              padding: EdgeInsets.only(top: 4.h, bottom: 2.h),
               child: BottomNavigationBar(
                 type: BottomNavigationBarType.fixed,
                 backgroundColor: Colors.transparent,
@@ -65,11 +65,11 @@ class DashboardScreen extends StatelessWidget {
                 unselectedItemColor: AppColors.grey,
                 showUnselectedLabels: true,
                 selectedLabelStyle: TextStyle(
-                  fontSize: 12.sp,
+                  fontSize: 11.sp,
                   fontWeight: FontWeight.w600,
                 ),
                 unselectedLabelStyle: TextStyle(
-                  fontSize: 12.sp,
+                  fontSize: 11.sp,
                   fontWeight: FontWeight.w400,
                 ),
                 items: [
@@ -123,7 +123,7 @@ class DashboardScreen extends StatelessWidget {
       icon: Stack(
         clipBehavior: Clip.none,
         children: [
-          Icon(icon, size: 26.sp),
+          Icon(icon, size: 22.sp),
           if (badgeCount != null && badgeCount > 0)
             Positioned(
               right: -4,
@@ -152,12 +152,12 @@ class DashboardScreen extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Container(
-            padding: EdgeInsets.all(8.w),
+            padding: EdgeInsets.all(6.w),
             decoration: BoxDecoration(
               color: AppColors.primaryColor,
               shape: BoxShape.circle,
             ),
-            child: Icon(activeIcon, color: AppColors.white, size: 20.sp),
+            child: Icon(activeIcon, color: AppColors.white, size: 19.sp),
           ),
           if (badgeCount != null && badgeCount > 0)
             Positioned(

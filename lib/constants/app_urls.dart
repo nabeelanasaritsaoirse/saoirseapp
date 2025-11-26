@@ -85,4 +85,7 @@ class AppURLs {
   // Investment Status Api
   static String INVESTMENT_STATUS_API =
       BASE_API + "api/installments/orders/overall-status";
+
+  // Success Story Banner API
+  static String SUCCESS_STORY_BANNER_API = BASE_API + "api/success-stories/public/active";    
 }
