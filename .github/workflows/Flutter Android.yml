@@ -179,26 +179,30 @@ jobs:
       
       - name: 🔧 Configure Signing
         run: |
-          cat > android/app/key.properties <<EOF
+          cat > android/key.properties <<EOF
           storePassword=${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword=${{ secrets.KEY_PASSWORD }}
           keyAlias=${{ secrets.KEY_ALIAS }}
           storeFile=android.keystore
           EOF
       
-      - name: 🔢 Auto-increment versionCode
+      - name: 🔢 Auto version bump (Name + Code)
         run: |
           VERSION_LINE=$(grep "^version:" pubspec.yaml)
-          VERSION_NAME=$(echo $VERSION_LINE | cut -d '+' -f 1 | awk '{print $2}')
-          VERSION_CODE=$(echo $VERSION_LINE | cut -d '+' -f 2)
-      
-          NEW_VERSION_CODE=$((VERSION_CODE + 1))
-      
-          echo "Old versionCode: $VERSION_CODE"
+          OLD_VERSION_CODE=$(echo $VERSION_LINE | cut -d '+' -f 2)
+          
+          NEW_VERSION_CODE=$((OLD_VERSION_CODE + 1))
+
+          # Format: YYYY.MM.DD.HHMM (unique per pipeline)
+          NEW_VERSION_NAME=$(date +'%Y.%m.%d.%H%M')
+
+          echo "Old versionCode: $OLD_VERSION_CODE"
           echo "New versionCode: $NEW_VERSION_CODE"
-      
-          sed -i "s/version: $VERSION_NAME+$VERSION_CODE/version: $VERSION_NAME+$NEW_VERSION_CODE/" pubspec.yaml
-      
+          echo "New versionName: $NEW_VERSION_NAME"
+
+          # Update pubspec.yaml
+          sed -i "s/^version:.*/version: $NEW_VERSION_NAME+$NEW_VERSION_CODE/" pubspec.yaml
+
           grep version: pubspec.yaml
       
       - name: 🏗️ Build Android AAB
