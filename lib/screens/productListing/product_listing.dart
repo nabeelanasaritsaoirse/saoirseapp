@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../constants/app_assets.dart';
 import '../../widgets/app_loader.dart';
@@ -9,10 +8,10 @@ import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/product_card.dart';
 import '../product_details/product_details_screen.dart';
+import '../profile/profile_controller.dart';
 import '../wishlist/wishlist_screen.dart';
 import '/screens/productListing/productListing_controller.dart';
 import '../../constants/app_colors.dart';
-import '../../widgets/app_text.dart';
 
 class ProductListing extends StatefulWidget {
   const ProductListing({super.key});
@@ -27,19 +26,22 @@ class _ProductListingState extends State<ProductListing> {
   void initState() {
     super.initState();
 
+    if (!Get.isRegistered<ProductlistingController>()) {
+      Get.put(ProductlistingController());
+    }
+
     scrollController.addListener(() {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
-        Get.find<ProductlistingController>().fetchProducts(); // LOAD NEXT PAGE
+        Get.find<ProductlistingController>().fetchProducts();
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    ProductlistingController productlistingController = Get.put(
-      ProductlistingController(),
-    );
+    final ProductlistingController productlistingController =
+        Get.find<ProductlistingController>();
 
     productlistingController.products;
 
@@ -70,62 +72,93 @@ class _ProductListingState extends State<ProductListing> {
             ),
           ),
           actions: [
-            IconBox(
-              image: AppAssets.wish,
-              padding: 8,
-              onTap: () {
-                Get.to(WishlistScreen());
-              },
-            ),
+            Obx(() {
+              final count = Get.find<ProfileController>().wishlistCount.value;
+
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconBox(
+                    image: AppAssets.wish,
+                    padding: 8.w,
+                    onTap: () {
+                      Get.to(() => const WishlistScreen());
+                    },
+                  ),
+
+                  // Show badge only if count > 0
+                  if (count > 0)
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: Container(
+                        padding: EdgeInsets.all(4.r),
+                        decoration: BoxDecoration(
+                          color: AppColors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          count > 9 ? "9+" : count.toString(),
+                          style: TextStyle(
+                            color: AppColors.white,
+                            fontSize: 9.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            }),
             SizedBox(width: 12.w),
           ],
         ),
       ),
       body: Column(
         children: [
-          Container(
-            color: AppColors.lightGrey,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(LucideIcons.arrowUpDown, size: 18.sp),
-                        appText("sort", fontSize: 18.sp),
-                      ],
-                    ),
-                    onTap: () {
-                      //  SORT BUTTON FUNCTION
-                    },
-                  ),
-                ),
-                Container(
-                  width: 1.w,
-                  height: 40.h,
-                  color: AppColors.shadowColor,
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(LucideIcons.filter, size: 18.sp),
-                        appText("Filter", fontSize: 18.sp),
-                      ],
-                    ),
-                    onTap: () {
-                      //  FILTER  BUTTON FUNCTION
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Container(
+          //   color: AppColors.lightGrey,
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          //     children: [
+          //       Expanded(
+          //         child: GestureDetector(
+          //           child: Row(
+          //             crossAxisAlignment: CrossAxisAlignment.center,
+          //             mainAxisAlignment: MainAxisAlignment.center,
+          //             children: [
+          //               Icon(LucideIcons.arrowUpDown, size: 18.sp),
+          //               appText("sort", fontSize: 18.sp),
+          //             ],
+          //           ),
+          //           onTap: () {
+          //             //  SORT BUTTON FUNCTION
+          //           },
+          //         ),
+          //       ),
+          //       Container(
+          //         width: 1.w,
+          //         height: 40.h,
+          //         color: AppColors.shadowColor,
+          //       ),
+          //       Expanded(
+          //         child: GestureDetector(
+          //           child: Row(
+          //             crossAxisAlignment: CrossAxisAlignment.center,
+          //             mainAxisAlignment: MainAxisAlignment.center,
+          //             children: [
+          //               Icon(LucideIcons.filter, size: 18.sp),
+          //               appText("Filter", fontSize: 18.sp),
+          //             ],
+          //           ),
+          //           onTap: () {
+          //             //  FILTER  BUTTON FUNCTION
+          //           },
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
           Expanded(
             child: Obx(() {
               if (productlistingController.isLoading.value &&
@@ -157,6 +190,7 @@ class _ProductListingState extends State<ProductListing> {
                             ));
                       },
                       child: ProductCard(
+                          margin: EdgeInsets.all(0),
                           productId: product.id,
                           name: product.name,
                           brand: product.brand,
@@ -164,7 +198,7 @@ class _ProductListingState extends State<ProductListing> {
                               ? product.images.last.url
                               : "https://via.placeholder.com/200",
                           price: product.pricing.finalPrice.toStringAsFixed(0),
-                          isFavorite: true));
+                          isFavorite: false));
                 },
               );
             }),

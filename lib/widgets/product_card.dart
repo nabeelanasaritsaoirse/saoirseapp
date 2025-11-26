@@ -38,7 +38,7 @@ class ProductCard extends StatelessWidget {
       ),
       child: Container(
         width: 150.w,
-        height: 220.h, // 🔥 FIXED, RESPONSIVE SAFE HEIGHT
+        height: 230.h, // 🔥 FIXED, RESPONSIVE SAFE HEIGHT
         margin: margin ?? EdgeInsets.only(right: 10.w),
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -57,7 +57,7 @@ class ProductCard extends StatelessWidget {
           children: [
             /// ---------------- IMAGE AREA ----------------
             SizedBox(
-              height: 120.h,
+              height: 110.h,
               child: Stack(
                 children: [
                   Container(

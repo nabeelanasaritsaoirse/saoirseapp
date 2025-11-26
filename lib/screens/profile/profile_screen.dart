@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/order_delivered/order_delivered_screen.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -10,8 +9,9 @@ import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/profile_menu_card.dart';
 import '../edit_profile/edit_profile_screen.dart';
+import '../order_delivered/order_delivered_screen.dart';
 import '../order_history/order_history_screen.dart';
-import '../pendingTransaction/pendingTrancation.dart';
+import '../pending_transaction/pending_transaction_screen.dart';
 import '../transaction_history/transaction_history.dart';
 import '../wishlist/wishlist_screen.dart';
 import 'profile_controller.dart';
@@ -51,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // BACKGROUND CONTAINER
                 Container(
                   width: double.infinity,
-                  height: 175.h,
+                  height: 200.h,
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage(AppAssets.profile_bg),
@@ -62,7 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 // PROFILE - DETAILS
                 Positioned(
-                  top: 20.h, // moves the circle down
+                  top: 18.h, // moves the circle down
                   left: 0,
                   right: 0,
                   child: Column(
@@ -172,7 +172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: controller.myOrders[index]["title"]!,
                       onTap: () {
                         if (index == 0) {
-                          Get.to(Pendingtrancation());
+                          Get.to(PendingTransaction());
                         } else if (index == 1) {
                           Get.to(OrderHistoryScreen());
                         } else if (index == 2) {

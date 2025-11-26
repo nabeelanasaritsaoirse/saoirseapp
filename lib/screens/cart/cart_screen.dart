@@ -32,6 +32,9 @@ class CartScreen extends StatelessWidget {
             onTap: () {
               controller.clearCartItems();
             },
+          ),
+          SizedBox(
+            width: 12.w,
           )
         ],
       ),

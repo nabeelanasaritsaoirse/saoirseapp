@@ -119,7 +119,7 @@ class AppStrings {
   static String equivalent_time = "Equivalent Time:";
   static String start_on = "Start On";
   static String end_on = "Start On";
-  static String selected = "Selected";
+  static String selected = "Select";
   static String warning_label = "Please Select Your Plan";
   static String warning_body =
       "You haven’t selected a plan yet. Please choose a plan before proceeding to Add to Cart.";

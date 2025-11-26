@@ -12,6 +12,10 @@ class DashboardController extends GetxController {
   void changeTab(int index) {
     selectedIndex.value = index;
 
+    if (index == 1) {
+      Get.put(ProfileController()).fetchWishlistCount();
+    }
+
     if (index == 2) {
       Get.put(ReferralController()).fetchReferralData();
     }

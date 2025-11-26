@@ -4,9 +4,11 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
 import '../../services/product_service.dart';
 import '../../services/wishlist_service.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/app_snackbar.dart';
 import '../../widgets/select_plan_sheet.dart';
 
@@ -18,6 +20,8 @@ class ProductDetailsController extends GetxController {
     required this.productId,
     this.id,
   });
+
+  RxList<PlanModel> plans = <PlanModel>[].obs;
 
   final WishlistService wishlistService = WishlistService();
   final ProductService productService = ProductService();
@@ -129,7 +133,23 @@ class ProductDetailsController extends GetxController {
     currentImageIndex.value = index;
   }
 
-  void openSelectPlanSheet() {
+  void openSelectPlanSheet() async {
+    if (product.value == null) return;
+
+    // Reset previous plan selection
+    resetPlanSelection();
+
+    appLoader();
+
+    // Fetch plans
+    isLoading.value = true;
+    await loadPlans(product.value!.id);
+    isLoading.value = false;
+
+    // Close loader
+    if (Get.isDialogOpen ?? false) Get.back();
+
+    // Open sheet
     Get.bottomSheet(
       const SelectPlanSheet(),
       isScrollControlled: true,
@@ -194,6 +214,45 @@ class ProductDetailsController extends GetxController {
     daysController.text = days.toString();
 
     isUpdating = false;
+  }
+
+  Future loadPlans(String productId) async {
+    isLoading.value = true;
+
+    final result = await ProductService().fetchProductPlans(productId);
+
+    plans.assignAll(result);
+
+    isLoading.value = false;
+  }
+
+  void selectApiPlan(int index) {
+    selectedPlanIndex.value = index;
+
+    // clear custom plan if user selects api plan
+    customDays.value = 0;
+    customAmount.value = 0.0;
+  }
+
+  void resetPlanSelection() {
+    selectedPlanIndex.value = -1;
+    customDays.value = 0;
+    customAmount.value = 0.0;
+  }
+
+  Map<String, dynamic> getSelectedPlan() {
+    if (selectedPlanIndex.value != -1) {
+      final plan = plans[selectedPlanIndex.value];
+      return {
+        "days": plan.days,
+        "amount": plan.totalAmount,
+      };
+    }
+
+    return {
+      "days": customDays.value,
+      "amount": customAmount.value,
+    };
   }
 
   void setCustomPlan(int days, double amount) {
