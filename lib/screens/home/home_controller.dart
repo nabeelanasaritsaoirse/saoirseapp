@@ -1,16 +1,18 @@
 // home_controller.dart
 import 'dart:developer';
-
 import 'package:get/get.dart';
-import '../../constants/app_assets.dart';
+
 import '../../models/product_model.dart';
+import '../../models/success_story_banner_model.dart';
 import '../../services/home_service.dart';
+import '../../services/success_story_banner_service.dart';
 
 class HomeController extends GetxController {
   RxBool loading = false.obs;
   RxBool popularLoading = false.obs;
   RxBool bestSellerLoading = false.obs;
   RxBool trendingLoading = false.obs;
+  RxBool successLoading = false.obs;
 
   RxInt currentCarouselIndex = 0.obs;
   RxInt currentBottomCarouselIndex = 0.obs;
@@ -22,15 +24,12 @@ class HomeController extends GetxController {
     'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800',
   ].obs;
 
-  final RxList<String> successImages = <String>[
-    AppAssets.success_image_1,
-    AppAssets.success_image_2,
-    AppAssets.success_image_3,
-  ].obs;
+  final SuccessStoryService successService = SuccessStoryService();
 
   final RxList<Product> mostPopularProducts = <Product>[].obs;
   final RxList<Product> bestSellerProducts = <Product>[].obs;
   final RxList<Product> trendingProducts = <Product>[].obs;
+  RxList<SuccessStoryItem> successStories = <SuccessStoryItem>[].obs;
 
   @override
   void onInit() {
@@ -44,6 +43,7 @@ class HomeController extends GetxController {
       fetchPopularProducts(),
       fetchBestSellerProducts(),
       fetchTrendingProducts(),
+      fetchSuccessStories(),
     ]);
   }
 
@@ -95,6 +95,23 @@ class HomeController extends GetxController {
       log('Error fetching trending products: $e');
     } finally {
       trendingLoading.value = false;
+    }
+  }
+
+  // Fetch Success Stories
+  Future<void> fetchSuccessStories() async {
+    try {
+      successLoading.value = true;
+
+      final result = await successService.fetchSuccessStories();
+
+      result.sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
+
+      successStories.value = result;
+    } catch (e) {
+      log("Error fetching success story: $e");
+    } finally {
+      successLoading.value = false;
     }
   }
 
