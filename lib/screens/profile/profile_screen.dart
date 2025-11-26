@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/app_loader.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -45,82 +46,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // -------------------- PROFILE BANNER -----------------------
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // BACKGROUND CONTAINER
-                Container(
-                  width: double.infinity,
+            Obx(() {
+              final user = controller.profile.value?.user;
+
+              if (user == null) {
+                return SizedBox(
                   height: 200.h,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(AppAssets.profile_bg),
-                      fit: BoxFit.cover,
+                  child: Center(child: appLoader()),
+                );
+              }
+
+              // // --- priority logic ---
+              // String primaryContact = "";
+              // if (user.email.isNotEmpty) {
+              //   primaryContact = user.email;
+              // } else if (user.phoneNumber.isNotEmpty) {
+              //   primaryContact = user.phoneNumber;
+              // }
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // BACKGROUND CONTAINER
+                  Container(
+                    width: double.infinity,
+                    height: 200.h,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(AppAssets.profile_bg),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
 
-                // PROFILE - DETAILS
-                Positioned(
-                  top: 18.h, // moves the circle down
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      // PROFILE WITH EDIT BUTTON
-                      Stack(
-                        children: [
-                          Container(
-                            width: 85.w,
-                            height: 85.h,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: AssetImage(AppAssets.facebook),
-                                fit: BoxFit.cover,
-                              ),
+                  // PROFILE - DETAILS
+                  Positioned(
+                    top: 18.h, // moves the circle down
+                    left: 0,
+                    right: 0,
+                    child: Column(
+                      children: [
+                        // PROFILE WITH EDIT BUTTON
+                        Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 42,
+                              backgroundColor: Colors.grey.shade300,
+                              backgroundImage: user.profilePicture.isNotEmpty
+                                  ? NetworkImage(user.profilePicture)
+                                  : AssetImage(AppAssets.facebook)
+                                      as ImageProvider,
                             ),
-                          ),
 
-                          // SMALL EDIT ICON
-                          Positioned(
-                            right: 0,
-                            bottom: 0,
-                            child: InkWell(
-                              onTap: () => Get.to(EditProfileScreen()),
-                              child: Container(
-                                width: 25.w,
-                                height: 25.h,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.primaryColor,
-                                ),
-                                child: Icon(
-                                  Icons.edit,
-                                  color: AppColors.white,
-                                  size: 14.sp,
+                            // SMALL EDIT ICON
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: InkWell(
+                                onTap: () => Get.to(EditProfileScreen()),
+                                child: Container(
+                                  width: 25.w,
+                                  height: 25.h,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  child: Icon(
+                                    Icons.edit,
+                                    color: AppColors.white,
+                                    size: 14.sp,
+                                  ),
                                 ),
                               ),
-                            ),
-                          )
-                        ],
-                      ),
+                            )
+                          ],
+                        ),
 
-                      SizedBox(height: 12.h),
+                        SizedBox(height: 12.h),
 
-                      appText('Albert Dan',
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textBlack,
-                          fontSize: 18.sp),
-                      appText('albert.dan@gmail.com',
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textBlack,
-                          fontSize: 14.sp)
-                    ],
+                        appText(user.name,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textBlack,
+                            fontSize: 18.sp),
+                        // if (primaryContact.isNotEmpty)
+                        //   appText(primaryContact,
+                        //       fontWeight: FontWeight.w400,
+                        //       color: AppColors.textBlack,
+                        //       fontSize: 14.sp)
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              );
+            }),
 
             SizedBox(height: 20.h),
 
