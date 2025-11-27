@@ -2,10 +2,9 @@ import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:saoirse_app/services/payment_service.dart';
 
 import '../../models/razorpay_payment_response.dart';
-
+import '../../services/payment_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_snackbar.dart';
 
@@ -130,7 +129,8 @@ class RazorpayWalletController extends GetxController {
       } else {
         appSnackbar(
           error: true,
-          content: response?["message"] ?? "Wallet Payment Verification Failed!",
+          content:
+              response?["message"] ?? "Wallet Payment Verification Failed!",
         );
       }
     } catch (e, s) {

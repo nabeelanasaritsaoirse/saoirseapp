@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:saoirse_app/screens/add_money/add_money_screen.dart';
 
 import '../../constants/app_strings.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
+import '../add_money/add_money_screen.dart';
 import '../withdtraw/withdraw_screen.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
@@ -26,7 +26,6 @@ class WalletScreen extends StatelessWidget {
         showBack: true,
         actions: [
           GestureDetector(
-            
             child: Container(
               margin: EdgeInsets.only(right: 16.w),
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
@@ -42,7 +41,7 @@ class WalletScreen extends StatelessWidget {
               ),
             ),
             onTap: () {
-               Get.to(AddMoneyScreen());
+              Get.to(AddMoneyScreen());
             },
           ),
         ],
