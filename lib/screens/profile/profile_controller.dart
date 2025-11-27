@@ -9,11 +9,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../constants/app_assets.dart';
-import '../../constants/app_constant.dart';
-import '../../constants/app_urls.dart';
-import '../../main.dart';
+// import '../../constants/app_constant.dart';
+// import '../../constants/app_urls.dart';
+// import '../../main.dart';
+// import '../../services/api_service.dart';
 import '../../models/profile_response.dart';
-import '../../services/api_service.dart';
 import '../../services/profile_service.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_snackbar.dart';
@@ -116,47 +116,47 @@ class ProfileController extends GetxController {
     }
   }
 
-  // ================== UPDATE USERNAME ONLY ==================
-  Future<void> updateUserName() async {
-    if (fullNameController.text.trim().isEmpty) {
-      appSnackbar(error: true, title: "Error", content: "Name cannot be empty");
-      return;
-    }
+  // // ================== UPDATE USERNAME ONLY ==================
+  // Future<void> updateUserName() async {
+  //   if (fullNameController.text.trim().isEmpty) {
+  //     appSnackbar(error: true, title: "Error", content: "Name cannot be empty");
+  //     return;
+  //   }
 
-    try {
-      isLoading(true);
-      final userId = profile.value?.user.id;
-      final token = storage.read(AppConst.ACCESS_TOKEN);
+  //   try {
+  //     isLoading(true);
+  //     final userId = profile.value?.user.id;
+  //     final token = storage.read(AppConst.ACCESS_TOKEN);
 
-      final response = await APIService.putRequest(
-        url: AppURLs.USER_UPDATE_API + userId!, //  CORRECT ENDPOINT
-        headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
-        },
-        body: {
-          "name": fullNameController.text.trim(), // ONLY NAME
-        },
-        onSuccess: (data) => data,
-      );
+  //     final response = await APIService.putRequest(
+  //       url: AppURLs.USER_UPDATE_API + userId!, //  CORRECT ENDPOINT
+  //       headers: {
+  //         "Authorization": "Bearer $token",
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: {
+  //         "name": fullNameController.text.trim(), // ONLY NAME
+  //       },
+  //       onSuccess: (data) => data,
+  //     );
 
-      print("Update Response => $response");
+  //     print("Update Response => $response");
 
-      if (response != null && response["success"] == true) {
-        appSnackbar(title: "Success", content: "Name updated");
-        await fetchUserProfile();
+  //     if (response != null && response["success"] == true) {
+  //       appSnackbar(title: "Success", content: "Name updated");
+  //       await fetchUserProfile();
 
-        Get.back(); // Go back to Profile Screen
-      } else {
-        appSnackbar(error: true, title: "Failed", content: "Update failed");
-      }
-    } catch (e) {
-      print("UPDATE NAME ERROR => $e");
-      appSnackbar(error: true, title: "Error", content: "Something went wrong");
-    } finally {
-      isLoading(false);
-    }
-  }
+  //       Get.back(); // Go back to Profile Screen
+  //     } else {
+  //       appSnackbar(error: true, title: "Failed", content: "Update failed");
+  //     }
+  //   } catch (e) {
+  //     print("UPDATE NAME ERROR => $e");
+  //     appSnackbar(error: true, title: "Error", content: "Something went wrong");
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
 
 // ================== PICK PROFILE IMAGE ==================
   Future<void> pickProfileImage() async {
@@ -171,62 +171,62 @@ class ProfileController extends GetxController {
 
       if (image != null) {
         profileImage.value = File(image.path);
-        await uploadUserProfilePicture(image.path);
+        // await uploadUserProfilePicture(image.path);----------(commendd for auto upload)
       }
     } catch (e) {
       print("PICK IMAGE ERROR: $e");
     }
   }
 
-// ================== NEW METHOD (fixed name) ==================
-  // ================== UPLOAD USER PROFILE PICTURE ==================
-  Future<void> uploadUserProfilePicture(String imagePath) async {
-    if (imagePath.isEmpty) {
-      appSnackbar(
-          error: true, title: "Error", content: "Invalid image selected");
-      return;
-    }
+// // ================== NEW METHOD (fixed name) ==================
+//   // ================== UPLOAD USER PROFILE PICTURE ==================
+//   Future<void> uploadUserProfilePicture(String imagePath) async {
+//     if (imagePath.isEmpty) {
+//       appSnackbar(
+//           error: true, title: "Error", content: "Invalid image selected");
+//       return;
+//     }
 
-    // Show loader
-    isLoading(true);
+//     // Show loader
+//     isLoading(true);
 
-    try {
-      final userId = profile.value?.user.id;
+//     try {
+//       final userId = profile.value?.user.id;
 
-      if (userId == null) {
-        print("UserID not found");
-        appSnackbar(error: true, title: "Error", content: "User not found");
-        return;
-      }
+//       if (userId == null) {
+//         print("UserID not found");
+//         appSnackbar(error: true, title: "Error", content: "User not found");
+//         return;
+//       }
 
-      print(" Uploading profile image for user: $userId");
+//       print(" Uploading profile image for user: $userId");
 
-      final success =
-          await _profileService.updateProfilePicture(userId, imagePath);
+//       final success =
+//           await _profileService.updateProfilePicture(userId, imagePath);
 
-      if (success) {
-        appSnackbar(
-          title: "Success",
-          content: "Profile picture updated successfully",
-        );
+//       if (success) {
+//         appSnackbar(
+//           title: "Success",
+//           content: "Profile picture updated successfully",
+//         );
 
-        print(" Refreshing user profile...");
-        await fetchUserProfile();
-      } else {
-        appSnackbar(
-          error: true,
-          title: "Failed",
-          content: "Unable to upload profile picture",
-        );
-      }
-    } catch (e) {
-      print(" Controller Error: $e");
-      appSnackbar(error: true, title: "Error", content: "Something went wrong");
-    } finally {
-      // hide loader after everything
-      isLoading(false);
-    }
-  }
+//         print(" Refreshing user profile...");
+//         await fetchUserProfile();
+//       } else {
+//         appSnackbar(
+//           error: true,
+//           title: "Failed",
+//           content: "Unable to upload profile picture",
+//         );
+//       }
+//     } catch (e) {
+//       print(" Controller Error: $e");
+//       appSnackbar(error: true, title: "Error", content: "Something went wrong");
+//     } finally {
+//       // hide loader after everything
+//       isLoading(false);
+//     }
+//   }
 
   // ================== GALLERY PERMISSION ==================
   Future<bool> _requestGalleryPermission() async {
@@ -312,7 +312,106 @@ class ProfileController extends GetxController {
     }
     return null;
   }
+//-------------------------------------------------------------------------------------------------------------------------------------
+  // this is for resetting form data when edit profile screen is (opened)
+  void resetFormData() {
+  final user = profile.value?.user;
+  if (user != null) {
+    fullNameController.text = user.name;
+    emailController.text = user.email;
+    phoneNumberController.text = user.phoneNumber;
+  }
+  profileImage.value = null; 
+  }
 
+  // This method updates both the username and profile picture if (provided)
+Future<void> updateUserName() async {
+  final name = fullNameController.text.trim();
+
+  if (name.isEmpty) {
+    appSnackbar(error: true, title: "Error", content: "Name cannot be empty");
+    return;
+  }
+
+  final userId = profile.value?.user.id;
+  if (userId == null) {
+    appSnackbar(error: true, title: "Error", content: "User not found");
+    return;
+  }
+
+  try {
+    isLoading(true);
+
+    // Upload image if selected
+    if (profileImage.value != null) {
+      final imageUpdated = await _profileService.updateProfilePicture(
+        userId,
+        profileImage.value!.path,
+      );
+
+      if (!imageUpdated) {
+        appSnackbar(
+          error: true,
+          title: "Failed",
+          content: "Unable to update profile picture",
+        );
+        // return;
+      }
+    }
+
+    // Update name here
+    final success = await _profileService.updateUserName(userId, name);
+
+    if (success) {
+      appSnackbar(title: "Success", content: "Profile updated successfully");
+      await fetchUserProfile();
+      Get.back();
+    } else {
+      appSnackbar(error: true, title: "Failed", content: "Update failed");
+    }
+  } catch (e) {
+    appSnackbar(error: true, title: "Error", content: "Something went wrong");
+  } finally {
+    isLoading(false);
+  }
+}
+
+// upload profile picture only (if needed)
+Future<void> uploadUserProfilePicture(String imagePath) async {
+  if (imagePath.isEmpty) {
+    appSnackbar(
+      error: true,
+      title: "Error",
+      content: "Invalid image selected",
+    );
+    return;
+  }
+
+  final userId = profile.value?.user.id;
+  if (userId == null) {
+    appSnackbar(error: true, title: "Error", content: "User not found");
+    return;
+  }
+
+  try {
+    final success = await _profileService.updateProfilePicture(
+      userId,
+      imagePath,
+    );
+
+    if (!success) {
+      appSnackbar(
+        error: true,
+        title: "Failed",
+        content: "Unable to upload profile picture",
+      );
+    }
+
+  } catch (e) {
+    appSnackbar(error: true, title: "Error", content: "Something went wrong");
+  }
+}
+//-------------------------------------------------------------------------------------------------------------------------------------
   // ================== CLEANUP ==================
   @override
   void onClose() {
