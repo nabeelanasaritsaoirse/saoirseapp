@@ -33,6 +33,7 @@ class ProductDetailsController extends GetxController {
   RxInt currentImageIndex = 0.obs;
   RxBool isFavorite = false.obs;
   RxInt selectedPlanIndex = (-1).obs;
+    RxString selectedVariantId = "".obs;
 
   /// Custom plan values
   RxInt customDays = 0.obs;
@@ -231,7 +232,7 @@ class ProductDetailsController extends GetxController {
 
     final plan = plans[index];
 
-    // ✅ store selected API plan values
+    //  store selected API plan values
     customDays.value = plan.days;
     customAmount.value = plan.perDayAmount;
   }
@@ -264,5 +265,28 @@ class ProductDetailsController extends GetxController {
     selectedPlanIndex.value = -1;
 
     Get.back();
+  }
+
+
+   void selectVariantById(String variantId) {
+    selectedVariantId.value = variantId;
+  
+    log("Selected variantId: $variantId");
+  }
+
+  Variant? getSelectedVariant() {
+  if (selectedVariantId.value.isEmpty) return null;
+
+  for (final v in product.value?.variants ?? []) {
+    if (v.variantId == selectedVariantId.value) {
+      return v;
+    }
+  }
+  return null; 
+}
+
+
+  void clearSelectedVariant() {
+    selectedVariantId.value = "";
   }
 }

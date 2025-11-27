@@ -300,35 +300,67 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   color: AppColors.textBlack,
                                 ),
                                 SizedBox(height: 12.h),
-                                SizedBox(
-                                  height: 64.h,
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: product.images.length,
-                                    itemBuilder: (context, index) {
-                                      final img = product.images[index];
-                                      return Container(
-                                        margin: EdgeInsets.only(right: 10.w),
-                                        width: 60.w,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(8.r),
-                                          border: Border.all(
-                                              color: Colors.grey.shade300),
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(7.r),
-                                          child: Image.network(
-                                            img.url,
-                                            fit: BoxFit.cover,
+                                Obx(() {
+                                  final productCtrl =
+                                      Get.find<ProductDetailsController>();
+                                  final selectedVariantId =
+                                      productCtrl.selectedVariantId.value;
+
+                                  return SizedBox(
+                                    height: 45.h,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: product.variants.length,
+                                      itemBuilder: (context, index) {
+                                        final variant = product.variants[index];
+                                        final colorName =
+                                            variant.attributes.color;
+
+                                        final isSelected = selectedVariantId ==
+                                            variant.variantId;
+
+                                        return GestureDetector(
+                                          onTap: () {
+                                            productCtrl.selectVariantById(
+                                                variant.variantId);
+                                          },
+                                          child: Container(
+                                            margin:
+                                                EdgeInsets.only(right: 10.w),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 12.w,
+                                                vertical: 8.h),
+                                            decoration: BoxDecoration(
+                                              color: isSelected
+                                                  ? AppColors.primaryColor
+                                                      .withOpacity(0.15)
+                                                  : AppColors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(8.r),
+                                              border: Border.all(
+                                                color: isSelected
+                                                    ? AppColors.primaryColor
+                                                    : AppColors.lightGrey,
+                                                width: isSelected ? 2 : 1,
+                                              ),
+                                            ),
+                                            child: Center(
+                                              child: appText(
+                                                colorName,
+                                                fontSize: 13.sp,
+                                                fontWeight: FontWeight.w600,
+                                                color: isSelected
+                                                    ? AppColors.primaryColor
+                                                    : AppColors.textBlack,
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                SizedBox(height: 20),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }),
+                                SizedBox(height: 20.h),
                               ],
                             ),
                           ],
@@ -479,8 +511,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       return;
                     }
 
+                    final productCtrl = Get.find<ProductDetailsController>();
+final variantIdToSend = productCtrl.selectedVariantId.value;
                     Get.to(SelectAddress(
                       product: product,
+                      selectVarientId:
+                          variantIdToSend, // NEW
                     ));
                   },
                   child: Text(

@@ -19,7 +19,8 @@ import '../../models/product_details_model.dart';
 
 class SelectAddress extends StatelessWidget {
   final ProductDetailsData? product;
-  SelectAddress({super.key, this.product});
+  final String? selectVarientId;
+  SelectAddress({super.key, this.product, this.selectVarientId});
 
   final SelectAddressController controller = Get.put(SelectAddressController());
 
@@ -115,6 +116,7 @@ class SelectAddress extends StatelessWidget {
                         addresses: selectedAddress,
                         product: product,
                         selectedDays: productCtrl.customDays.value,
+                        selectVarientId: productCtrl.selectedVariantId.value,
                         selectedAmount: productCtrl.customAmount.value,
                       ));
                 },
