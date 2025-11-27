@@ -15,9 +15,21 @@ import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
 import '../profile/profile_controller.dart';
 
-class EditProfileScreen extends StatelessWidget {
+class EditProfileScreen extends StatefulWidget {
   // ignore: use_super_parameters
   const EditProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    final controller = Get.find<ProfileController>();
+    controller.resetFormData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +56,7 @@ class EditProfileScreen extends StatelessWidget {
                   children: [
                     Obx(() {
                       final user = controller.profile.value?.user;
+                      final localImage = controller.profileImage.value;
                       return Container(
                         width: 120.w,
                         height: 120.w,
@@ -51,10 +64,12 @@ class EditProfileScreen extends StatelessWidget {
                           shape: BoxShape.circle,
                           color: AppColors.grey,
                           image: DecorationImage(
-                            image: user!.profilePicture.isNotEmpty
-                                ? NetworkImage(user.profilePicture)
-                                : AssetImage(AppAssets.user_img)
-                                    as ImageProvider,
+                            image: localImage != null
+                                ? FileImage(localImage) as ImageProvider
+                                : (user!.profilePicture.isNotEmpty
+                                    ? NetworkImage(user.profilePicture)
+                                    : AssetImage(AppAssets.user_img)
+                                        as ImageProvider),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -244,6 +259,7 @@ class EditProfileScreen extends StatelessWidget {
                         ? () {}
                         : () {
                             controller.updateUserName();
+                            Get.back();
                           },
                     width: double.infinity,
                     height: 54.h,
@@ -251,9 +267,9 @@ class EditProfileScreen extends StatelessWidget {
                     child: Center(
                       child: controller.isLoading.value
                           ? SizedBox(
-                              width: 26.w, // Adjust size if needed
+                              width: 26.w,
                               height: 26.w,
-                              child: appLoader(), // 🔥 YOUR CUSTOM LOADER HERE
+                              child: appLoader(),
                             )
                           : appText(
                               AppStrings.saveChanges,

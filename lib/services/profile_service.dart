@@ -72,8 +72,7 @@ class ProfileService {
       // ---- FORCE NEW FILE NAME WITH .jpg ----
       final originalFile = File(imagePath);
       final tempDir = Directory.systemTemp;
-      final newPath =
-          "${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
+      final newPath = "${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
 
       final newFile = await originalFile.copy(newPath);
 
@@ -115,4 +114,32 @@ class ProfileService {
       return false;
     }
   }
+
+  // ----------------UPDATE PROFILE NAME (ONLY)----------------
+  Future<bool> updateUserName(String userId, String name) async {
+    try {
+      final token = storage.read(AppConst.ACCESS_TOKEN);
+
+      final response = await APIService.putRequest(
+        url: AppURLs.USER_UPDATE_API + userId,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        body: {
+          "name": name,
+        },
+        onSuccess: (data) => data,
+      );
+
+      if (response != null && response["success"] == true) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  
 }
