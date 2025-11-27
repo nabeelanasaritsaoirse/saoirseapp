@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -122,139 +124,131 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             SizedBox(height: 8.h),
 
-            //  Carousel Section
+            // --------- Carousel Section (Banner Top)-------------------------
             Obx(
-              () => Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  CarouselSlider(
-                    items: homeController.carouselImages.map((imagePath) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return Container(
-                            margin: EdgeInsets.symmetric(horizontal: 8.w),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12.r),
-                              image: DecorationImage(
-                                image: NetworkImage(imagePath),
-                                fit: BoxFit.cover,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.lightBlack,
-                                  blurRadius: 8.r,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Stack(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    gradient: AppGradients.topCarosalGradient,
-                                  ),
-                                ),
-
-                                // Text and Button overlay
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 24.w,
-                                    vertical: 10.h,
-                                  ),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        appText(
-                                          "Stylish",
-                                          fontSize: 24.sp,
-                                          color: AppColors.white,
-                                          fontWeight: FontWeight.w800,
-                                          fontStyle: FontStyle.italic,
-                                          fontFamily: "Times New Roman",
-                                        ),
-                                        SizedBox(height: 2.h),
-                                        appText(
-                                          AppStrings.card_discription,
-                                          maxLines: 2,
-                                          fontSize: 11.sp,
-                                          textAlign: TextAlign.left,
-                                          color: AppColors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        SizedBox(height: 5.h),
-                                        appButton(
-                                          width: 120.w,
-                                          height: 30.h,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 12.w, vertical: 4.h),
-                                          onTap: () {},
-                                          buttonColor: AppColors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(6.r),
-                                          child: appText(
-                                            AppStrings.btton_lebel,
-                                            color: AppColors.textBlack,
-                                            fontSize: 11.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    }).toList(),
-                    options: CarouselOptions(
-                      autoPlay: true,
-                      autoPlayInterval: const Duration(seconds: 5),
-                      enlargeCenterPage: true,
-                      viewportFraction: 1.0,
+              () => homeController.carouselImages.isEmpty
+                  ? Container(
                       height: 140.h,
-                      onPageChanged: (index, reason) {
-                        homeController.currentCarouselIndex.value = index;
-                      },
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 8.h,
-                    child: Obx(
-                      () => Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: homeController.carouselImages
-                            .asMap()
-                            .entries
-                            .map((entry) {
-                          return Container(
-                            width: homeController.currentCarouselIndex.value ==
-                                    entry.key
-                                ? 24.w
-                                : 8.w,
-                            height: 8.h,
-                            margin: EdgeInsets.symmetric(horizontal: 4.w),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4.r),
-                              color:
-                                  homeController.currentCarouselIndex.value ==
-                                          entry.key
-                                      ? AppColors.white
-                                      : AppColors.transparentWhite,
-                            ),
-                          );
-                        }).toList(),
+                      margin: EdgeInsets.symmetric(horizontal: 8.w),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12.r),
+                        color: AppColors.lightBlack.withOpacity(0.1),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.lightBlack,
+                            blurRadius: 8.r,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
+                      child: Center(
+                        child: Icon(
+                          Icons.image,
+                          size: 50.sp,
+                          color: Colors.grey.withOpacity(0.5),
+                        ),
+                      ),
+                    )
+                  : Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        CarouselSlider(
+                          items: homeController.carouselImages.map((imagePath) {
+                            return Builder(
+                              builder: (BuildContext context) {
+                                return Container(
+                                  margin: EdgeInsets.symmetric(horizontal: 8.w),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    image: DecorationImage(
+                                      image: NetworkImage(imagePath),
+                                      fit: BoxFit.cover,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.lightBlack,
+                                        blurRadius: 8.r,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }).toList(),
+                          options: CarouselOptions(
+                            autoPlay: true,
+                            autoPlayInterval: const Duration(seconds: 5),
+                            enlargeCenterPage: true,
+                            viewportFraction: 1.0,
+                            height: 140.h,
+                            onPageChanged: (index, reason) {
+                              homeController.currentCarouselIndex.value = index;
+                            },
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 8.h,
+                          child: Obx(
+                            () => Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: homeController.carouselImages
+                                  .asMap()
+                                  .entries
+                                  .map((entry) {
+                                return Container(
+                                  width: homeController
+                                              .currentCarouselIndex.value ==
+                                          entry.key
+                                      ? 24.w
+                                      : 8.w,
+                                  height: 8.h,
+                                  margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.r),
+                                    color: homeController
+                                                .currentCarouselIndex.value ==
+                                            entry.key
+                                        ? AppColors.white
+                                        : AppColors.transparentWhite,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 8.h,
+                          child: Obx(
+                            () => Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: homeController.carouselImages
+                                  .asMap()
+                                  .entries
+                                  .map((entry) {
+                                return Container(
+                                  width: homeController
+                                              .currentCarouselIndex.value ==
+                                          entry.key
+                                      ? 24.w
+                                      : 8.w,
+                                  height: 8.h,
+                                  margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.r),
+                                    color: homeController
+                                                .currentCarouselIndex.value ==
+                                            entry.key
+                                        ? AppColors.white
+                                        : AppColors.transparentWhite,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
             ),
 
             SizedBox(height: 10.h),
@@ -698,6 +692,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                               .size
                                               .width
                                               .w,
+
+                                          // 👇 If image not found → show simple grey container with icon
                                           errorBuilder: (_, __, ___) =>
                                               Container(
                                             color: Colors.grey.shade300,

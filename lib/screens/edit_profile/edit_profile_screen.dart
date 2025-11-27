@@ -3,17 +3,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
-import 'package:saoirse_app/screens/profile/profile_controller.dart';
-import 'package:saoirse_app/widgets/app_loader.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
+import '../profile/profile_controller.dart';
 
 class EditProfileScreen extends StatelessWidget {
   // ignore: use_super_parameters
@@ -93,7 +93,7 @@ class EditProfileScreen extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            Icons.edit,
+                            Iconsax.camera,
                             color: AppColors.white,
                             size: 16.sp,
                           ),

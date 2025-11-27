@@ -90,6 +90,10 @@ class AppURLs {
   static String SUCCESS_STORY_BANNER_API =
       BASE_API + "api/success-stories/public/active";
 
+  // Home Screen Top Banner API
+  static String HOME_SCREEN_TOP_BANNER_API =
+      BASE_API + "api/banners/public/active";
+
   // Profile Api
   static String MY_PROFILE = BASE_API + "api/users/me/profile";
 }
