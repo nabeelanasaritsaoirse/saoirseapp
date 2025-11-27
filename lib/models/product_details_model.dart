@@ -34,6 +34,19 @@ class ProductDetailsData {
   final bool isBestSeller;
   final bool isTrending;
 
+  /// ✅ Added Remaining Fields
+  final String status;
+  final bool hasVariants;
+  final List<dynamic> regionalPricing;
+  final List<dynamic> regionalSeo;
+  final List<dynamic> regionalAvailability;
+  final List<dynamic> relatedProducts;
+  final List<dynamic> variants;
+  final List<dynamic> plans;
+  final String createdAt;
+  final String updatedAt;
+  final int v;
+
   ProductDetailsData({
     required this.id,
     required this.productId,
@@ -49,6 +62,19 @@ class ProductDetailsData {
     required this.isPopular,
     required this.isBestSeller,
     required this.isTrending,
+
+    /// ✅ Added fields
+    required this.status,
+    required this.hasVariants,
+    required this.regionalPricing,
+    required this.regionalSeo,
+    required this.regionalAvailability,
+    required this.relatedProducts,
+    required this.variants,
+    required this.plans,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.v,
   });
 
   factory ProductDetailsData.fromJson(Map<String, dynamic> json) {
@@ -59,14 +85,11 @@ class ProductDetailsData {
       brand: json["brand"] ?? "",
       sku: json["sku"] ?? "",
 
-      /// SAFE: description can have extra fields (features, seo, etc.)
       description: Description.fromJson(json["description"] ?? {}),
-
       category: Category.fromJson(json["category"] ?? {}),
       availability: Availability.fromJson(json["availability"] ?? {}),
       pricing: Pricing.fromJson(json["pricing"] ?? {}),
 
-      /// FIXED: warranty can be NULL from API
       warranty: json["warranty"] != null
           ? Warranty.fromJson(json["warranty"])
           : Warranty(period: 0),
@@ -78,6 +101,19 @@ class ProductDetailsData {
       isPopular: json["isPopular"] ?? false,
       isBestSeller: json["isBestSeller"] ?? false,
       isTrending: json["isTrending"] ?? false,
+
+      /// ✅ Added mappings with safe defaults
+      status: json["status"] ?? "",
+      hasVariants: json["hasVariants"] ?? false,
+      regionalPricing: json["regionalPricing"] ?? [],
+      regionalSeo: json["regionalSeo"] ?? [],
+      regionalAvailability: json["regionalAvailability"] ?? [],
+      relatedProducts: json["relatedProducts"] ?? [],
+      variants: json["variants"] ?? [],
+      plans: json["plans"] ?? [],
+      createdAt: json["createdAt"] ?? "",
+      updatedAt: json["updatedAt"] ?? "",
+      v: json["__v"] ?? 0,
     );
   }
 }
@@ -86,15 +122,20 @@ class Description {
   final String short;
   final String long;
 
+  /// ✅ Added missing array field
+  final List<dynamic> features;
+
   Description({
     required this.short,
     required this.long,
+    required this.features,
   });
 
   factory Description.fromJson(Map<String, dynamic> json) {
     return Description(
       short: json["short"] ?? "",
       long: json["long"] ?? "",
+      features: json["features"] ?? [],
     );
   }
 }
@@ -180,10 +221,14 @@ class ImageData {
   final String? altText;
   final bool isPrimary;
 
+  /// ✅ Added missing `_id`
+  final String id;
+
   ImageData({
     required this.url,
     required this.altText,
     required this.isPrimary,
+    required this.id,
   });
 
   factory ImageData.fromJson(Map<String, dynamic> json) {
@@ -191,7 +236,7 @@ class ImageData {
       url: json["url"] ?? "",
       altText: json["altText"],
       isPrimary: json["isPrimary"] ?? false,
+      id: json["_id"] ?? "",
     );
   }
 }
-

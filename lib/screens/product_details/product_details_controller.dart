@@ -229,9 +229,11 @@ class ProductDetailsController extends GetxController {
   void selectApiPlan(int index) {
     selectedPlanIndex.value = index;
 
-    // clear custom plan if user selects api plan
-    customDays.value = 0;
-    customAmount.value = 0.0;
+    final plan = plans[index];
+
+    // ✅ store selected API plan values
+    customDays.value = plan.days;
+    customAmount.value = plan.perDayAmount;
   }
 
   void resetPlanSelection() {
