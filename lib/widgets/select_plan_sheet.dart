@@ -11,6 +11,7 @@ import '../../screens/product_details/product_details_controller.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/app_text.dart';
+import 'app_loader.dart';
 import 'app_snackbar.dart';
 
 class SelectPlanSheet extends StatelessWidget {
@@ -50,21 +51,30 @@ class SelectPlanSheet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 /// --- Header ---
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  spacing: 60.w,
-                  children: [
-                    appText(
-                      AppStrings.select_plan,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      textAlign: TextAlign.center,
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.close, size: 25.sp),
-                      onPressed: () => Get.back(),
-                    ),
-                  ],
+                SizedBox(
+                  height: 30.h,
+                  child: Stack(
+                    children: [
+                      /// CENTER TITLE
+                      Center(
+                        child: appText(
+                          AppStrings.select_plan,
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                      /// CLOSE BUTTON (top-right)
+                      Positioned(
+                        bottom: -6.h,
+                        right: 0,
+                        child: IconButton(
+                          icon: Icon(Icons.close, size: 25.sp),
+                          onPressed: () => Get.back(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 SizedBox(height: 10.h),
@@ -216,11 +226,26 @@ class SelectPlanSheet extends StatelessWidget {
 
                 Obx(() {
                   if (controller.isLoading.value) {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(child: appLoader());
                   }
 
                   if (controller.plans.isEmpty) {
-                    return Center(child: appText("No plans available"));
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 30.h),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 70.h,
+                          ),
+                          appText(
+                            "No plans available",
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.grey,
+                          ),
+                        ],
+                      ),
+                    );
                   }
 
                   return Column(
@@ -356,41 +381,53 @@ class SelectPlanSheet extends StatelessWidget {
                 SizedBox(height: 13.h),
 
                 /// --- Final Selected Button ---
-                appButton(
-                  onTap: () {
-                    final selected = controller.getSelectedPlan();
+                Obx(() {
+                  final hasSelectedPlan =
+                      controller.selectedPlanIndex.value != -1 ||
+                          (controller.customDays.value > 0 &&
+                              controller.customAmount.value > 0);
 
-                    if (selected["days"] == 0 || selected["amount"] == 0) {
-                      appSnackbar(
-                          error: true, content: "Please select a plan!");
-                      return;
-                    }
+                  if (!hasSelectedPlan) {
+                    return SizedBox.shrink(); // hide button
+                  }
 
-                    /// ✅ Ensure controller is registered
-                    final orderCtrl = Get.isRegistered<OrderDetailsController>()
-                        ? Get.find<OrderDetailsController>()
-                        : Get.put(OrderDetailsController());
+                  return appButton(
+                    onTap: () {
+                      final selected = controller.getSelectedPlan();
 
-                    orderCtrl.setCustomPlan(
-                      selected["days"],
-                      selected["amount"],
-                    );
+                      if (selected["days"] == 0 || selected["amount"] == 0) {
+                        appSnackbar(
+                            error: true, content: "Please select a plan!");
+                        return;
+                      }
 
-                    Get.back();
-                  },
-                  buttonColor: AppColors.primaryColor,
-                  width: 170.w,
-                  height: 40.h,
-                  borderRadius: BorderRadius.circular(8.r),
-                  child: Center(
-                    child: appText(
-                      AppStrings.selected,
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.white,
+                      /// Ensure controller exists
+                      final orderCtrl =
+                          Get.isRegistered<OrderDetailsController>()
+                              ? Get.find<OrderDetailsController>()
+                              : Get.put(OrderDetailsController());
+
+                      orderCtrl.setCustomPlan(
+                        selected["days"],
+                        selected["amount"],
+                      );
+
+                      Get.back();
+                    },
+                    buttonColor: AppColors.primaryColor,
+                    width: 170.w,
+                    height: 40.h,
+                    borderRadius: BorderRadius.circular(8.r),
+                    child: Center(
+                      child: appText(
+                        AppStrings.selected,
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.white,
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                }),
               ],
             ),
           ),

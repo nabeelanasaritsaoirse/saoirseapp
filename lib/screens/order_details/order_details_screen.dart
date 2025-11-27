@@ -1,5 +1,7 @@
 // ignore_for_file: unused_local_variable
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -12,12 +14,14 @@ import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
+import '../product_details/product_details_controller.dart';
 import '../razorpay/razorpay_controller.dart';
 import 'order_details_controller.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final Address addresses;
   final ProductDetailsData? product;
+  final String? selectVarientId;
   final int selectedDays;
   final double selectedAmount;
 
@@ -27,12 +31,15 @@ class OrderDetailsScreen extends StatelessWidget {
     this.product,
     required this.selectedDays,
     required this.selectedAmount,
+    this.selectVarientId,
   });
   final orderController = Get.find<OrderDetailsController>();
   final razorpayController = Get.put(RazorpayController());
 
   @override
   Widget build(BuildContext context) {
+    log("DEBUG → incoming selectVarientId: $selectVarientId");
+
     final couponController = TextEditingController();
     final pricing = product!.pricing;
 
@@ -280,8 +287,23 @@ class OrderDetailsScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              appText("Red | 1TB",
-                                  fontSize: 12.sp, fontWeight: FontWeight.w600),
+                              if (product!.hasVariants)
+                                Obx(() {
+                                  final productCtrl =
+                                      Get.find<ProductDetailsController>();
+                                  final selectedVariant =
+                                      productCtrl.getSelectedVariant();
+
+                                  if (selectedVariant == null) {
+                                    return SizedBox.shrink();
+                                  }
+
+                                  return appText(
+                                    selectedVariant.attributes.color,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w600,
+                                  );
+                                }),
                               appText("₹ ${product!.pricing.finalPrice}",
                                   fontSize: 12.sp, fontWeight: FontWeight.w600),
                               Obx(() {
@@ -455,6 +477,7 @@ class OrderDetailsScreen extends StatelessWidget {
               onTap: () {
                 orderController.placeOrder(
                   productId: product!.id,
+                  variantId: selectVarientId ?? "",
                   paymentOption: "daily",
                   totalDays: orderController.selectedDays.value,
                   deliveryAddress: {

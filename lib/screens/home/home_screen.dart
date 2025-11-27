@@ -698,8 +698,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                               .size
                                               .width
                                               .w,
-
-                                          // 👇 If image not found → show simple grey container with icon
                                           errorBuilder: (_, __, ___) =>
                                               Container(
                                             color: Colors.grey.shade300,

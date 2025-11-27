@@ -16,6 +16,7 @@ class OrderDetailsController extends GetxController {
 
   Future<void> placeOrder({
     required String productId,
+    String variantId = "",
     required String paymentOption,
     required int totalDays,
     required Map<String, dynamic> deliveryAddress,
@@ -33,6 +34,7 @@ class OrderDetailsController extends GetxController {
     // Final body
     final body = {
       "productId": productId,
+      "variantId": variantId,
       "paymentOption": paymentOption,
       "paymentDetails": {
         "totalDays": totalDays,
