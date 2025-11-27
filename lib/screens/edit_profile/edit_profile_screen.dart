@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 
 import 'package:saoirse_app/screens/profile/profile_controller.dart';
 import 'package:saoirse_app/widgets/app_loader.dart';
@@ -93,7 +94,7 @@ class EditProfileScreen extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            Icons.edit,
+                            Iconsax.camera,
                             color: AppColors.white,
                             size: 16.sp,
                           ),

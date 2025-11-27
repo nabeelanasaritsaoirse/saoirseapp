@@ -3,7 +3,7 @@
 class AppURLs {
   //base api
   // static String BASE_API = 'https://api.epielio.com/';
-  static String BASE_API = 'http://65.0.64.8:5000/';
+  static String BASE_API = 'https://api.epielio.com/';
 
   //login api
   static String LOGIN_API = BASE_API + 'api/auth/login';
@@ -90,6 +90,10 @@ class AppURLs {
   // Success Story Banner API
   static String SUCCESS_STORY_BANNER_API =
       BASE_API + "api/success-stories/public/active";
+
+  // Home Screen Top Banner API
+  static String HOME_SCREEN_TOP_BANNER_API =
+      BASE_API + "api/banners/public/active";    
 
   // Profile Api
   static String MY_PROFILE = BASE_API + "api/users/me/profile";

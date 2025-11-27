@@ -169,7 +169,7 @@ class AppStrings {
   static String ZipCode = 'Zip Code';
   static String PhoneNumber = 'Phone Number';
   static String Save = 'Save';
-  static String profile_title = "Profile";
+  static String profile_title = "My Profile";
 
   // Edit Profile screen
   static String editLabel = 'Edit Profile';

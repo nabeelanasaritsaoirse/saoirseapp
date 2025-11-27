@@ -1,6 +1,7 @@
 // home_controller.dart
 import 'dart:developer';
 import 'package:get/get.dart';
+import 'package:saoirse_app/services/home_banner_top_service.dart';
 
 import '../../models/product_model.dart';
 import '../../models/success_story_banner_model.dart';
@@ -13,18 +14,15 @@ class HomeController extends GetxController {
   RxBool bestSellerLoading = false.obs;
   RxBool trendingLoading = false.obs;
   RxBool successLoading = false.obs;
+  RxBool bannerLoading = false.obs;
 
   RxInt currentCarouselIndex = 0.obs;
   RxInt currentBottomCarouselIndex = 0.obs;
 
-  // For the custom images
-  final RxList<String> carouselImages = <String>[
-    'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800',
-    'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800',
-    'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800',
-  ].obs;
+  RxList<String> carouselImages = <String>[].obs;
 
   final SuccessStoryService successService = SuccessStoryService();
+  final HomeBannerService bannerService = HomeBannerService();
 
   final RxList<Product> mostPopularProducts = <Product>[].obs;
   final RxList<Product> bestSellerProducts = <Product>[].obs;
@@ -44,6 +42,7 @@ class HomeController extends GetxController {
       fetchBestSellerProducts(),
       fetchTrendingProducts(),
       fetchSuccessStories(),
+      fetchHomeBanners(),
     ]);
   }
 
@@ -51,8 +50,7 @@ class HomeController extends GetxController {
   Future<void> fetchPopularProducts() async {
     try {
       popularLoading.value = true;
-      final products =
-          await HomeService.fetchPopularProducts(page: 1, limit: 10);
+      final products = await HomeService.fetchPopularProducts(page: 1, limit: 10);
 
       if (products != null && products.isNotEmpty) {
         mostPopularProducts.value = products;
@@ -68,8 +66,7 @@ class HomeController extends GetxController {
   Future<void> fetchBestSellerProducts() async {
     try {
       bestSellerLoading.value = true;
-      final products =
-          await HomeService.fetchBestSellerProducts(page: 1, limit: 10);
+      final products = await HomeService.fetchBestSellerProducts(page: 1, limit: 10);
 
       if (products != null && products.isNotEmpty) {
         bestSellerProducts.value = products;
@@ -85,8 +82,7 @@ class HomeController extends GetxController {
   Future<void> fetchTrendingProducts() async {
     try {
       trendingLoading.value = true;
-      final products =
-          await HomeService.fetchTrendingProducts(page: 1, limit: 10);
+      final products = await HomeService.fetchTrendingProducts(page: 1, limit: 10);
 
       if (products != null && products.isNotEmpty) {
         trendingProducts.value = products;
@@ -112,6 +108,26 @@ class HomeController extends GetxController {
       log("Error fetching success story: $e");
     } finally {
       successLoading.value = false;
+    }
+  }
+
+  // Fetch Home Banners Top
+  Future<void> fetchHomeBanners() async {
+    try {
+      bannerLoading.value = true;
+
+      final banners = await bannerService.fetchHomeBanners();
+
+      if (banners.isNotEmpty) {
+        banners.sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
+
+        carouselImages.value = banners.map((e) => e.imageUrl).toList();
+
+      }
+    } catch (e) {
+      log("Error fetching home banners: $e");
+    } finally {
+      bannerLoading.value = false;
     }
   }
 

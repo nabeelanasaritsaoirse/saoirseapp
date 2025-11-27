@@ -80,7 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   // PROFILE - DETAILS
                   Positioned(
-                    top: 18.h, // moves the circle down
+                    top: 39.h, // moves the circle down
                     left: 0,
                     right: 0,
                     child: Column(
