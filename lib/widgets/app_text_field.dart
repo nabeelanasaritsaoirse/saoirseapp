@@ -35,6 +35,7 @@ class appTextField extends StatefulWidget {
   final bool suffix;
   final bool obsecure;
   final bool readOnly;
+  final bool? enabled;
 
   /// ✅ Added FocusNode here
   final FocusNode? focusNode;
@@ -68,6 +69,7 @@ class appTextField extends StatefulWidget {
     this.suffix = false,
     this.obsecure = false,
     this.readOnly = false,
+    this.enabled = false,
 
     /// ✅ Added FocusNode param
     this.focusNode,

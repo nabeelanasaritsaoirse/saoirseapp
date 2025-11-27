@@ -89,4 +89,7 @@ class AppURLs {
   // Success Story Banner API
   static String SUCCESS_STORY_BANNER_API =
       BASE_API + "api/success-stories/public/active";
+
+  // Profile Api
+  static String MY_PROFILE = BASE_API + "api/users/me/profile";
 }
