@@ -25,6 +25,7 @@ class AppURLs {
   static String FRIEND_DETAILS = BASE_API + "api/referral/friend/";
   static String PRODUCT_DETAILS = BASE_API + "api/referral/product/";
   static String FETCH_REFERRAL = BASE_API + "api/referral/list/";
+  static String APPLY_REFERRAL = BASE_API + "api/auth/applyReferralCode";
 
   // Wishlist api
   static String GET_WISHLIST = BASE_API + "api/wishlist";
@@ -39,6 +40,7 @@ class AppURLs {
   //Wallet api
   static String Wallet = BASE_API + "api/wallet";
   static String WALLET_TRANSACTIONS = BASE_API + "api/wallet/transactions";
+  static String ADD_MONEY_WALLET = BASE_API + "api/wallet/add-money";
 
   // Category api
   static String CATEGORY_API =
@@ -85,4 +87,15 @@ class AppURLs {
   // Investment Status Api
   static String INVESTMENT_STATUS_API =
       BASE_API + "api/installments/orders/overall-status";
+
+  // Success Story Banner API
+  static String SUCCESS_STORY_BANNER_API =
+      BASE_API + "api/success-stories/public/active";
+
+  // Home Screen Top Banner API
+  static String HOME_SCREEN_TOP_BANNER_API =
+      BASE_API + "api/banners/public/active";
+
+  // Profile Api
+  static String MY_PROFILE = BASE_API + "api/users/me/profile";
 }

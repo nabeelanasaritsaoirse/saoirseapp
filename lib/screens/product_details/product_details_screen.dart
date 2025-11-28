@@ -1,15 +1,17 @@
-// ignore_for_file: unused_local_variable, body_might_complete_normally_nullable
+// ignore_for_file: unused_local_variable, body_might_complete_normally_nullable, deprecated_member_use
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/warning_dialog.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_text.dart';
+import '../cart/cart_controller.dart';
 import '../select_address/select_address.dart';
 import 'product_details_controller.dart';
 
@@ -29,6 +31,7 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late ProductDetailsController controller;
+  final CartController cartController = Get.find<CartController>();
 
   @override
   void initState() {
@@ -170,8 +173,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 () => GestureDetector(
                                   onTap: controller.toggleFavorite,
                                   child: Container(
-                                    width: 40,
-                                    height: 40,
+                                    width: 40.w,
+                                    height: 40.h,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       shape: BoxShape.circle,
@@ -230,24 +233,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     ),
                                   ),
                                   SizedBox(width: 4.w),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 5.w,
-                                      vertical: 2.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.mediumAmber,
-                                      borderRadius: BorderRadius.circular(10.r),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.star,
-                                            size: 8.sp,
-                                            color: AppColors.darkAmber),
-                                        appText("4.3", fontSize: 8.sp),
-                                      ],
-                                    ),
-                                  ),
+                                  // Container(
+                                  //   padding: EdgeInsets.symmetric(
+                                  //     horizontal: 5.w,
+                                  //     vertical: 2.h,
+                                  //   ),
+                                  //   decoration: BoxDecoration(
+                                  //     color: AppColors.mediumAmber,
+                                  //     borderRadius: BorderRadius.circular(10.r),
+                                  //   ),
+                                  //   child: Row(
+                                  //     children: [
+                                  //       Icon(Icons.star,
+                                  //           size: 8.sp,
+                                  //           color: AppColors.darkAmber),
+                                  //       appText("4.3", fontSize: 8.sp),
+                                  //     ],
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                             ],
@@ -269,60 +272,101 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           Row(
                             children: [
                               appText(
-                                "₹${product.pricing.currency} ${product.pricing.finalPrice}",
+                                "₹${product.pricing.finalPrice}",
                                 fontSize: 22.sp,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textBlack,
                               ),
                               SizedBox(width: 8.w),
-                              appText(
-                                "₹${product.pricing.currency} ${product.pricing.regularPrice}",
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.grey,
-                                decoration: TextDecoration.lineThrough,
-                              ),
+                              if (product.pricing.finalPrice !=
+                                  product.pricing.regularPrice)
+                                appText(
+                                  "₹${product.pricing.regularPrice}",
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.grey,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
                             ],
                           ),
+
                           SizedBox(height: 10),
 
-                          appText(
-                            AppStrings.ColorAvailable,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14.sp,
-                            color: AppColors.textBlack,
-                          ),
-                          SizedBox(height: 12.h),
+                          if (product.hasVariants) ...[
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                appText(
+                                  AppStrings.ColorAvailable,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14.sp,
+                                  color: AppColors.textBlack,
+                                ),
+                                SizedBox(height: 12.h),
+                                Obx(() {
+                                  final productCtrl =
+                                      Get.find<ProductDetailsController>();
+                                  final selectedVariantId =
+                                      productCtrl.selectedVariantId.value;
 
-                          // Thumbnails
-                          SizedBox(
-                            height: 64.h,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: product.images.length,
-                              itemBuilder: (context, index) {
-                                final img = product.images[index];
-                                return Container(
-                                  margin: EdgeInsets.only(right: 10.w),
-                                  width: 60.w,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8.r),
-                                    border:
-                                        Border.all(color: Colors.grey.shade300),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(7.r),
-                                    child: Image.network(
-                                      img.url,
-                                      fit: BoxFit.cover,
+                                  return SizedBox(
+                                    height: 45.h,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: product.variants.length,
+                                      itemBuilder: (context, index) {
+                                        final variant = product.variants[index];
+                                        final colorName =
+                                            variant.attributes.color;
+
+                                        final isSelected = selectedVariantId ==
+                                            variant.variantId;
+
+                                        return GestureDetector(
+                                          onTap: () {
+                                            productCtrl.selectVariantById(
+                                                variant.variantId);
+                                          },
+                                          child: Container(
+                                            margin:
+                                                EdgeInsets.only(right: 10.w),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 12.w,
+                                                vertical: 8.h),
+                                            decoration: BoxDecoration(
+                                              color: isSelected
+                                                  ? AppColors.primaryColor
+                                                      .withOpacity(0.15)
+                                                  : AppColors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(8.r),
+                                              border: Border.all(
+                                                color: isSelected
+                                                    ? AppColors.primaryColor
+                                                    : AppColors.lightGrey,
+                                                width: isSelected ? 2 : 1,
+                                              ),
+                                            ),
+                                            child: Center(
+                                              child: appText(
+                                                colorName,
+                                                fontSize: 13.sp,
+                                                fontWeight: FontWeight.w600,
+                                                color: isSelected
+                                                    ? AppColors.primaryColor
+                                                    : AppColors.textBlack,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
-                                  ),
-                                );
-                              },
+                                  );
+                                }),
+                                SizedBox(height: 20.h),
+                              ],
                             ),
-                          ),
-
-                          SizedBox(height: 20),
+                          ],
                         ],
                       ),
                     )
@@ -346,7 +390,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         product.description.long,
                         textAlign: TextAlign.left,
                         fontSize: 12.sp,
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w500,
                         color: AppColors.grey,
                         height: 1.5.h,
                       ),
@@ -360,7 +404,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           ),
         ),
         bottomNavigationBar: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
           decoration: BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.only(
@@ -376,6 +420,40 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           ),
           child: Row(
             children: [
+              appButton(
+                  onTap: () {
+                    bool hasSelectedRecommendedPlan =
+                        controller.selectedPlanIndex.value != -1;
+
+                    bool hasCustomPlan = controller.customDays.value > 0 &&
+                        controller.customAmount.value > 0;
+
+                    if (!hasSelectedRecommendedPlan && !hasCustomPlan) {
+                      WarningDialog.show(
+                        title: AppStrings.warning_label,
+                        message: AppStrings.warning_body,
+                      );
+                      return;
+                    }
+
+                    cartController.addProductToCart(product.id);
+                  },
+                  width: 50.w,
+                  height: 35.h,
+                  padding: EdgeInsets.all(0),
+                  borderRadius: BorderRadius.circular(10.r),
+                  borderColor: AppColors.shadowColor,
+                  child: Center(
+                    child: Icon(
+                      Icons.shopping_cart_checkout,
+                      color: AppColors.textBlack,
+                    ),
+                  )),
+
+              SizedBox(
+                width: 8.w,
+              ),
+
               /// 🔹 Select Plan Button
               Expanded(
                 child: OutlinedButton(
@@ -409,7 +487,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
               ),
 
-              SizedBox(width: 10.w),
+              SizedBox(width: 5.w),
 
               /// 🔹 Check Out Button
               Expanded(
@@ -431,17 +509,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     if (!hasSelectedRecommendedPlan && !hasCustomPlan) {
                       WarningDialog.show(
                         title: AppStrings.warning_label,
-                        message: AppStrings.warning_body,
+                        message: AppStrings.checkout_warning_body,
                       );
                       return;
                     }
 
+                    final productCtrl = Get.find<ProductDetailsController>();
+                    final variantIdToSend = productCtrl.selectedVariantId.value;
                     Get.to(SelectAddress(
                       product: product,
+                      selectVarientId: variantIdToSend, // NEW
                     ));
                   },
                   child: Text(
-                    AppStrings.addToCart,
+                    AppStrings.checkout,
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w600,

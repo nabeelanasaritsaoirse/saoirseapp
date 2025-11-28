@@ -1,36 +1,40 @@
-import 'package:country_picker/country_picker.dart';
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 
+import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
-import 'edit_profile_controller.dart';
+import '../profile/profile_controller.dart';
 
-class EditProfileScreen extends StatelessWidget {
+class EditProfileScreen extends StatefulWidget {
   // ignore: use_super_parameters
   const EditProfileScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(EditProfileController());
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
 
-    void showCountryPickerDialog() {
-      showCountryPicker(
-        context: context,
-        countryListTheme: CountryListThemeData(
-          bottomSheetHeight: 600.h,
-          backgroundColor: AppColors.white,
-        ),
-        onSelect: (country) {
-          controller.updateCountry(country);
-        },
-      );
-    }
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    final controller = Get.find<ProfileController>();
+    controller.resetFormData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // final controller = Get.put(EditProfileController());
+    final controller = Get.find<ProfileController>();
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -51,6 +55,8 @@ class EditProfileScreen extends StatelessWidget {
                 child: Stack(
                   children: [
                     Obx(() {
+                      final user = controller.profile.value?.user;
+                      final localImage = controller.profileImage.value;
                       return Container(
                         width: 120.w,
                         height: 120.w,
@@ -58,21 +64,42 @@ class EditProfileScreen extends StatelessWidget {
                           shape: BoxShape.circle,
                           color: AppColors.grey,
                           image: DecorationImage(
-                            image: controller.profileImage.value != null
-                                ? FileImage(controller.profileImage.value!)
-                                : const NetworkImage(
-                                    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-                                  ) as ImageProvider,
+                            image: localImage != null
+                                ? FileImage(localImage) as ImageProvider
+                                : (user!.profilePicture.isNotEmpty
+                                    ? NetworkImage(user.profilePicture)
+                                    : AssetImage(AppAssets.user_img)
+                                        as ImageProvider),
                             fit: BoxFit.cover,
                           ),
                         ),
                       );
                     }),
+                    Obx(() {
+                      return controller.isLoading.value
+                          ? Container(
+                              width: 120.w,
+                              height: 120.w,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black.withOpacity(0.4),
+                              ),
+                              child: Center(
+                                child: SizedBox(
+                                    width: 28.w,
+                                    height: 28.w,
+                                    child: appLoader()),
+                              ),
+                            )
+                          : const SizedBox();
+                    }),
                     Positioned(
                       right: 0,
                       bottom: 0,
                       child: GestureDetector(
-                        onTap: () => controller.pickProfileImage(),
+                        onTap: () {
+                          controller.pickProfileImage();
+                        },
                         child: Container(
                           width: 34.w,
                           height: 34.w,
@@ -81,7 +108,7 @@ class EditProfileScreen extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            Icons.edit,
+                            Iconsax.camera,
                             color: AppColors.white,
                             size: 16.sp,
                           ),
@@ -121,120 +148,138 @@ class EditProfileScreen extends StatelessWidget {
               SizedBox(height: 15.h),
 
               // Phone Number
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppStrings.phoneNumber,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textBlack,
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Row(
-                      children: [
-                        /// LEFT COUNTRY BOX
-                        Obx(() {
-                          final c = controller.country.value;
-
-                          return GestureDetector(
-                            onTap: showCountryPickerDialog,
-                            child: Container(
-                              width: 80.w,
-                              height: 50.h,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.r),
-                                border: Border.all(
-                                  color: AppColors.shadowColor,
-                                ),
-                              ),
-                              alignment: Alignment.center,
-                              child: c == null
-                                  ? const SizedBox()
-                                  : Text(
-                                      "${c.flagEmoji} +${c.phoneCode}",
-                                      style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textBlack,
-                                      ),
-                                    ),
-                            ),
-                          );
-                        }),
-
-                        SizedBox(width: 12.w),
-
-                        /// PHONE INPUT FIELD
-                        Expanded(
-                          child: appTextField(
-                            controller: controller.phoneNumberController,
-                            prefixWidth: 0,
-                            hintText: AppStrings.phoneNumber,
-                            textInputType: TextInputType.phone,
-                            hintColor: AppColors.textBlack,
-                            textColor: AppColors.textBlack,
-                            textWeight: FontWeight.w500,
-                            hintSize: 15.sp,
-                            validator: controller.validatePhone,
-                          ),
+              Obx(() {
+                if (!controller.showPhoneField.value) return SizedBox();
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppStrings.phoneNumber,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textBlack,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Row(
+                        children: [
+                          /// LEFT COUNTRY BOX
+                          Obx(() {
+                            return controller.showPhoneField.value
+                                ? Container(
+                                    width: 80.w,
+                                    height: 50.h,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                      border: Border.all(
+                                          color: AppColors.shadowColor),
+                                    ),
+                                    child: Text(
+                                      "${controller.country.value?.flagEmoji} +${controller.country.value?.phoneCode}",
+                                      style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )
+                                : SizedBox();
+                          }),
+
+                          SizedBox(width: 12.w),
+
+                          /// PHONE INPUT FIELD
+                          Expanded(
+                            child: appTextField(
+                              controller: controller.phoneNumberController,
+                              prefixWidth: 0,
+                              readOnly: true,
+                              enabled: false,
+                              validator: null,
+                              hintText: AppStrings.phoneNumber,
+                              textInputType: TextInputType.phone,
+                              hintColor: AppColors.textBlack,
+                              textColor: AppColors.textBlack,
+                              textWeight: FontWeight.w500,
+                              hintSize: 15.sp,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }),
 
               SizedBox(height: 15.h),
 
               // Email
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppStrings.email,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textBlack,
+              Obx(() {
+                if (!controller.showEmailField.value) return SizedBox();
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppStrings.email,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textBlack,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 8.h),
-                    appTextField(
-                      controller: controller.emailController,
-                      prefixWidth: 20.w,
-                      hintText: AppStrings.email,
-                      hintColor: AppColors.black,
-                      textColor: AppColors.black,
-                      hintSize: 15.sp,
-                      validator: controller.validateEmail,
-                    ),
-                  ],
-                ),
-              ),
+                      SizedBox(height: 8.h),
+                      appTextField(
+                        controller: controller.emailController,
+                        readOnly: true, // 🔥 IMPORTANT
+                        enabled: false, // 🔥 Important
+                        validator: null,
+                        prefixWidth: 20.w,
+                        hintText: AppStrings.email,
+                        hintColor: AppColors.black,
+                        textColor: AppColors.black,
+                        hintSize: 15.sp,
+                      ),
+                    ],
+                  ),
+                );
+              }),
 
               SizedBox(height: 60.h),
 
               // SAVE BUTTON
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: appButton(
-                    onTap: () => controller.saveChanges(),
+                child: Obx(() {
+                  return appButton(
+                    onTap: controller.isLoading.value
+                        ? () {}
+                        : () {
+                            controller.updateUserName();
+                            Get.back();
+                          },
                     width: double.infinity,
                     height: 54.h,
                     buttonColor: AppColors.primaryColor,
                     child: Center(
-                      child: appText(AppStrings.saveChanges,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.white),
-                    )),
+                      child: controller.isLoading.value
+                          ? SizedBox(
+                              width: 26.w,
+                              height: 26.w,
+                              child: appLoader(),
+                            )
+                          : appText(
+                              AppStrings.saveChanges,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.white,
+                            ),
+                    ),
+                  );
+                }),
               ),
 
               SizedBox(height: 32.h),
