@@ -397,13 +397,30 @@ class _ReferralScreenState extends State<ReferralScreen> {
           ),
         ),
 
-        SizedBox(height: 28.h),
+        SizedBox(height: 20.h),
 
-        appText(
-          AppStrings.your_refferal,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textBlack,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            appText(
+              AppStrings.your_refferal,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textBlack,
+            ),
+            Obx(() {
+              final count = controller.filteredReferrals.length;
+              return Align(
+                alignment: AlignmentGeometry.centerRight,
+                child: appText(
+                  "$count / 50",
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textGray,
+                ),
+              );
+            }),
+          ],
         ),
 
         SizedBox(height: 12.h),
