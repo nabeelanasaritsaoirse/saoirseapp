@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import '../../models/order_response_model.dart';
 import '../../services/order_service.dart';
 import '../../widgets/app_loader.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 import '../razorpay/razorpay_controller.dart';
 
 class OrderDetailsController extends GetxController {
@@ -51,7 +51,7 @@ class OrderDetailsController extends GetxController {
     if (Get.isDialogOpen ?? false) Get.back();
 
     if (response == null) {
-      appSnackbar(
+      appToast(
         error: true,
         title: "Error",
         content: "Failed to place order. Please try again!",
@@ -65,7 +65,7 @@ class OrderDetailsController extends GetxController {
     final paymentOrder = response["order"];
 
     if (paymentOrder == null) {
-      appSnackbar(
+      appToast(
         error: true,
         content: "Payment info missing from server!",
       );
@@ -76,14 +76,14 @@ class OrderDetailsController extends GetxController {
 
     // Validate
     if (payment.order.id.isEmpty) {
-      appSnackbar(
+      appToast(
         error: true,
         content: "Invalid payment details!",
       );
       return;
     }
     if (payment.payment.orderId.isEmpty) {
-      appSnackbar(
+      appToast(
         error: true,
         content: "Invalid Razorpay Order ID!",
       );

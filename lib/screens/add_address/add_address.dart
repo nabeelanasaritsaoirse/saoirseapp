@@ -40,48 +40,68 @@ class _AddAddressState extends State<AddAddress> {
             children: [
               appText(AppStrings.Name,
                   fontSize: 14.sp, fontWeight: FontWeight.w600),
+              SizedBox(
+                height: 5.h,
+              ),
               appTextField(
                 controller: addAddressController.nameController,
                 textColor: AppColors.black,
                 textInputType: TextInputType.name,
                 hintText: AppStrings.Name,
                 hintColor: AppColors.grey,
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 13.h, horizontal: 10.w),
                 validator: (value) =>
                     AddAddressValidation.nameValidation(name: value ?? ""),
               ),
               SizedBox(height: 10.h),
               appText(AppStrings.StreetName,
                   fontSize: 14.sp, fontWeight: FontWeight.w600),
+              SizedBox(
+                height: 5.h,
+              ),
               appTextField(
                 controller: addAddressController.streetNameController,
                 textColor: AppColors.black,
                 hintText: AppStrings.StreetName,
                 textInputType: TextInputType.streetAddress,
                 hintColor: AppColors.grey,
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 13.h, horizontal: 10.w),
                 validator: (value) =>
                     AddAddressValidation.streetValidation(street: value ?? ""),
               ),
               SizedBox(height: 10.h),
               appText(AppStrings.City,
                   fontSize: 14.sp, fontWeight: FontWeight.w600),
+              SizedBox(
+                height: 5.h,
+              ),
               appTextField(
                 controller: addAddressController.cityController,
                 textColor: AppColors.black,
                 textInputType: TextInputType.name,
                 hintText: AppStrings.City,
                 hintColor: AppColors.grey,
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 13.h, horizontal: 10.w),
                 validator: (value) =>
                     AddAddressValidation.cityValidation(city: value ?? ""),
               ),
               SizedBox(height: 10.h),
               appText(AppStrings.State,
                   fontSize: 14.sp, fontWeight: FontWeight.w600),
+              SizedBox(
+                height: 5.h,
+              ),
               appTextField(
                 controller: addAddressController.stateController,
                 textColor: AppColors.black,
                 hintText: AppStrings.State,
                 textInputType: TextInputType.text,
                 hintColor: AppColors.grey,
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 13.h, horizontal: 10.w),
                 validator: (value) =>
                     AddAddressValidation.stateValidation(state: value ?? ""),
               ),
@@ -94,12 +114,17 @@ class _AddAddressState extends State<AddAddress> {
                       children: [
                         appText(AppStrings.Country,
                             fontSize: 14.sp, fontWeight: FontWeight.w600),
+                        SizedBox(
+                          height: 5.h,
+                        ),
                         appTextField(
                           controller: addAddressController.countryController,
                           textColor: AppColors.black,
                           textInputType: TextInputType.text,
                           hintText: AppStrings.Country,
                           hintColor: AppColors.grey,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.h, horizontal: 10.w),
                           validator: (value) =>
                               AddAddressValidation.countryValidation(
                                   country: value ?? ""),
@@ -114,12 +139,17 @@ class _AddAddressState extends State<AddAddress> {
                       children: [
                         appText(AppStrings.ZipCode,
                             fontSize: 14.sp, fontWeight: FontWeight.w600),
+                        SizedBox(
+                          height: 5.h,
+                        ),
                         appTextField(
                           controller: addAddressController.zipController,
                           textColor: AppColors.black,
                           textInputType: TextInputType.number,
                           hintText: AppStrings.ZipCode,
                           hintColor: AppColors.grey,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 13.h, horizontal: 10.w),
                           validator: (value) =>
                               AddAddressValidation.zipValidation(
                                   zip: value ?? ""),
@@ -132,12 +162,17 @@ class _AddAddressState extends State<AddAddress> {
               SizedBox(height: 10.h),
               appText(AppStrings.phoneNumber,
                   fontSize: 14.sp, fontWeight: FontWeight.w600),
+              SizedBox(
+                height: 5.h,
+              ),
               appTextField(
                 controller: addAddressController.phoneController,
                 textColor: AppColors.black,
                 textInputType: TextInputType.phone,
                 hintText: AppStrings.phoneNumber,
                 hintColor: AppColors.grey,
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 13.h, horizontal: 10.w),
                 validator: (value) => AddAddressValidation.phoneValidation(
                     phone: value?.trim() ?? ""),
               ),

@@ -56,7 +56,7 @@
 //       bool granted = await _requestGalleryPermission();
 
 //       if (!granted) {
-//         appSnackbar(
+//         appToast(
 //           error: true,
 //           title: "Permission Required",
 //           content: "Please allow gallery access to upload profile picture",
@@ -76,7 +76,7 @@
 //         await uploadProfileImage();
 //       }
 //     } catch (e) {
-//       appSnackbar(
+//       appToast(
 //           error: true, title: "Error", content: "Unable to open gallery");
 //       print("Image Picker Error: $e");
 //     }
@@ -85,7 +85,7 @@
 //   // ------------------ UPLOAD PROFILE IMAGE (MAIN FUNCTION) ------------------
 //   Future<void> uploadProfileImage() async {
 //     if (profileImage.value == null) {
-//       appSnackbar(error: true, title: "Error", content: "No image selected");
+//       appToast(error: true, title: "Error", content: "No image selected");
 //       return;
 //     }
 
@@ -117,19 +117,19 @@
 //       );
 
 //       if (response != null && response.statusCode == 200) {
-//         appSnackbar(
+//         appToast(
 //           title: "Success",
 //           content: "Profile picture updated successfully",
 //         );
 //       } else {
-//         appSnackbar(
+//         appToast(
 //           error: true,
 //           title: "Failed",
 //           content: "Unable to upload image",
 //         );
 //       }
 //     } catch (e) {
-//       appSnackbar(
+//       appToast(
 //         error: true,
 //         title: "Error",
 //         content: "Upload Failed",
@@ -214,7 +214,7 @@
 //   // ------------------ SAVE CHANGES ------------------
 //   void saveChanges() {
 //     if (!formKey.currentState!.validate()) {
-//       appSnackbar(
+//       appToast(
 //           error: true, title: "Error", content: "Please correct the errors");
 //       return;
 //     }
@@ -226,7 +226,7 @@
 //       profile?.email = emailController.text.trim();
 //     });
 
-//     appSnackbar(title: "Success", content: "Profile updated successfully");
+//     appToast(title: "Success", content: "Profile updated successfully");
 //     Get.back();
 //   }
 

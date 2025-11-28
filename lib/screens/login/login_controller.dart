@@ -13,7 +13,7 @@ import '../../main.dart';
 import '../../services/api_service.dart';
 import '../../services/appsflyer_service.dart';
 import '../../services/auth_service.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
 
 import 'package:http/http.dart' as http;
@@ -95,7 +95,7 @@ class LoginController extends GetxController {
     final res = await AuthService.loginWithIdToken(idToken);
 
     if (res == null || res.success != true) {
-      appSnackbar(content: "Login failed", error: true);
+      appToast(content: "Login failed", error: true);
       return;
     }
 
@@ -122,7 +122,7 @@ class LoginController extends GetxController {
     if (updated) {
       // Step 4: Navigate to Home
       Get.offAll(() => DashboardScreen());
-      appSnackbar(content: "Login Successful!");
+      appToast(content: "Login Successful!");
     }
 
     loading.value = false;
@@ -133,17 +133,17 @@ class LoginController extends GetxController {
     String phone = phoneController.text.trim();
 
     if (username.isEmpty) {
-      appSnackbar(content: "Username is required", error: true);
+      appToast(content: "Username is required", error: true);
       return false;
     }
 
     if (phone.isEmpty) {
-      appSnackbar(content: "Phone number is required", error: true);
+      appToast(content: "Phone number is required", error: true);
       return false;
     }
 
     if (phone.length < 7 || phone.length > 15) {
-      appSnackbar(content: "Enter a valid phone number", error: true);
+      appToast(content: "Enter a valid phone number", error: true);
       return false;
     }
 
@@ -187,7 +187,7 @@ class LoginController extends GetxController {
         return true;
       }
 
-      appSnackbar(content: result["message"], error: true);
+      appToast(content: result["message"], error: true);
       return false;
     } catch (e) {
       print("UPDATE ERROR::: $e");
@@ -220,27 +220,27 @@ class LoginController extends GetxController {
       print("Referral Response: $response");
 
       if (response["success"] == true) {
-        appSnackbar(title: "Success", content: response["message"]);
+        appToast(title: "Success", content: response["message"]);
         return true;
       }
 
       // Handle backend error codes
       switch (response["code"]) {
         case "REFERRAL_ALREADY_APPLIED":
-          appSnackbar(error: true, content: "Referral already applied");
+          appToast(error: true, content: "Referral already applied");
           break;
         case "INVALID_REFERRAL_CODE":
-          appSnackbar(error: true, content: "Invalid referral code");
+          appToast(error: true, content: "Invalid referral code");
           break;
         case "SELF_REFERRAL":
-          appSnackbar(
+          appToast(
               error: true, content: "You cannot use your own referral code");
           break;
         case "REFERRAL_LIMIT_EXCEEDED":
-          appSnackbar(error: true, content: "Referral limit exceeded");
+          appToast(error: true, content: "Referral limit exceeded");
           break;
         default:
-          appSnackbar(error: true, content: response["message"]);
+          appToast(error: true, content: response["message"]);
       }
       return false;
     } catch (e) {

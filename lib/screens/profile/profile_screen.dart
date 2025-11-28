@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -13,6 +15,8 @@ import '../edit_profile/edit_profile_screen.dart';
 import '../order_delivered/order_delivered_screen.dart';
 import '../order_history/order_history_screen.dart';
 import '../pending_transaction/pending_transaction_screen.dart';
+import '../terms_and_privacy/privacy_policy.dart';
+import '../terms_and_privacy/terms_conditions.dart';
 import '../transaction_history/transaction_history.dart';
 import '../wishlist/wishlist_screen.dart';
 import 'profile_controller.dart';
@@ -93,7 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               backgroundColor: Colors.grey.shade300,
                               backgroundImage: user.profilePicture.isNotEmpty
                                   ? NetworkImage(user.profilePicture)
-                                  : AssetImage(AppAssets.facebook)
+                                  : AssetImage(AppAssets.user_img)
                                       as ImageProvider,
                             ),
 
@@ -233,9 +237,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisSpacing: 15.h,
                 ),
                 itemBuilder: (_, index) {
+                  final item = controller.settings[index];
+                  final title = item["title"]!;
+                  final icon = item["icon"]!;
+
                   return ProfileMenuCard(
-                    icon: controller.settings[index]["icon"]!,
-                    title: controller.settings[index]["title"]!,
+                    icon: icon,
+                    title: title,
+                    onTap: () {
+                      switch (title) {
+                        case "Log Out":
+                          controller.confirmLogout();
+                          break;
+
+                        case "Privacy Policy":
+                          Get.to(() => PrivacyPolicyScreen());
+                          break;
+
+                        case "Terms & Condition":
+                          Get.to(() => TermsAndConditionsScreen());
+                          break;
+
+                        default:
+                          print("Clicked $title");
+                      }
+                    },
                   );
                 },
               ),

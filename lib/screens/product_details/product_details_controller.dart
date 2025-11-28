@@ -9,7 +9,7 @@ import '../../models/product_details_model.dart';
 import '../../services/product_service.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_loader.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 import '../../widgets/select_plan_sheet.dart';
 
 class ProductDetailsController extends GetxController {
@@ -64,7 +64,7 @@ class ProductDetailsController extends GetxController {
       }
     } catch (e) {
       log("ERROR FETCHING PRODUCT DETAILS: $e");
-      appSnackbar(content: "Failed to load product details");
+      appToast(content: "Failed to load product details");
     } finally {
       isLoading(false);
     }
@@ -89,13 +89,13 @@ class ProductDetailsController extends GetxController {
     final productData = product.value;
 
     if (productData == null) {
-      appSnackbar(content: "Product not loaded");
+      appToast(content: "Product not loaded");
       return;
     }
 
     // Check if id is null
     if (id == null) {
-      appSnackbar(content: "Product ID not available", error: true);
+      appToast(content: "Product ID not available", error: true);
       return;
     }
 
@@ -104,9 +104,9 @@ class ProductDetailsController extends GetxController {
 
       if (removed) {
         isFavorite(false);
-        appSnackbar(content: "Removed from wishlist");
+        appToast(content: "Removed from wishlist");
       } else {
-        appSnackbar(content: "Failed to remove from wishlist", error: true);
+        appToast(content: "Failed to remove from wishlist", error: true);
       }
 
       return;
@@ -116,9 +116,9 @@ class ProductDetailsController extends GetxController {
 
     if (added) {
       isFavorite(true);
-      appSnackbar(content: "Added to wishlist");
+      appToast(content: "Added to wishlist");
     } else {
-      appSnackbar(content: "Failed to add wishlist", error: true);
+      appToast(content: "Failed to add wishlist", error: true);
     }
   }
 
@@ -292,5 +292,18 @@ class ProductDetailsController extends GetxController {
 
   void clearSelectedVariant() {
     selectedVariantId.value = "";
+  }
+
+  String get selectedPlanButtonText {
+    if (selectedPlanIndex.value != -1) {
+      final plan = plans[selectedPlanIndex.value];
+      return "${plan.days} Days";
+    }
+
+    if (customDays.value > 0) {
+      return "${customDays.value} Days";
+    }
+
+    return "Select Plan";
   }
 }

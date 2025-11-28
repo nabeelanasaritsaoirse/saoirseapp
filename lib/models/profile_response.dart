@@ -29,12 +29,12 @@ class UserData {
   String profilePicture;
   String firebaseUid;
   String phoneNumber;
-  String deviceToken;
+  String? deviceToken;
   bool isAgree;
-  int referralLimit;
-  String role;
+  int? referralLimit;
+  String? role;
   bool isActive;
-  int totalEarnings;
+  int? totalEarnings;
   int availableBalance;
   List<dynamic> wishlist;
   List<dynamic> addresses;
@@ -46,8 +46,8 @@ class UserData {
   DateTime createdAt;
   DateTime updatedAt;
   String referralCode;
-  String authMethod;
-  int unreadMessageCount;
+  String? authMethod;
+  int? unreadMessageCount;
 
   UserData({
     required this.wallet,
@@ -93,8 +93,8 @@ class UserData {
         fcmToken: json["fcmToken"],
         id: json["_id"],
         name: json["name"],
-        email: json["email"],
-        profilePicture: json["profilePicture"],
+        email: json["email"] ?? '',
+        profilePicture: json["profilePicture"] ?? '',
         firebaseUid: json["firebaseUid"],
         phoneNumber: json["phoneNumber"],
         deviceToken: json["deviceToken"],

@@ -15,6 +15,7 @@ import '../../constants/app_strings.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/investment_status_card.dart';
 import '../../widgets/product_card.dart';
+import '../category/category_controller.dart';
 import '../dashboard/dashboard_controller.dart';
 import '../my_wallet/my_wallet.dart';
 import '../notification/notification_controller.dart';
@@ -253,37 +254,60 @@ class _HomeScreenState extends State<HomeScreen> {
 
             SizedBox(height: 10.h),
 
-            // Category Section
+            //-------------------------- Category Section--------------------------------//
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: ['Technology', 'Fashion', 'Sports', 'Digital']
-                      .map((category) {
-                    // final isFirst = category == 'Technology';
-                    return Container(
-                      margin: EdgeInsets.only(right: 8.w),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 14.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(color: Colors.grey.shade400),
-                      ),
-                      child: appText(
-                        category,
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textBlack,
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
+              child: Obx(() {
+                final categories = homeController.parentCategories;
+
+                if (homeController.homeCategoryLoading.value) {
+                  return SizedBox();
+                }
+
+                if (categories.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: categories.map((cat) {
+                      return GestureDetector(
+                        onTap: () {
+                          //---------Navigate to Category Screen with selected category---------//
+                          int index =
+                              homeController.parentCategories.indexOf(cat);
+                          Get.find<DashboardController>().selectedIndex.value =
+                              1;
+                          Future.delayed(Duration(milliseconds: 100), () {
+                            Get.find<CategoryController>().selectedIndex.value =
+                                index;
+                          });
+                          //---------------------------------------------------------------//
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(right: 8.w),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 14.w, vertical: 4.h),
+                          decoration: BoxDecoration(
+                            color: AppColors.white,
+                            borderRadius: BorderRadius.circular(12.r),
+                            border: Border.all(color: Colors.grey.shade400),
+                          ),
+                          child: appText(
+                            cat.name,
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textBlack,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              }),
             ),
+
             SizedBox(height: 10.h),
 //----------------Progress Card Section----------------//
             Obx(() {
