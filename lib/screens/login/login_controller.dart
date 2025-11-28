@@ -111,9 +111,14 @@ class LoginController extends GetxController {
     print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
 
     // Step 3: Update user with FCM + referral
+
+    final referralText = referrelController.text.trim();
+    if (referralText.isNotEmpty) {
+      await applyReferralCode(referralText);
+    }
+
     bool updated = await updateUser(
-      data.userId!,
-      referrelController.text.isNotEmpty ? referrelController.text.trim() : "",
+      data.userId!
     );
 
     if (updated) {
@@ -162,14 +167,13 @@ class LoginController extends GetxController {
     }
   }
 
-  Future<bool> updateUser(String userId, String? referralCode) async {
+  Future<bool> updateUser(String userId) async {
     try {
       final deviceToken = await getDeviceToken();
 
       final result = await APIService.putRequest(
         url: AppURLs.USER_UPDATE_API + userId,
         body: {
-          "referral": referralCode ?? "",
           "deviceToken": deviceToken ?? "",
         },
         headers: {
@@ -189,6 +193,60 @@ class LoginController extends GetxController {
       return false;
     } catch (e) {
       print("UPDATE ERROR::: $e");
+      return false;
+    }
+  }
+
+  // ================= APPLY REFERRAL CODE API =================
+  Future<bool> applyReferralCode(String code) async {
+    try {
+      final token = storage.read(AppConst.ACCESS_TOKEN);
+
+      if (code.isEmpty) {
+        print("No referral code entered → Skipping referral apply");
+        return true; // no referral is NOT an error
+      }
+
+      final response = await APIService.postRequest(
+        url: AppURLs.APPLY_REFERRAL,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        body: {"referralCode": code},
+        onSuccess: (json) => json,
+      );
+
+      if (response == null) return false;
+
+      print("Referral Response: $response");
+
+      if (response["success"] == true) {
+        appSnackbar(title: "Success", content: response["message"]);
+        return true;
+      }
+
+      // Handle backend error codes
+      switch (response["code"]) {
+        case "REFERRAL_ALREADY_APPLIED":
+          appSnackbar(error: true, content: "Referral already applied");
+          break;
+        case "INVALID_REFERRAL_CODE":
+          appSnackbar(error: true, content: "Invalid referral code");
+          break;
+        case "SELF_REFERRAL":
+          appSnackbar(
+              error: true, content: "You cannot use your own referral code");
+          break;
+        case "REFERRAL_LIMIT_EXCEEDED":
+          appSnackbar(error: true, content: "Referral limit exceeded");
+          break;
+        default:
+          appSnackbar(error: true, content: response["message"]);
+      }
+      return false;
+    } catch (e) {
+      print("Referral Apply Error: $e");
       return false;
     }
   }

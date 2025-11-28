@@ -3,6 +3,7 @@ import 'dart:async';
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
+import '../models/apply_refferal.dart';
 import '../models/friend_details_response.dart';
 import '../models/product_detiails_response.dart';
 import '../models/referral_response_model.dart';
@@ -10,6 +11,7 @@ import '../services/api_service.dart';
 
 class ReferralService {
   //  To fetch referral User List & Data
+  final token = storage.read(AppConst.ACCESS_TOKEN);
 
   Future<ReferralResponse?> fetchReferralResponseFromServer() async {
     final userId = await storage.read(AppConst.USER_ID);
@@ -64,4 +66,37 @@ class ReferralService {
       },
     );
   }
+
+
+  // To apply referral code
+  Future<ApplyReferralResponse?> applyReferralCode(String referralCode) async {
+    try {
+      final url = AppURLs.APPLY_REFERRAL;
+
+      print("APPLY REFERRAL");
+      print("URL: $url");
+      print("Token: $token");
+      print("Referral Code: $referralCode");
+
+      final response = await APIService.postRequest(
+        url: url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        body: {
+          "referralCode": referralCode.trim(),
+        },
+        onSuccess: (json) => json,
+      );
+
+      if (response == null) return null;
+
+      return ApplyReferralResponse.fromJson(response);
+    } catch (e) {
+      print("Referral Error: $e");
+      return null;
+    }
+  }
+
 }
