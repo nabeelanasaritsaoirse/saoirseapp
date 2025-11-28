@@ -70,13 +70,13 @@ class ReferralController extends GetxController {
         referrals.assignAll(response.referrals);
         filteredReferrals.assignAll(response.referrals);
       } else {
-        appSnackbar(
+        appToast(
           error: true,
           content: response?.message ?? "Failed to fetch referral data",
         );
       }
     } catch (e) {
-      appSnackbar(error: true, content: e.toString());
+      appToast(error: true, content: e.toString());
     } finally {
       isDashboardLoading(false);
     }
@@ -178,8 +178,7 @@ class ReferralController extends GetxController {
         );
         await intent.launch();
       } catch (e) {
-        appSnackbar(
-            error: true, content: "Gmail app not found on this device.");
+        appToast(error: true, content: "Gmail app not found on this device.");
       }
     } else if (Platform.isIOS) {
       final uri = Uri.parse(
@@ -228,7 +227,7 @@ class ReferralController extends GetxController {
     );
 
     // Show success message
-    appSnackbar(
+    appToast(
       error: false,
       title: "Copied!",
       content: "Referral code copied to clipboard",

@@ -55,7 +55,7 @@ class WishlistController extends GetxController {
       wishlistProducts.removeWhere((item) => item.productId == productId);
       wishlistProducts.refresh();
 
-      appSnackbar(title: "Removed", content: "Item removed from wishlist");
+      appToast(title: "Removed", content: "Item removed from wishlist");
     }
   }
 

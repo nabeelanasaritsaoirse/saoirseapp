@@ -33,7 +33,7 @@ class ProductDetailsController extends GetxController {
   RxInt currentImageIndex = 0.obs;
   RxBool isFavorite = false.obs;
   RxInt selectedPlanIndex = (-1).obs;
-    RxString selectedVariantId = "".obs;
+  RxString selectedVariantId = "".obs;
 
   /// Custom plan values
   RxInt customDays = 0.obs;
@@ -58,7 +58,7 @@ class ProductDetailsController extends GetxController {
       product.value = result;
     } catch (e) {
       log("ERROR FETCHING PRODUCT DETAILS: $e");
-      appSnackbar(content: "Failed to load product details");
+      appToast(content: "Failed to load product details");
     } finally {
       isLoading(false);
     }
@@ -83,13 +83,13 @@ class ProductDetailsController extends GetxController {
     final productData = product.value;
 
     if (productData == null) {
-      appSnackbar(content: "Product not loaded");
+      appToast(content: "Product not loaded");
       return;
     }
 
     // Check if id is null
     if (id == null) {
-      appSnackbar(content: "Product ID not available", error: true);
+      appToast(content: "Product ID not available", error: true);
       return;
     }
 
@@ -98,9 +98,9 @@ class ProductDetailsController extends GetxController {
 
       if (removed) {
         isFavorite(false);
-        appSnackbar(content: "Removed from wishlist");
+        appToast(content: "Removed from wishlist");
       } else {
-        appSnackbar(content: "Failed to remove from wishlist", error: true);
+        appToast(content: "Failed to remove from wishlist", error: true);
       }
 
       return;
@@ -110,9 +110,9 @@ class ProductDetailsController extends GetxController {
 
     if (added) {
       isFavorite(true);
-      appSnackbar(content: "Added to wishlist");
+      appToast(content: "Added to wishlist");
     } else {
-      appSnackbar(content: "Failed to add wishlist", error: true);
+      appToast(content: "Failed to add wishlist", error: true);
     }
   }
 
@@ -267,24 +267,22 @@ class ProductDetailsController extends GetxController {
     Get.back();
   }
 
-
-   void selectVariantById(String variantId) {
+  void selectVariantById(String variantId) {
     selectedVariantId.value = variantId;
-  
+
     log("Selected variantId: $variantId");
   }
 
   Variant? getSelectedVariant() {
-  if (selectedVariantId.value.isEmpty) return null;
+    if (selectedVariantId.value.isEmpty) return null;
 
-  for (final v in product.value?.variants ?? []) {
-    if (v.variantId == selectedVariantId.value) {
-      return v;
+    for (final v in product.value?.variants ?? []) {
+      if (v.variantId == selectedVariantId.value) {
+        return v;
+      }
     }
+    return null;
   }
-  return null; 
-}
-
 
   void clearSelectedVariant() {
     selectedVariantId.value = "";

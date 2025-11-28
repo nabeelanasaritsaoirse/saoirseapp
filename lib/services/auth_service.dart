@@ -71,7 +71,7 @@ class AuthService {
         },
         verificationFailed: (FirebaseAuthException e) {
           print(" [OTP FAILED] ${e.code} : ${e.message}");
-          appSnackbar(content: e.message!, error: true);
+          appToast(content: e.message!, error: true);
         },
         codeSent: (String vId, int? resendToken) {
           print("[CODE SENT] verificationId: $vId");
@@ -86,7 +86,7 @@ class AuthService {
       return true;
     } catch (e) {
       print("[SEND OTP ERROR] $e");
-      appSnackbar(content: "OTP sending failed: $e", error: true);
+      appToast(content: "OTP sending failed: $e", error: true);
       return false;
     }
   }
@@ -97,7 +97,7 @@ class AuthService {
 
     if (verificationId == null) {
       print("[ERROR] verificationId is NULL!");
-      appSnackbar(
+      appToast(
           content: "OTP expired or not sent. Please send OTP again.",
           error: true);
       return null;
@@ -121,7 +121,7 @@ class AuthService {
       return token;
     } catch (e) {
       print("[VERIFY OTP ERROR] $e");
-      appSnackbar(content: "Invalid OTP: $e", error: true);
+      appToast(content: "Invalid OTP: $e", error: true);
       return null;
     }
   }
@@ -141,7 +141,7 @@ class AuthService {
       final GoogleSignInAccount? account = await google.authenticate();
 
       if (account == null) {
-        appSnackbar(content: "Login cancelled", error: true);
+        appToast(content: "Login cancelled", error: true);
         return null;
       }
       googleUser = account;
@@ -154,7 +154,7 @@ class AuthService {
       final idToken = authData.idToken;
 
       if (idToken == null) {
-        appSnackbar(content: "Failed to get Google ID Token", error: true);
+        appToast(content: "Failed to get Google ID Token", error: true);
         return null;
       }
 
@@ -168,7 +168,7 @@ class AuthService {
       return idToken;
     } catch (e) {
       print("GOOGLE LOGIN ERROR::: $e");
-      appSnackbar(content: "Google Login Error: $e", error: true);
+      appToast(content: "Google Login Error: $e", error: true);
       return null;
     }
   }

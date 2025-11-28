@@ -4,6 +4,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/app_snackbar.dart';
 
 import '../../constants/app_assets.dart';
 import '../../services/auth_service.dart';
@@ -135,9 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                           controller: loginController.phoneController,
                           onFieldSubmitted: (phoneNumber) {
                             final fullNumber = loginController.fullPhoneNumber;
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(SnackBar(content: Text(fullNumber)));
+                            appToast(content: fullNumber);
                           },
                           prefixWidth: 70.w,
                           hintText: AppStrings.phoneNumber,
