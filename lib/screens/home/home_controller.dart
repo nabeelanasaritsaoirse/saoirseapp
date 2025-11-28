@@ -2,8 +2,10 @@
 import 'dart:developer';
 import 'package:get/get.dart';
 
+import '../../models/category_model.dart';
 import '../../models/product_model.dart';
 import '../../models/success_story_banner_model.dart';
+import '../../services/category_service.dart';
 import '../../services/home_banner_top_service.dart';
 import '../../services/home_service.dart';
 import '../../services/success_story_banner_service.dart';
@@ -15,6 +17,7 @@ class HomeController extends GetxController {
   RxBool trendingLoading = false.obs;
   RxBool successLoading = false.obs;
   RxBool bannerLoading = false.obs;
+  RxBool homeCategoryLoading = false.obs;
 
   RxInt currentCarouselIndex = 0.obs;
   RxInt currentBottomCarouselIndex = 0.obs;
@@ -28,6 +31,7 @@ class HomeController extends GetxController {
   final RxList<Product> bestSellerProducts = <Product>[].obs;
   final RxList<Product> trendingProducts = <Product>[].obs;
   RxList<SuccessStoryItem> successStories = <SuccessStoryItem>[].obs;
+  RxList<CategoryGroup> parentCategories = <CategoryGroup>[].obs;
 
   @override
   void onInit() {
@@ -43,6 +47,7 @@ class HomeController extends GetxController {
       fetchTrendingProducts(),
       fetchSuccessStories(),
       fetchHomeBanners(),
+      fetchParentCategories(),
     ]);
   }
 
@@ -130,6 +135,21 @@ class HomeController extends GetxController {
       log("Error fetching home banners: $e");
     } finally {
       bannerLoading.value = false;
+    }
+  }
+
+  // Fetch Parent Categories for Home Screen
+  Future<void> fetchParentCategories() async {
+    try {
+      homeCategoryLoading.value = true;
+
+      final result = await CategoryService.fetchCategories();
+
+      if (result != null && result.isNotEmpty) {
+        parentCategories.assignAll(result);
+      }
+    } finally {
+      homeCategoryLoading.value = false;
     }
   }
 

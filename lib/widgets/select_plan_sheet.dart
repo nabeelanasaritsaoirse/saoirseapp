@@ -12,7 +12,7 @@ import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/app_text.dart';
 import 'app_loader.dart';
-import 'app_snackbar.dart';
+import 'app_toast.dart';
 
 class SelectPlanSheet extends StatelessWidget {
   const SelectPlanSheet({super.key});
@@ -171,7 +171,7 @@ class SelectPlanSheet extends StatelessWidget {
                                 0.0;
 
                         if (days <= 0 || amount <= 0) {
-                          appSnackbar(
+                          appToast(
                               error: true,
                               title: "Invalid Input",
                               content: "Please enter valid days and amount");
@@ -179,7 +179,7 @@ class SelectPlanSheet extends StatelessWidget {
                         }
 
                         if (days < 5) {
-                          appSnackbar(
+                          appToast(
                               error: true,
                               title: "Invalid Days",
                               content: "Days cannot be less than 5");
@@ -187,7 +187,7 @@ class SelectPlanSheet extends StatelessWidget {
                         }
 
                         if (amount < 50) {
-                          appSnackbar(
+                          appToast(
                               error: true,
                               title: "Invalid Amount",
                               content: "Amount cannot be more less 50");
@@ -396,8 +396,7 @@ class SelectPlanSheet extends StatelessWidget {
                       final selected = controller.getSelectedPlan();
 
                       if (selected["days"] == 0 || selected["amount"] == 0) {
-                        appSnackbar(
-                            error: true, content: "Please select a plan!");
+                        appToast(error: true, content: "Please select a plan!");
                         return;
                       }
 

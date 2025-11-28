@@ -98,4 +98,11 @@ class AppURLs {
 
   // Profile Api
   static String MY_PROFILE = BASE_API + "api/users/me/profile";
+
+  //Log Out Api
+  static String LOGOUT_API = BASE_API + "api/auth/logout";
+
+  // Pending Transaction (PAYMENT METHOD API)
+  static String PENDING_TRANSACTION_PAYMENT_RESPONSE =
+      BASE_API + "api/installments/payments/create-combined-razorpay";
 }

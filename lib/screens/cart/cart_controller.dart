@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 import '../../models/cart_response_model.dart';
 import '../../services/cart_service.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 
 class CartController extends GetxController {
   final CartService service = CartService();
@@ -57,7 +57,7 @@ class CartController extends GetxController {
     final response = await service.updateCartQty(product.productId, newQty);
     print("API Response: $response");
     if (response == null) {
-      appSnackbar(content: "Unable to update quantity", error: true);
+      appToast(content: "Unable to update quantity", error: true);
       return;
     }
 
@@ -67,7 +67,7 @@ class CartController extends GetxController {
       fetchCart();
       fetchCartCount(); // refresh total
     } else {
-      appSnackbar(content: response["message"], error: true);
+      appToast(content: response["message"], error: true);
     }
   }
 
@@ -88,7 +88,7 @@ class CartController extends GetxController {
     final response = await service.updateCartQty(product.productId, newQty);
     print("API Response: $response");
     if (response == null) {
-      appSnackbar(content: "Unable to update quantity", error: true);
+      appToast(content: "Unable to update quantity", error: true);
       return;
     }
 
@@ -98,7 +98,7 @@ class CartController extends GetxController {
       fetchCart();
       fetchCartCount();
     } else {
-      appSnackbar(content: response["message"], error: true);
+      appToast(content: response["message"], error: true);
     }
   }
 
@@ -110,12 +110,12 @@ class CartController extends GetxController {
       final response = await service.addToCart(productId);
 
       if (response == null) {
-        appSnackbar(content: "Failed to add to cart", error: true);
+        appToast(content: "Failed to add to cart", error: true);
         return;
       }
 
       if (response.success) {
-        appSnackbar(
+        appToast(
           content: response.message,
         );
 
@@ -123,10 +123,10 @@ class CartController extends GetxController {
         fetchCart();
         fetchCartCount();
       } else {
-        appSnackbar(content: response.message, error: true);
+        appToast(content: response.message, error: true);
       }
     } catch (e) {
-      appSnackbar(content: "Error: $e", error: true);
+      appToast(content: "Error: $e", error: true);
     } finally {
       isLoading(false);
     }
@@ -136,7 +136,7 @@ class CartController extends GetxController {
   Future<void> clearCartItems() async {
     try {
       if (cartData.value == null || cartData.value!.products.isEmpty) {
-        appSnackbar(content: "No items to clear", error: true);
+        appToast(content: "No items to clear", error: true);
         return;
       }
 
@@ -156,12 +156,12 @@ class CartController extends GetxController {
         cartCount.value = 0; // Reset badge count
         cartData.refresh();
 
-        appSnackbar(content: "Cart cleared successfully");
+        appToast(content: "Cart cleared successfully");
       } else {
-        appSnackbar(content: "Failed to clear cart", error: true);
+        appToast(content: "Failed to clear cart", error: true);
       }
     } catch (e) {
-      appSnackbar(content: "Error: $e", error: true);
+      appToast(content: "Error: $e", error: true);
     } finally {
       isLoading(false);
     }
@@ -175,7 +175,7 @@ class CartController extends GetxController {
       final response = await service.removeItemCart(productId);
 
       if (response == null) {
-        appSnackbar(content: "Failed to remove item", error: true);
+        appToast(content: "Failed to remove item", error: true);
         return;
       }
 
@@ -184,16 +184,16 @@ class CartController extends GetxController {
         cartData.value?.products.removeWhere((p) => p.productId == productId);
         cartData.refresh();
 
-        appSnackbar(content: "Item is removed from cart");
+        appToast(content: "Item is removed from cart");
 
         // Re-fetch cart if needed
         fetchCart();
         fetchCartCount();
       } else {
-        appSnackbar(content: response.message, error: true);
+        appToast(content: response.message, error: true);
       }
     } catch (e) {
-      appSnackbar(content: "Error: $e", error: true);
+      appToast(content: "Error: $e", error: true);
     } finally {
       isLoading(false);
     }

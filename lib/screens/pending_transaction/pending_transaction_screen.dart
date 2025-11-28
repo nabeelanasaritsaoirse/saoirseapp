@@ -3,8 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_strings.dart';
+import '../../dummy/dummy_assets.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
-import '../transaction_succsess/transactionSuccsess.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
@@ -27,14 +28,29 @@ class PendingTransaction extends StatelessWidget {
       body: Column(
         children: [
           SizedBox(height: 8.h),
+
+          //-------------------------------- LIST SECTION -------------------------------
           Expanded(
-            child: Obx(
-              () => ListView.builder(
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return Center(child: appLoader());
+              }
+
+              if (controller.transactions.isEmpty) {
+                return Center(
+                  child: Text(
+                    "No pending payment",
+                    style: TextStyle(fontSize: 16.sp),
+                  ),
+                );
+              }
+
+              return ListView.builder(
                 padding: EdgeInsets.symmetric(horizontal: 12.w),
                 itemCount: controller.transactions.length,
                 itemBuilder: (context, index) {
                   final item = controller.transactions[index];
-                  final RxBool isSelected = item['isSelected'];
+                  final RxBool isSelected = controller.selectedList[index];
 
                   return GestureDetector(
                     onTap: () {
@@ -57,15 +73,19 @@ class PendingTransaction extends StatelessWidget {
                         child: Row(
                           children: [
                             SizedBox(width: 6.w),
+
+                            //-------------------------------- IMAGE (Placeholder) -------------------------------
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8.r),
-                              child: Image.network(
-                                item["image"],
+                              child: Image.asset(
+                                DummyAssets.mobile,
                                 width: 80.w,
                                 height: 70.h,
-                                fit: BoxFit.cover,
+                                fit: BoxFit.contain,
                               ),
                             ),
+
+                            //-------------------------------- TEXT CONTENT -------------------------------
                             Expanded(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
@@ -73,52 +93,32 @@ class PendingTransaction extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    appText(item["title"],
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.textBlack,
-                                        fontFamily: "poppins",
-                                        textAlign: TextAlign.start),
+                                    appText(
+                                      item.productName,
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textBlack,
+                                    ),
                                     SizedBox(height: 2.h),
                                     appText(
-                                      item["subtitle"],
+                                      "Installment ${item.installmentNumber}",
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.textBlack,
-                                      fontFamily: "poppins",
                                     ),
                                     SizedBox(height: 6.h),
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10.w, vertical: 4.h),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primaryColor,
-                                            borderRadius:
-                                                BorderRadius.circular(6.r),
-                                          ),
-                                          child: appText("Pay Now",
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.w600,
-                                              color: AppColors.white,
-                                              fontFamily: "poppins",
-                                              fontStyle: FontStyle.italic),
-                                        ),
-                                        SizedBox(width: 10.w),
-                                        appText(
-                                          "₹${item['price']}",
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.black,
-                                          fontFamily: "poppins",
-                                        ),
-                                      ],
+                                    appText(
+                                      "₹${item.amount}",
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.black,
                                     ),
                                   ],
                                 ),
                               ),
                             ),
+
+                            //-------------------------------- RADIO BUTTON -------------------------------
                             Padding(
                               padding: EdgeInsets.only(right: 12.w),
                               child: Icon(
@@ -136,9 +136,11 @@ class PendingTransaction extends StatelessWidget {
                     ),
                   );
                 },
-              ),
-            ),
+              );
+            }),
           ),
+
+          //-------------------------------- BOTTOM TOTAL AMOUNT SECTION -------------------------------
           Obx(
             () => Container(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
@@ -163,35 +165,34 @@ class PendingTransaction extends StatelessWidget {
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w500,
                         color: AppColors.grey,
-                        fontFamily: "poppins",
                       ),
                       appText(
                         "₹${controller.totalAmount}",
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w600,
                         color: AppColors.black,
-                        fontFamily: "poppins",
                       ),
                     ],
                   ),
+
+                  // Pay now button
                   appButton(
                     onTap: () {
-                      Get.to(Transactionsuccsess());
+                      controller.payNow();
                     },
                     child: Center(
-                      child: appText("Pay Now",
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.white,
-                          fontFamily: "poppins",
-                          fontStyle: FontStyle.italic),
+                      child: appText(
+                        "Pay Now",
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.white,
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
-                    // borderWidth: 1.w,
                     width: 120.w,
                     height: 40.h,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
-                    // borderColor: AppColors.primaryColor,
                     buttonColor: AppColors.mediumAmber,
                   ),
                 ],

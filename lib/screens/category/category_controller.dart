@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/services/category_service.dart';
+
 import '../../models/category_model.dart';
+import '../../services/category_service.dart';
 
 class CategoryController extends GetxController {
   RxInt selectedIndex = 0.obs;
@@ -31,7 +32,11 @@ class CategoryController extends GetxController {
 
       if (result != null && result.isNotEmpty) {
         categoryGroups.assignAll(result);
-        selectedIndex.value = 0; // this is select first category by default
+
+        if (selectedIndex.value < 0 ||
+            selectedIndex.value >= categoryGroups.length) {
+          selectedIndex.value = 0;
+        }
       } else {
         categoryGroups.clear();
         errorMessage.value = 'No categories found';

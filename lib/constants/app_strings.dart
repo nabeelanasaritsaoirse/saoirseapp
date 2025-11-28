@@ -205,8 +205,8 @@ class AppStrings {
 
   // Booking confirmed screen
   static String confirm_content =
-      "Your order is confirmed and being prepared.\nTrack it anytime in your history.";
-  static String confirm_title = "Your booking is Confirmed!";
+      "Your EMI plan is activated.\nProduct will be delivered after all EMIs are paid.";
+  static String confirm_title = "Payment Successful";
 
   // Pending Transaction
   static String pending_transaction = "Pending Transaction";

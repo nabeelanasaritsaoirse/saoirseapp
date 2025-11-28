@@ -3,14 +3,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../constants/app_colors.dart';
 
 appToast({
-  required String message,
+  required String content,
+  String title = 'Message',
   bool error = false,
-  ToastGravity gravity = ToastGravity.BOTTOM,
 }) {
   Fluttertoast.showToast(
-    msg: message,
+    msg: content,
     toastLength: Toast.LENGTH_SHORT,
-    gravity: gravity,
+    gravity: ToastGravity.BOTTOM,
     backgroundColor: error ? AppColors.red : AppColors.green,
     textColor: AppColors.white,
     fontSize: 14.0,

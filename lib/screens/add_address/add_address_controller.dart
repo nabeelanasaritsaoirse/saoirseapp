@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../services/address_service.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 import '../select_address/select_address_controller.dart';
 
 class AddAddressController extends GetxController {
@@ -44,12 +44,11 @@ class AddAddressController extends GetxController {
         log("SelectAddressController not found: $e");
       }
 
-      appSnackbar(title: "Success", content: "Address added successfully");
+      appToast(title: "Success", content: "Address added successfully");
 
       Get.back();
     } else {
-      appSnackbar(
-          error: true, title: "Error", content: "Failed to add address");
+      appToast(error: true, title: "Error", content: "Failed to add address");
     }
   }
 }

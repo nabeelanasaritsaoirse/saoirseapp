@@ -135,6 +135,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     appTextField(
                       controller: controller.fullNameController,
                       prefixWidth: 20.w,
+                      textInputType: TextInputType.name,
                       hintText: AppStrings.fullName,
                       hintColor: AppColors.black,
                       textColor: AppColors.black,
@@ -239,6 +240,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         validator: null,
                         prefixWidth: 20.w,
                         hintText: AppStrings.email,
+                        textInputType: TextInputType.emailAddress,
                         hintColor: AppColors.black,
                         textColor: AppColors.black,
                         hintSize: 15.sp,
