@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/terms_and_privacy/terms_conditions.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -13,6 +14,7 @@ import '../edit_profile/edit_profile_screen.dart';
 import '../order_delivered/order_delivered_screen.dart';
 import '../order_history/order_history_screen.dart';
 import '../pending_transaction/pending_transaction_screen.dart';
+import '../terms_and_privacy/privacy_policy.dart';
 import '../transaction_history/transaction_history.dart';
 import '../wishlist/wishlist_screen.dart';
 import 'profile_controller.dart';
@@ -247,11 +249,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           break;
 
                         case "Privacy Policy":
-                          // Get.to(() => PrivacyPolicyScreen());
+                          Get.to(() => PrivacyPolicyScreen());
                           break;
 
                         case "Terms & Condition":
-                          // Get.to(() => TermsScreen());
+                          Get.to(() => TermsAndConditionsScreen());
                           break;
 
                         default:
