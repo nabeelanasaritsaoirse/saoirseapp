@@ -12,6 +12,7 @@ import '../../services/auth_service.dart';
 import '../../widgets/app_snackbar.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
+import '../login/login_controller.dart';
 
 class VerifyOtpController extends GetxController {
   VerifyOtpController({
@@ -67,9 +68,12 @@ class VerifyOtpController extends GetxController {
     print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
 
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
+    if (referral.isNotEmpty) {
+      await Get.find<LoginController>().applyReferralCode(referral);
+    }
+
     bool updated = await updateUser(
       userId: data.userId!,
-      referralCode: referral,
       name: username,
       phoneNumber: phoneNumber,
     );
@@ -91,7 +95,6 @@ class VerifyOtpController extends GetxController {
   /// UPDATE USER API
   Future<bool> updateUser({
     required String userId,
-    required String? referralCode,
     required String name,
     required String phoneNumber,
   }) async {
@@ -102,17 +105,12 @@ class VerifyOtpController extends GetxController {
       print(" Updating User with:");
       print("   name: $username");
       print("   phoneNumber: $phoneNumber");
-      print("   Referral: $referralCode");
       print("   DeviceToken: $deviceToken");
       Map<String, dynamic> body = {
         "deviceToken": deviceToken,
         "name": username,
       };
 
-      // add referral only when user entered it
-      if (referralCode != null && referralCode.isNotEmpty) {
-        body["referral"] = referralCode;
-      }
       final result = await APIService.putRequest(
         url: AppURLs.USER_UPDATE_API + userId,
         body: body,
