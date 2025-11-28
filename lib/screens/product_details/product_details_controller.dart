@@ -52,17 +52,29 @@ class ProductDetailsController extends GetxController {
 
   // FETCH PRODUCT DETAILS
   Future<void> fetchProductDetails() async {
-    try {
-      isLoading(true);
-      final result = await productService.fetchProductDetails(productId);
-      product.value = result;
-    } catch (e) {
-      log("ERROR FETCHING PRODUCT DETAILS: $e");
-      appSnackbar(content: "Failed to load product details");
-    } finally {
-      isLoading(false);
+  try {
+    isLoading(true);
+
+    final result = await productService.fetchProductDetails(productId);
+    product.value = result;
+
+
+    if (result != null &&
+        result.hasVariants &&
+        result.variants.isNotEmpty) {
+      selectedVariantId.value = result.variants.first.variantId;
+      log("Default Variant Selected: ${selectedVariantId.value}");
     }
+
+  } catch (e) {
+    log("ERROR FETCHING PRODUCT DETAILS: $e");
+    appSnackbar(content: "Failed to load product details");
+  } finally {
+    isLoading(false);
   }
+}
+
+
 
   Future<void> checkIfInWishlist() async {
     // ✅ Check if id is null before using it

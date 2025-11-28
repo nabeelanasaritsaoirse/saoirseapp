@@ -173,8 +173,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 () => GestureDetector(
                                   onTap: controller.toggleFavorite,
                                   child: Container(
-                                    width: 40,
-                                    height: 40,
+                                    width: 40.w,
+                                    height: 40.h,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       shape: BoxShape.circle,
@@ -278,15 +278,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 color: AppColors.textBlack,
                               ),
                               SizedBox(width: 8.w),
-                              appText(
-                                "₹${product.pricing.regularPrice}",
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.grey,
-                                decoration: TextDecoration.lineThrough,
-                              ),
+                              if (product.pricing.finalPrice !=
+                                  product.pricing.regularPrice)
+                                appText(
+                                  "₹${product.pricing.regularPrice}",
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.grey,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
                             ],
                           ),
+
                           SizedBox(height: 10),
 
                           if (product.hasVariants) ...[
