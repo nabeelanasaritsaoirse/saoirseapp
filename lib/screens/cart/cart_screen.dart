@@ -86,25 +86,32 @@ class CartScreen extends StatelessWidget {
                         /// IMAGE
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10.r),
-                          child: item.images.first.url.startsWith('http')
-                              ? Image.network(
-                                  item.images.first.url,
-                                  width: 80.w,
-                                  height: 80.h,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Icon(
-                                      Icons.broken_image,
-                                      size: 80.sp,
-                                      color: AppColors.grey,
-                                    );
-                                  },
-                                )
-                              : Image.asset(
-                                  item.images.first.url,
-                                  width: 80.w,
-                                  height: 80.h,
-                                  fit: BoxFit.cover,
+                          child: item.images.isNotEmpty
+                              ? item.images.first.url.startsWith('http')
+                                  ? Image.network(
+                                      item.images.first.url,
+                                      width: 80.w,
+                                      height: 80.h,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Icon(
+                                          Icons.broken_image,
+                                          size: 80.sp,
+                                          color: AppColors.grey,
+                                        );
+                                      },
+                                    )
+                                  : Image.asset(
+                                      item.images.first.url,
+                                      width: 80.w,
+                                      height: 80.h,
+                                      fit: BoxFit.cover,
+                                    )
+                              : Icon(
+                                  Icons.broken_image,
+                                  size: 80.sp,
+                                  color: AppColors.grey,
                                 ),
                         ),
 

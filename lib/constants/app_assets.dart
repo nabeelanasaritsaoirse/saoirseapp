@@ -53,6 +53,7 @@ class AppAssets {
   static String profile_image = "assets/images/profile_image.jpg";
 
   // profile screen
+  static String user_img = "assets/images/user_img.webp";
   static String profile_bg = "assets/images/profile_bg.png";
   static String pending_payment = "assets/icons/pending_payment.png";
   static String order_history = "assets/icons/order_history.png";

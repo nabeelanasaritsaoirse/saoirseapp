@@ -123,6 +123,8 @@ class AppStrings {
   static String warning_label = "Please Select Your Plan";
   static String warning_body =
       "You haven’t selected a plan yet. Please choose a plan before proceeding to Add to Cart.";
+  static String checkout_warning_body =
+      "You haven’t selected a plan yet. Please choose a plan before proceeding to Check out.";
 
   //Cart page
   static String carttitle = "Cart";
@@ -167,7 +169,7 @@ class AppStrings {
   static String ZipCode = 'Zip Code';
   static String PhoneNumber = 'Phone Number';
   static String Save = 'Save';
-  static String profile_title = "Profile";
+  static String profile_title = "My Profile";
 
   // Edit Profile screen
   static String editLabel = 'Edit Profile';

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
@@ -38,14 +39,13 @@ class RazorpayController extends GetxController {
     required String orderId,
     required String razorpayOrderId,
     required int amount,
-    required String key,
   }) {
     this.orderId = orderId;
     try {
       log("Opening Razorpay Checkout with Order ID: $orderId");
 
       final options = {
-        'key': "rzp_live_rqOS9AG74ADgsB",
+        'key': dotenv.env['RAZORPAY_KEY_ID'],
         'amount': amount,
         'order_id': razorpayOrderId,
         'currency': 'INR',

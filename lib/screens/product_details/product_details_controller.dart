@@ -33,6 +33,7 @@ class ProductDetailsController extends GetxController {
   RxInt currentImageIndex = 0.obs;
   RxBool isFavorite = false.obs;
   RxInt selectedPlanIndex = (-1).obs;
+  RxString selectedVariantId = "".obs;
 
   /// Custom plan values
   RxInt customDays = 0.obs;
@@ -53,8 +54,14 @@ class ProductDetailsController extends GetxController {
   Future<void> fetchProductDetails() async {
     try {
       isLoading(true);
+
       final result = await productService.fetchProductDetails(productId);
       product.value = result;
+
+      if (result != null && result.hasVariants && result.variants.isNotEmpty) {
+        selectedVariantId.value = result.variants.first.variantId;
+        log("Default Variant Selected: ${selectedVariantId.value}");
+      }
     } catch (e) {
       log("ERROR FETCHING PRODUCT DETAILS: $e");
       appSnackbar(content: "Failed to load product details");
@@ -229,9 +236,11 @@ class ProductDetailsController extends GetxController {
   void selectApiPlan(int index) {
     selectedPlanIndex.value = index;
 
-    // clear custom plan if user selects api plan
-    customDays.value = 0;
-    customAmount.value = 0.0;
+    final plan = plans[index];
+
+    //  store selected API plan values
+    customDays.value = plan.days;
+    customAmount.value = plan.perDayAmount;
   }
 
   void resetPlanSelection() {
@@ -262,5 +271,26 @@ class ProductDetailsController extends GetxController {
     selectedPlanIndex.value = -1;
 
     Get.back();
+  }
+
+  void selectVariantById(String variantId) {
+    selectedVariantId.value = variantId;
+
+    log("Selected variantId: $variantId");
+  }
+
+  Variant? getSelectedVariant() {
+    if (selectedVariantId.value.isEmpty) return null;
+
+    for (final v in product.value?.variants ?? []) {
+      if (v.variantId == selectedVariantId.value) {
+        return v;
+      }
+    }
+    return null;
+  }
+
+  void clearSelectedVariant() {
+    selectedVariantId.value = "";
   }
 }

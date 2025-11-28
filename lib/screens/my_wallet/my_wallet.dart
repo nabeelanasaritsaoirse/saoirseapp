@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
+import '../add_money/add_money_screen.dart';
 import '../withdtraw/withdraw_screen.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
@@ -40,9 +41,7 @@ class WalletScreen extends StatelessWidget {
               ),
             ),
             onTap: () {
-              //
-              //    ADD MONEY BUTTON FUNCTION
-              //
+              Get.to(AddMoneyScreen());
             },
           ),
         ],

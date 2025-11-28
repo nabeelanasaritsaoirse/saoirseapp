@@ -1,8 +1,11 @@
+// ignore_for_file: unused_local_variable
+
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../models/address_response.dart';
@@ -11,12 +14,14 @@ import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
+import '../product_details/product_details_controller.dart';
 import '../razorpay/razorpay_controller.dart';
 import 'order_details_controller.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   final Address addresses;
   final ProductDetailsData? product;
+  final String? selectVarientId;
   final int selectedDays;
   final double selectedAmount;
 
@@ -26,14 +31,28 @@ class OrderDetailsScreen extends StatelessWidget {
     this.product,
     required this.selectedDays,
     required this.selectedAmount,
+    this.selectVarientId,
   });
   final orderController = Get.find<OrderDetailsController>();
   final razorpayController = Get.put(RazorpayController());
 
   @override
   Widget build(BuildContext context) {
+    log("DEBUG → incoming selectVarientId: $selectVarientId");
+
     final couponController = TextEditingController();
     final pricing = product!.pricing;
+
+    final String? productImageUrl =
+        product != null && product!.images.isNotEmpty
+            ? product!.images
+                .firstWhere(
+                  (img) => img.isPrimary,
+                  orElse: () => product!.images.first,
+                )
+                .url
+            : null;
+
     return Scaffold(
       backgroundColor: AppColors.paperColor,
       appBar: CustomAppBar(
@@ -197,11 +216,51 @@ class OrderDetailsScreen extends StatelessWidget {
                       spacing: 15.w,
                       children: [
                         SizedBox(
-                          width: 55.w,
-                          height: 55.h,
-                          child:
-                              Image.asset(AppAssets.iphone, fit: BoxFit.cover),
-                        ),
+                            width: 55.w,
+                            height: 55.h,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.r),
+                              child: Image.network(
+                                product!.images.isNotEmpty
+                                    ? product!.images
+                                        .firstWhere(
+                                          (img) => img.isPrimary,
+                                          orElse: () => product!.images.first,
+                                        )
+                                        .url
+                                    : "", // empty triggers errorBuilder
+                                width: 70.w,
+                                height: 70.w,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) {
+                                  return Container(
+                                    width: 70.w,
+                                    height: 70.w,
+                                    color: Colors.grey.shade200,
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      size: 28.sp,
+                                      color: Colors.grey,
+                                    ),
+                                  );
+                                },
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+
+                                  return Center(
+                                    child: SizedBox(
+                                      width: 24.w,
+                                      height: 24.w,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            )),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,8 +287,23 @@ class OrderDetailsScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              appText("Red | 1TB",
-                                  fontSize: 12.sp, fontWeight: FontWeight.w600),
+                              if (product!.hasVariants)
+                                Obx(() {
+                                  final productCtrl =
+                                      Get.find<ProductDetailsController>();
+                                  final selectedVariant =
+                                      productCtrl.getSelectedVariant();
+
+                                  if (selectedVariant == null) {
+                                    return SizedBox.shrink();
+                                  }
+
+                                  return appText(
+                                    selectedVariant.attributes.color,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w600,
+                                  );
+                                }),
                               appText("₹ ${product!.pricing.finalPrice}",
                                   fontSize: 12.sp, fontWeight: FontWeight.w600),
                               Obx(() {
@@ -264,7 +338,9 @@ class OrderDetailsScreen extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(15.w),
-                  height: 130.h,
+                  constraints: BoxConstraints(
+                    minHeight: 65.h,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.white,
                     boxShadow: [
@@ -310,32 +386,32 @@ class OrderDetailsScreen extends StatelessWidget {
                               )),
                         ],
                       ),
-                      appText(AppStrings.premoCode,
-                          fontSize: 13.sp, fontWeight: FontWeight.w600),
-                      Row(
-                        spacing: 15.w,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 25.w, vertical: 7.h),
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: AppColors.grey, width: 1.w),
-                                borderRadius: BorderRadius.circular(5.r)),
-                            child: appText("FHD10%",
-                                fontSize: 13.sp, fontWeight: FontWeight.w600),
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 25.w, vertical: 7.h),
-                            decoration: BoxDecoration(
-                                border: Border.all(color: AppColors.grey),
-                                borderRadius: BorderRadius.circular(5.r)),
-                            child: appText("FHD10%",
-                                fontSize: 13.sp, fontWeight: FontWeight.w600),
-                          )
-                        ],
-                      )
+                      // appText(AppStrings.premoCode,
+                      //     fontSize: 13.sp, fontWeight: FontWeight.w600),
+                      // Row(
+                      //   spacing: 15.w,
+                      //   children: [
+                      //     Container(
+                      //       padding: EdgeInsets.symmetric(
+                      //           horizontal: 25.w, vertical: 7.h),
+                      //       decoration: BoxDecoration(
+                      //           border: Border.all(
+                      //               color: AppColors.grey, width: 1.w),
+                      //           borderRadius: BorderRadius.circular(5.r)),
+                      //       child: appText("FHD10%",
+                      //           fontSize: 13.sp, fontWeight: FontWeight.w600),
+                      //     ),
+                      //     Container(
+                      //       padding: EdgeInsets.symmetric(
+                      //           horizontal: 25.w, vertical: 7.h),
+                      //       decoration: BoxDecoration(
+                      //           border: Border.all(color: AppColors.grey),
+                      //           borderRadius: BorderRadius.circular(5.r)),
+                      //       child: appText("FHD10%",
+                      //           fontSize: 13.sp, fontWeight: FontWeight.w600),
+                      //     )
+                      //   ],
+                      // )
                     ],
                   ),
                 ),
@@ -371,10 +447,8 @@ class OrderDetailsScreen extends StatelessWidget {
                   ),
                   buildPriceInfo(
                       label: product!.name, content: "₹ ${pricing.finalPrice}"),
-                  buildPriceInfo(label: AppStrings.tax, content: "₹ 950"),
-                  buildPriceInfo(label: AppStrings.market_fee, content: "₹ 50"),
                   buildPriceInfo(
-                      label: AppStrings.shipping_charge, content: "₹ Free"),
+                      label: AppStrings.shipping_charge, content: "Free"),
                   Divider(
                     color: AppColors.grey,
                   ),
@@ -390,8 +464,7 @@ class OrderDetailsScreen extends StatelessWidget {
                   Obx(() {
                     return buildPriceInfo(
                         label: AppStrings.pay_now,
-                        content:
-                            "₹${orderController.selectedAmount.value} Only");
+                        content: "₹${orderController.selectedAmount.value}");
                   }),
                 ],
               ),
@@ -406,6 +479,7 @@ class OrderDetailsScreen extends StatelessWidget {
               onTap: () {
                 orderController.placeOrder(
                   productId: product!.id,
+                  variantId: selectVarientId ?? "",
                   paymentOption: "daily",
                   totalDays: orderController.selectedDays.value,
                   deliveryAddress: {

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -57,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.paperColor,
       // Header Section (app-bar)
       appBar: CustomAppBar(
         showLogo: true,
@@ -120,141 +122,133 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: 15.h),
+            SizedBox(height: 8.h),
 
-            //  Carousel Section
+            // --------- Carousel Section (Banner Top)-------------------------
             Obx(
-              () => Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  CarouselSlider(
-                    items: homeController.carouselImages.map((imagePath) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return Container(
-                            margin: EdgeInsets.symmetric(horizontal: 8.w),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20.r),
-                              image: DecorationImage(
-                                image: NetworkImage(imagePath),
-                                fit: BoxFit.cover,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.lightBlack,
-                                  blurRadius: 8.r,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Stack(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    gradient: AppGradients.topCarosalGradient,
-                                  ),
-                                ),
-
-                                // Text and Button overlay
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 24.w,
-                                    vertical: 10.h,
-                                  ),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        appText(
-                                          "Stylish",
-                                          fontSize: 24.sp,
-                                          color: AppColors.white,
-                                          fontWeight: FontWeight.w800,
-                                          fontStyle: FontStyle.italic,
-                                          fontFamily: "Times New Roman",
-                                        ),
-                                        SizedBox(height: 2.h),
-                                        appText(
-                                          AppStrings.card_discription,
-                                          maxLines: 2,
-                                          fontSize: 11.sp,
-                                          textAlign: TextAlign.left,
-                                          color: AppColors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        SizedBox(height: 5.h),
-                                        appButton(
-                                          width: 150.w,
-                                          height: 35.h,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 15.w, vertical: 5.h),
-                                          onTap: () {},
-                                          buttonColor: AppColors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(8.r),
-                                          child: appText(
-                                            AppStrings.btton_lebel,
-                                            color: AppColors.textBlack,
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    }).toList(),
-                    options: CarouselOptions(
-                      autoPlay: true,
-                      autoPlayInterval: const Duration(seconds: 5),
-                      enlargeCenterPage: true,
-                      viewportFraction: 1.0,
-                      height: 170.h,
-                      onPageChanged: (index, reason) {
-                        homeController.currentCarouselIndex.value = index;
-                      },
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 8.h,
-                    child: Obx(
-                      () => Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: homeController.carouselImages
-                            .asMap()
-                            .entries
-                            .map((entry) {
-                          return Container(
-                            width: homeController.currentCarouselIndex.value ==
-                                    entry.key
-                                ? 24.w
-                                : 8.w,
-                            height: 8.h,
-                            margin: EdgeInsets.symmetric(horizontal: 4.w),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4.r),
-                              color:
-                                  homeController.currentCarouselIndex.value ==
-                                          entry.key
-                                      ? AppColors.white
-                                      : AppColors.transparentWhite,
-                            ),
-                          );
-                        }).toList(),
+              () => homeController.carouselImages.isEmpty
+                  ? Container(
+                      height: 140.h,
+                      margin: EdgeInsets.symmetric(horizontal: 8.w),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12.r),
+                        color: AppColors.lightBlack.withOpacity(0.1),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.lightBlack,
+                            blurRadius: 8.r,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
+                      child: Center(
+                        child: Icon(
+                          Icons.image,
+                          size: 50.sp,
+                          color: Colors.grey.withOpacity(0.5),
+                        ),
+                      ),
+                    )
+                  : Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        CarouselSlider(
+                          items: homeController.carouselImages.map((imagePath) {
+                            return Builder(
+                              builder: (BuildContext context) {
+                                return Container(
+                                  margin: EdgeInsets.symmetric(horizontal: 8.w),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    image: DecorationImage(
+                                      image: NetworkImage(imagePath),
+                                      fit: BoxFit.cover,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.lightBlack,
+                                        blurRadius: 8.r,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }).toList(),
+                          options: CarouselOptions(
+                            autoPlay: true,
+                            autoPlayInterval: const Duration(seconds: 5),
+                            enlargeCenterPage: true,
+                            viewportFraction: 1.0,
+                            height: 140.h,
+                            onPageChanged: (index, reason) {
+                              homeController.currentCarouselIndex.value = index;
+                            },
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 8.h,
+                          child: Obx(
+                            () => Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: homeController.carouselImages
+                                  .asMap()
+                                  .entries
+                                  .map((entry) {
+                                return Container(
+                                  width: homeController
+                                              .currentCarouselIndex.value ==
+                                          entry.key
+                                      ? 24.w
+                                      : 8.w,
+                                  height: 8.h,
+                                  margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.r),
+                                    color: homeController
+                                                .currentCarouselIndex.value ==
+                                            entry.key
+                                        ? AppColors.white
+                                        : AppColors.transparentWhite,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 8.h,
+                          child: Obx(
+                            () => Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: homeController.carouselImages
+                                  .asMap()
+                                  .entries
+                                  .map((entry) {
+                                return Container(
+                                  width: homeController
+                                              .currentCarouselIndex.value ==
+                                          entry.key
+                                      ? 24.w
+                                      : 8.w,
+                                  height: 8.h,
+                                  margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4.r),
+                                    color: homeController
+                                                .currentCarouselIndex.value ==
+                                            entry.key
+                                        ? AppColors.white
+                                        : AppColors.transparentWhite,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
             ),
 
             SizedBox(height: 10.h),
@@ -269,20 +263,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       .map((category) {
                     // final isFirst = category == 'Technology';
                     return Container(
-                      margin: EdgeInsets.only(right: 10.w),
+                      margin: EdgeInsets.only(right: 8.w),
                       padding: EdgeInsets.symmetric(
-                        horizontal: 20.w,
-                        vertical: 6.h,
+                        horizontal: 14.w,
+                        vertical: 4.h,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.white,
-                        borderRadius: BorderRadius.circular(15.r),
+                        borderRadius: BorderRadius.circular(12.r),
                         border: Border.all(color: Colors.grey.shade400),
                       ),
                       child: appText(
                         category,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textBlack,
                       ),
                     );
@@ -292,20 +286,29 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SizedBox(height: 10.h),
 //----------------Progress Card Section----------------//
-            Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Obx(() {
-                  final data = investmentController.overview.value;
+            Obx(() {
+              final data = investmentController.overview.value;
 
-                  return InvestmentStatusCard(
-                    balanceAmount: data.totalRemainingAmount.toInt(),
-                    daysLeft: data.remainingDays,
-                    progress: data.progressPercent / 100, // (must be 0–1)
-                    onPayNow: () => Get.to(PendingTransaction()),
-                  );
-                })),
+              if (data.remainingDays <= 0) {
+                return const SizedBox.shrink();
+              }
+
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    InvestmentStatusCard(
+                      balanceAmount: data.totalRemainingAmount.toInt(),
+                      daysLeft: data.remainingDays,
+                      progress: data.progressPercent / 100,
+                      onPayNow: () => Get.to(PendingTransaction()),
+                    ),
+                    SizedBox(height: 10.h),
+                  ],
+                ),
+              );
+            }),
 //--------------------------------------------------------
-            SizedBox(height: 10.h),
             // Most Popular Product Section
             Column(
               children: [
@@ -645,8 +648,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-
-            // Success Section
+//-------------- Success  Story Section---------------------
             Container(
               width: double.infinity,
               height: 420.h,
@@ -657,92 +659,105 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   children: [
                     SizedBox(height: 10.h),
-                    Stack(
-                      alignment: Alignment.bottomCenter,
-                      children: [
-                        CarouselSlider(
-                          items: homeController.successImages.map((
-                            imagePath,
-                          ) {
-                            return Builder(
-                              builder: (BuildContext context) {
-                                return Container(
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: 8.w,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20.r),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.lightBlack,
-                                        blurRadius: 8.r,
-                                        offset: const Offset(0, 4),
+                    Obx(
+                      () {
+                        return Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: [
+                            CarouselSlider(
+                              items: homeController.successStories.map((story) {
+                                return Builder(
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 8.w),
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(20.r),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppColors.lightBlack,
+                                            blurRadius: 8.r,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(20.r),
-                                    child: Image.asset(
-                                      imagePath,
-                                      fit: BoxFit.cover,
-                                      width: MediaQuery.of(
-                                        context,
-                                      ).size.width.w,
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          }).toList(),
-                          options: CarouselOptions(
-                            autoPlay: true,
-                            autoPlayInterval: const Duration(seconds: 5),
-                            enlargeCenterPage: true,
-                            viewportFraction: 1.0,
-                            height: 170.h,
-                            onPageChanged: (index, reason) {
-                              homeController.currentBottomCarouselIndex.value =
-                                  index;
-                            },
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 10.h,
-                          child: Obx(
-                            () => Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: homeController.successImages
-                                  .asMap()
-                                  .entries
-                                  .map((entry) {
-                                return Container(
-                                  width: homeController
-                                              .currentBottomCarouselIndex
-                                              .value ==
-                                          entry.key
-                                      ? 24.w
-                                      : 8.w,
-                                  height: 8.h,
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: 4.w,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                      4.r,
-                                    ),
-                                    color: homeController
-                                                .currentBottomCarouselIndex
-                                                .value ==
-                                            entry.key
-                                        ? AppColors.white
-                                        : AppColors.transparentWhite,
-                                  ),
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(20.r),
+                                        child: Image.network(
+                                          story.imageUrl,
+                                          fit: BoxFit.cover,
+                                          width: MediaQuery.of(context)
+                                              .size
+                                              .width
+                                              .w,
+
+                                          // 👇 If image not found → show simple grey container with icon
+                                          errorBuilder: (_, __, ___) =>
+                                              Container(
+                                            color: Colors.grey.shade300,
+                                            child: Icon(
+                                              Icons.broken_image,
+                                              size: 40.sp,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 );
                               }).toList(),
+                              options: CarouselOptions(
+                                autoPlay: true,
+                                autoPlayInterval: const Duration(seconds: 5),
+                                enlargeCenterPage: true,
+                                viewportFraction: 1.0,
+                                height: 170.h,
+                                onPageChanged: (index, reason) {
+                                  homeController
+                                      .currentBottomCarouselIndex.value = index;
+                                },
+                              ),
                             ),
-                          ),
-                        ),
-                      ],
+                            Positioned(
+                              bottom: 10.h,
+                              child: Obx(
+                                () => Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: homeController.successStories
+                                      .asMap()
+                                      .entries
+                                      .map((entry) {
+                                    return Container(
+                                      width: homeController
+                                                  .currentBottomCarouselIndex
+                                                  .value ==
+                                              entry.key
+                                          ? 24.w
+                                          : 8.w,
+                                      height: 8.h,
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 4.w),
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(4.r),
+                                        color: homeController
+                                                    .currentBottomCarouselIndex
+                                                    .value ==
+                                                entry.key
+                                            ? AppColors.white
+                                            : AppColors.transparentWhite,
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     SizedBox(height: 10.h),
 
