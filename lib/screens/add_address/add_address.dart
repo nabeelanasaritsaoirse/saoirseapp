@@ -43,6 +43,7 @@ class _AddAddressState extends State<AddAddress> {
               appTextField(
                 controller: addAddressController.nameController,
                 textColor: AppColors.black,
+                textInputType: TextInputType.name,
                 hintText: AppStrings.Name,
                 hintColor: AppColors.grey,
                 validator: (value) =>
@@ -55,6 +56,7 @@ class _AddAddressState extends State<AddAddress> {
                 controller: addAddressController.streetNameController,
                 textColor: AppColors.black,
                 hintText: AppStrings.StreetName,
+                textInputType: TextInputType.streetAddress,
                 hintColor: AppColors.grey,
                 validator: (value) =>
                     AddAddressValidation.streetValidation(street: value ?? ""),
@@ -65,6 +67,7 @@ class _AddAddressState extends State<AddAddress> {
               appTextField(
                 controller: addAddressController.cityController,
                 textColor: AppColors.black,
+                textInputType: TextInputType.name,
                 hintText: AppStrings.City,
                 hintColor: AppColors.grey,
                 validator: (value) =>
@@ -77,6 +80,7 @@ class _AddAddressState extends State<AddAddress> {
                 controller: addAddressController.stateController,
                 textColor: AppColors.black,
                 hintText: AppStrings.State,
+                textInputType: TextInputType.text,
                 hintColor: AppColors.grey,
                 validator: (value) =>
                     AddAddressValidation.stateValidation(state: value ?? ""),
@@ -93,6 +97,7 @@ class _AddAddressState extends State<AddAddress> {
                         appTextField(
                           controller: addAddressController.countryController,
                           textColor: AppColors.black,
+                          textInputType: TextInputType.text,
                           hintText: AppStrings.Country,
                           hintColor: AppColors.grey,
                           validator: (value) =>
@@ -112,6 +117,7 @@ class _AddAddressState extends State<AddAddress> {
                         appTextField(
                           controller: addAddressController.zipController,
                           textColor: AppColors.black,
+                          textInputType: TextInputType.number,
                           hintText: AppStrings.ZipCode,
                           hintColor: AppColors.grey,
                           validator: (value) =>
@@ -129,6 +135,7 @@ class _AddAddressState extends State<AddAddress> {
               appTextField(
                 controller: addAddressController.phoneController,
                 textColor: AppColors.black,
+                textInputType: TextInputType.phone,
                 hintText: AppStrings.phoneNumber,
                 hintColor: AppColors.grey,
                 validator: (value) => AddAddressValidation.phoneValidation(

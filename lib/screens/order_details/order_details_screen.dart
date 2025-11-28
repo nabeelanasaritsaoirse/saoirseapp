@@ -338,7 +338,9 @@ class OrderDetailsScreen extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(15.w),
-                  height: 130.h,
+                  constraints: BoxConstraints(
+                    minHeight: 65.h,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.white,
                     boxShadow: [
@@ -384,32 +386,32 @@ class OrderDetailsScreen extends StatelessWidget {
                               )),
                         ],
                       ),
-                      appText(AppStrings.premoCode,
-                          fontSize: 13.sp, fontWeight: FontWeight.w600),
-                      Row(
-                        spacing: 15.w,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 25.w, vertical: 7.h),
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: AppColors.grey, width: 1.w),
-                                borderRadius: BorderRadius.circular(5.r)),
-                            child: appText("FHD10%",
-                                fontSize: 13.sp, fontWeight: FontWeight.w600),
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 25.w, vertical: 7.h),
-                            decoration: BoxDecoration(
-                                border: Border.all(color: AppColors.grey),
-                                borderRadius: BorderRadius.circular(5.r)),
-                            child: appText("FHD10%",
-                                fontSize: 13.sp, fontWeight: FontWeight.w600),
-                          )
-                        ],
-                      )
+                      // appText(AppStrings.premoCode,
+                      //     fontSize: 13.sp, fontWeight: FontWeight.w600),
+                      // Row(
+                      //   spacing: 15.w,
+                      //   children: [
+                      //     Container(
+                      //       padding: EdgeInsets.symmetric(
+                      //           horizontal: 25.w, vertical: 7.h),
+                      //       decoration: BoxDecoration(
+                      //           border: Border.all(
+                      //               color: AppColors.grey, width: 1.w),
+                      //           borderRadius: BorderRadius.circular(5.r)),
+                      //       child: appText("FHD10%",
+                      //           fontSize: 13.sp, fontWeight: FontWeight.w600),
+                      //     ),
+                      //     Container(
+                      //       padding: EdgeInsets.symmetric(
+                      //           horizontal: 25.w, vertical: 7.h),
+                      //       decoration: BoxDecoration(
+                      //           border: Border.all(color: AppColors.grey),
+                      //           borderRadius: BorderRadius.circular(5.r)),
+                      //       child: appText("FHD10%",
+                      //           fontSize: 13.sp, fontWeight: FontWeight.w600),
+                      //     )
+                      //   ],
+                      // )
                     ],
                   ),
                 ),
