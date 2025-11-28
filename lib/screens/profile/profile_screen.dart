@@ -97,7 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               backgroundColor: Colors.grey.shade300,
                               backgroundImage: user.profilePicture.isNotEmpty
                                   ? NetworkImage(user.profilePicture)
-                                  : AssetImage(AppAssets.facebook)
+                                  : AssetImage(AppAssets.user_img)
                                       as ImageProvider,
                             ),
 

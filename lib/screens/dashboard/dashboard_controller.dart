@@ -27,6 +27,7 @@ class DashboardController extends GetxController {
 
     if (index == 4) {
       Get.put(ProfileController()).fetchWishlistCount();
+      Get.put(ProfileController()).fetchUserProfile();
     }
   }
 }
