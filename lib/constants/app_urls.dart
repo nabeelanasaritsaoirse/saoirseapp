@@ -12,12 +12,9 @@ class AppURLs {
   static String PROFILE_UPDATE_API = BASE_API + "api/users/";
 
   // home screen api
-  static String POPULAR_PRODUCT_API =
-      BASE_API + "api/products/featured/popular?";
-  static String BEST_SELLER_PRODUCT_API =
-      BASE_API + "api/products/featured/best-sellers?";
-  static String TRENDING_PRODUCT_API =
-      BASE_API + "api/products/featured/trending?";
+  static String POPULAR_PRODUCT_API = BASE_API + "api/products/featured/popular?";
+  static String BEST_SELLER_PRODUCT_API = BASE_API + "api/products/featured/best-sellers?";
+  static String TRENDING_PRODUCT_API = BASE_API + "api/products/featured/trending?";
 
   //refferal api
   static String getRefferal_API = BASE_API + "api/referrals/generate-code";
@@ -42,8 +39,7 @@ class AppURLs {
   static String ADD_MONEY_WALLET = BASE_API + "api/wallet/add-money";
 
   // Category api
-  static String CATEGORY_API =
-      BASE_API + "api/categories?parentCategoryId=null&isActive=true";
+  static String CATEGORY_API = BASE_API + "api/categories?parentCategoryId=null&isActive=true";
 
   // Product Details
   static String PRODUCT_DETAILS_API = BASE_API + "api/products/";
@@ -71,30 +67,27 @@ class AppURLs {
 
   // Notifications
   static String NOTIFICATIONS = BASE_API + "api/notifications";
-  static String UNREAD_NOTIFICATIONS =
-      BASE_API + "api/notifications/unread-count";
+  static String UNREAD_NOTIFICATIONS = BASE_API + "api/notifications/unread-count";
 
   // Orders History
   static String ORDER_HISTORY_API = BASE_API + "api/orders/user/history";
-  static String ORDER_DELIVERED_HISTORY_API =
-      BASE_API + "api/orders/user/delivered";
+  static String ORDER_DELIVERED_HISTORY_API = BASE_API + "api/orders/user/delivered";
 
   // Pending Transactions Api
-  static String PENDING_TRANSACTIONS_API =
-      BASE_API + "api/installments/payments/daily-pending";
+  static String PENDING_TRANSACTIONS_API = BASE_API + "api/installments/payments/daily-pending";
 
   // Investment Status Api
-  static String INVESTMENT_STATUS_API =
-      BASE_API + "api/installments/orders/overall-status";
+  static String INVESTMENT_STATUS_API = BASE_API + "api/installments/orders/overall-status";
 
   // Success Story Banner API
-  static String SUCCESS_STORY_BANNER_API =
-      BASE_API + "api/success-stories/public/active";
+  static String SUCCESS_STORY_BANNER_API = BASE_API + "api/success-stories/public/active";
 
   // Home Screen Top Banner API
-  static String HOME_SCREEN_TOP_BANNER_API =
-      BASE_API + "api/banners/public/active";
+  static String HOME_SCREEN_TOP_BANNER_API = BASE_API + "api/banners/public/active";
 
   // Profile Api
   static String MY_PROFILE = BASE_API + "api/users/me/profile";
+
+  // Pending Transaction (PAYMENT METHOD API)
+  static String PENDING_TRANSACTION_PAYMENT_RESPONSE = BASE_API + "api/installments/payments/create-combined-razorpay";
 }

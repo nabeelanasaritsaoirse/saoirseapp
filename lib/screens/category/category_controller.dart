@@ -31,7 +31,11 @@ class CategoryController extends GetxController {
 
       if (result != null && result.isNotEmpty) {
         categoryGroups.assignAll(result);
-        selectedIndex.value = 0; // this is select first category by default
+
+        if (selectedIndex.value < 0 || selectedIndex.value >= categoryGroups.length) {
+          selectedIndex.value = 0;
+        }
+        
       } else {
         categoryGroups.clear();
         errorMessage.value = 'No categories found';
