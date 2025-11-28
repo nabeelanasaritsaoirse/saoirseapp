@@ -9,7 +9,7 @@ import '../../constants/app_constant.dart';
 import '../../main.dart';
 import '../../models/referral_response_model.dart';
 import '../../services/refferal_service.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 
 class ReferralController extends GetxController {
   final ReferralService _referralService = ReferralService();

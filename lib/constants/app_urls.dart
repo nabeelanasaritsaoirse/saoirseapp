@@ -98,4 +98,7 @@ class AppURLs {
 
   // Profile Api
   static String MY_PROFILE = BASE_API + "api/users/me/profile";
+
+  //Log Out Api
+  static String LOGOUT_API = BASE_API + "api/auth/logout";
 }

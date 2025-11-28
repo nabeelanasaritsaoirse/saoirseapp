@@ -6,7 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
 import '../models/LoginAuth/login_response/login_response.dart';
-import '../widgets/app_snackbar.dart';
+import '../widgets/app_toast.dart';
 import 'api_service.dart';
 
 class AuthService {

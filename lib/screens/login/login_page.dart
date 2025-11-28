@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import '../../constants/app_assets.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/app_loader.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 import '../otp/otp_screen.dart';
 import '/constants/app_colors.dart';
 import '/constants/app_strings.dart';

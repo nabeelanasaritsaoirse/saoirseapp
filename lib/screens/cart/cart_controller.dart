@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 import '../../models/cart_response_model.dart';
 import '../../services/cart_service.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 
 class CartController extends GetxController {
   final CartService service = CartService();

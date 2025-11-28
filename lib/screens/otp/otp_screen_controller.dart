@@ -9,7 +9,7 @@ import '../../constants/app_urls.dart';
 import '../../main.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../login/login_controller.dart';
 

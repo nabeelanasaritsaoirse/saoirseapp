@@ -9,10 +9,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../constants/app_assets.dart';
+import '../../constants/app_colors.dart';
+import '../../main.dart';
 import '../../models/profile_response.dart';
 import '../../services/profile_service.dart';
 import '../../services/wishlist_service.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
+import '../onboard/onboard_screen.dart';
 
 class ProfileController extends GetxController {
   final WishlistService _wishlistService = WishlistService();
@@ -405,6 +408,46 @@ class ProfileController extends GetxController {
       }
     } catch (e) {
       appToast(error: true, title: "Error", content: "Something went wrong");
+    }
+  }
+
+  void confirmLogout() {
+    Get.defaultDialog(
+      title: "Logout",
+      middleText: "Are you sure you want to exit?",
+      textConfirm: "Yes",
+      textCancel: "No",
+      confirmTextColor: Colors.white,
+      buttonColor: AppColors.primaryColor,
+      cancelTextColor: AppColors.primaryColor,
+      onConfirm: () async {
+        Get.back(); // close dialog
+        await logoutUser();
+      },
+    );
+  }
+
+  Future<void> logoutUser() async {
+    try {
+      isLoading(true);
+
+      bool success = await _profileService.logout();
+
+      if (success) {
+        // CLEAR STORAGE
+        await storage.erase();
+        appToast(content: "Logged out successfully!");
+
+        // GO TO ONBOARD SCREEN
+        Get.offAll(() => OnBoardScreen());
+      } else {
+        appToast(content: "Logout failed!", error: true);
+      }
+    } catch (e) {
+      print("Logout Error: $e");
+      appToast(content: "Something went wrong", error: true);
+    } finally {
+      isLoading(false);
     }
   }
 

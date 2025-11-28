@@ -72,7 +72,8 @@ class ProfileService {
       // ---- FORCE NEW FILE NAME WITH .jpg ----
       final originalFile = File(imagePath);
       final tempDir = Directory.systemTemp;
-      final newPath = "${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
+      final newPath =
+          "${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
 
       final newFile = await originalFile.copy(newPath);
 
@@ -141,5 +142,29 @@ class ProfileService {
     }
   }
 
-  
+  Future<bool> logout() async {
+    try {
+      final token = storage.read(AppConst.ACCESS_TOKEN);
+
+      final response = await APIService.postRequest(
+        url: AppURLs.LOGOUT_API, // /api/auth/logout
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        // No body required
+        body: {},
+        onSuccess: (json) => json,
+      );
+
+      print("LOGOUT RESPONSE: $response");
+
+      if (response == null) return false;
+
+      return response["success"] == true;
+    } catch (e) {
+      print("Logout Error: $e");
+      return false;
+    }
+  }
 }
