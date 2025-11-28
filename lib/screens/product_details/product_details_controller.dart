@@ -64,7 +64,7 @@ class ProductDetailsController extends GetxController {
       }
     } catch (e) {
       log("ERROR FETCHING PRODUCT DETAILS: $e");
-      appSnackbar(content: "Failed to load product details");
+      appToast(content: "Failed to load product details");
     } finally {
       isLoading(false);
     }
@@ -89,13 +89,13 @@ class ProductDetailsController extends GetxController {
     final productData = product.value;
 
     if (productData == null) {
-      appSnackbar(content: "Product not loaded");
+      appToast(content: "Product not loaded");
       return;
     }
 
     // Check if id is null
     if (id == null) {
-      appSnackbar(content: "Product ID not available", error: true);
+      appToast(content: "Product ID not available", error: true);
       return;
     }
 
@@ -104,9 +104,9 @@ class ProductDetailsController extends GetxController {
 
       if (removed) {
         isFavorite(false);
-        appSnackbar(content: "Removed from wishlist");
+        appToast(content: "Removed from wishlist");
       } else {
-        appSnackbar(content: "Failed to remove from wishlist", error: true);
+        appToast(content: "Failed to remove from wishlist", error: true);
       }
 
       return;
@@ -116,9 +116,9 @@ class ProductDetailsController extends GetxController {
 
     if (added) {
       isFavorite(true);
-      appSnackbar(content: "Added to wishlist");
+      appToast(content: "Added to wishlist");
     } else {
-      appSnackbar(content: "Failed to add wishlist", error: true);
+      appToast(content: "Failed to add wishlist", error: true);
     }
   }
 

@@ -70,7 +70,7 @@ class RazorpayController extends GetxController {
     } catch (e, s) {
       log("ERROR opening Razorpay: $e");
       log("STACKTRACE: $s");
-      appSnackbar(error: true, content: "Could not open payment window");
+      appToast(error: true, content: "Could not open payment window");
     }
   }
 
@@ -83,7 +83,7 @@ class RazorpayController extends GetxController {
     log("Order ID: ${response.orderId}");
     log("Signature: ${response.signature}");
 
-    appSnackbar(content: "Payment Success: ${response.paymentId}");
+    appToast(content: "Payment Success: ${response.paymentId}");
 
     final paymentData = RazorpayPaymentResponse(
       orderId: response.orderId ?? "",
@@ -99,7 +99,7 @@ class RazorpayController extends GetxController {
     log("Code: ${response.code}");
     log("Message: ${response.message}");
 
-    appSnackbar(
+    appToast(
       error: true,
       content: "Payment Failed. Code: ${response.code}",
     );
@@ -108,7 +108,7 @@ class RazorpayController extends GetxController {
   void _handleExternalWallet(ExternalWalletResponse response) {
     log("EXTERNAL WALLET SELECTED: ${response.walletName}");
 
-    appSnackbar(
+    appToast(
       content: "Wallet Selected: ${response.walletName}",
     );
   }
@@ -136,7 +136,7 @@ class RazorpayController extends GetxController {
         // Payment is verified
         Get.to(BookingConfirmationScreen());
       } else {
-        appSnackbar(
+        appToast(
             error: true,
             content: response?["message"] ??
                 "Payment verification failed! Please contact support.");
@@ -144,7 +144,7 @@ class RazorpayController extends GetxController {
     } catch (e, s) {
       if (Get.isDialogOpen ?? false) Get.back();
       log("Verify Payment Error: $e\n$s");
-      appSnackbar(
+      appToast(
           error: true, content: "Payment verification failed unexpectedly!");
     }
   }

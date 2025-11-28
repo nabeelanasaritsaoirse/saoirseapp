@@ -115,7 +115,7 @@ class ProfileController extends GetxController {
   // // ================== UPDATE USERNAME ONLY ==================
   // Future<void> updateUserName() async {
   //   if (fullNameController.text.trim().isEmpty) {
-  //     appSnackbar(error: true, title: "Error", content: "Name cannot be empty");
+  //     appToast(error: true, title: "Error", content: "Name cannot be empty");
   //     return;
   //   }
 
@@ -139,16 +139,16 @@ class ProfileController extends GetxController {
   //     print("Update Response => $response");
 
   //     if (response != null && response["success"] == true) {
-  //       appSnackbar(title: "Success", content: "Name updated");
+  //       appToast(title: "Success", content: "Name updated");
   //       await fetchUserProfile();
 
   //       Get.back(); // Go back to Profile Screen
   //     } else {
-  //       appSnackbar(error: true, title: "Failed", content: "Update failed");
+  //       appToast(error: true, title: "Failed", content: "Update failed");
   //     }
   //   } catch (e) {
   //     print("UPDATE NAME ERROR => $e");
-  //     appSnackbar(error: true, title: "Error", content: "Something went wrong");
+  //     appToast(error: true, title: "Error", content: "Something went wrong");
   //   } finally {
   //     isLoading(false);
   //   }
@@ -178,7 +178,7 @@ class ProfileController extends GetxController {
 //   // ================== UPLOAD USER PROFILE PICTURE ==================
 //   Future<void> uploadUserProfilePicture(String imagePath) async {
 //     if (imagePath.isEmpty) {
-//       appSnackbar(
+//       appToast(
 //           error: true, title: "Error", content: "Invalid image selected");
 //       return;
 //     }
@@ -191,7 +191,7 @@ class ProfileController extends GetxController {
 
 //       if (userId == null) {
 //         print("UserID not found");
-//         appSnackbar(error: true, title: "Error", content: "User not found");
+//         appToast(error: true, title: "Error", content: "User not found");
 //         return;
 //       }
 
@@ -201,7 +201,7 @@ class ProfileController extends GetxController {
 //           await _profileService.updateProfilePicture(userId, imagePath);
 
 //       if (success) {
-//         appSnackbar(
+//         appToast(
 //           title: "Success",
 //           content: "Profile picture updated successfully",
 //         );
@@ -209,7 +209,7 @@ class ProfileController extends GetxController {
 //         print(" Refreshing user profile...");
 //         await fetchUserProfile();
 //       } else {
-//         appSnackbar(
+//         appToast(
 //           error: true,
 //           title: "Failed",
 //           content: "Unable to upload profile picture",
@@ -217,7 +217,7 @@ class ProfileController extends GetxController {
 //       }
 //     } catch (e) {
 //       print(" Controller Error: $e");
-//       appSnackbar(error: true, title: "Error", content: "Something went wrong");
+//       appToast(error: true, title: "Error", content: "Something went wrong");
 //     } finally {
 //       // hide loader after everything
 //       isLoading(false);
@@ -326,13 +326,13 @@ class ProfileController extends GetxController {
     final name = fullNameController.text.trim();
 
     if (name.isEmpty) {
-      appSnackbar(error: true, title: "Error", content: "Name cannot be empty");
+      appToast(error: true, title: "Error", content: "Name cannot be empty");
       return;
     }
 
     final userId = profile.value?.user.id;
     if (userId == null) {
-      appSnackbar(error: true, title: "Error", content: "User not found");
+      appToast(error: true, title: "Error", content: "User not found");
       return;
     }
 
@@ -347,7 +347,7 @@ class ProfileController extends GetxController {
         );
 
         if (!imageUpdated) {
-          appSnackbar(
+          appToast(
             error: true,
             title: "Failed",
             content: "Unable to update profile picture",
@@ -360,14 +360,14 @@ class ProfileController extends GetxController {
       final success = await _profileService.updateUserName(userId, name);
 
       if (success) {
-        appSnackbar(title: "Success", content: "Profile updated successfully");
+        appToast(title: "Success", content: "Profile updated successfully");
         await fetchUserProfile();
         Get.back();
       } else {
-        appSnackbar(error: true, title: "Failed", content: "Update failed");
+        appToast(error: true, title: "Failed", content: "Update failed");
       }
     } catch (e) {
-      appSnackbar(error: true, title: "Error", content: "Something went wrong");
+      appToast(error: true, title: "Error", content: "Something went wrong");
     } finally {
       isLoading(false);
     }
@@ -376,7 +376,7 @@ class ProfileController extends GetxController {
 // upload profile picture only (if needed)
   Future<void> uploadUserProfilePicture(String imagePath) async {
     if (imagePath.isEmpty) {
-      appSnackbar(
+      appToast(
         error: true,
         title: "Error",
         content: "Invalid image selected",
@@ -386,7 +386,7 @@ class ProfileController extends GetxController {
 
     final userId = profile.value?.user.id;
     if (userId == null) {
-      appSnackbar(error: true, title: "Error", content: "User not found");
+      appToast(error: true, title: "Error", content: "User not found");
       return;
     }
 
@@ -397,14 +397,14 @@ class ProfileController extends GetxController {
       );
 
       if (!success) {
-        appSnackbar(
+        appToast(
           error: true,
           title: "Failed",
           content: "Unable to upload profile picture",
         );
       }
     } catch (e) {
-      appSnackbar(error: true, title: "Error", content: "Something went wrong");
+      appToast(error: true, title: "Error", content: "Something went wrong");
     }
   }
 

@@ -16,8 +16,7 @@ class AddMoneyController extends GetxController {
     String raw = amountController.text.replaceAll(".00", "");
 
     if (raw.isEmpty || raw == "0") {
-      appSnackbar(
-          title: "Error", content: "Please enter an amount", error: true);
+      appToast(title: "Error", content: "Please enter an amount", error: true);
       return false;
     }
 
@@ -37,7 +36,7 @@ class AddMoneyController extends GetxController {
       "amount": amountInPaise,
     };
 
-    appSnackbar(
+    appToast(
       title: "Processing",
       content: "Sending ₹${enteredAmount.toStringAsFixed(2)}",
     );
@@ -45,10 +44,9 @@ class AddMoneyController extends GetxController {
     final response = await PaymentService.addMoney(body);
 
     if (response != null) {
-      appSnackbar(title: "Success", content: "Order Created Successfully!");
+      appToast(title: "Success", content: "Order Created Successfully!");
     } else {
-      appSnackbar(
-          title: "Error", content: "Something went wrong!", error: true);
+      appToast(title: "Error", content: "Something went wrong!", error: true);
     }
 
     // final razorWallet = Get.put(RazorpayWalletController());

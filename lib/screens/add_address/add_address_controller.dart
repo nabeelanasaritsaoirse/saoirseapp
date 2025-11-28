@@ -44,12 +44,11 @@ class AddAddressController extends GetxController {
         log("SelectAddressController not found: $e");
       }
 
-      appSnackbar(title: "Success", content: "Address added successfully");
+      appToast(title: "Success", content: "Address added successfully");
 
       Get.back();
     } else {
-      appSnackbar(
-          error: true, title: "Error", content: "Failed to add address");
+      appToast(error: true, title: "Error", content: "Failed to add address");
     }
   }
 }

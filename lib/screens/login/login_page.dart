@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import '../../constants/app_assets.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/app_loader.dart';
+import '../../widgets/app_snackbar.dart';
 import '../otp/otp_screen.dart';
 import '/constants/app_colors.dart';
 import '/constants/app_strings.dart';
@@ -135,9 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                           controller: loginController.phoneController,
                           onFieldSubmitted: (phoneNumber) {
                             final fullNumber = loginController.fullPhoneNumber;
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(SnackBar(content: Text(fullNumber)));
+                            appToast(content: fullNumber);
                           },
                           prefixWidth: 70.w,
                           hintText: AppStrings.phoneNumber,

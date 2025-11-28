@@ -7,13 +7,10 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
 import '../widgets/app_snackbar.dart';
-import '../widgets/app_text.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -52,7 +49,7 @@ class APIService {
           final data = jsonDecode(response.body);
 
           if (data is! Map<String, dynamic>) {
-            appSnackbar(
+            appToast(
               title: "Error",
               content: "Invalid response format received from server.",
               error: true,
@@ -63,49 +60,49 @@ class APIService {
           return onSuccess(data);
 
         case 204:
-          appSnackbar(
+          appToast(
             content: "No data available.",
             error: true,
           );
           return null;
 
         case 400:
-          appSnackbar(
+          appToast(
             content: "Bad request. Check parameters.",
             error: true,
           );
           return null;
 
         case 401:
-          appSnackbar(
+          appToast(
             content: "Unauthorized. Please log in again.",
             error: true,
           );
           return null;
 
         case 403:
-          appSnackbar(
+          appToast(
             content: "Forbidden. Access denied.",
             error: true,
           );
           return null;
 
         case 404:
-          appSnackbar(
+          appToast(
             content: "Resource not found (404).",
             error: true,
           );
           return null;
 
         case 408:
-          appSnackbar(
+          appToast(
             content: "Request timeout. Try again later.",
             error: true,
           );
           return null;
 
         case 429:
-          appSnackbar(
+          appToast(
             content: "Too many requests. Try again later.",
             error: true,
           );
@@ -113,12 +110,12 @@ class APIService {
 
         default:
           if (response.statusCode >= 500) {
-            appSnackbar(
+            appToast(
               content: "Server error (${response.statusCode}). Try later.",
               error: true,
             );
           } else {
-            appSnackbar(
+            appToast(
               content:
                   "Unexpected error (${response.statusCode}). Please try again.",
               error: true,
@@ -127,31 +124,31 @@ class APIService {
           return null;
       }
     } on SocketException {
-      appSnackbar(
+      appToast(
         content: "No internet connection. Check your network.",
         error: true,
       );
       return null;
     } on FormatException {
-      appSnackbar(
+      appToast(
         content: "Invalid response format.",
         error: true,
       );
       return null;
     } on TimeoutException {
-      appSnackbar(
+      appToast(
         content: "Request timed out. Please try again.",
         error: true,
       );
       return null;
     } on http.ClientException catch (e) {
-      appSnackbar(
+      appToast(
         content: "Network error occurred: $e",
         error: true,
       );
       return null;
     } catch (e) {
-      appSnackbar(
+      appToast(
         content: "Something went wrong: ${e.toString()}",
         error: true,
       );
@@ -190,7 +187,7 @@ class APIService {
           if (data is Map<String, dynamic>) {
             return onSuccess(data);
           } else {
-            appSnackbar(
+            appToast(
               title: "Error",
               content: "Invalid response format. Expected JSON object.",
               error: true,
@@ -199,49 +196,49 @@ class APIService {
           }
 
         case 204:
-          appSnackbar(
+          appToast(
             content: "No data available.",
             error: true,
           );
           return null;
 
         case 400:
-          appSnackbar(
+          appToast(
             content: "Bad request. Check parameters.",
             error: true,
           );
           return null;
 
         case 401:
-          appSnackbar(
+          appToast(
             content: "Unauthorized. Please log in again.",
             error: true,
           );
           return null;
 
         case 403:
-          appSnackbar(
+          appToast(
             content: "Forbidden. Access denied.",
             error: true,
           );
           return null;
 
         case 404:
-          appSnackbar(
+          appToast(
             content: "Resource not found (404).",
             error: true,
           );
           return null;
 
         case 408:
-          appSnackbar(
+          appToast(
             content: "Request timeout. Try again later.",
             error: true,
           );
           return null;
 
         case 429:
-          appSnackbar(
+          appToast(
             content: "Too many requests. Try again later.",
             error: true,
           );
@@ -249,12 +246,12 @@ class APIService {
 
         default:
           if (response.statusCode >= 500) {
-            appSnackbar(
+            appToast(
               content: "Server error (${response.statusCode}). Try later.",
               error: true,
             );
           } else {
-            appSnackbar(
+            appToast(
               content:
                   "Unexpected error (${response.statusCode}). Please try again.",
               error: true,
@@ -263,32 +260,32 @@ class APIService {
           return null;
       }
     } on SocketException {
-      appSnackbar(
+      appToast(
         content: "No internet connection. Check your network.",
         error: true,
       );
       return null;
     } on FormatException {
-      appSnackbar(
+      appToast(
         content: "Invalid response format.",
         error: true,
       );
       return null;
     } on TimeoutException {
-      appSnackbar(
+      appToast(
         content: "Request timed out. Please try again.",
         error: true,
       );
       return null;
     } on http.ClientException catch (e) {
-      appSnackbar(
+      appToast(
         content: "Network error occurred: $e",
         error: true,
       );
       return null;
     } catch (e) {
       log("Error =====> ${e.toString()}");
-      appSnackbar(
+      appToast(
         content: "Something went wrong: ${e.toString()}",
         error: true,
       );
@@ -329,7 +326,7 @@ class APIService {
           final data = jsonDecode(response.body);
 
           if (data is! Map<String, dynamic>) {
-            appSnackbar(
+            appToast(
               title: "Error",
               content: "Invalid response format received from server.",
               error: true,
@@ -340,49 +337,49 @@ class APIService {
           return onSuccess(data);
 
         case 204:
-          appSnackbar(
+          appToast(
             content: "No data available.",
             error: true,
           );
           return null;
 
         case 400:
-          appSnackbar(
+          appToast(
             content: "Bad request. Check parameters.",
             error: true,
           );
           return null;
 
         case 401:
-          appSnackbar(
+          appToast(
             content: "Unauthorized. Please log in again.",
             error: true,
           );
           return null;
 
         case 403:
-          appSnackbar(
+          appToast(
             content: "Forbidden. Access denied.",
             error: true,
           );
           return null;
 
         case 404:
-          appSnackbar(
+          appToast(
             content: "Resource not found (404).",
             error: true,
           );
           return null;
 
         case 408:
-          appSnackbar(
+          appToast(
             content: "Request timeout. Try again later.",
             error: true,
           );
           return null;
 
         case 429:
-          appSnackbar(
+          appToast(
             content: "Too many requests. Try again later.",
             error: true,
           );
@@ -390,12 +387,12 @@ class APIService {
 
         default:
           if (response.statusCode >= 500) {
-            appSnackbar(
+            appToast(
               content: "Server error (${response.statusCode}). Try later.",
               error: true,
             );
           } else {
-            appSnackbar(
+            appToast(
               content:
                   "Unexpected error (${response.statusCode}). Please try again.",
               error: true,
@@ -404,31 +401,31 @@ class APIService {
           return null;
       }
     } on SocketException {
-      appSnackbar(
+      appToast(
         content: "No internet connection. Check your network.",
         error: true,
       );
       return null;
     } on FormatException {
-      appSnackbar(
+      appToast(
         content: "Invalid response format.",
         error: true,
       );
       return null;
     } on TimeoutException {
-      appSnackbar(
+      appToast(
         content: "Request timed out. Please try again.",
         error: true,
       );
       return null;
     } on http.ClientException catch (e) {
-      appSnackbar(
+      appToast(
         content: "Network error occurred: $e",
         error: true,
       );
       return null;
     } catch (e) {
-      appSnackbar(
+      appToast(
         content: "Something went wrong: ${e.toString()}",
         error: true,
       );
@@ -481,7 +478,7 @@ class APIService {
           final data = jsonDecode(response.body);
 
           if (data is! Map<String, dynamic>) {
-            appSnackbar(
+            appToast(
               title: "Error",
               content: "Invalid response format received from server.",
               error: true,
@@ -492,42 +489,42 @@ class APIService {
           return onSuccess(data);
 
         case 400:
-          appSnackbar(
+          appToast(
             content: "Bad request. Check parameters.",
             error: true,
           );
           return null;
 
         case 401:
-          appSnackbar(
+          appToast(
             content: "Unauthorized. Please log in again.",
             error: true,
           );
           return null;
 
         case 403:
-          appSnackbar(
+          appToast(
             content: "Forbidden. Access denied.",
             error: true,
           );
           return null;
 
         case 404:
-          appSnackbar(
+          appToast(
             content: "Resource not found (404).",
             error: true,
           );
           return null;
 
         case 408:
-          appSnackbar(
+          appToast(
             content: "Request timeout. Try again later.",
             error: true,
           );
           return null;
 
         case 429:
-          appSnackbar(
+          appToast(
             content: "Too many requests. Try again later.",
             error: true,
           );
@@ -535,12 +532,12 @@ class APIService {
 
         default:
           if (response.statusCode >= 500) {
-            appSnackbar(
+            appToast(
               content: "Server error (${response.statusCode}). Try later.",
               error: true,
             );
           } else {
-            appSnackbar(
+            appToast(
               content:
                   "Unexpected error (${response.statusCode}). Please try again.",
               error: true,
@@ -549,31 +546,31 @@ class APIService {
           return null;
       }
     } on SocketException {
-      appSnackbar(
+      appToast(
         content: "No internet connection. Check your network.",
         error: true,
       );
       return null;
     } on FormatException {
-      appSnackbar(
+      appToast(
         content: "Invalid response format.",
         error: true,
       );
       return null;
     } on TimeoutException {
-      appSnackbar(
+      appToast(
         content: "Request timed out. Please try again.",
         error: true,
       );
       return null;
     } on http.ClientException catch (e) {
-      appSnackbar(
+      appToast(
         content: "Network error occurred: $e",
         error: true,
       );
       return null;
     } catch (e) {
-      appSnackbar(
+      appToast(
         content: "Something went wrong: ${e.toString()}",
         error: true,
       );
@@ -586,26 +583,30 @@ class APIService {
       if (result == ConnectivityResult.none) {
         internet = false;
 
-        Get.showSnackbar(
-          GetSnackBar(
-            isDismissible: false,
-            borderRadius: 5,
-            margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
-            backgroundColor: AppColors.red,
-            messageText: appText(
-              AppStrings.no_internet,
-              color: AppColors.white,
-              textAlign: TextAlign.left,
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w400,
-            ),
-            mainButton: IconButton(
-              onPressed: () {
-                Get.closeAllSnackbars();
-              },
-              icon: Icon(Icons.close, size: 18.sp, color: AppColors.white),
-            ),
-          ),
+        // Get.showSnackbar(
+        //   GetSnackBar(
+        //     isDismissible: false,
+        //     borderRadius: 5,
+        //     margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
+        //     backgroundColor: AppColors.red,
+        //     messageText: appText(
+        //       AppStrings.no_internet,
+        //       color: AppColors.white,
+        //       textAlign: TextAlign.left,
+        //       fontSize: 12.sp,
+        //       fontWeight: FontWeight.w400,
+        //     ),
+        //     mainButton: IconButton(
+        //       onPressed: () {
+        //         Get.closeAllSnackbars();
+        //       },
+        //       icon: Icon(Icons.close, size: 18.sp, color: AppColors.white),
+        //     ),
+        //   ),
+        // );
+        appToast(
+          content: AppStrings.no_internet,
+          error: true,
         );
       }
     });
@@ -614,26 +615,30 @@ class APIService {
       if (result == ConnectivityResult.none) {
         internet = false;
 
-        Get.showSnackbar(
-          GetSnackBar(
-            isDismissible: false,
-            borderRadius: 5,
-            margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
-            backgroundColor: AppColors.red,
-            messageText: appText(
-              AppStrings.no_internet,
-              color: AppColors.white,
-              textAlign: TextAlign.left,
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w400,
-            ),
-            mainButton: IconButton(
-              onPressed: () {
-                Get.closeAllSnackbars();
-              },
-              icon: Icon(Icons.close, size: 18.sp, color: AppColors.white),
-            ),
-          ),
+        // Get.showSnackbar(
+        //   GetSnackBar(
+        //     isDismissible: false,
+        //     borderRadius: 5,
+        //     margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
+        //     backgroundColor: AppColors.red,
+        //     messageText: appText(
+        //       AppStrings.no_internet,
+        //       color: AppColors.white,
+        //       textAlign: TextAlign.left,
+        //       fontSize: 12.sp,
+        //       fontWeight: FontWeight.w400,
+        //     ),
+        //     mainButton: IconButton(
+        //       onPressed: () {
+        //         Get.closeAllSnackbars();
+        //       },
+        //       icon: Icon(Icons.close, size: 18.sp, color: AppColors.white),
+        //     ),
+        //   ),
+        // );
+        appToast(
+          content: AppStrings.no_internet,
+          error: true,
         );
       } else {
         internet = true;

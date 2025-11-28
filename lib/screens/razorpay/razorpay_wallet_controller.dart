@@ -63,7 +63,7 @@ class RazorpayWalletController extends GetxController {
       razorpay.open(options);
     } catch (e, s) {
       log("ERROR Opening Razorpay Wallet: $e\n$s");
-      appSnackbar(error: true, content: "Could not open payment window");
+      appToast(error: true, content: "Could not open payment window");
     }
   }
 
@@ -77,7 +77,7 @@ class RazorpayWalletController extends GetxController {
     log("Order ID: ${response.orderId}");
     log("Signature: ${response.signature}");
 
-    appSnackbar(content: "Wallet Payment Success!");
+    appToast(content: "Wallet Payment Success!");
 
     final paymentData = RazorpayPaymentResponse(
       orderId: response.orderId ?? "",
@@ -90,12 +90,12 @@ class RazorpayWalletController extends GetxController {
 
   void _handlePaymentError(PaymentFailureResponse response) {
     log("WALLET PAYMENT FAILED");
-    appSnackbar(error: true, content: "Wallet Payment Failed");
+    appToast(error: true, content: "Wallet Payment Failed");
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
     log("WALLET SELECTED: ${response.walletName}");
-    appSnackbar(content: "External Wallet: ${response.walletName}");
+    appToast(content: "External Wallet: ${response.walletName}");
   }
 
   // ---------------------------------------------------------
@@ -120,14 +120,14 @@ class RazorpayWalletController extends GetxController {
       if (Get.isDialogOpen ?? false) Get.back();
 
       if (response != null && response["success"] == true) {
-        appSnackbar(content: "Money Added to Wallet Successfully!");
+        appToast(content: "Money Added to Wallet Successfully!");
 
         // Optionally: refresh wallet screen
         // Get.find<WalletController>().fetchBalance();
 
         Get.back(); // Close Add Money Screen
       } else {
-        appSnackbar(
+        appToast(
           error: true,
           content:
               response?["message"] ?? "Wallet Payment Verification Failed!",
@@ -136,7 +136,7 @@ class RazorpayWalletController extends GetxController {
     } catch (e, s) {
       if (Get.isDialogOpen ?? false) Get.back();
       log("Wallet Verify Error: $e\n$s");
-      appSnackbar(error: true, content: "Unexpected Wallet Payment Error!");
+      appToast(error: true, content: "Unexpected Wallet Payment Error!");
     }
   }
 

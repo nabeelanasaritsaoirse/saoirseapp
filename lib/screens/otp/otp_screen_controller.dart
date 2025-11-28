@@ -10,7 +10,6 @@ import '../../main.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/app_snackbar.dart';
-import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../login/login_controller.dart';
 
@@ -50,7 +49,7 @@ class VerifyOtpController extends GetxController {
     final res = await AuthService.loginWithIdToken(idToken);
 
     if (res == null || res.success != true) {
-      appSnackbar(content: "Login failed", error: true);
+      appToast(content: "Login failed", error: true);
       return;
     }
     print("✔ SUCCESS FLAG: ${res.success}");
@@ -87,7 +86,7 @@ class VerifyOtpController extends GetxController {
 
     /// STEP 4 — Navigate to Home
     Get.offAll(() => DashboardScreen());
-    appSnackbar(content: "Login Successful!");
+    appToast(content: "Login Successful!");
 
     isLoading.value = false;
   }
@@ -129,7 +128,7 @@ class VerifyOtpController extends GetxController {
         return true;
       }
 
-      appSnackbar(content: result["message"], error: true);
+      appToast(content: result["message"], error: true);
       return false;
     } catch (e) {
       print("UPDATE ERROR: $e");
@@ -152,6 +151,6 @@ class VerifyOtpController extends GetxController {
   /// --- Resend OTP (Local mock) ---
   Future<void> resendOtp() async {
     appToast(
-        message: "Resending OTP...A new OTP has been sent to your number.");
+        content: "Resending OTP...A new OTP has been sent to your number.");
   }
 }
