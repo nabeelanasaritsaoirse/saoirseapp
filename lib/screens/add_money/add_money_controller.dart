@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../services/payment_service.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 
 class AddMoneyController extends GetxController {
   final TextEditingController amountController = TextEditingController();

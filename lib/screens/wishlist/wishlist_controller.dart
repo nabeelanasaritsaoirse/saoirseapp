@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 
 import '../../models/wishlist_response_model.dart';
 import '../../services/wishlist_service.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 
 class WishlistController extends GetxController {
   final WishlistService wishlistService = WishlistService();

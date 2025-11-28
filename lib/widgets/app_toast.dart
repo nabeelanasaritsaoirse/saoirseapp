@@ -1,15 +1,13 @@
-// ignore_for_file: depend_on_referenced_packages
-
 import 'package:fluttertoast/fluttertoast.dart';
 import '../constants/app_colors.dart';
 
-appSnackbar({
+appToast({
   required String content,
   String title = 'Message',
   bool error = false,
 }) {
   Fluttertoast.showToast(
-    msg: "$title\n$content",
+    msg: content,
     toastLength: Toast.LENGTH_SHORT,
     gravity: ToastGravity.BOTTOM,
     backgroundColor: error ? AppColors.red : AppColors.green,

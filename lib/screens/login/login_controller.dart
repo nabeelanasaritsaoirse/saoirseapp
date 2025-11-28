@@ -13,7 +13,7 @@ import '../../main.dart';
 import '../../services/api_service.dart';
 import '../../services/appsflyer_service.dart';
 import '../../services/auth_service.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
 
 import 'package:http/http.dart' as http;

@@ -4,7 +4,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/widgets/app_snackbar.dart';
+import 'package:saoirse_app/widgets/app_toast.dart';
 
 import '../../constants/app_assets.dart';
 import '../../services/auth_service.dart';

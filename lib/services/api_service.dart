@@ -7,13 +7,9 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
-import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
-import '../widgets/app_snackbar.dart';
-import '../widgets/app_text.dart';
+import '../widgets/app_toast.dart';
 
 import 'package:http/http.dart' as http;
 

@@ -7,7 +7,7 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import '../../models/razorpay_payment_response.dart';
 import '../../services/payment_service.dart';
 import '../../widgets/app_loader.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 import '../booking_confirmation/booking_confirmation_screen.dart';
 
 class RazorpayController extends GetxController {

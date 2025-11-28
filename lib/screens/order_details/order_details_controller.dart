@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import '../../models/order_response_model.dart';
 import '../../services/order_service.dart';
 import '../../widgets/app_loader.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 import '../razorpay/razorpay_controller.dart';
 
 class OrderDetailsController extends GetxController {

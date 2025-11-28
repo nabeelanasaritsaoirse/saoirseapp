@@ -233,9 +233,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisSpacing: 15.h,
                 ),
                 itemBuilder: (_, index) {
+                  final item = controller.settings[index];
+                  final title = item["title"]!;
+                  final icon = item["icon"]!;
+
                   return ProfileMenuCard(
-                    icon: controller.settings[index]["icon"]!,
-                    title: controller.settings[index]["title"]!,
+                    icon: icon,
+                    title: title,
+                    onTap: () {
+                      switch (title) {
+                        case "Log Out":
+                          controller.confirmLogout();
+                          break;
+
+                        case "Privacy Policy":
+                          // Get.to(() => PrivacyPolicyScreen());
+                          break;
+
+                        case "Terms & Condition":
+                          // Get.to(() => TermsScreen());
+                          break;
+
+                        default:
+                          print("Clicked $title");
+                      }
+                    },
                   );
                 },
               ),

@@ -9,7 +9,7 @@ import '../../models/product_details_model.dart';
 import '../../services/product_service.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_loader.dart';
-import '../../widgets/app_snackbar.dart';
+import '../../widgets/app_toast.dart';
 import '../../widgets/select_plan_sheet.dart';
 
 class ProductDetailsController extends GetxController {
