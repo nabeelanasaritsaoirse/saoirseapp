@@ -9,12 +9,12 @@ permissions:
 on:
   push:
     branches: [ main ]
-    paths:
-      - "android/**"
-      - "lib/**"
-      - "pubspec.yaml"
-      - "pubspec.lock"
-      - "assets/**"
+    # paths:
+    #   - "android/**"
+    #   - "lib/**"
+    #   - "pubspec.yaml"
+    #   - "pubspec.lock"
+    #   - "assets/**"
 
   # pull_request:
   #   branches: [ main, developer ]
