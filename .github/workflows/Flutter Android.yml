@@ -1,4 +1,4 @@
-name: 🤖 Flutter Android Build and Deploy
+name: 🤖 Flutter Android Build and Deploy(Production)
 run-name: "🚀 Android Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
 permissions:
@@ -236,21 +236,7 @@ jobs:
 
       - run: gem install fastlane -N
 
-      - name: 🚀 Deploy to Google Play
-        env:
-          JSON_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
-          PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
-        run: |
-          echo "$JSON_KEY" > service_account.json
-          fastlane supply \
-            --aab app-release.aab \
-            --json_key service_account.json \
-            --package_name "$PACKAGE_NAME" \
-            --track internal \
-            --skip_upload_screenshots true \
-            --skip_upload_images true
-
-      # - name: 🚀 Deploy to Google Play (Production)
+      # - name: 🚀 Deploy to Google Play
       #   env:
       #     JSON_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
       #     PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
@@ -260,11 +246,25 @@ jobs:
       #       --aab app-release.aab \
       #       --json_key service_account.json \
       #       --package_name "$PACKAGE_NAME" \
-      #       --track production \
-      #       --skip_upload_metadata \
-      #       --skip_upload_changelogs \
-      #       --skip_upload_images \
-      #       --skip_upload_screenshots
+      #       --track internal \
+      #       --skip_upload_screenshots true \
+      #       --skip_upload_images true
+
+      - name: 🚀 Deploy to Google Play (Production)
+        env:
+          JSON_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
+        run: |
+          echo "$JSON_KEY" > service_account.json
+          fastlane supply \
+            --aab app-release.aab \
+            --json_key service_account.json \
+            --package_name "$PACKAGE_NAME" \
+            --track production \
+            --skip_upload_metadata \
+            --skip_upload_changelogs \
+            --skip_upload_images \
+            --skip_upload_screenshots
 
       # Optional — Add summary
       - name: 🧾 Build Summary
