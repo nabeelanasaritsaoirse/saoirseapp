@@ -8,7 +8,7 @@ permissions:
 
 on:
   push:
-    branches: [ main, developer ]
+    branches: [ main ]
     paths:
       - "ios/**"
       - "assets/**"
@@ -16,14 +16,14 @@ on:
       - "pubspec.yaml"
       - "pubspec.lock"
 
-  pull_request:
-    branches: [ main, developer ]
-    paths:
-      - "ios/**"
-      - "assets/**"
-      - "lib/**"
-      - "pubspec.yaml"
-      - "pubspec.lock"
+  # pull_request:
+  #   branches: [ main, developer ]
+  #   paths:
+  #     - "ios/**"
+  #     - "assets/**"
+  #     - "lib/**"
+  #     - "pubspec.yaml"
+  #     - "pubspec.lock"
 
 jobs:
   ios-ci:
