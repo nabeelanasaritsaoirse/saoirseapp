@@ -115,13 +115,13 @@ class NotificationCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: appText(
-                        textAlign: TextAlign.start,
-                        item.title,
-                        overflow: TextOverflow.ellipsis,
-                        color: AppColors.black,
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
+                          textAlign: TextAlign.start,
+                          item.title,
+                          // overflow: TextOverflow.ellipsis,
+                          color: AppColors.black,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          maxLines: null),
                     ),
                     appText(
                       date,
@@ -136,8 +136,9 @@ class NotificationCard extends StatelessWidget {
                 /// Message
                 appText(
                   item.body,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+                  textAlign: TextAlign.start,
+                  // overflow: TextOverflow.ellipsis,
+                  maxLines: null,
                   color: AppColors.darkGray,
                   fontSize: 13.sp,
                   fontWeight: FontWeight.w500,
