@@ -293,4 +293,17 @@ class ProductDetailsController extends GetxController {
   void clearSelectedVariant() {
     selectedVariantId.value = "";
   }
+
+  String get selectedPlanButtonText {
+    if (selectedPlanIndex.value != -1) {
+      final plan = plans[selectedPlanIndex.value];
+      return "${plan.days} Days";
+    }
+
+    if (customDays.value > 0) {
+      return "${customDays.value} Days";
+    }
+
+    return "Select Plan";
+  }
 }
