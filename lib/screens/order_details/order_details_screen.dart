@@ -325,98 +325,98 @@ class OrderDetailsScreen extends StatelessWidget {
 
             // -------------------- PRODUCT DETAILS -----------------------
 
-            // -------------------- COUPON SECTION -----------------------
-            Column(
-              spacing: 10.h,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                appText(
-                  AppStrings.apply_coupen,
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w700,
-                ),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(15.w),
-                  constraints: BoxConstraints(
-                    minHeight: 65.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.shadowColor,
-                        blurRadius: 6.r,
-                        offset: Offset(0, 2),
-                      )
-                    ],
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  child: Column(
-                    spacing: 10.h,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        spacing: 10.w,
-                        children: [
-                          SizedBox(
-                            width: 180.w,
-                            child: appTextField(
-                              borderRadius: BorderRadius.circular(15.w),
-                              contentPadding: EdgeInsets.symmetric(
-                                  vertical: 8.h, horizontal: 8.w),
-                              controller: couponController,
-                              hintText: AppStrings.coupen_hint,
-                              hintSize: 13.sp,
-                              textColor: AppColors.textBlack,
-                              hintColor: AppColors.grey,
-                            ),
-                          ),
-                          appButton(
-                              onTap: () {},
-                              width: 90.w,
-                              height: 35.h,
-                              buttonColor: AppColors.primaryColor,
-                              padding: EdgeInsets.all(0.w),
-                              child: Center(
-                                child: appText(AppStrings.apply,
-                                    fontSize: 13.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.white),
-                              )),
-                        ],
-                      ),
-                      // appText(AppStrings.premoCode,
-                      //     fontSize: 13.sp, fontWeight: FontWeight.w600),
-                      // Row(
-                      //   spacing: 15.w,
-                      //   children: [
-                      //     Container(
-                      //       padding: EdgeInsets.symmetric(
-                      //           horizontal: 25.w, vertical: 7.h),
-                      //       decoration: BoxDecoration(
-                      //           border: Border.all(
-                      //               color: AppColors.grey, width: 1.w),
-                      //           borderRadius: BorderRadius.circular(5.r)),
-                      //       child: appText("FHD10%",
-                      //           fontSize: 13.sp, fontWeight: FontWeight.w600),
-                      //     ),
-                      //     Container(
-                      //       padding: EdgeInsets.symmetric(
-                      //           horizontal: 25.w, vertical: 7.h),
-                      //       decoration: BoxDecoration(
-                      //           border: Border.all(color: AppColors.grey),
-                      //           borderRadius: BorderRadius.circular(5.r)),
-                      //       child: appText("FHD10%",
-                      //           fontSize: 13.sp, fontWeight: FontWeight.w600),
-                      //     )
-                      //   ],
-                      // )
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            // // -------------------- COUPON SECTION -----------------------
+            // Column(
+            //   spacing: 10.h,
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: [
+            //     appText(
+            //       AppStrings.apply_coupen,
+            //       fontSize: 13.sp,
+            //       fontWeight: FontWeight.w700,
+            //     ),
+            //     Container(
+            //       width: double.infinity,
+            //       padding: EdgeInsets.all(15.w),
+            //       constraints: BoxConstraints(
+            //         minHeight: 65.h,
+            //       ),
+            //       decoration: BoxDecoration(
+            //         color: AppColors.white,
+            //         boxShadow: [
+            //           BoxShadow(
+            //             color: AppColors.shadowColor,
+            //             blurRadius: 6.r,
+            //             offset: Offset(0, 2),
+            //           )
+            //         ],
+            //         borderRadius: BorderRadius.circular(8.r),
+            //       ),
+            //       child: Column(
+            //         spacing: 10.h,
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: [
+            //           Row(
+            //             spacing: 10.w,
+            //             children: [
+            //               SizedBox(
+            //                 width: 180.w,
+            //                 child: appTextField(
+            //                   borderRadius: BorderRadius.circular(15.w),
+            //                   contentPadding: EdgeInsets.symmetric(
+            //                       vertical: 8.h, horizontal: 8.w),
+            //                   controller: couponController,
+            //                   hintText: AppStrings.coupen_hint,
+            //                   hintSize: 13.sp,
+            //                   textColor: AppColors.textBlack,
+            //                   hintColor: AppColors.grey,
+            //                 ),
+            //               ),
+            //               appButton(
+            //                   onTap: () {},
+            //                   width: 90.w,
+            //                   height: 35.h,
+            //                   buttonColor: AppColors.primaryColor,
+            //                   padding: EdgeInsets.all(0.w),
+            //                   child: Center(
+            //                     child: appText(AppStrings.apply,
+            //                         fontSize: 13.sp,
+            //                         fontWeight: FontWeight.w600,
+            //                         color: AppColors.white),
+            //                   )),
+            //             ],
+            //           ),
+            //           appText(AppStrings.premoCode,
+            //               fontSize: 13.sp, fontWeight: FontWeight.w600),
+            //           Row(
+            //             spacing: 15.w,
+            //             children: [
+            //               Container(
+            //                 padding: EdgeInsets.symmetric(
+            //                     horizontal: 25.w, vertical: 7.h),
+            //                 decoration: BoxDecoration(
+            //                     border: Border.all(
+            //                         color: AppColors.grey, width: 1.w),
+            //                     borderRadius: BorderRadius.circular(5.r)),
+            //                 child: appText("FHD10%",
+            //                     fontSize: 13.sp, fontWeight: FontWeight.w600),
+            //               ),
+            //               Container(
+            //                 padding: EdgeInsets.symmetric(
+            //                     horizontal: 25.w, vertical: 7.h),
+            //                 decoration: BoxDecoration(
+            //                     border: Border.all(color: AppColors.grey),
+            //                     borderRadius: BorderRadius.circular(5.r)),
+            //                 child: appText("FHD10%",
+            //                     fontSize: 13.sp, fontWeight: FontWeight.w600),
+            //               )
+            //             ],
+            //           )
+            //         ],
+            //       ),
+            //     ),
+            //   ],
+            // ),
             // -------------------- COUPON SECTION -----------------------
 
             // -------------------- ORDER INFORMATION SECTION -----------------------
@@ -470,44 +470,45 @@ class OrderDetailsScreen extends StatelessWidget {
               ),
             ),
             // -------------------- ORDER INFORMATION SECTION -----------------------
-            SizedBox(
-              height: 1.h,
-            ),
-            // -------------------- PAY NOW BUTTON SECTION -----------------------
 
-            appButton(
-              onTap: () {
-                orderController.placeOrder(
-                  productId: product!.id,
-                  variantId: selectVarientId ?? "",
-                  paymentOption: "daily",
-                  totalDays: orderController.selectedDays.value,
-                  deliveryAddress: {
-                    "name": addresses.name,
-                    "phoneNumber": addresses.phoneNumber,
-                    "addressLine1": addresses.addressLine1,
-                    "city": addresses.city,
-                    "state": addresses.state,
-                    "pincode": addresses.pincode,
-                  },
-                );
-              },
-              width: double.infinity,
-              height: 45.h,
-              buttonColor: AppColors.lightAmber,
-              borderRadius: BorderRadius.circular(20.r),
-              child: Center(
-                child: appText(
-                  AppStrings.pay_now,
-                  fontSize: 15.sp,
-                  color: AppColors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            )
+            // -------------------- PAY NOW BUTTON SECTION -----------------------
           ],
         ),
       )),
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.all(12.w),
+        color: AppColors.transparent,
+        child: appButton(
+          onTap: () {
+            orderController.placeOrder(
+              productId: product!.id,
+              variantId: selectVarientId ?? "",
+              paymentOption: "daily",
+              totalDays: orderController.selectedDays.value,
+              deliveryAddress: {
+                "name": addresses.name,
+                "phoneNumber": addresses.phoneNumber,
+                "addressLine1": addresses.addressLine1,
+                "city": addresses.city,
+                "state": addresses.state,
+                "pincode": addresses.pincode,
+              },
+            );
+          },
+          width: double.infinity,
+          height: 45.h,
+          buttonColor: AppColors.lightAmber,
+          borderRadius: BorderRadius.circular(20.r),
+          child: Center(
+            child: appText(
+              AppStrings.pay_now,
+              fontSize: 15.sp,
+              color: AppColors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
