@@ -5,8 +5,8 @@ import 'package:get/get.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
-import '../../dummy/dummy_assets.dart';
 import '../../models/category_model.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../productListing/product_listing.dart';
@@ -14,11 +14,30 @@ import '../profile/profile_controller.dart';
 import '../wishlist/wishlist_screen.dart';
 import 'category_controller.dart';
 
-class CategoryScreen extends StatelessWidget {
-  CategoryScreen({super.key});
+class CategoryScreen extends StatefulWidget {
+  final int initialIndex;
+  const CategoryScreen({super.key, this.initialIndex = 0});
 
+  @override
+  State<CategoryScreen> createState() => _CategoryScreenState();
+}
+
+class _CategoryScreenState extends State<CategoryScreen> {
   final CategoryController controller = Get.put(CategoryController());
   final ProfileController profileController = Get.put(ProfileController());
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() {
+      final controller = Get.find<CategoryController>();
+
+      if (widget.initialIndex < controller.categoryGroups.length) {
+        controller.selectedIndex.value = widget.initialIndex;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +96,7 @@ class CategoryScreen extends StatelessWidget {
         ),
         body: Obx(() {
           if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: appLoader());
           }
           if (controller.errorMessage.value.isNotEmpty) {
             return Center(
@@ -132,8 +151,34 @@ class CategoryScreen extends StatelessWidget {
                               ),
                               child: Column(
                                 children: [
-                                  Image.asset(DummyAssets.washingMachine,
-                                      width: 70.w, height: 70.h),
+                                  Builder(
+                                    builder: (_) {
+                                      final imageUrl = category.image?.url;
+
+                                      if (imageUrl == null ||
+                                          imageUrl.isEmpty) {
+                                        return Icon(
+                                          Icons.image_outlined,
+                                          size: 32.sp,
+                                          color: AppColors.grey,
+                                        );
+                                      }
+                                      return Image.network(
+                                        imageUrl,
+                                        width: 70.w,
+                                        height: 70.h,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Icon(
+                                            Icons.image_outlined,
+                                            size: 32.sp,
+                                            color: AppColors.grey,
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
                                   SizedBox(height: 7.h),
                                   appText(
                                     category.name,
@@ -239,62 +284,76 @@ class SubCategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Get.to(() => const ProductListing());
+      },
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.transparent,
           borderRadius: BorderRadius.circular(12.r),
         ),
-        child: Expanded(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                height: 95.h,
-                decoration: BoxDecoration(
-                  color: AppColors.lightGrey,
-                  borderRadius: BorderRadius.circular(10.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadowColor,
-                      blurRadius: 5.r,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-                child: Image.asset(
-                  DummyAssets.mobile,
-                  height: 70.h,
-                  width: 70.w,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.lightGrey,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              height: 95.h,
+              decoration: BoxDecoration(
+                color: AppColors.lightGrey,
+                borderRadius: BorderRadius.circular(10.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.shadowColor,
+                    blurRadius: 5.r,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+              child: Builder(
+                builder: (_) {
+                  final imageUrl = subCategory.image?.url;
+
+                  if (imageUrl == null || imageUrl.isEmpty) {
+                    // No image: only icon
+                    return Center(
                       child: Icon(
-                        Icons.image,
+                        Icons.image_outlined,
                         size: 40.sp,
-                        color: AppColors.lightGrey,
+                        color: AppColors.grey,
                       ),
                     );
-                  },
-                ),
+                  }
+
+                  // Image available: show network image, fallback to icon on error
+                  return Image.network(
+                    imageUrl,
+                    height: 70.h,
+                    width: 70.w,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(
+                        child: Icon(
+                          Icons.image_outlined,
+                          size: 40.sp,
+                          color: AppColors.grey,
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
-              SizedBox(height: 8.h),
-              appText(
-                subCategory.name,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                fontSize: 11.sp,
-                overflow: TextOverflow.ellipsis,
-                fontWeight: FontWeight.w500,
-              ),
-            ],
-          ),
+            ),
+            SizedBox(height: 8.h),
+            appText(
+              subCategory.name,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              fontSize: 11.sp,
+              overflow: TextOverflow.ellipsis,
+              fontWeight: FontWeight.w500,
+            ),
+          ],
         ),
       ),
     );
