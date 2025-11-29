@@ -29,6 +29,24 @@ android {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
+    bundle {
+        abi {
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        language {
+            enableSplit = false
+        }
+    }
+
+    packaging {
+      jniLibs {
+        useLegacyPackaging = true
+      }
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.saoirse.epi"
