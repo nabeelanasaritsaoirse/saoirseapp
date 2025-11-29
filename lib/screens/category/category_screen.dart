@@ -264,7 +264,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     itemCount: subCategories.length,
                     itemBuilder: (context, index) {
                       final subCategory = subCategories[index];
-                      return SubCategoryCard(subCategory: subCategory);
+
+                      return SubCategoryCard(
+                        subCategory: subCategory,
+                        id: controller
+                            .categoryGroups[controller.selectedIndex.value],
+                      );
                     },
                   );
                 }(),
@@ -278,14 +283,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
 //---------------------- SubCategoryCard Widget ---------------------//
 class SubCategoryCard extends StatelessWidget {
   final SubCategory subCategory;
+  final CategoryGroup id;
 
-  const SubCategoryCard({super.key, required this.subCategory});
+  const SubCategoryCard(
+      {super.key, required this.subCategory, required this.id});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => const ProductListing());
+        Get.to(() => const ProductListing(), arguments: {'categoryId': id.id});
       },
       child: Container(
         decoration: BoxDecoration(

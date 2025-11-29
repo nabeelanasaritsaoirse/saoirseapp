@@ -105,4 +105,8 @@ class AppURLs {
   // Pending Transaction (PAYMENT METHOD API)
   static String PENDING_TRANSACTION_PAYMENT_RESPONSE =
       BASE_API + "api/installments/payments/create-combined-razorpay";
+
+  // Sub Category Order Listing Page
+  static String PRODUCT_LISTING_SUBCATEGORY =
+      BASE_API + "api/products/category/";
 }
