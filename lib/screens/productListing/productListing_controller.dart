@@ -21,9 +21,17 @@ class ProductlistingController extends GetxController {
   final int limit = 20;
 
   var hasNextPage = true.obs;
+  //new
+   String? categoryId;
 
   @override
   void onInit() {
+//new
+    final args = Get.arguments;
+    if (args != null && args is Map && args['categoryId'] != null) {
+      categoryId = args['categoryId'] as String?;
+    }
+
     fetchProducts();
 
     super.onInit();
@@ -43,6 +51,7 @@ class ProductlistingController extends GetxController {
         page,
         limit,
         search: searchQuery.value.isEmpty ? null : searchQuery.value,
+        categoryId: categoryId,
       );
 
       if (response != null && response.success) {

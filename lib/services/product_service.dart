@@ -28,34 +28,71 @@ class ProductService {
   }
 
   // Fetch productslisting with pagination
+  // Future<ProductListResponse?> getProducts(
+  //   int page,
+  //   int limit, {
+  //   String? search,
+  // }) async {
+  //   try {
+  //     final query =
+  //         search != null && search.isNotEmpty ? "&search=$search" : "";
+  //     final url = "${AppURLs.PRODUCTS_LISTING}?page=$page&limit=$limit$query";
+
+  //     print("GET PRODUCTS: $url");
+
+  //     final response = await APIService.getRequest(
+  //       url: url,
+  //       onSuccess: (data) => data,
+  //       headers: {
+  //         "Authorization": "Bearer $token",
+  //       },
+  //     );
+
+  //     if (response == null) return null;
+  //     log("Product List response ====> $response");
+  //     return ProductListResponse.fromJson(response);
+  //   } catch (e) {
+  //     print("Product fetch error: $e");
+  //     return null;
+  //   }
+  // }
+
   Future<ProductListResponse?> getProducts(
-    int page,
-    int limit, {
-    String? search,
-  }) async {
-    try {
-      final query =
-          search != null && search.isNotEmpty ? "&search=$search" : "";
-      final url = "${AppURLs.PRODUCTS_LISTING}?page=$page&limit=$limit$query";
+  int page,
+  int limit, {
+  String? search,
+  String? categoryId, // new
+}) async {
+  try {
+    final query = <String>[];
+    query.add('page=$page');
+    query.add('limit=$limit');
+    if (search != null && search.isNotEmpty) query.add('search=$search');
 
-      print("GET PRODUCTS: $url");
+    // If categoryId provided, call category endpoint (backend path shown by you)
+    final url = (categoryId != null && categoryId.isNotEmpty)
+        ? "${AppURLs.PRODUCT_LISTING_SUBCATEGORY}$categoryId?${query.join('&')}"
+        : "${AppURLs.PRODUCTS_LISTING}?${query.join('&')}";
 
-      final response = await APIService.getRequest(
-        url: url,
-        onSuccess: (data) => data,
-        headers: {
-          "Authorization": "Bearer $token",
-        },
-      );
+    print("GET PRODUCTS: $url");
 
-      if (response == null) return null;
-      log("Product List response ====> $response");
-      return ProductListResponse.fromJson(response);
-    } catch (e) {
-      print("Product fetch error: $e");
-      return null;
-    }
+    final response = await APIService.getRequest(
+      url: url,
+      onSuccess: (data) => data,
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response == null) return null;
+    log("Product List response ====> $response");
+    return ProductListResponse.fromJson(response);
+  } catch (e) {
+    print("Product fetch error: $e");
+    return null;
   }
+}
+
 
   // Fetch investment plans for a product
   Future<List<PlanModel>> fetchProductPlans(String productId) async {
