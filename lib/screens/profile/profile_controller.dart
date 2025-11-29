@@ -6,7 +6,6 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -160,8 +159,8 @@ class ProfileController extends GetxController {
 // ================== PICK PROFILE IMAGE ==================
   Future<void> pickProfileImage() async {
     try {
-      bool granted = await _requestGalleryPermission();
-      if (!granted) return;
+      // bool granted = await _requestGalleryPermission();
+      // if (!granted) return;
 
       final XFile? image = await _picker.pickImage(
         source: ImageSource.gallery,
@@ -228,25 +227,25 @@ class ProfileController extends GetxController {
 //   }
 
   // ================== GALLERY PERMISSION ==================
-  Future<bool> _requestGalleryPermission() async {
-    if (Platform.isAndroid) {
-      final photos = await Permission.photos.request();
-      final storage = await Permission.storage.request();
+  // Future<bool> _requestGalleryPermission() async {
+  //   if (Platform.isAndroid) {
+  //     final photos = await Permission.photos.request();
+  //     final storage = await Permission.storage.request();
 
-      if (photos.isGranted || storage.isGranted) return true;
+  //     if (photos.isGranted || storage.isGranted) return true;
 
-      if (photos.isPermanentlyDenied || storage.isPermanentlyDenied) {
-        openAppSettings();
-      }
-      return false;
-    }
+  //     if (photos.isPermanentlyDenied || storage.isPermanentlyDenied) {
+  //       openAppSettings();
+  //     }
+  //     return false;
+  //   }
 
-    final ios = await Permission.photos.request();
-    if (ios.isGranted) return true;
+  //   final ios = await Permission.photos.request();
+  //   if (ios.isGranted) return true;
 
-    if (ios.isPermanentlyDenied) openAppSettings();
-    return false;
-  }
+  //   if (ios.isPermanentlyDenied) openAppSettings();
+  //   return false;
+  // }
 
 // ------------------ COUNTRY SETUP ------------------
   void _setInitialCountryFromCode(String code) {
