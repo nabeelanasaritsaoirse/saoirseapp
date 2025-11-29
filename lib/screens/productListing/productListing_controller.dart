@@ -22,7 +22,7 @@ class ProductlistingController extends GetxController {
 
   var hasNextPage = true.obs;
   //new
-   String? categoryId;
+  String? categoryId;
 
   @override
   void onInit() {

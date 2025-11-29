@@ -125,17 +125,22 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         controller: controller.scrollController.value,
                         itemCount: controller.categoryGroups.length,
                         itemBuilder: (context, index) {
-                          final isSelected = controller.selectedIndex.value == index;
+                          final isSelected =
+                              controller.selectedIndex.value == index;
                           final category = controller.categoryGroups[index];
 
                           return GestureDetector(
                             onTap: () => controller.selectCategory(index),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: isSelected ? AppColors.lightGrey : AppColors.white,
+                                color: isSelected
+                                    ? AppColors.lightGrey
+                                    : AppColors.white,
                                 border: Border(
                                   left: BorderSide(
-                                    color: isSelected ? AppColors.primaryColor : AppColors.transparent,
+                                    color: isSelected
+                                        ? AppColors.primaryColor
+                                        : AppColors.transparent,
                                     width: 4.w,
                                   ),
                                 ),
@@ -150,7 +155,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                     builder: (_) {
                                       final imageUrl = category.image?.url;
 
-                                      if (imageUrl == null || imageUrl.isEmpty) {
+                                      if (imageUrl == null ||
+                                          imageUrl.isEmpty) {
                                         return Icon(
                                           Icons.image_outlined,
                                           size: 32.sp,
@@ -162,7 +168,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                         width: 70.w,
                                         height: 70.h,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
                                           return Icon(
                                             Icons.image_outlined,
                                             size: 32.sp,
@@ -177,8 +184,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                     category.name,
                                     textAlign: TextAlign.center,
                                     fontSize: 11.sp,
-                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                    color: isSelected ? AppColors.primaryColor : AppColors.textBlack,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w700
+                                        : FontWeight.w600,
+                                    color: isSelected
+                                        ? AppColors.primaryColor
+                                        : AppColors.textBlack,
                                   ),
                                 ],
                               ),
@@ -254,7 +265,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     itemBuilder: (context, index) {
                       final subCategory = subCategories[index];
 
-                      return SubCategoryCard(subCategory: subCategory,id: controller.categoryGroups[controller.selectedIndex.value],);
+                      return SubCategoryCard(
+                        subCategory: subCategory,
+                        id: controller
+                            .categoryGroups[controller.selectedIndex.value],
+                      );
                     },
                   );
                 }(),
@@ -270,7 +285,8 @@ class SubCategoryCard extends StatelessWidget {
   final SubCategory subCategory;
   final CategoryGroup id;
 
-  const SubCategoryCard({super.key, required this.subCategory,required this.id});
+  const SubCategoryCard(
+      {super.key, required this.subCategory, required this.id});
 
   @override
   Widget build(BuildContext context) {
