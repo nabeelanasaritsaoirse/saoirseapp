@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import '/screens/kyc/kycScreen.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -246,8 +247,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     title: title,
                     onTap: () {
                       switch (title) {
-                        case "Log Out":
-                          controller.confirmLogout();
+                        case "KYC":
+                          Get.to(() => kycScreen(kycStatus: "not_submitted"));
                           break;
 
                         case "Privacy Policy":
@@ -256,6 +257,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         case "Terms & Condition":
                           Get.to(() => TermsAndConditionsScreen());
+                          break;
+                        case "Log Out":
+                          controller.confirmLogout();
                           break;
 
                         default:
