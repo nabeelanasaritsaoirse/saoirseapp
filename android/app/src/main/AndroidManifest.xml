@@ -5,6 +5,8 @@
         <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
         <uses-permission android:name="com.android.vending.INSTALL_REFERRER" />
         <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
+        <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+        <uses-permission android:name="android.permission.READ_SMS"/>
 
         <application
         android:label="EPI"
@@ -51,6 +53,13 @@
                     android:host="inviteapp.onelink.me" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name="com.google.android.gms.auth.api.phone.SmsRetrieverReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.auth.api.phone.SMS_RETRIEVED" />
+            </intent-filter>
+        </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

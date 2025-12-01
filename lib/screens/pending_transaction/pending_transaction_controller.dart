@@ -1,5 +1,6 @@
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/razorpay/pending_transaction_razorpay_controller.dart';
+import 'package:saoirse_app/widgets/app_toast.dart';
 
 import '../../models/pending_transaction_model.dart';
 import '../../services/pending_transaction_service.dart';
@@ -80,19 +81,48 @@ class PendingTransactionController extends GetxController {
   //------------------------------------Tranaction API Methods and All---------------------------------------------------
 
   Future<void> payNow() async {
-    if (selectedOrderIds.isEmpty) {
-      return;
-    }
-
-    final response = await service.createCombinedRazorpayOrder(
-      selectedOrderIds.toList(),
-    );
-
-    if (response != null) {
-      debugPrint("✅ API RESPONSE:");
-      debugPrint(response.toString());
-    } else {
-      debugPrint("❌ API returned null");
-    }
+  if (selectedOrderIds.isEmpty) {
+    appToast(error: true, content: "Please select at least one order to pay.");
+    return;
   }
+
+  // call backend to create combined razorpay order response
+  final response = await service.createCombinedRazorpayOrder(
+    selectedOrderIds.toList(),
+  );
+
+  if (response == null) {
+    appToast(error: true, content: "Server error. Try again.");
+    return;
+  }
+
+  // response is the full JSON returned by postRequest
+  // Check success and get the `data` map
+  final bool success = response['success'] == true;
+  if (!success) {
+    final msg = response['message'] ?? 'Failed to create order';
+    appToast(error: true, content: msg);
+    return;
+  }
+
+  final Map<String, dynamic>? data =
+      (response['data'] is Map) ? Map<String, dynamic>.from(response['data']) : null;
+
+  if (data == null) {
+    appToast(error: true, content: "Invalid server response.");
+    return;
+  }
+
+  // Put/initialize the razorpay controller and start payment
+  final PendingTransactionRazorpayController razorController =
+      Get.put(PendingTransactionRazorpayController());
+
+  razorController.startCombinedPayment(
+    createResponse: data,
+    selectedOrders: selectedOrderIds.toList(),
+  );
+}
+
+
+
 }

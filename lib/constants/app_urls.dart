@@ -103,9 +103,13 @@ class AppURLs {
   //Log Out Api
   static String LOGOUT_API = BASE_API + "api/auth/logout";
 
-  // Pending Transaction (PAYMENT METHOD API)
+  // Pending Transaction (BEFORE PAYMENT METHOD API RESPONSE)
   static String PENDING_TRANSACTION_PAYMENT_RESPONSE =
       BASE_API + "api/installments/payments/create-combined-razorpay";
+
+  // Pending Transaction (AFTER PAYMENT METHOD API )
+  static String PENDING_TRANSACTION_PAY_DAILY_SELECTED =
+      BASE_API + "api/installments/payments/pay-daily-selected";
 
   // Sub Category Order Listing Page
   static String PRODUCT_LISTING_SUBCATEGORY =
