@@ -8,6 +8,11 @@ on:
 jobs:
   block:
     runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write    # REQUIRED for commenting
+      issues: write           # REQUIRED for commenting
+
     steps:
       - name: 💬 Comment on PR
         uses: peter-evans/create-or-update-comment@v3
@@ -15,9 +20,11 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             ❌ **PRs to \`main\` are blocked.**
-            Please open this pull request against **dev** or **developer** branch.
+            Please open this PR against **dev** or **developer** branch.
+          edit-mode: append
+          append-separator: newline
 
       - name: ❌ Prevent PR to main
         run: |
-          echo "PRs to 'main' are not allowed. Create PR to 'dev' instead."
+          echo "PRs to main are not allowed. Use dev or developer branch."
           exit 1
