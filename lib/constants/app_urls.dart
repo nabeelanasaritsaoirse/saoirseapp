@@ -41,6 +41,7 @@ class AppURLs {
   static String Wallet = BASE_API + "api/wallet";
   static String WALLET_TRANSACTIONS = BASE_API + "api/wallet/transactions";
   static String ADD_MONEY_WALLET = BASE_API + "api/wallet/add-money";
+  static String WITHDRAWAL_API = BASE_API + "api/wallet/withdraw";
 
   // Category api
   static String CATEGORY_API =

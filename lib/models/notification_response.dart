@@ -82,6 +82,30 @@ class AppNotification {
       createdBy: CreatedBy.fromJson(json['createdBy']),
     );
   }
+
+  AppNotification copyWith({
+  int? likeCount,
+  bool? isLikedByMe,
+}) {
+  return AppNotification(
+    id: id,
+    notificationId: notificationId,
+    type: type,
+    title: title,
+    body: body,
+    imageUrl: imageUrl,
+    publishedAt: publishedAt,
+    createdAt: createdAt,
+    likeCount: likeCount ?? this.likeCount,
+    commentCount: commentCount,
+    viewCount: viewCount,
+    commentsEnabled: commentsEnabled,
+    likesEnabled: likesEnabled,
+    isLikedByMe: isLikedByMe ?? this.isLikedByMe,
+    createdBy: createdBy,
+  );
+}
+
 }
 
 class CreatedBy {

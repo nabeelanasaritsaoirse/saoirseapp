@@ -1,8 +1,12 @@
 // ignore_for_file: avoid_print
 
+import 'dart:developer';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:saoirse_app/screens/notification/notification_controller.dart';
 
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
@@ -82,6 +86,24 @@ class VerifyOtpController extends GetxController {
       return;
     }
 
+    final fcmToken = await getDeviceToken();
+    if (fcmToken != null) {
+      log("Assign FCM token to the registerFCM function : $fcmToken");
+      Get.find<NotificationController>().registerFCM(fcmToken);
+    }
+
+    /// ✅ STEP 5 — TOKEN REFRESH LISTENER (Only after login)
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      log("🔄 New FCM token generated: $newToken");
+
+      final accessToken = storage.read(AppConst.ACCESS_TOKEN);
+      if (accessToken != null) {
+        Get.find<NotificationController>().registerFCM(newToken);
+      } else {
+        log("⚠ User logged out — skipping FCM refresh update");
+      }
+    });
+
     print("User Updated Successfully!");
 
     /// STEP 4 — Navigate to Home
@@ -140,10 +162,10 @@ class VerifyOtpController extends GetxController {
   Future<String?> getDeviceToken() async {
     try {
       final token = await FirebaseMessaging.instance.getToken();
-      print("FCM Token: $token");
+      log("FCM Token: $token");
       return token;
     } catch (e) {
-      print("FCM TOKEN ERROR: $e");
+      log("FCM TOKEN ERROR: $e");
       return null;
     }
   }

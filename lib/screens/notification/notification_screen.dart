@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/notification_details/notification_details_screen.dart';
 
 import '../../constants/app_strings.dart';
 import '../../models/notification_response.dart';
@@ -89,83 +90,86 @@ class NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final date = item.publishedAt.split("T").first;
 
-    return Container(
-      margin: EdgeInsets.only(bottom: 14.h),
-      padding: EdgeInsets.all(16.r),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(14.r),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.grey.withOpacity(0.3),
-            spreadRadius: 1,
-            blurRadius: 7,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          appText(
-            date,
-            color: AppColors.darkGray,
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (item.imageUrl != null && item.imageUrl!.isNotEmpty)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10.r),
-                  child: Image.network(
-                    item.imageUrl!,
-                    width: 70.w,
-                    height: 70.w,
-                    fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () => Get.to(NotificationDetailsScreen(notificationId: item.id),),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 14.h),
+        padding: EdgeInsets.all(16.r),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(14.r),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.grey.withOpacity(0.3),
+              spreadRadius: 1,
+              blurRadius: 7,
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            appText(
+              date,
+              color: AppColors.darkGray,
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w500,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (item.imageUrl != null && item.imageUrl!.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: Image.network(
+                      item.imageUrl!,
+                      width: 70.w,
+                      height: 70.w,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                if (item.imageUrl != null && item.imageUrl!.isNotEmpty)
+                  SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// Title + Date
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: appText(
+                                textAlign: TextAlign.start,
+                                item.title,
+                                // overflow: TextOverflow.ellipsis,
+                                color: AppColors.black,
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w600,
+                                maxLines: null),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4.h),
+      
+                      /// Message
+                      appText(
+                        item.body,
+                        textAlign: TextAlign.start,
+                        // overflow: TextOverflow.ellipsis,
+                        maxLines: null,
+                        color: AppColors.darkGray,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      SizedBox(height: 4.h),
+                    ],
                   ),
                 ),
-              if (item.imageUrl != null && item.imageUrl!.isNotEmpty)
-                SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    /// Title + Date
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: appText(
-                              textAlign: TextAlign.start,
-                              item.title,
-                              // overflow: TextOverflow.ellipsis,
-                              color: AppColors.black,
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w600,
-                              maxLines: null),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 4.h),
-
-                    /// Message
-                    appText(
-                      item.body,
-                      textAlign: TextAlign.start,
-                      // overflow: TextOverflow.ellipsis,
-                      maxLines: null,
-                      color: AppColors.darkGray,
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    SizedBox(height: 4.h),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

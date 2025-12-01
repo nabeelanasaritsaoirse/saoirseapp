@@ -3,9 +3,11 @@
 import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:saoirse_app/screens/notification/notification_controller.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -420,6 +422,9 @@ class ProfileController extends GetxController {
       buttonColor: AppColors.primaryColor,
       cancelTextColor: AppColors.primaryColor,
       onConfirm: () async {
+        await Get.find<NotificationController>().removeFCM();
+        await FirebaseMessaging.instance.deleteToken();
+        print("🗑 Local FCM token deleted.");
         Get.back(); // close dialog
         await logoutUser();
       },

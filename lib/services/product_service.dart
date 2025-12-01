@@ -69,7 +69,7 @@ class ProductService {
       query.add('limit=$limit');
       if (search != null && search.isNotEmpty) query.add('search=$search');
 
-      // If categoryId provided, call category endpoint (backend path shown by you)
+    
       final url = (categoryId != null && categoryId.isNotEmpty)
           ? "${AppURLs.PRODUCT_LISTING_SUBCATEGORY}$categoryId?${query.join('&')}"
           : "${AppURLs.PRODUCTS_LISTING}?${query.join('&')}";
