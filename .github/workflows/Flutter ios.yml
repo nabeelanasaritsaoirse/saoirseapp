@@ -33,6 +33,20 @@ jobs:
       - name: 🧪 Tests
         run: flutter test || true
 
+      - name: Generate .env file
+        run: |
+          cat > .env <<EOF
+          IOS_API_KEY=${{ secrets.IOS_API_KEY }}
+          IOS_APP_ID=${{ secrets.IOS_APP_ID }}
+          IOS_MESSAGING_SENDER_ID=${{ secrets.IOS_MESSAGING_SENDER_ID }}
+          IOS_PROJECT_ID=${{ secrets.IOS_PROJECT_ID }}
+          
+          ANDROID_API_KEY=${{ secrets.ANDROID_API_KEY }}
+          ANDROID_APP_ID=${{ secrets.ANDROID_APP_ID }}
+          ANDROID_MESSAGING_SENDER_ID=${{ secrets.ANDROID_MESSAGING_SENDER_ID }}
+          ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
+          EOF
+
       # ------------------------------
       # Build iOS IPA (NO CODESIGN)
       # Flutter will generate the .ipa automatically.
