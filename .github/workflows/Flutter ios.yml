@@ -32,16 +32,9 @@ jobs:
       #   run: flutter test || true
 
 
-      ############################################################
-      # 🟢 STEP 1: Build iOS (Creates `.xcarchive`)
-      ############################################################
-      - name: 🍏 Build iOS (No Codesign)
-        run: flutter build ios --release --no-codesign
+      - name: 🍏 Build IPA (Generate xcarchive)
+        run: flutter build ipa --no-codesign --export-method ad-hoc
 
-
-      ############################################################
-      # 🟢 STEP 2: Create ExportOptions.plist for Xcode
-      ############################################################
       - name: 📝 Create ExportOptions.plist
         run: |
           cat > ios/ExportOptions.plist <<EOF
@@ -51,7 +44,7 @@ jobs:
           <plist version="1.0">
           <dict>
               <key>method</key>
-              <string>app-store</string>
+              <string>ad-hoc</string>
               <key>signingStyle</key>
               <string>manual</string>
               <key>destination</key>
@@ -63,11 +56,7 @@ jobs:
           </dict>
           </plist>
           EOF
-
-
-      ############################################################
-      # 🟢 STEP 3: Export UNSIGNED IPA using Xcode
-      ############################################################
+      
       - name: 📦 Export IPA From Xcode Archive
         run: |
           mkdir -p build/ios/ipa
@@ -75,17 +64,17 @@ jobs:
             -archivePath build/ios/archive/Runner.xcarchive \
             -exportPath build/ios/ipa \
             -exportOptionsPlist ios/ExportOptions.plist
-
-
-      ############################################################
-      # 🟢 STEP 4: Upload IPA Artifact to GitHub
-      ############################################################
-      - name: 📤 Upload IPA Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-ipa
-          path: build/ios/ipa/*.ipa
-
+      
+      
+            ############################################################
+            # 🟢 STEP 4: Upload IPA Artifact to GitHub
+            ############################################################
+            - name: 📤 Upload IPA Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: ios-ipa
+                path: build/ios/ipa/*.ipa
+      
 
 
   ################################################################
