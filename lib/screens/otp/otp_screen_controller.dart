@@ -97,6 +97,9 @@ class VerifyOtpController extends GetxController with CodeAutoFill {
     print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
 
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
+  final notif = Get.find<NotificationController>();
+  notif.updateToken(data.accessToken!);         // update token in controller
+  notif.service.updateToken(data.accessToken!); 
     if (referral.isNotEmpty) {
       await Get.find<LoginController>().applyReferralCode(referral);
     }

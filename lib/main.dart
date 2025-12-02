@@ -1,7 +1,8 @@
-
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,7 +11,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:saoirse_app/constants/app_constant.dart';
 import 'package:saoirse_app/screens/notification/notification_controller.dart';
+import 'package:saoirse_app/services/notification_service_helper.dart';
 
 import 'constants/app_colors.dart';
 import 'constants/app_strings.dart';
@@ -22,6 +25,11 @@ import 'services/appsflyer_service.dart';
 //storage instance
 GetStorage storage = GetStorage();
 
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  log("🟡 Background Message Received: ${message.notification?.title}");
+  NotificationServiceHelper.showFlutterNotification(message);
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
@@ -29,28 +37,65 @@ Future<void> main() async {
   await dotenv.load(fileName: ".env");
   Platform.isIOS
       ? await Firebase.initializeApp(
-          options: const FirebaseOptions(
-          apiKey: 'AIzaSyDpQb5HVM28WGffCCwrMmNs9luxSMFyaBY',
-          appId: '1:486829564070:ios:07e32a618113ab29479467',
-          messagingSenderId: '486829564070',
-          projectId: 'saoirse-epi',
+          options:  FirebaseOptions(
+          apiKey: dotenv.env['IOS_API_KEY']?? '',
+          appId: dotenv.env['IOS_APP_ID'] ?? '',
+          messagingSenderId: dotenv.env['IOS_MESSAGING_SENDER_ID'] ?? '',
+          projectId: dotenv.env['IOS_PROJECT_ID'] ?? '',
         ))
       : await Firebase.initializeApp(
           options: FirebaseOptions(
-          apiKey: 'AIzaSyCxnv1w6XLZhEd0E_WZU3cXk8D3qh5Ssg0',
-          appId: '1:486829564070:android:74e217e102e40a69479467',
-          messagingSenderId: '486829564070',
-          projectId: 'saoirse-epi',
+          apiKey: dotenv.env['ANDROID_API_KEY'] ?? '',
+          appId: dotenv.env['ANDROID_APP_ID'] ?? '',
+          messagingSenderId: dotenv.env['ANDROID_MESSAGING_SENDER_ID'] ?? '',
+          projectId: dotenv.env['ANDROID_PROJECT_ID'] ?? '',
         ));
+    
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+     log("📌 FCM TOKEN: $fcmToken");
+  // Background handler registration
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  // Request permission
+  await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  // 📌 Local Notification Initialization
+  await NotificationServiceHelper.initializeLocalNotifications();
 
   String? lang = storage.read('language') ?? 'en';
   Locale locale = Locale(lang);
 
   // 🔥 REGISTER CONTROLLERS FIRST
-  Get.put(NotificationController(), permanent: true);
+  final notif = Get.put(NotificationController(), permanent: true);
 
+  // Restore token if already logged in
+  final savedToken = storage.read(AppConst.ACCESS_TOKEN);
+  if (savedToken != null) {
+    notif.updateToken(savedToken);
+  }
 
+  // 🟢 Foreground message listener
+  FirebaseMessaging.onMessage.listen((message) {
+    log("🟢 Foreground Msg Received: ${message.notification?.title}");
+    NotificationServiceHelper.showFlutterNotification(message);
+  });
 
+  // 🔵 User taps notification (when app is in background)
+  FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    log("🔵 Notification clicked: ${message.data}");
+    NotificationServiceHelper.handleNotificationTap(message.data);
+  });
+
+  // 🔴 Terminated → user taps notification
+  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+    log("🟥 Terminated state → Notification tapped");
+    NotificationServiceHelper.handleNotificationTap(initialMessage.data);
+  }
 
   runApp(MyApp(locale: locale));
 }

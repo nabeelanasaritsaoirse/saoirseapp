@@ -11,7 +11,17 @@ import '../models/notification_response.dart';
 import '../services/api_service.dart';
 
 class NotificationService {
-  final token = storage.read(AppConst.ACCESS_TOKEN);
+   String? token; // IMPORTANT: dynamic token
+
+  void updateToken(String newToken) {
+    token = newToken;
+    log("🔑 NotificationService token updated: $token");
+  }
+
+  Map<String, String> get headers => {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json"
+      };
 
   // Fetch Notifications with pagination
   Future<NotificationResponse?> fetchNotifications(int page, int limit) async {
@@ -22,9 +32,7 @@ class NotificationService {
 
       final response = await APIService.getRequest(
         url: url,
-        headers: {
-          "Authorization": "Bearer $token",
-        },
+        headers: headers,
         onSuccess: (data) => data,
       );
 
@@ -44,9 +52,7 @@ class NotificationService {
 
       final response = await APIService.getRequest(
         url: url,
-        headers: {
-          "Authorization": "Bearer $token",
-        },
+        headers:  headers,
         onSuccess: (data) => data,
       );
 
@@ -68,9 +74,7 @@ class NotificationService {
 
     final response = await APIService.getRequest(
       url: url,
-      headers: {
-        "Authorization": "Bearer $token",
-      },
+      headers:  headers,
       onSuccess: (data) => data,
     );
 
@@ -91,9 +95,7 @@ Future<Map<String, dynamic>?> toggleLike(String notificationId) async {
 
     final response = await APIService.postRequest(
       url: url,
-      headers: {
-        "Authorization": "Bearer $token",
-      },
+      headers:  headers,
       onSuccess: (data) => data,
     );
 
@@ -112,9 +114,7 @@ Future<bool> markAsRead(String notificationId) async {
     final response = await APIService.postRequest(
       url: url,
       onSuccess: (data) => data,
-      headers: {
-        "Authorization": "Bearer $token",
-      },
+      headers:  headers,
     );
      
      if (response != null) {
@@ -145,10 +145,7 @@ Future<Map<String, dynamic>?> addComment({
     final response = await APIService.postRequest(
       url: url,
       body: body,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json"
-      },
+      headers:  headers,
       onSuccess: (data) => data,
     );
 
@@ -177,10 +174,7 @@ Future<bool> registerFCMToken(String fcmToken) async {
     final response = await APIService.postRequest(
       url: url,
       body: body,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json"
-      },
+      headers:  headers,
       onSuccess: (data) => data,
     );
 
@@ -207,9 +201,7 @@ Future<bool> removeFCMToken() async {
     final response = await APIService.postRequest(
       url: url,
       body: {}, // empty body
-      headers: {
-        "Authorization": "Bearer $token",
-      },
+      headers:  headers,
       onSuccess: (data) => data,
     );
 
