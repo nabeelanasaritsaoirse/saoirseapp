@@ -90,12 +90,13 @@ jobs:
             echo "}"
           } > ~/.appstoreconnect/api_key.json
 
-      # ------------------------------
-      # Upload to TestFlight
-      # ------------------------------
       - name: 🚀 Upload to TestFlight
         run: |
           fastlane pilot upload \
             --ipa release/*.ipa \
             --api_key_path ~/.appstoreconnect/api_key.json \
+            --bundle_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
+            --app_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
+            --apple_id "${{ secrets.APPLE_ID }}" \
+            --itc_provider "${{ secrets.APP_STORE_TEAM_ID }}" \
             --skip_waiting_for_build_processing true
