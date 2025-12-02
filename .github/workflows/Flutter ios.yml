@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: read
+  checks: write
+  pull-requests: write
 
 jobs:
   ios-ci:
@@ -16,72 +18,52 @@ jobs:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: ⚙️ Setup Flutter (Stable)
+      - name: ⚙️ Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.7'
-          channel: 'stable'
+          flutter-version: "3.35.7"
+          channel: stable
 
       - name: 📦 Install Dependencies
         run: flutter pub get
 
-      # - name: 🔍 Lint
-      #   run: flutter analyze || true
+      - name: 🔍 Lint
+        run: flutter analyze || true
 
-      # - name: 🧪 Tests
-      #   run: flutter test || true
+      - name: 🧪 Tests
+        run: flutter test || true
 
+      # ------------------------------
+      # Build iOS IPA (NO CODESIGN)
+      # Flutter will generate the .ipa automatically.
+      # ------------------------------
+      - name: 🍏 Build iOS IPA (No Codesign)
+        run: flutter build ipa --no-codesign
 
-      - name: 🍏 Build IPA (Generate xcarchive)
-        run: flutter build ipa --no-codesign --export-method ad-hoc
-
-      - name: 📝 Create ExportOptions.plist
+      # ------------------------------
+      # DEBUG where the IPA is created
+      # ------------------------------
+      - name: 🕵️ Debug IPA Location
         run: |
-          cat > ios/ExportOptions.plist <<EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-          "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>ad-hoc</string>
-              <key>signingStyle</key>
-              <string>manual</string>
-              <key>destination</key>
-              <string>export</string>
-              <key>stripSwiftSymbols</key>
-              <true/>
-              <key>compileBitcode</key>
-              <false/>
-          </dict>
-          </plist>
-          EOF
-      
-      - name: 📦 Export IPA From Xcode Archive
-        run: |
-          mkdir -p build/ios/ipa
-          xcodebuild -exportArchive \
-            -archivePath build/ios/archive/Runner.xcarchive \
-            -exportPath build/ios/ipa \
-            -exportOptionsPlist ios/ExportOptions.plist
-      
-      
-            ############################################################
-            # 🟢 STEP 4: Upload IPA Artifact to GitHub
-            ############################################################
-            - name: 📤 Upload IPA Artifact
-              uses: actions/upload-artifact@v4
-              with:
-                name: ios-ipa
-                path: build/ios/ipa/*.ipa
-      
+          echo "🔍 Searching for IPA files..."
+          find build -name "*.ipa" -print
 
+      # ------------------------------
+      # Upload IPA Artifact (auto-detect path)
+      # ------------------------------
+      - name: 📤 Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: |
+            build/**/*.ipa
+          if-no-files-found: error
 
-  ################################################################
-  # 🟣 DEPLOY TO TESTFLIGHT (Using API Key Only)
-  ################################################################
+  # -----------------------------------------
+  # DEPLOY JOB (UPLOAD IPA TO TESTFLIGHT)
+  # -----------------------------------------
   ios-deploy:
-    name: "🚀 Deploy to TestFlight"
+    name: "🚀 iOS Deploy to TestFlight"
     runs-on: macos-latest
     needs: ios-ci
     if: github.ref == 'refs/heads/developer'
@@ -99,19 +81,21 @@ jobs:
       - name: 🚀 Install Fastlane
         run: sudo gem install fastlane
 
+      # ------------------------------
+      # Setup App Store Connect API key
+      # ------------------------------
       - name: 🔐 Setup App Store Connect API Key
         run: |
           mkdir -p ~/.appstoreconnect
           echo "{
             \"key_id\": \"${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}\",
             \"issuer_id\": \"${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}\",
-            \"key\": \"${{ secrets.APP_STORE_CONNECT_API_KEY }}\"
+            \"key\": \"$(echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | sed 's/$/\\n/')\"
           }" > ~/.appstoreconnect/api_key.json
 
-
-      ############################################################
-      # 🟢 STEP 5: Upload to TestFlight
-      ############################################################
+      # ------------------------------
+      # Upload to TestFlight
+      # ------------------------------
       - name: 🚀 Upload to TestFlight
         run: |
           fastlane pilot upload \
