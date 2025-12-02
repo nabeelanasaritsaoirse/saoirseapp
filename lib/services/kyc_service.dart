@@ -1,119 +1,115 @@
-import 'dart:convert';
+
+
 import 'dart:developer';
-import 'dart:io';
-
-import 'package:http/http.dart' as http;
-
-import 'package:saoirse_app/screens/kyc/kyc_controller.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '/constants/app_constant.dart';
 import '/constants/app_urls.dart';
-
-import '/main.dart';
 import '/models/LoginAuth/kycModel.dart';
 import '/services/api_service.dart';
+import 'package:http/http.dart' as http;
+
+enum DocumentType { aadhaar, pan }
 
 class KycServices {
+  final storage = GetStorage();
+
+  /// ================================================================
+  /// GET KYC STATUS
+  /// ================================================================
   Future<KycModel?> getKyc() async {
     final token = storage.read(AppConst.ACCESS_TOKEN);
 
+    if (token == null || token.isEmpty) {
+      log("❌ No token found for GET KYC");
+      return null;
+    }
+
+    log("📌 GET KYC → ${AppURLs.KYC_API}");
+
     try {
-      final url = AppURLs.KYC_API;
-
-      log("KYC API URL: $url");
-      log("TOKEN: $token");
-
-      if (token == null || token.isEmpty) {
-        log("NO TOKEN FOUND IN STORAGE");
-        return null;
-      }
-
       KycModel? model;
 
       await APIService.getRequest(
-        url: url,
+        url: AppURLs.KYC_API,
         headers: {
-          'Authorization': 'Bearer $token', // FIXED
-          'Content-Type': 'application/json',
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
         },
         onSuccess: (json) {
-          log("KYC JSON: $json");
+          log("📥 KYC RESPONSE: $json");
           model = KycModel.fromJson(json);
         },
       );
 
       return model;
-    } catch (e) {
-      log("KYC API ERROR: $e");
+    } catch (e, s) {
+      log("❌ KYC GET ERROR: $e");
+      log(s.toString());
       return null;
     }
   }
 
-  Future<bool> uploadDocument({
-    required DocumentType docType,
-    required File front,
-    File? back,
+  /// ================================================================
+  /// SUBMIT KYC DOCUMENTS (MULTIPART FILES)
+  /// ================================================================
+  ///
+  ///  This function matches the KycController:
+  ///  
+  ///   - type (aadhaar / pan)
+  ///   - front (file)
+  ///   - back (file? optional)
+  ///
+  Future<bool> submitKycMultipart({
+    required String docType,
+    required http.MultipartFile frontFile,
+    http.MultipartFile? backFile,
   }) async {
     final token = storage.read(AppConst.ACCESS_TOKEN);
-    final url = AppURLs.KYC_POST_API;
 
     if (token == null || token.isEmpty) {
-      log("uploadDocument: no token found");
+      log("❌ No token found for POST KYC");
       return false;
     }
 
+    log("📤 SUBMITTING KYC → ${AppURLs.KYC_POST_API}");
+
     try {
-      log("uploadDocument -> url: $url");
-      log("uploadDocument -> docType: $docType");
-      log("uploadDocument -> front path: ${front.path} (${await front.length()} bytes)");
-      if (back != null) {
-        log("uploadDocument -> back path: ${back.path} (${await back.length()} bytes)");
-      }
+      var request = http.MultipartRequest(
+        "POST",
+        Uri.parse(AppURLs.KYC_POST_API),
+      );
 
-      final request = http.MultipartRequest("POST", Uri.parse(url));
+      // Headers
+      request.headers.addAll({
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+      });
 
-      // Required headers (don't set content-type yourself for MultipartRequest)
-      request.headers['Authorization'] = 'Bearer $token';
-      log("KYC API POST $token ");
+      // Body fields
+      request.fields["type"] = docType;
 
-      // Fields (use the names expected by your backend)
-      // If your backend expects 'document_type' use that; adjust if needed.
-      request.fields['document_type'] =
-          docType == DocumentType.aadhaar ? 'aadhaar' : 'pan';
+      // Files
+      request.files.add(frontFile);
+      if (backFile != null) request.files.add(backFile);
 
-      // Attach files — use field names your backend expects. I used "front_image"/"back_image".
-      request.files
-          .add(await http.MultipartFile.fromPath('front_image', front.path));
+      // Send
+      var streamed = await request.send();
+      var response = await http.Response.fromStream(streamed);
 
-      if (docType == DocumentType.aadhaar && back != null) {
-        request.files
-            .add(await http.MultipartFile.fromPath('back_image', back.path));
-      }
+      log("📥 RESPONSE CODE: ${response.statusCode}");
+      log("📥 RESPONSE BODY: ${response.body}");
 
-      final streamedResp = await request.send();
-
-      // Read response body fully (important to debug)
-      final respStr = await streamedResp.stream.bytesToString();
-      log("uploadDocument -> status: ${streamedResp.statusCode}");
-      log("uploadDocument -> body: $respStr");
-
-      // Try to parse JSON body if present to inspect server message
-      try {
-        final parsed = json.decode(respStr);
-        log("uploadDocument -> parsedResponse: $parsed");
-      } catch (_) {
-        // Not JSON — ignore parse error (we already logged the raw body)
-      }
-
-      // treat any 2xx as success
-      if (streamedResp.statusCode >= 200 && streamedResp.statusCode < 300) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
-      } else {
-        return false;
       }
-    } catch (e, st) {
-      log("uploadDocument EXCEPTION: $e\n$st");
+
+      return false;
+    } catch (e, s) {
+      log("❌ KYC MULTIPART ERROR: $e");
+      log(s.toString());
       return false;
     }
   }
 }
+
