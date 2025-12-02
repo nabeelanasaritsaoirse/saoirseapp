@@ -40,6 +40,14 @@ jobs:
       - name: 🍏 Build iOS (No Codesign)
         run: flutter build ipa --no-codesign
 
+      - name: 📦 Create IPA from Xcode Archive
+        run: |
+          mkdir -p build/ios/ipa
+          xcodebuild -exportArchive \
+            -archivePath build/ios/archive/Runner.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist ios/ExportOptions.plist
+
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
