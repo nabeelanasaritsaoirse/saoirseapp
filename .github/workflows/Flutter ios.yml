@@ -93,10 +93,10 @@ jobs:
       - name: 🚀 Upload to TestFlight
         run: |
           fastlane pilot upload \
-            --ipa release/*.ipa \
-            --api_key_path ~/.appstoreconnect/api_key.json \
-            --bundle_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
-            --app_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
+            --ipa app.ipa \
             --apple_id "${{ secrets.APPLE_ID }}" \
+            --app_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
             --itc_provider "${{ secrets.APP_STORE_TEAM_ID }}" \
             --skip_waiting_for_build_processing true
+        env:
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
