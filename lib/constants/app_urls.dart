@@ -41,6 +41,7 @@ class AppURLs {
   static String Wallet = BASE_API + "api/wallet";
   static String WALLET_TRANSACTIONS = BASE_API + "api/wallet/transactions";
   static String ADD_MONEY_WALLET = BASE_API + "api/wallet/add-money";
+  static String WITHDRAWAL_API = BASE_API + "api/wallet/withdraw";
 
   // Category api
   static String CATEGORY_API =
@@ -102,9 +103,13 @@ class AppURLs {
   //Log Out Api
   static String LOGOUT_API = BASE_API + "api/auth/logout";
 
-  // Pending Transaction (PAYMENT METHOD API)
+  // Pending Transaction (BEFORE PAYMENT METHOD API RESPONSE)
   static String PENDING_TRANSACTION_PAYMENT_RESPONSE =
       BASE_API + "api/installments/payments/create-combined-razorpay";
+
+  // Pending Transaction (AFTER PAYMENT METHOD API )
+  static String PENDING_TRANSACTION_PAY_DAILY_SELECTED =
+      BASE_API + "api/installments/payments/pay-daily-selected";
 
   // Sub Category Order Listing Page
   static String PRODUCT_LISTING_SUBCATEGORY =

@@ -1,8 +1,12 @@
 // ignore_for_file: avoid_print
 
+import 'dart:developer';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:saoirse_app/screens/notification/notification_controller.dart';
 
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
@@ -12,20 +16,46 @@ import '../../services/auth_service.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../login/login_controller.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 
-class VerifyOtpController extends GetxController {
+class VerifyOtpController extends GetxController with CodeAutoFill {
   VerifyOtpController({
     required this.phoneNumber,
     required this.referral,
     required this.username,
   });
-  final List<TextEditingController> otpControllers =
-      List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> otpControllers = List.generate(6, (index) => TextEditingController());
+  final List<FocusNode> focusNodes = List.generate(6, (index) => FocusNode());//new
 
   var isLoading = false.obs;
   final String phoneNumber;
   final String username;
   final String referral;
+
+  //-----------------------OTP AUTO FILL--------------------------//
+    @override
+  void onInit() {
+    super.onInit();
+    SmsAutoFill().listenForCode();   // <-- Start listening for OTP SMS
+  }
+  
+   @override
+  void codeUpdated() {
+    if (code != null && code!.length == 6) {
+      autoFillOTP(code!);  // <-- Auto-fill the 6 boxes
+    }
+  }
+
+    void autoFillOTP(String smsCode) {
+    for (int i = 0; i < 6; i++) {
+      otpControllers[i].text = smsCode[i];
+    }
+
+    // Move focus to end
+    focusNodes.last.requestFocus();
+  }
+
+  //--------------------------------------------------------------//
 
   /// STEP 1 — Verify OTP (Firebase)
   verifyOtp() async {
@@ -81,6 +111,24 @@ class VerifyOtpController extends GetxController {
       isLoading.value = false;
       return;
     }
+
+    final fcmToken = await getDeviceToken();
+    if (fcmToken != null) {
+      log("Assign FCM token to the registerFCM function : $fcmToken");
+      Get.find<NotificationController>().registerFCM(fcmToken);
+    }
+
+    /// ✅ STEP 5 — TOKEN REFRESH LISTENER (Only after login)
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      log("🔄 New FCM token generated: $newToken");
+
+      final accessToken = storage.read(AppConst.ACCESS_TOKEN);
+      if (accessToken != null) {
+        Get.find<NotificationController>().registerFCM(newToken);
+      } else {
+        log("⚠ User logged out — skipping FCM refresh update");
+      }
+    });
 
     print("User Updated Successfully!");
 
@@ -140,10 +188,10 @@ class VerifyOtpController extends GetxController {
   Future<String?> getDeviceToken() async {
     try {
       final token = await FirebaseMessaging.instance.getToken();
-      print("FCM Token: $token");
+      log("FCM Token: $token");
       return token;
     } catch (e) {
-      print("FCM TOKEN ERROR: $e");
+      log("FCM TOKEN ERROR: $e");
       return null;
     }
   }
@@ -153,4 +201,18 @@ class VerifyOtpController extends GetxController {
     appToast(
         content: "Resending OTP...A new OTP has been sent to your number.");
   }
+
+//------------------new-----------------------------
+  @override
+ void onClose() {
+  cancel(); 
+  // Dispose focus nodes
+  for (var node in focusNodes) {
+    node.dispose();
+  }
+  for (var controller in otpControllers) {
+    controller.dispose();
+  }
+  super.onClose();
+}
 }

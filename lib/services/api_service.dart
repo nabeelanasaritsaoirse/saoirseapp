@@ -18,143 +18,112 @@ class APIService {
   static bool internet = false;
 
 //  Post Request Funtion
-  static Future<T?> postRequest<T>({
-    required String url,
-    required Map<String, dynamic> body,
-    required T Function(Map<String, dynamic>) onSuccess,
-    Map<String, String>? headers,
-    int timeoutSeconds = 15,
-  }) async {
-    try {
-      log("post: $url");
+ static Future<T?> postRequest<T>({
+  required String url,
+  Map<String, dynamic>? body,      
+  required T Function(Map<String, dynamic>) onSuccess,
+  Map<String, String>? headers,
+  int timeoutSeconds = 15,
+}) async {
+  try {
+    log("POST → $url");
+
+    if (body != null) {
       debugPrint("body: $body", wrapWidth: 1024);
-
-      final response = await http
-          .post(
-            Uri.parse(url),
-            body: jsonEncode(body),
-            headers: headers ??
-                {
-                  "Content-Type": "application/json",
-                },
-          )
-          .timeout(Duration(seconds: timeoutSeconds));
-
-      log("Response [${response.statusCode}]: ${response.body}");
-
-      // Handle response codes
-      switch (response.statusCode) {
-        case 200:
-        case 201:
-          final data = jsonDecode(response.body);
-
-          if (data is! Map<String, dynamic>) {
-            appToast(
-              title: "Error",
-              content: "Invalid response format received from server.",
-              error: true,
-            );
-            return null;
-          }
-
-          return onSuccess(data);
-
-        case 204:
-          appToast(
-            content: "No data available.",
-            error: true,
-          );
-          return null;
-
-        case 400:
-          appToast(
-            content: "Bad request. Check parameters.",
-            error: true,
-          );
-          return null;
-
-        case 401:
-          appToast(
-            content: "Unauthorized. Please log in again.",
-            error: true,
-          );
-          return null;
-
-        case 403:
-          appToast(
-            content: "Forbidden. Access denied.",
-            error: true,
-          );
-          return null;
-
-        case 404:
-          appToast(
-            content: "Resource not found (404).",
-            error: true,
-          );
-          return null;
-
-        case 408:
-          appToast(
-            content: "Request timeout. Try again later.",
-            error: true,
-          );
-          return null;
-
-        case 429:
-          appToast(
-            content: "Too many requests. Try again later.",
-            error: true,
-          );
-          return null;
-
-        default:
-          if (response.statusCode >= 500) {
-            appToast(
-              content: "Server error (${response.statusCode}). Try later.",
-              error: true,
-            );
-          } else {
-            appToast(
-              content:
-                  "Unexpected error (${response.statusCode}). Please try again.",
-              error: true,
-            );
-          }
-          return null;
-      }
-    } on SocketException {
-      appToast(
-        content: "No internet connection. Check your network.",
-        error: true,
-      );
-      return null;
-    } on FormatException {
-      appToast(
-        content: "Invalid response format.",
-        error: true,
-      );
-      return null;
-    } on TimeoutException {
-      appToast(
-        content: "Request timed out. Please try again.",
-        error: true,
-      );
-      return null;
-    } on http.ClientException catch (e) {
-      appToast(
-        content: "Network error occurred: $e",
-        error: true,
-      );
-      return null;
-    } catch (e) {
-      appToast(
-        content: "Something went wrong: ${e.toString()}",
-        error: true,
-      );
-      return null;
+    } else {
+      debugPrint("body: <EMPTY>", wrapWidth: 1024);
     }
+
+    final response = await http
+        .post(
+          Uri.parse(url),
+          body: body != null ? jsonEncode(body) : null,   
+          headers: headers ??
+              {
+                "Content-Type": "application/json",
+              },
+        )
+        .timeout(Duration(seconds: timeoutSeconds));
+
+    log("Response [${response.statusCode}]: ${response.body}");
+
+    switch (response.statusCode) {
+      case 200:
+      case 201:
+        final data = jsonDecode(response.body);
+
+        if (data is! Map<String, dynamic>) {
+          appToast(
+            title: "Error",
+            content: "Invalid response format received from server.",
+            error: true,
+          );
+          return null;
+        }
+
+        return onSuccess(data);
+
+      case 204:
+        appToast(content: "No data available.", error: true);
+        return null;
+
+      case 400:
+        appToast(content: "Bad request. Check parameters.", error: true);
+        return null;
+
+      case 401:
+        appToast(content: "Unauthorized. Please log in again.", error: true);
+        return null;
+
+      case 403:
+        appToast(content: "Forbidden. Access denied.", error: true);
+        return null;
+
+      case 404:
+        appToast(content: "Resource not found (404).", error: true);
+        return null;
+
+      case 408:
+        appToast(content: "Request timeout. Try again later.", error: true);
+        return null;
+
+      case 429:
+        appToast(content: "Too many requests. Try again later.", error: true);
+        return null;
+
+      default:
+        if (response.statusCode >= 500) {
+          appToast(
+            content: "Server error (${response.statusCode}). Try later.",
+            error: true,
+          );
+        } else {
+          appToast(
+            content:
+                "Unexpected error (${response.statusCode}). Please try again.",
+            error: true,
+          );
+        }
+        return null;
+    }
+  } on SocketException {
+    appToast(content: "No internet connection. Check your network.", error: true);
+    return null;
+  } on FormatException {
+    appToast(content: "Invalid response format.", error: true);
+    return null;
+  } on TimeoutException {
+    appToast(content: "Request timed out. Please try again.", error: true);
+    return null;
+  } on http.ClientException catch (e) {
+    appToast(content: "Network error occurred: $e", error: true);
+    return null;
+  } catch (e) {
+    appToast(content: "Something went wrong: ${e.toString()}", error: true);
+    return null;
   }
+}
+
 
 //  Get Request Funtion
   static Future<T?> getRequest<T>({

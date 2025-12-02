@@ -270,16 +270,37 @@ class SelectPlanSheet extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 /// Radio Button (visual only)
-                                Radio<int>(
-                                  value: index,
-                                  groupValue:
-                                      controller.selectedPlanIndex.value == -1
-                                          ? null
-                                          : controller.selectedPlanIndex.value,
-                                  onChanged: (_) {
-                                    // We handle everything in InkWell.onTap
+                                GestureDetector(
+                                  onTap: () {
+                                    if (controller.selectedPlanIndex.value ==
+                                        index) {
+                                      controller.selectedPlanIndex.value = -1;
+                                      controller.customDays.value = 0;
+                                      controller.customAmount.value = 0;
+                                    } else {
+                                      controller.selectApiPlan(index);
+                                    }
                                   },
-                                  activeColor: AppColors.primaryColor,
+                                  child: Radio<int>(
+                                    value: index,
+                                    groupValue:
+                                        controller.selectedPlanIndex.value == -1
+                                            ? null
+                                            : controller
+                                                .selectedPlanIndex.value,
+                                    activeColor: AppColors.primaryColor,
+                                    onChanged: (_) {
+                                  
+                                      if (controller.selectedPlanIndex.value ==
+                                          index) {
+                                        controller.selectedPlanIndex.value = -1;
+                                        controller.customDays.value = 0;
+                                        controller.customAmount.value = 0;
+                                      } else {
+                                        controller.selectApiPlan(index);
+                                      }
+                                    },
+                                  ),
                                 ),
 
                                 /// Plan Content

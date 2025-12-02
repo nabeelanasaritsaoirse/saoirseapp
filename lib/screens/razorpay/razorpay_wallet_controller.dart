@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:saoirse_app/screens/transaction_succsess/transactionSuccsess.dart';
 
 import '../../models/razorpay_payment_response.dart';
 import '../../services/payment_service.dart';
@@ -12,7 +13,7 @@ class RazorpayWalletController extends GetxController {
   late Razorpay razorpay;
 
   // Wallet-specific order ID (internal order)
-  String walletOrderId = "";
+  String transactionId = "";
 
   @override
   void onInit() {
@@ -35,8 +36,8 @@ class RazorpayWalletController extends GetxController {
     required String rpOrderId,
     required int amount,
   }) {
-    walletOrderId = internalOrderId;
-
+    transactionId = internalOrderId;
+   log("Transaction id ===================> $internalOrderId");
     openCheckout(
       razorpayOrderId: rpOrderId,
       amount: amount,
@@ -107,10 +108,11 @@ class RazorpayWalletController extends GetxController {
       appLoader();
 
       final body = {
-        "orderId": walletOrderId,
-        "razorpayOrderId": data.orderId,
-        "razorpayPaymentId": data.paymentId,
-        "razorpaySignature": data.signature,
+        
+        "razorpay_order_id": data.orderId,
+        "razorpay_payment_id": data.paymentId,
+        "razorpay_signature": data.signature,
+        "transaction_id": transactionId,
       };
 
       log("Verify Wallet Payment Body => $body");
@@ -123,9 +125,9 @@ class RazorpayWalletController extends GetxController {
         appToast(content: "Money Added to Wallet Successfully!");
 
         // Optionally: refresh wallet screen
-        // Get.find<WalletController>().fetchBalance();
+        Get.to(Transactionsuccsess());
 
-        Get.back(); // Close Add Money Screen
+        // Close Add Money Screen
       } else {
         appToast(
           error: true,

@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/dashboard/dashboard_screen.dart';
+import 'package:saoirse_app/screens/my_wallet/my_wallet.dart';
 
 import '../../constants/app_strings.dart';
 import '../dashboard/dashboard_controller.dart';
@@ -61,10 +63,10 @@ class _TransactionsuccsessState extends State<Transactionsuccsess> {
                 height: 45.h,
                 width: 300.w,
                 buttonColor: AppColors.primaryColor,
-                onTap: () {
-                  final dashboard = Get.find<DashboardController>();
-                  dashboard.changeTab(0);
-                },
+              onTap: () {
+  // Just close the success screen and go back to the Wallet screen
+  Get.off(() => WalletScreen());
+},
               )
             ],
           ),
