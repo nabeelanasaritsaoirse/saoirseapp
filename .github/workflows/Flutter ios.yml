@@ -37,27 +37,22 @@ jobs:
       # Build iOS IPA (NO CODESIGN)
       # Flutter will generate the .ipa automatically.
       # ------------------------------
-      - name: 🍏 Build iOS IPA (No Codesign)
-        run: flutter build ipa --no-codesign
+      - name: 🍏 Build iOS (No Codesign)
+        run: flutter build ios --release --no-codesign
 
-      # ------------------------------
-      # DEBUG where the IPA is created
-      # ------------------------------
-      - name: 🕵️ Debug IPA Location
+      - name: 📦 Package .app into unsigned IPA
         run: |
-          echo "🔍 Searching for IPA files..."
-          find build -name "*.ipa" -print
+          cd build/ios/archive/Runner.xcarchive/Products/Applications
+          zip -r Runner.ipa Runner.app
+          mkdir -p $GITHUB_WORKSPACE/ipa-out
+          mv Runner.ipa $GITHUB_WORKSPACE/ipa-out/
 
-      # ------------------------------
-      # Upload IPA Artifact (auto-detect path)
-      # ------------------------------
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
-          path: |
-            build/**/*.ipa
-          if-no-files-found: error
+          path: ipa-out/Runner.ipa
+
 
   # -----------------------------------------
   # DEPLOY JOB (UPLOAD IPA TO TESTFLIGHT)
