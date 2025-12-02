@@ -7,168 +7,236 @@ import '/constants/app_colors.dart';
 import '/screens/kyc/kyc_controller.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
-import '/widgets/app_text_field.dart';
 
-class kycScreen extends StatefulWidget {
-   final String kycStatus;
-  // Options: "not_submitted", "pending", "approved", "auto_approved", "rejected"
+class KycScreen extends StatelessWidget {
+  KycScreen({super.key});
 
- const  kycScreen({super.key, required this.kycStatus});
-
-  @override
-  State<kycScreen> createState() => _kycScreenState();
-}
-
-class _kycScreenState extends State<kycScreen> {
-  kyc_controller controller = Get.put(kyc_controller());
+  final controller = Get.put(KycController());
 
   @override
   Widget build(BuildContext context) {
-    Widget body;
-
-    switch (widget.kycStatus) {
-      case "not_submitted":
-        body = NotSubmittedUI();
-        break;
-      case "pending":
-        body = const PendingUI();
-        break;
-      case "approved":
-        body = const ApprovedUI(isAuto: false);
-        break;
-      case "auto_approved":
-        body = const ApprovedUI(isAuto: true);
-        break;
-      case "rejected":
-        body = const RejectedUI();
-        break;
-      default:
-        body = const Center(child: Text("Unknown state"));
-    }
-
     return Scaffold(
       appBar: AppBar(
-          leading: GestureDetector(
-            child: Icon(
-              Icons.arrow_back_ios,
-              size: 25.sp,
-              color: AppColors.white,
-            ),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          backgroundColor: AppColors.primaryColor,
-          title:
-              appText("KYC Status", color: AppColors.white, fontSize: 25.sp)),
-      body: body,
+        title: appText("KYC Status", fontSize: 25, color: AppColors.white),
+        backgroundColor: AppColors.primaryColor,
+      ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (controller.errorMessage.isNotEmpty) {
+          return Center(child: Text(controller.errorMessage.value));
+        }
+
+        if (controller.kyc.value == null) {
+          return const Center(child: Text("No KYC data found"));
+        }
+
+        final status = controller.kyc.value!.status;
+
+        switch (status) {
+          case "not_submitted":
+            return const NotSubmittedUI();
+          case "pending":
+            return const PendingUI();
+          case "approved":
+            return const ApprovedUI(isAuto: false);
+          case "auto_approved":
+            return const ApprovedUI(isAuto: true);
+          case "rejected":
+            return const RejectedUI();
+          default:
+            return const Center(child: Text("Unknown KYC State"));
+        }
+      }),
     );
   }
 }
 
 //
-// 
-//                 NOT SUBMITTED UI
-// 
 //
-class NotSubmittedUI extends StatefulWidget {
-  const NotSubmittedUI();
-
-  @override
-  State<NotSubmittedUI> createState() => _NotSubmittedUIState();
-}
-
-class _NotSubmittedUIState extends State<NotSubmittedUI> {
-  List<Map<String, String>> docs = [
-    {"type": "", "frontUrl": "", "backUrl": ""},
-  ];
-
-  void addDoc() {
-    setState(() {
-      docs.add({"type": "", "frontUrl": "", "backUrl": ""});
-    });
-  }
-
-  void removeDoc(int index) {
-    if (docs.length == 1) return;
-    setState(() {
-      docs.removeAt(index);
-    });
-  }
+//                 NOT SUBMITTED UI
+//
+//
+class NotSubmittedUI extends StatelessWidget {
+  const NotSubmittedUI({super.key});
 
   @override
   Widget build(BuildContext context) {
-    String? aadhaarError;
+    final controller = Get.find<KycController>();
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(16.r),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.info_outline, size: 70.sp, color: AppColors.orange),
           SizedBox(height: 8.h),
+
           appText("KYC Not Submitted",
               fontSize: 18.sp, fontWeight: FontWeight.bold),
-          SizedBox(height: 4.h),
-          appText("Please add your documents to continue.",
-              fontSize: 14.sp, fontWeight: FontWeight.w500),
-          SizedBox(height: 15.h),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: docs.length,
-            itemBuilder: (context, index) {
-              return Card(
-                elevation: 3,
-                margin: EdgeInsets.symmetric(vertical: 10.h),
-                child: Padding(
-                  padding: EdgeInsets.all(15.r),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: appTextField(
-                        controller: kyc_controller().AadhaarController,
-                        hintText: "Aadhaar / PAN",
-                        hintColor: AppColors.black,
-                      )),
-                      SizedBox(
-                        width: 4.w,
-                      ),
-                      GestureDetector(
-                        child: Icon(
-                          Icons.delete_outline,
-                          size: 30.sp,
-                        ),
-                        onTap: () => removeDoc(index),
-                      ),
-                    ],
+
+          SizedBox(height: 20.h),
+
+          //
+          // 🔥 1. SELECT DOCUMENT TYPE (Aadhaar/PAN)
+          //
+          appText("Select Document Type",
+              fontSize: 16.sp, fontWeight: FontWeight.w600),
+
+          SizedBox(height: 12.h),
+
+          Obx(() => Column(
+                children: [
+                  // Aadhaar CARD OPTION
+                  _docTypeOption(
+                    label: "Aadhaar Card",
+                    selected: controller.selectedDocType.value ==
+                        DocumentType.aadhaar,
+                    onTap: () {
+                      controller.selectedDocType.value = DocumentType.aadhaar;
+                      controller.backImage.value = null; // reset
+                    },
                   ),
-                ),
-              );
-            },
-          ),
+
+                  SizedBox(height: 10.h),
+
+                  // PAN CARD OPTION
+                  _docTypeOption(
+                    label: "PAN Card",
+                    selected:
+                        controller.selectedDocType.value == DocumentType.pan,
+                    onTap: () {
+                      controller.selectedDocType.value = DocumentType.pan;
+                      controller.backImage.value = null; // remove back image
+                    },
+                  ),
+                ],
+              )),
+
+          SizedBox(height: 25.h),
+
+          //
+          // 🔥 2. FRONT IMAGE UPLOAD
+          //
+          appText("Upload Front Image",
+              fontSize: 16.sp, fontWeight: FontWeight.w600),
+
           SizedBox(height: 10.h),
-          appButton(
-              buttonText: "+ Add Document",
-              onTap: addDoc,
-              buttonColor: AppColors.primaryColor),
-          SizedBox(
-            height: 20.h,
-          ),
-          appButton(
-              buttonText: "Submit KYC",
-              onTap: addDoc,
-              buttonColor: AppColors.primaryColor),
+
+          Obx(() => GestureDetector(
+                onTap: controller.pickFrontImage,
+                child: Container(
+                  height: 150.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.grey),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: controller.frontImage.value == null
+                      ? Center(child: appText("Tap to upload front image"))
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(12.r),
+                          child: Image.file(
+                            controller.frontImage.value!,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                ),
+              )),
+
+          SizedBox(height: 20.h),
+
+          //
+          // 🔥 3. BACK IMAGE ONLY IF DOCUMENT = AADHAAR
+          //
+          Obx(() => controller.selectedDocType.value == DocumentType.aadhaar
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    appText("Upload Back Image",
+                        fontSize: 16.sp, fontWeight: FontWeight.w600),
+                    SizedBox(height: 10.h),
+                    GestureDetector(
+                      onTap: controller.pickBackImage,
+                      child: Container(
+                        height: 150.h,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppColors.grey),
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: controller.backImage.value == null
+                            ? Center(child: appText("Tap to upload back image"))
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(12.r),
+                                child: Image.file(
+                                  controller.backImage.value!,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                  ],
+                )
+              : SizedBox()),
+
+          SizedBox(height: 25.h),
+
+          //
+          // 🔥 4. SUBMIT BUTTON
+          //
+          Obx(() => appButton(
+                buttonText:
+                    controller.isLoading.value ? "Uploading..." : "Submit KYC",
+                buttonColor: AppColors.primaryColor,
+                onTap: controller.uploadDocuments,
+              )),
         ],
+      ),
+    );
+  }
+
+  // REUSABLE UI COMPONENT
+  Widget _docTypeOption({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(14.r),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.r),
+          border: Border.all(
+            color: selected ? AppColors.primaryColor : AppColors.grey,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.credit_card,
+                color: selected ? AppColors.primaryColor : AppColors.black),
+            SizedBox(width: 10.w),
+            Expanded(child: appText(label, fontSize: 16.sp)),
+            Icon(
+              selected ? Icons.radio_button_checked : Icons.radio_button_off,
+              color: selected ? AppColors.primaryColor : AppColors.grey,
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-// // ElevatedButton.icon(
-
-// 
+//
+//
 // 2️⃣ PENDING UI
-// 
+//
 //
 class PendingUI extends StatelessWidget {
   const PendingUI();
@@ -196,9 +264,9 @@ class PendingUI extends StatelessWidget {
 }
 
 //
-// 
+//
 //         APPROVED & AUTO APPROVED UI
-// 
+//
 //
 class ApprovedUI extends StatelessWidget {
   final bool isAuto;
