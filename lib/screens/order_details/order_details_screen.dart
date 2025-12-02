@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/app_text_field.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -39,18 +40,17 @@ class OrderDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     log("DEBUG → incoming selectVarientId: $selectVarientId");
 
-    final couponController = TextEditingController();
+    final couponController = orderController.couponTextController;
     final pricing = product!.pricing;
 
-    final String? productImageUrl =
-        product != null && product!.images.isNotEmpty
-            ? product!.images
-                .firstWhere(
-                  (img) => img.isPrimary,
-                  orElse: () => product!.images.first,
-                )
-                .url
-            : null;
+    final String? productImageUrl = product != null && product!.images.isNotEmpty
+        ? product!.images
+            .firstWhere(
+              (img) => img.isPrimary,
+              orElse: () => product!.images.first,
+            )
+            .url
+        : null;
 
     return Scaffold(
       backgroundColor: AppColors.paperColor,
@@ -85,13 +85,9 @@ class OrderDetailsScreen extends StatelessWidget {
                     spacing: 15.w,
                     children: [
                       Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 15.w, vertical: 4.h),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: AppColors.grey),
-                            borderRadius: BorderRadius.circular(4.r)),
-                        child: appText(AppStrings.address,
-                            fontSize: 11.sp, fontWeight: FontWeight.w600),
+                        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 4.h),
+                        decoration: BoxDecoration(border: Border.all(color: AppColors.grey), borderRadius: BorderRadius.circular(4.r)),
+                        child: appText(AppStrings.address, fontSize: 11.sp, fontWeight: FontWeight.w600),
                       ),
                       appText(
                         addresses.name,
@@ -108,37 +104,18 @@ class OrderDetailsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 2.h,
                         children: [
-                          appText(addresses.addressLine1,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                              height: 1.3.h,
-                              textAlign: TextAlign.left),
+                          appText(addresses.addressLine1, fontSize: 12.sp, fontWeight: FontWeight.w600, height: 1.3.h, textAlign: TextAlign.left),
                           Row(
                             spacing: 5.w,
                             children: [
-                              appText("${addresses.city},",
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.3.h,
-                                  textAlign: TextAlign.left),
-                              appText(addresses.pincode,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.3.h,
-                                  textAlign: TextAlign.left),
+                              appText("${addresses.city},", fontSize: 12.sp, fontWeight: FontWeight.w600, height: 1.3.h, textAlign: TextAlign.left),
+                              appText(addresses.pincode, fontSize: 12.sp, fontWeight: FontWeight.w600, height: 1.3.h, textAlign: TextAlign.left),
                             ],
                           ),
-                          appText(addresses.country,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                              height: 1.3.h,
-                              textAlign: TextAlign.left),
+                          appText(addresses.country, fontSize: 12.sp, fontWeight: FontWeight.w600, height: 1.3.h, textAlign: TextAlign.left),
                           Row(
                             children: [
-                              appText(AppStrings.phone,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.grey),
+                              appText(AppStrings.phone, fontSize: 12.sp, fontWeight: FontWeight.w600, color: AppColors.grey),
                               appText(
                                 addresses.phoneNumber,
                                 fontSize: 12.sp,
@@ -161,10 +138,7 @@ class OrderDetailsScreen extends StatelessWidget {
                               buttonColor: AppColors.primaryColor,
                               borderRadius: BorderRadius.circular(8.r),
                               child: Center(
-                                child: appText(AppStrings.change,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.white),
+                                child: appText(AppStrings.change, fontSize: 12.sp, fontWeight: FontWeight.w600, color: AppColors.white),
                               ))
                         ],
                       )
@@ -202,8 +176,7 @@ class OrderDetailsScreen extends StatelessWidget {
                   ),
                   Container(
                     width: double.infinity,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
+                    padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
                     constraints: BoxConstraints(
                       minHeight: 80.h, // ⬅️ instead of fixed height
                     ),
@@ -243,8 +216,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                     ),
                                   );
                                 },
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
+                                loadingBuilder: (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
 
                                   return Center(
@@ -266,8 +238,7 @@ class OrderDetailsScreen extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: appText(
@@ -288,10 +259,8 @@ class OrderDetailsScreen extends StatelessWidget {
                               ),
                               if (product!.hasVariants)
                                 Obx(() {
-                                  final productCtrl =
-                                      Get.find<ProductDetailsController>();
-                                  final selectedVariant =
-                                      productCtrl.getSelectedVariant();
+                                  final productCtrl = Get.find<ProductDetailsController>();
+                                  final selectedVariant = productCtrl.getSelectedVariant();
 
                                   if (selectedVariant == null) {
                                     return SizedBox.shrink();
@@ -303,8 +272,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                     fontWeight: FontWeight.w600,
                                   );
                                 }),
-                              appText("₹ ${product!.pricing.finalPrice}",
-                                  fontSize: 12.sp, fontWeight: FontWeight.w600),
+                              appText("₹ ${product!.pricing.finalPrice}", fontSize: 12.sp, fontWeight: FontWeight.w600),
                               Obx(() {
                                 return appText(
                                   "Plan - ₹${orderController.selectedAmount.value} / ${orderController.selectedDays.value} Days",
@@ -324,98 +292,114 @@ class OrderDetailsScreen extends StatelessWidget {
 
             // -------------------- PRODUCT DETAILS -----------------------
 
-            // // -------------------- COUPON SECTION -----------------------
-            // Column(
-            //   spacing: 10.h,
-            //   crossAxisAlignment: CrossAxisAlignment.start,
-            //   children: [
-            //     appText(
-            //       AppStrings.apply_coupen,
-            //       fontSize: 13.sp,
-            //       fontWeight: FontWeight.w700,
-            //     ),
-            //     Container(
-            //       width: double.infinity,
-            //       padding: EdgeInsets.all(15.w),
-            //       constraints: BoxConstraints(
-            //         minHeight: 65.h,
-            //       ),
-            //       decoration: BoxDecoration(
-            //         color: AppColors.white,
-            //         boxShadow: [
-            //           BoxShadow(
-            //             color: AppColors.shadowColor,
-            //             blurRadius: 6.r,
-            //             offset: Offset(0, 2),
-            //           )
-            //         ],
-            //         borderRadius: BorderRadius.circular(8.r),
-            //       ),
-            //       child: Column(
-            //         spacing: 10.h,
-            //         crossAxisAlignment: CrossAxisAlignment.start,
-            //         children: [
-            //           Row(
-            //             spacing: 10.w,
-            //             children: [
-            //               SizedBox(
-            //                 width: 180.w,
-            //                 child: appTextField(
-            //                   borderRadius: BorderRadius.circular(15.w),
-            //                   contentPadding: EdgeInsets.symmetric(
-            //                       vertical: 8.h, horizontal: 8.w),
-            //                   controller: couponController,
-            //                   hintText: AppStrings.coupen_hint,
-            //                   hintSize: 13.sp,
-            //                   textColor: AppColors.textBlack,
-            //                   hintColor: AppColors.grey,
-            //                 ),
-            //               ),
-            //               appButton(
-            //                   onTap: () {},
-            //                   width: 90.w,
-            //                   height: 35.h,
-            //                   buttonColor: AppColors.primaryColor,
-            //                   padding: EdgeInsets.all(0.w),
-            //                   child: Center(
-            //                     child: appText(AppStrings.apply,
-            //                         fontSize: 13.sp,
-            //                         fontWeight: FontWeight.w600,
-            //                         color: AppColors.white),
-            //                   )),
-            //             ],
-            //           ),
-            //           appText(AppStrings.premoCode,
-            //               fontSize: 13.sp, fontWeight: FontWeight.w600),
-            //           Row(
-            //             spacing: 15.w,
-            //             children: [
-            //               Container(
-            //                 padding: EdgeInsets.symmetric(
-            //                     horizontal: 25.w, vertical: 7.h),
-            //                 decoration: BoxDecoration(
-            //                     border: Border.all(
-            //                         color: AppColors.grey, width: 1.w),
-            //                     borderRadius: BorderRadius.circular(5.r)),
-            //                 child: appText("FHD10%",
-            //                     fontSize: 13.sp, fontWeight: FontWeight.w600),
-            //               ),
-            //               Container(
-            //                 padding: EdgeInsets.symmetric(
-            //                     horizontal: 25.w, vertical: 7.h),
-            //                 decoration: BoxDecoration(
-            //                     border: Border.all(color: AppColors.grey),
-            //                     borderRadius: BorderRadius.circular(5.r)),
-            //                 child: appText("FHD10%",
-            //                     fontSize: 13.sp, fontWeight: FontWeight.w600),
-            //               )
-            //             ],
-            //           )
-            //         ],
-            //       ),
-            //     ),
-            //   ],
-            // ),
+            // -------------------- COUPON SECTION -----------------------
+            Column(
+              spacing: 10.h,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                appText(
+                  AppStrings.apply_coupen,
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w700,
+                ),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(15.w),
+                  constraints: BoxConstraints(
+                    minHeight: 65.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.shadowColor,
+                        blurRadius: 6.r,
+                        offset: Offset(0, 2),
+                      )
+                    ],
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Column(
+                    spacing: 10.h,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        spacing: 10.w,
+                        children: [
+                          SizedBox(
+                            width: 180.w,
+                            child: appTextField(
+                              borderRadius: BorderRadius.circular(15.w),
+                              contentPadding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                              controller: couponController,
+                              hintText: AppStrings.coupen_hint,
+                              hintSize: 13.sp,
+                              textColor: AppColors.textBlack,
+                              hintColor: AppColors.grey,
+                            ),
+                          ),
+                          appButton(
+                              onTap: () {
+                                //button addded
+                                orderController.applyCoupon(
+                                  totalAmount: pricing.finalPrice,
+                                );
+                              },
+                              width: 90.w,
+                              height: 35.h,
+                              buttonColor: AppColors.primaryColor,
+                              padding: EdgeInsets.all(0.w),
+                              child: Center(
+                                child: appText(AppStrings.apply, fontSize: 13.sp, fontWeight: FontWeight.w600, color: AppColors.white),
+                              )),
+                        ],
+                      ),
+                      appText(AppStrings.premoCode, fontSize: 13.sp, fontWeight: FontWeight.w600),
+                      Row(
+                        spacing: 15.w,
+                        children: [
+                          // added in list
+                          Obx(() {
+                            if (orderController.couponsLoading.value) {
+                              return Center(child: SizedBox(height: 24.h, width: 24.w, child: CircularProgressIndicator(strokeWidth: 2)));
+                            }
+
+                            if (orderController.coupons.isEmpty) {
+                              return appText("No coupons available", fontSize: 13.sp, fontWeight: FontWeight.w600);
+                            }
+
+                            return Wrap(
+                              spacing: 12.w,
+                              runSpacing: 8.h,
+                              children: orderController.coupons.map((coupon) {
+                                return GestureDetector(
+                                  onTap: () => orderController.selectCoupon(coupon),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 7.h),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: AppColors.grey),
+                                      borderRadius: BorderRadius.circular(5.r),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        appText(coupon.couponCode, fontSize: 13.sp, fontWeight: FontWeight.w600),
+                                        // small hint line (optional)
+                                        if (coupon.minOrderValue > 0) appText("Min ₹${coupon.minOrderValue.toStringAsFixed(0)}", fontSize: 10.sp),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            );
+                          }),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
             // -------------------- COUPON SECTION -----------------------
 
             // -------------------- ORDER INFORMATION SECTION -----------------------
@@ -444,26 +428,36 @@ class OrderDetailsScreen extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  buildPriceInfo(
-                      label: product!.name, content: "₹ ${pricing.finalPrice}"),
-                  buildPriceInfo(
-                      label: AppStrings.shipping_charge, content: "Free"),
+                  buildPriceInfo(label: product!.name, content: "₹ ${pricing.finalPrice}"),
+                  buildPriceInfo(label: AppStrings.shipping_charge, content: "Free"),
                   Divider(
                     color: AppColors.grey,
                   ),
-                  buildPriceInfo(
-                      label: AppStrings.total_amount,
-                      content: "₹ ${pricing.finalPrice}"),
+                  //added
+                  Obx(() {
+                    final applied = orderController.couponApplied.value;
+                    final code = orderController.selectedCoupon.value?.couponCode ?? "";
+                    final discount = orderController.couponDiscount.value;
+                    return Column(
+                      children: [
+                        if (applied) buildPriceInfo(label: "Coupon ($code)", content: "- ₹${discount.toStringAsFixed(0)}"),
+                        buildPriceInfo(
+                          label: AppStrings.total_amount,
+                          content: "₹${(pricing.finalPrice - (applied ? discount : 0)).toStringAsFixed(0)}",
+                        ),
+                      ],
+                    );
+                  }),
+//-----------------------
+                  // buildPriceInfo(
+                  //     label: AppStrings.total_amount,
+                  //     content: "₹ ${pricing.finalPrice}"),
                   Obx(() {
                     return buildPriceInfo(
-                        label: AppStrings.your_plan,
-                        content:
-                            "₹${orderController.selectedAmount.value}/ ${orderController.selectedDays.value} Days");
+                        label: AppStrings.your_plan, content: "₹${orderController.selectedAmount.value}/ ${orderController.selectedDays.value} Days");
                   }),
                   Obx(() {
-                    return buildPriceInfo(
-                        label: AppStrings.pay_now,
-                        content: "₹${orderController.selectedAmount.value}");
+                    return buildPriceInfo(label: AppStrings.pay_now, content: "₹${orderController.selectedAmount.value}");
                   }),
                 ],
               ),
@@ -528,8 +522,7 @@ class OrderDetailsScreen extends StatelessWidget {
             color: AppColors.grey,
             maxLines: isProductName ? 2 : 1,
             softWrap: isProductName,
-            overflow:
-                isProductName ? TextOverflow.visible : TextOverflow.ellipsis,
+            overflow: isProductName ? TextOverflow.visible : TextOverflow.ellipsis,
           ),
         ),
         SizedBox(width: 10.w),

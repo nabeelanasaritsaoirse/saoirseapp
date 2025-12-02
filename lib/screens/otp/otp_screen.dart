@@ -86,7 +86,6 @@ class VerifyOTPScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: List.generate(6, (index) {
-                    // Create a FocusNode for each field (add this to your controller)
                     final focusNode = controller.focusNodes[index];
 
                     return SizedBox(
@@ -99,10 +98,10 @@ class VerifyOTPScreen extends StatelessWidget {
                         keyboardType: TextInputType.number,
                         maxLength: 1,
                         style: TextStyle(
-                          fontSize: 20.sp, // Slightly reduced from 22.sp
+                          fontSize: 20.sp, 
                           fontWeight: FontWeight.bold,
                           color: AppColors.black,
-                          height: 1.2, // Add line height for better vertical alignment
+                          height: 1.2,
                         ),
                         decoration: InputDecoration(
                           counterText: '',
@@ -112,14 +111,12 @@ class VerifyOTPScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10.r),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: EdgeInsets.symmetric(vertical: 15.h), // Add padding
+                          contentPadding: EdgeInsets.symmetric(vertical: 15.h), 
                         ),
                         onChanged: (value) {
                           if (value.isNotEmpty && index < 5) {
-                            // Move to next field when typing
                             FocusScope.of(context).nextFocus();
                           } else if (value.isEmpty && index > 0) {
-                            // Move to previous field when backspace is pressed
                             FocusScope.of(context).previousFocus();
                           }
                         },
