@@ -130,16 +130,23 @@ jobs:
       # Build iOS (NO CODESIGN)
       # ------------------------------
       - name: 🍏 Build iOS (No Codesign)
-        run: flutter build ios --release --no-codesign
+        # run: flutter build ios --release --no-codesign
+        run: flutter build ipa --no-codesign
 
-      # ------------------------------
-      # Upload Runner.app (unsigned)
-      # ------------------------------
-      - name: 📤 Upload iOS Build Artifact
+      - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-build
-          path: build/ios/iphoneos/Runner.app
+          name: ios-ipa
+          path: build/ios/ipa/*.ipa
+
+      # # ------------------------------
+      # # Upload Runner.app (unsigned)
+      # # ------------------------------
+      # - name: 📤 Upload iOS Build Artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ios-build
+      #     path: build/ios/iphoneos/Runner.app
 
   # -----------------------------------------
   # DEPLOY JOB (Requires Manual Approval)
@@ -151,43 +158,32 @@ jobs:
     if: github.ref == 'refs/heads/developer' && github.event_name == 'push'
     environment:
       name: ios-deploy
-
+  
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
-
-      - name: 📥 Download iOS Build Artifact
+  
+      - name: 📥 Download IPA
         uses: actions/download-artifact@v4
         with:
-          name: ios-build
-          path: ios-build/
-
-      - name: 🍎 Setup Xcode
-        run: sudo xcode-select -switch /Applications/Xcode.app
-
+          name: ios-ipa
+          path: release/
+  
       - name: 🚀 Install Fastlane
         run: sudo gem install fastlane
-
-      - name: 🔧 Setup App Store Authentication
+  
+      - name: 🔐 Setup App Store Connect API Key
         run: |
-          mkdir -p ~/.fastlane
+          mkdir -p ~/.appstoreconnect
           echo "{
-            \"apple_id\": \"${{ secrets.APPLE_ID }}\",
-            \"app_identifier\": \"${{ secrets.IOS_BUNDLE_ID }}\",
-            \"itc_team_id\": \"${{ secrets.APP_STORE_TEAM_ID }}\"
-          }" > ~/.fastlane/app_store_connect.json
-      - name: 📦 Package Runner.app into IPA
-        run: |
-          mkdir Payload
-          cp -R ios-build/Runner.app Payload/
-          zip -r app.ipa Payload
+            \"key_id\": \"${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}\",
+            \"issuer_id\": \"${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}\",
+            \"key\": \"${{ secrets.APP_STORE_CONNECT_API_KEY }}\"
+          }" > ~/.appstoreconnect/api_key.json
+  
       - name: 🚀 Upload to TestFlight
         run: |
           fastlane pilot upload \
-            --ipa app.ipa \
-            --apple_id "${{ secrets.APPLE_ID }}" \
-            --app_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
-            --itc_provider "${{ secrets.APP_STORE_TEAM_ID }}" \
+            --ipa release/*.ipa \
+            --api_key_path ~/.appstoreconnect/api_key.json \
             --skip_waiting_for_build_processing true
-        env:
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
