@@ -64,6 +64,7 @@ class AppStrings {
   static String referalBannerContent =
       "Invite Friends\nEarn Money\nStart Referring Today!";
   static String refer_via = "Refer Via";
+  static String apply_refferal = "Apply Refferal";
   static String shareTo = "Share to";
   static String search = "Search";
   static String no = "No";
@@ -81,7 +82,11 @@ class AppStrings {
   static String more = 'More';
   static String your_refferal = "Your referral";
   static String no_refferal_content = "Refer your friends and earn money";
-
+  static String enter_refferal_code = "Enter referral code";
+  static String refferal_discription =
+      "If someone referred you, enter their referral code below. This helps us apply rewards correctly.";
+  static String refferal_applied_success =
+      "Your referral code has been\nsuccessfully applied.";
   // Invite friend Details page
   static String referal_screen_label = "Referal Details";
   static String productId = "Product ID";

@@ -5,6 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:saoirse_app/widgets/app_button.dart';
 
 import '../../constants/app_strings.dart';
 import '../../screens/refferal/referral_controller.dart';
@@ -15,6 +17,7 @@ import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
 import '../invite_friend/invite_friend_details_screen.dart';
+import '../login/login_controller.dart';
 import '../my_wallet/my_wallet.dart';
 import '../notification/notification_controller.dart';
 import '../notification/notification_screen.dart';
@@ -28,6 +31,7 @@ class ReferralScreen extends StatefulWidget {
 
 class _ReferralScreenState extends State<ReferralScreen> {
   late ReferralController controller;
+  late LoginController loginController;
   late TextEditingController searchController;
   late FocusNode searchFocusNode;
   late ScrollController scrollController;
@@ -39,6 +43,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
     super.initState();
 
     controller = Get.put(ReferralController());
+    loginController = Get.put(LoginController());
     searchController = TextEditingController();
     scrollController = ScrollController();
     searchFocusNode = FocusNode();
@@ -173,6 +178,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
             padding: EdgeInsets.all(16.w),
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: _buildContentSection(
+              loginController: loginController,
               controller: controller,
               searchController: searchController,
               focusNode: searchFocusNode,
@@ -185,6 +191,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
   Widget _buildContentSection({
     required ReferralController controller,
+    required LoginController loginController,
     required TextEditingController searchController,
     required FocusNode focusNode,
   }) {
@@ -195,11 +202,28 @@ class _ReferralScreenState extends State<ReferralScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 10.h),
-        appText(
-          AppStrings.refer_via,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textBlack,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            appText(
+              AppStrings.refer_via,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textBlack,
+            ),
+            GestureDetector(
+              onTap: () {
+                if (!loginController.referralApplied.value) {
+                  showReferralInputPopup();
+                }
+              },
+              child: appText(AppStrings.apply_refferal,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primaryColor,
+                  decoration: TextDecoration.underline),
+            ),
+          ],
         ),
 
         SizedBox(height: 10.h),
@@ -677,6 +701,161 @@ class _ReferralScreenState extends State<ReferralScreen> {
             style: TextStyle(fontSize: 10.sp, color: AppColors.grey),
           ),
         ],
+      ),
+    );
+  }
+
+  void showReferralInputPopup() {
+    final TextEditingController referralCtrl = TextEditingController();
+
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(15.r),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ICON
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(10.r),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.green.withOpacity(0.1),
+                    ),
+                    child: Icon(Iconsax.tick_circle,
+                        size: 25.sp, color: Colors.green),
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        Get.back();
+                      },
+                      icon: Icon(Icons.close))
+                ],
+              ),
+              SizedBox(height: 10.h),
+
+              appText(AppStrings.enter_refferal_code,
+                  fontSize: 16.sp, fontWeight: FontWeight.w700),
+              SizedBox(height: 8.h),
+
+              appText(AppStrings.refferal_discription,
+                  color: AppColors.black54, fontSize: 10.sp),
+              SizedBox(height: 15.h),
+
+              // INPUT FIELD
+              appTextField(
+                contentPadding: EdgeInsets.all(10.r),
+                controller: referralCtrl,
+                textColor: AppColors.black,
+                hintText: "Enter the referral code",
+                hintSize: 14.sp,
+                hintColor: AppColors.grey,
+              ),
+
+              SizedBox(height: 15.h),
+
+              Row(
+                children: [
+                  // CANCEL BUTTON
+                  Expanded(
+                    child: appButton(
+                      onTap: () => Get.back(),
+                      borderColor: Colors.grey,
+                      textColor: AppColors.textBlack,
+                      buttonText: "Cancel",
+                      fontSize: 12.sp,
+                      height: 35.h,
+                    ),
+                  ),
+
+                  SizedBox(width: 10.w),
+
+                  // APPLY BUTTON
+                  Expanded(
+                    child: appButton(
+                      onTap: () async {
+                        Get.back(); // close input popup
+                        await Future.delayed(Duration(milliseconds: 100));
+                        bool success = await Get.put(LoginController())
+                            .applyReferral(referralCtrl.text.trim());
+
+                        if (success) {
+                          showReferralSuccessPopup();
+                        }
+                      },
+                      buttonColor: AppColors.primaryColor,
+                      textColor: AppColors.white,
+                      buttonText: "Apply",
+                      fontSize: 12.sp,
+                      height: 35.h,
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showReferralSuccessPopup() {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(20.r),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // CELEBRATION ICON
+              Container(
+                padding: EdgeInsets.all(12.r),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.green.withOpacity(0.1),
+                ),
+                child: Icon(
+                  Icons.celebration,
+                  size: 38.sp,
+                  color: AppColors.green,
+                ),
+              ),
+
+              SizedBox(height: 15.h),
+
+              appText(
+                AppStrings.refferal_applied_success,
+                textAlign: TextAlign.center,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textBlack,
+              ),
+
+              SizedBox(height: 20.h),
+
+              // THANKS BUTTON (appButton)
+              appButton(
+                onTap: () => Get.back(),
+                buttonColor: Colors.indigo.shade900,
+                height: 48.h,
+                width: double.infinity,
+                buttonText: "Thanks",
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

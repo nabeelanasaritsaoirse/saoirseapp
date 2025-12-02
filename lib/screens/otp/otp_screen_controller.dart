@@ -5,7 +5,6 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:saoirse_app/screens/notification/notification_controller.dart';
 
 import '../../constants/app_constant.dart';
@@ -24,8 +23,10 @@ class VerifyOtpController extends GetxController with CodeAutoFill {
     required this.referral,
     required this.username,
   });
-  final List<TextEditingController> otpControllers = List.generate(6, (index) => TextEditingController());
-  final List<FocusNode> focusNodes = List.generate(6, (index) => FocusNode());//new
+  final List<TextEditingController> otpControllers =
+      List.generate(6, (index) => TextEditingController());
+  final List<FocusNode> focusNodes =
+      List.generate(6, (index) => FocusNode()); //new
 
   var isLoading = false.obs;
   final String phoneNumber;
@@ -33,20 +34,20 @@ class VerifyOtpController extends GetxController with CodeAutoFill {
   final String referral;
 
   //-----------------------OTP AUTO FILL--------------------------//
-    @override
+  @override
   void onInit() {
     super.onInit();
-    SmsAutoFill().listenForCode();   // <-- Start listening for OTP SMS
+    SmsAutoFill().listenForCode(); // <-- Start listening for OTP SMS
   }
-  
-   @override
+
+  @override
   void codeUpdated() {
     if (code != null && code!.length == 6) {
-      autoFillOTP(code!);  // <-- Auto-fill the 6 boxes
+      autoFillOTP(code!); // <-- Auto-fill the 6 boxes
     }
   }
 
-    void autoFillOTP(String smsCode) {
+  void autoFillOTP(String smsCode) {
     for (int i = 0; i < 6; i++) {
       otpControllers[i].text = smsCode[i];
     }
@@ -98,7 +99,7 @@ class VerifyOtpController extends GetxController with CodeAutoFill {
 
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
     if (referral.isNotEmpty) {
-      await Get.find<LoginController>().applyReferralCode(referral);
+      await Get.find<LoginController>().applyReferral(referral);
     }
 
     bool updated = await updateUser(
@@ -204,15 +205,15 @@ class VerifyOtpController extends GetxController with CodeAutoFill {
 
 //------------------new-----------------------------
   @override
- void onClose() {
-  cancel(); 
-  // Dispose focus nodes
-  for (var node in focusNodes) {
-    node.dispose();
+  void onClose() {
+    cancel();
+    // Dispose focus nodes
+    for (var node in focusNodes) {
+      node.dispose();
+    }
+    for (var controller in otpControllers) {
+      controller.dispose();
+    }
+    super.onClose();
   }
-  for (var controller in otpControllers) {
-    controller.dispose();
-  }
-  super.onClose();
-}
 }
