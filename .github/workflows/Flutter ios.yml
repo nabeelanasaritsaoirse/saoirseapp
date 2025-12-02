@@ -1,12 +1,29 @@
 name: 🍎 iOS CI & Deploy
 run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
 on:
   push:
     branches: [ developer ]
+    # paths:
+    #   - "ios/**"
+    #   - "assets/**"
+    #   - "lib/**"
+    #   - "pubspec.yaml"
+    #   - "pubspec.lock"
 
-permissions:
-  contents: read
+  # pull_request:
+  #   branches: [ main, developer ]
+  #   paths:
+  #     - "ios/**"
+  #     - "assets/**"
+  #     - "lib/**"
+  #     - "pubspec.yaml"
+  #     - "pubspec.lock"
 
 jobs:
   ios-ci:
@@ -16,65 +33,161 @@ jobs:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: ⚙️ Setup Flutter
+      - name: ⚙️ Setup Flutter (Stable)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.35.7"
-          channel: stable
+          flutter-version: '3.35.7'
+          channel: 'stable'
 
       - name: 📦 Install Dependencies
         run: flutter pub get
 
-      - name: 🔍 Lint
-        run: flutter analyze || true
+      # ------------------------------
+      # LINT
+      # ------------------------------
+      - name: 🔍 Lint Check
+        id: lint
+        run: |
+          flutter analyze
+          if [ $? -eq 0 ]; then
+            echo "success=true" >> $GITHUB_OUTPUT
+          else
+            echo "success=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
 
-      - name: 🧪 Tests
-        run: flutter test || true
+      # Install junitreport
+      - name: 📦 Install junitreport
+        run: dart pub global activate junitreport
 
-      - name: 🍏 Build iOS IPA (No Codesign)
-        run: flutter build ipa --no-codesign
+      # ------------------------------
+      # TEST
+      # ------------------------------
+      - name: 🧪 Run Tests (JUnit Output)
+        id: test
+        run: |
+          export PATH="$HOME/.pub-cache/bin:$PATH"
+          flutter test --machine --no-pub > test_output.json || true
+          dart pub global run junitreport:tojunit < test_output.json > test-results.xml || true
+          if grep -q "<failure" test-results.xml; then
+            echo "success=false" >> $GITHUB_OUTPUT
+          else
+            echo "success=true" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
 
-      - name: 📤 Upload IPA Artifact
+      - name: 📈 Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: iOS Test Results
+          path: test-results.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      # ------------------------------
+      # Summary
+      # ------------------------------
+      
+      - name: 🧾 Add Lint + Test Summary
+        if: always()
+        run: |
+          echo "## 🍎 iOS CI Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Lint Errors" >> $GITHUB_STEP_SUMMARY
+      
+          # Capture only error/warning/info related to Dart rules
+          flutter analyze --no-fatal-warnings --no-fatal-infos > lint.log || true
+      
+          # Extract only analyzer messages (avoid_print, unnecessary_container, etc)
+          grep -E "error •|warning •|info •" lint.log >> $GITHUB_STEP_SUMMARY || \
+            echo "No lint issues found 🎉" >> $GITHUB_STEP_SUMMARY
+      
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🧪 Tests" >> $GITHUB_STEP_SUMMARY
+          TOTAL=$(grep -o "<testcase" test-results.xml | wc -l)
+          FAILED=$(grep -o "<failure" test-results.xml | wc -l)
+          PASSED=$((TOTAL - FAILED))
+      
+          echo "- **Total Tests:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+          echo "- **Passed:** 🟢 $PASSED" >> $GITHUB_STEP_SUMMARY
+          echo "- **Failed:** 🔴 $FAILED" >> $GITHUB_STEP_SUMMARY
+      
+
+      # ------------------------------
+      # Fail if lint or tests failed
+      # ------------------------------
+      - name: ❌ Fail CI if Lint or Tests Failed
+        if: always()
+        run: |
+          if [ "${{ steps.lint.outputs.success }}" != "true" ] || [ "${{ steps.test.outputs.success }}" != "true" ]; then
+            echo "❌ Lint or Tests Failed — stopping deploy"
+            exit 1
+          else
+            echo "✅ Lint & Tests Passed"
+          fi
+      # ------------------------------
+      # Build iOS (NO CODESIGN)
+      # ------------------------------
+      - name: 🍏 Build iOS (No Codesign)
+        run: flutter build ios --release --no-codesign
+
+      # ------------------------------
+      # Upload Runner.app (unsigned)
+      # ------------------------------
+      - name: 📤 Upload iOS Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-ipa
-          path: build/ios/ipa/*.ipa
+          name: ios-build
+          path: build/ios/iphoneos/Runner.app
 
-
+  # -----------------------------------------
+  # DEPLOY JOB (Requires Manual Approval)
+  # -----------------------------------------
   ios-deploy:
-    name: "🚀 Deploy to TestFlight"
+    name: "🚀 iOS Deploy to TestFlight"
     runs-on: macos-latest
     needs: ios-ci
-    if: github.ref == 'refs/heads/developer'
+    if: github.ref == 'refs/heads/developer' && github.event_name == 'push'
+    environment:
+      name: ios-deploy
 
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 📥 Download IPA
+      - name: 📥 Download iOS Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ios-ipa
-          path: release/
+          name: ios-build
+          path: ios-build/
 
-      - name: 🛠️ Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode.app
+      - name: 🍎 Setup Xcode
+        run: sudo xcode-select -switch /Applications/Xcode.app
 
       - name: 🚀 Install Fastlane
         run: sudo gem install fastlane
 
-      - name: 🔐 Setup App Store Connect API Key (JSON)
+      - name: 🔧 Setup App Store Authentication
         run: |
-          mkdir -p ~/.appstoreconnect
-          printf "{
-            \"key_id\": \"${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}\",
-            \"issuer_id\": \"${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}\",
-            \"key\": \"$(echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | sed ':a;N;$!ba;s/\n/\\n/g')\"
-          }" > ~/.appstoreconnect/api_key.json
-
+          mkdir -p ~/.fastlane
+          echo "{
+            \"apple_id\": \"${{ secrets.APPLE_ID }}\",
+            \"app_identifier\": \"${{ secrets.IOS_BUNDLE_ID }}\",
+            \"itc_team_id\": \"${{ secrets.APP_STORE_TEAM_ID }}\"
+          }" > ~/.fastlane/app_store_connect.json
+      - name: 📦 Package Runner.app into IPA
+        run: |
+          mkdir Payload
+          cp -R ios-build/Runner.app Payload/
+          zip -r app.ipa Payload
       - name: 🚀 Upload to TestFlight
         run: |
           fastlane pilot upload \
-            --ipa release/*.ipa \
-            --api_key_path ~/.appstoreconnect/api_key.json \
+            --ipa app.ipa \
+            --apple_id "${{ secrets.APPLE_ID }}" \
+            --app_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
+            --itc_provider "${{ secrets.APP_STORE_TEAM_ID }}" \
             --skip_waiting_for_build_processing true
+        env:
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
