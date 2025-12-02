@@ -36,13 +36,12 @@ jobs:
       # ------------------------------
       # Build iOS IPA (NO CODESIGN)
       # Flutter will generate the .ipa automatically.
-      # ------------------------------
       - name: 🍏 Build iOS (No Codesign)
         run: flutter build ios --release --no-codesign
 
       - name: 📦 Package .app into unsigned IPA
         run: |
-          cd build/ios/archive/Runner.xcarchive/Products/Applications
+          cd build/ios/iphoneos
           zip -r Runner.ipa Runner.app
           mkdir -p $GITHUB_WORKSPACE/ipa-out
           mv Runner.ipa $GITHUB_WORKSPACE/ipa-out/
@@ -52,6 +51,7 @@ jobs:
         with:
           name: ios-ipa
           path: ipa-out/Runner.ipa
+
 
 
   # -----------------------------------------
