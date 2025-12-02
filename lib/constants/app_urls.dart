@@ -66,6 +66,10 @@ class AppURLs {
   // Address api
   static String ADDRESS_API = BASE_API + "api/users/";
 
+  // KYC api
+  static String KYC_API = BASE_API + "api/kyc/status";
+  static String KYC_POST_API = BASE_API + "api/kyc/submit";
+
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/orders";
 
