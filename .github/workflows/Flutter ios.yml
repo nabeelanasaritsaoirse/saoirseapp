@@ -90,10 +90,13 @@ jobs:
             echo "}"
           } > ~/.appstoreconnect/api_key.json
 
+      - name: 📂 List IPA after artifact download
+        run: ls -R release
+      
       - name: 🚀 Upload to TestFlight
         run: |
           fastlane pilot upload \
-            --ipa app.ipa \
+            --ipa release/Runner.ipa \
             --apple_id "${{ secrets.APPLE_ID }}" \
             --app_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
             --itc_provider "${{ secrets.APP_STORE_TEAM_ID }}" \
