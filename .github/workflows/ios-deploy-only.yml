@@ -2,11 +2,6 @@ name: 🚀 Deploy iOS IPA to TestFlight (No Build)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ developer ]
-
-permissions:
-  contents: read
 
 jobs:
   deploy:
@@ -16,40 +11,40 @@ jobs:
       - name: 📥 Checkout Repo
         uses: actions/checkout@v4
 
-      - name: 📥 Download Latest IPA Artifact
+      # Download latest IPA artifact from the build workflow
+      - name: 📥 Download IPA Artifact
         uses: dawidd6/action-download-artifact@v3
         with:
           workflow: "Flutter ios.yml"
           name: ios-ipa
           path: release/
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          workflow_search: false
-          workflow_conclusion: success
 
-      - name: 📂 List IPA
+      - name: 📂 Show IPA
         run: ls -lah release/
 
-      - name: 🚀 Install Fastlane
-        run: sudo gem install fastlane
+      - name: ⚙️ Install Fastlane
+        run: sudo gem install fastlane -N
 
-      # Generate the API key JSON file (correct format for Fastlane)
-      - name: 🔐 Create Fastlane API Key JSON
+      # Save the raw .p8 key
+      - name: 🔐 Save App Store Private Key
         run: |
           mkdir -p ~/.private_keys
-          echo "{
-            \"key_id\": \"${{ secrets.APP_STORE_CONNECT_KEY_ID }}\",
-            \"issuer_id\": \"${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}\",
-            \"key\": \"$(echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | sed 's/$/\\n/' )\",
-            \"in_house\": false
-          }" > ~/.private_keys/appstoreconnect_api_key.json
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" \
+            > ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
 
+      # Upload to TestFlight
       - name: 🚀 Upload to TestFlight
         run: |
           fastlane pilot upload \
             --ipa release/*.ipa \
-            --api_key_path ~/.private_keys/appstoreconnect_api_key.json \
+            --api_key_path ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8 \
             --skip_waiting_for_build_processing true \
             --skip_submission true
 
-      - name: 🎉 Done
-        run: echo "🎉 IPA uploaded to TestFlight!"
+      # Optional summary
+      - name: 🧾 Deployment Summary
+        run: |
+          echo "## 🍎 TestFlight Upload Complete" >> $GITHUB_STEP_SUMMARY
+          echo "Uploaded IPA from artifact." >> $GITHUB_STEP_SUMMARY
+          echo "API Key ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" >> $GITHUB_STEP_SUMMARY
