@@ -90,30 +90,76 @@ jobs:
       - name: 🚀 Install Fastlane
         run: sudo gem install fastlane
 
+    
       # ------------------------------
-      # Setup App Store Connect API key
+      # ✅ FIXED: Proper API Key Setup
       # ------------------------------
       - name: 🔐 Setup App Store Connect API Key
         run: |
-          mkdir -p ~/.appstoreconnect
+          mkdir -p ~/.appstoreconnect/private_keys
+          
+          # Save the .p8 key file
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+          
+          # Verify key file was created
+          ls -lah ~/.appstoreconnect/private_keys/
+          
+          # Create API key JSON (optional, for reference)
+          cat > ~/.appstoreconnect/api_key.json << 'EOF'
           {
-            echo "{"
-            echo "  \"key_id\": \"${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}\","
-            echo "  \"issuer_id\": \"${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}\","
-            echo "  \"key\": \"$(printf "%s" "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | awk '{printf "%s\\n", $0}')\""
-            echo "}"
-          } > ~/.appstoreconnect/api_key.json
+            "key_id": "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}",
+            "issuer_id": "${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}",
+            "key_filepath": "~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8",
+            "is_key_content_base64": false
+          }
+          EOF
 
-      - name: 📂 List IPA after artifact download
-        run: ls -R release
-      
+      # ------------------------------
+      # ✅ FIXED: Use API Key Authentication (NO username/password)
+      # ------------------------------
       - name: 🚀 Upload to TestFlight
+        env:
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
         run: |
           fastlane pilot upload \
-            --ipa release/Runner.ipa \
-            --apple_id "${{ secrets.APPLE_ID }}" \
-            --app_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
-            --itc_provider "${{ secrets.APP_STORE_TEAM_ID }}" \
-            --skip_waiting_for_build_processing true
-        env:
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+            --ipa release/*.ipa \
+            --skip_waiting_for_build_processing true \
+            --skip_submission true
+
+      - name: 🎉 Deployment Complete
+        if: success()
+        run: |
+          echo "✅ Successfully uploaded to TestFlight!"
+          echo "🔗 Check your build at: https://appstoreconnect.apple.com"
+
+
+
+      # # ------------------------------
+      # # Setup App Store Connect API key
+      # # ------------------------------
+      # - name: 🔐 Setup App Store Connect API Key
+      #   run: |
+      #     mkdir -p ~/.appstoreconnect
+      #     {
+      #       echo "{"
+      #       echo "  \"key_id\": \"${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}\","
+      #       echo "  \"issuer_id\": \"${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}\","
+      #       echo "  \"key\": \"$(printf "%s" "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | awk '{printf "%s\\n", $0}')\""
+      #       echo "}"
+      #     } > ~/.appstoreconnect/api_key.json
+
+      # - name: 📂 List IPA after artifact download
+      #   run: ls -R release
+      
+      # - name: 🚀 Upload to TestFlight
+      #   run: |
+      #     fastlane pilot upload \
+      #       --ipa release/Runner.ipa \
+      #       --apple_id "${{ secrets.APPLE_ID }}" \
+      #       --app_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
+      #       --itc_provider "${{ secrets.APP_STORE_TEAM_ID }}" \
+      #       --skip_waiting_for_build_processing true
+      #   env:
+      #     FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
