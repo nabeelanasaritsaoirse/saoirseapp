@@ -40,7 +40,7 @@ class OrderDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     log("DEBUG → incoming selectVarientId: $selectVarientId");
 
-    final couponController = orderController.couponTextController;
+    final couponController = TextEditingController();
     final pricing = product!.pricing;
 
     final String? productImageUrl =
@@ -462,7 +462,7 @@ Container(
 
             // -------------------- PRODUCT DETAILS -----------------------
 
-            // -------------------- COUPON SECTION -----------------------
+            // // -------------------- COUPON SECTION -----------------------
             Column(
               spacing: 10.h,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -511,9 +511,14 @@ Container(
                           ),
                           appButton(
                               onTap: () {
-                                //button addded
-                                orderController.applyCoupon(
-                                  totalAmount: pricing.finalPrice,
+                                //added coupon edit
+                                orderController.applyCouponApi(
+                                  couponCode: couponController.text.trim(),
+                                  productId: product!.id,
+                                  totalDays: orderController.selectedDays.value,
+                                  dailyAmount: orderController.selectedAmount.value,
+                                  variantId: selectVarientId ?? "",
+                                  quantity: 1,
                                 );
                               },
                               width: 90.w,
@@ -528,61 +533,110 @@ Container(
                               )),
                         ],
                       ),
-                      appText(AppStrings.premoCode,
-                          fontSize: 13.sp, fontWeight: FontWeight.w600),
-                      Row(
-                        spacing: 15.w,
-                        children: [
-                          // added in list
-                          Obx(() {
-                            if (orderController.couponsLoading.value) {
-                              return Center(
-                                  child: SizedBox(
-                                      height: 24.h,
-                                      width: 24.w,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2)));
-                            }
+                      // Added this for Coupon edit---------------------------------------
+                      Obx(() {
+                        if (orderController.coupons.isEmpty) {
+                          return SizedBox.shrink();
+                        }
 
-                            if (orderController.coupons.isEmpty) {
-                              return appText("No coupons available",
-                                  fontSize: 13.sp, fontWeight: FontWeight.w600);
-                            }
-
-                            return Wrap(
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            appText(
+                              "Available Coupons",
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            SizedBox(height: 8.h),
+                            Wrap(
                               spacing: 12.w,
                               runSpacing: 8.h,
                               children: orderController.coupons.map((coupon) {
                                 return GestureDetector(
-                                  onTap: () =>
-                                      orderController.selectCoupon(coupon),
+                                  onTap: () {
+                                    orderController.selectCoupon(coupon, couponController);
+                                  },
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20.w, vertical: 7.h),
+                                    padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
                                     decoration: BoxDecoration(
-                                      border: Border.all(color: AppColors.grey),
+                                      border: Border.all(color: AppColors.grey, width: 1.w),
                                       borderRadius: BorderRadius.circular(5.r),
                                     ),
                                     child: Column(
-                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      spacing: 4.h,
                                       children: [
-                                        appText(coupon.couponCode,
-                                            fontSize: 13.sp,
-                                            fontWeight: FontWeight.w600),
-                                        // small hint line (optional)
-                                        if (coupon.minOrderValue > 0)
-                                          appText(
-                                              "Min ₹${coupon.minOrderValue.toStringAsFixed(0)}",
-                                              fontSize: 10.sp),
+                                        appText(
+                                          coupon.couponCode,
+                                          fontSize: 13.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        appText(
+                                          "Min : ₹${coupon.minOrderValue.toStringAsFixed(0)}",
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.grey,
+                                        ),
                                       ],
                                     ),
                                   ),
                                 );
                               }).toList(),
-                            );
-                          }),
-                        ],
-                      )
+                            ),
+                            // 2) Add this Obx block (to show validation result) below the coupon input / promo chips.
+                            // Place inside the same Column that contains the coupon UI so it updates in real-time.
+                            Obx(() {
+                              final v = orderController.couponValidation.value;
+                              if (v == null) return SizedBox.shrink();
+
+                              // Pricing info
+                              final p = v.pricing;
+                              final ins = v.installment;
+                              final b = v.benefits;
+                              final type = v.coupon.type;
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height: 10.h),
+
+                                  // Savings message (short)
+                                  if (b.savingsMessage.isNotEmpty) appText(b.savingsMessage, fontSize: 13.sp, fontWeight: FontWeight.w700),
+
+                                  SizedBox(height: 6.h),
+
+                                  // How it works (longer explanation)
+                                  if (b.howItWorksMessage.isNotEmpty)
+                                    appText(b.howItWorksMessage, fontSize: 12.sp, fontWeight: FontWeight.w600, color: AppColors.grey),
+
+                                  SizedBox(height: 10.h),
+
+                                  // Price details from server (use your buildPriceInfo helper)
+                                  buildPriceInfo(label: "Original Price", content: "₹ ${p.originalPrice.toStringAsFixed(0)}"),
+                                  buildPriceInfo(label: "Discount", content: "- ₹ ${p.discountAmount.toStringAsFixed(0)}"),
+                                  buildPriceInfo(label: "Final Price", content: "₹ ${p.finalPrice.toStringAsFixed(0)}"),
+
+                                  // Installment details
+                                  buildPriceInfo(label: "Installment Days", content: "${ins.totalDays}"),
+                                  buildPriceInfo(label: "Daily Amount", content: "₹ ${ins.dailyAmount.toStringAsFixed(0)}"),
+                                  if (ins.freeDays > 0) buildPriceInfo(label: "Free Days", content: "${ins.freeDays}"),
+                                  if (ins.reducedDays != null) buildPriceInfo(label: "Reduced Days", content: "${ins.reducedDays}"),
+
+                                  SizedBox(height: 8.h),
+
+                                  // Small label showing coupon type & applied code
+                                  appText(
+                                      "Applied: ${orderController.appliedCouponCode.value.isNotEmpty ? orderController.appliedCouponCode.value : couponController.text.trim()}  •  Type: $type",
+                                      fontSize: 11.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.grey),
+                                ],
+                              );
+                            })
+                          ],
+                        );
+                      })
+                      //------------------------coupon edit close-------------------------
                     ],
                   ),
                 ),
@@ -623,30 +677,7 @@ Container(
                   Divider(
                     color: AppColors.grey,
                   ),
-                  //added
-                  Obx(() {
-                    final applied = orderController.couponApplied.value;
-                    final code =
-                        orderController.selectedCoupon.value?.couponCode ?? "";
-                    final discount = orderController.couponDiscount.value;
-                    return Column(
-                      children: [
-                        if (applied)
-                          buildPriceInfo(
-                              label: "Coupon ($code)",
-                              content: "- ₹${discount.toStringAsFixed(0)}"),
-                        buildPriceInfo(
-                          label: AppStrings.total_amount,
-                          content:
-                              "₹${(pricing.finalPrice - (applied ? discount : 0)).toStringAsFixed(0)}",
-                        ),
-                      ],
-                    );
-                  }),
-//-----------------------
-                  // buildPriceInfo(
-                  //     label: AppStrings.total_amount,
-                  //     content: "₹ ${pricing.finalPrice}"),
+                  buildPriceInfo(label: AppStrings.total_amount, content: "₹ ${pricing.finalPrice}"),
                   Obx(() {
                     return buildPriceInfo(
                         label: AppStrings.your_plan,

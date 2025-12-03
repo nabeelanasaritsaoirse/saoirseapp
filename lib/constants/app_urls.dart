@@ -129,4 +129,10 @@ class AppURLs {
   //Chat messages
   static String CREATE_INDIVIDUAL_CHAT_FROM_REFFERAL =
       BASE_API + "api/chat/conversations/individual";
+
+  //Post request for Coupon Validation after this API will send the response
+  static String POST_RQ_COUPONS_VALIDATION =
+      BASE_API + "api/installments/validate-coupon";
+
+      
 }
