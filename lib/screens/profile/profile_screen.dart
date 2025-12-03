@@ -5,8 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import 'package:saoirse_app/screens/kyc/kyc_controller.dart';
-
-import '/screens/kyc/kycScreen.dart';
+import '../kyc/kyc_screen.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
