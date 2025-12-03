@@ -76,6 +76,8 @@ Future<void> main() async {
   final savedToken = storage.read(AppConst.ACCESS_TOKEN);
   if (savedToken != null) {
     notif.updateToken(savedToken);
+     notif.refreshNotifications();
+  notif.fetchUnreadCount();
   }
 
   // 🟢 Foreground message listener

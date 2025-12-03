@@ -20,8 +20,16 @@ import '../../models/product_details_model.dart';
 class SelectAddress extends StatelessWidget {
   final ProductDetailsData? product;
   final String? selectVarientId;
+  final int selectedDays; // NEW
+  final double selectedAmount;
 
-  SelectAddress({super.key, this.product, this.selectVarientId});
+  SelectAddress({
+    super.key,
+    this.product,
+    this.selectVarientId,
+    required this.selectedDays,
+    required this.selectedAmount,
+  });
 
   final SelectAddressController controller = Get.put(SelectAddressController());
 
@@ -97,30 +105,29 @@ class SelectAddress extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
                 onTap: () {
-                  final selectedAddress =
-                      controller.addressList[controller.selectedIndex.value];
+  final selectedAddress =
+      controller.addressList[controller.selectedIndex.value];
 
-                  final productCtrl = Get.find<ProductDetailsController>();
+  if (!Get.isRegistered<OrderDetailsController>()) {
+    Get.put(OrderDetailsController());
+  }
 
-                  if (!Get.isRegistered<OrderDetailsController>()) {
-                    Get.put(OrderDetailsController());
-                  }
+  final orderCtrl = Get.find<OrderDetailsController>();
 
-                  final orderCtrl = Get.find<OrderDetailsController>();
+  // Save selected data
+  orderCtrl.selectedDays.value = selectedDays;
+  orderCtrl.selectedAmount.value = selectedAmount;
 
-                  orderCtrl.selectedDays.value = productCtrl.customDays.value;
-                  orderCtrl.selectedAmount.value =
-                      productCtrl.customAmount.value;
+  // Navigate to Order Details
+  Get.to(() => OrderDetailsScreen(
+        addresses: selectedAddress,
+        product: product,
+        selectedDays: selectedDays,
+        selectVarientId: selectVarientId ?? "",
+        selectedAmount: selectedAmount,
+      ));
+},
 
-                  // Navigate
-                  Get.to(() => OrderDetailsScreen(
-                        addresses: selectedAddress,
-                        product: product,
-                        selectedDays: productCtrl.customDays.value,
-                        selectVarientId: productCtrl.selectedVariantId.value,
-                        selectedAmount: productCtrl.customAmount.value,
-                      ));
-                },
               ),
             ),
           ],

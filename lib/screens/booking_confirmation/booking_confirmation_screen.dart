@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_constant.dart';
+import 'package:saoirse_app/main.dart';
+import 'package:saoirse_app/screens/notification/notification_controller.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_gradient.dart';
@@ -66,7 +69,10 @@ class BookingConfirmationScreen extends StatelessWidget {
 
               // Thank You Button
               InkWell(
-                onTap: () {
+                onTap: () async {
+                  final username = storage.read(AppConst.USER_NAME) ?? "User";
+                  final notif = Get.find<NotificationController>();
+                  await notif.sendOrderConfirmation(username);
                   final dashboardController = Get.find<DashboardController>();
                   dashboardController.selectedIndex.value = 0;
 

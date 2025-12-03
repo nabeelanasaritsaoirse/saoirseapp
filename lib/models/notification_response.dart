@@ -2,7 +2,10 @@ class NotificationResponse {
   final bool success;
   final NotificationData data;
 
-  NotificationResponse({required this.success, required this.data});
+  NotificationResponse({
+    required this.success,
+    required this.data,
+  });
 
   factory NotificationResponse.fromJson(Map<String, dynamic> json) {
     return NotificationResponse(
@@ -12,11 +15,16 @@ class NotificationResponse {
   }
 }
 
+// --------------------------------------------------------------------
+
 class NotificationData {
   final List<AppNotification> notifications;
   final Pagination pagination;
 
-  NotificationData({required this.notifications, required this.pagination});
+  NotificationData({
+    required this.notifications,
+    required this.pagination,
+  });
 
   factory NotificationData.fromJson(Map<String, dynamic> json) {
     return NotificationData(
@@ -28,6 +36,8 @@ class NotificationData {
   }
 }
 
+// --------------------------------------------------------------------
+
 class AppNotification {
   final String id;
   final String notificationId;
@@ -37,13 +47,15 @@ class AppNotification {
   final String? imageUrl;
   final String publishedAt;
   final String createdAt;
+
+  // Optional fields (admin posts only)
   final int likeCount;
   final int commentCount;
   final int viewCount;
   final bool commentsEnabled;
   final bool likesEnabled;
   final bool isLikedByMe;
-  final CreatedBy createdBy;
+  final CreatedBy? createdBy;
 
   AppNotification({
     required this.id,
@@ -54,13 +66,15 @@ class AppNotification {
     this.imageUrl,
     required this.publishedAt,
     required this.createdAt,
-    required this.likeCount,
-    required this.commentCount,
-    required this.viewCount,
-    required this.commentsEnabled,
-    required this.likesEnabled,
-    required this.isLikedByMe,
-    required this.createdBy,
+
+    // defaults for SYSTEM_NOTIFICATION
+    this.likeCount = 0,
+    this.commentCount = 0,
+    this.viewCount = 0,
+    this.commentsEnabled = false,
+    this.likesEnabled = false,
+    this.isLikedByMe = false,
+    this.createdBy,
   });
 
   factory AppNotification.fromJson(Map<String, dynamic> json) {
@@ -73,40 +87,43 @@ class AppNotification {
       imageUrl: json['imageUrl'],
       publishedAt: json['publishedAt'],
       createdAt: json['createdAt'],
-      likeCount: json['likeCount'],
-      commentCount: json['commentCount'],
-      viewCount: json['viewCount'],
-      commentsEnabled: json['commentsEnabled'],
-      likesEnabled: json['likesEnabled'],
-      isLikedByMe: json['isLikedByMe'],
-      createdBy: CreatedBy.fromJson(json['createdBy']),
+
+      likeCount: json['likeCount'] ?? 0,
+      commentCount: json['commentCount'] ?? 0,
+      viewCount: json['viewCount'] ?? 0,
+      commentsEnabled: json['commentsEnabled'] ?? false,
+      likesEnabled: json['likesEnabled'] ?? false,
+      isLikedByMe: json['isLikedByMe'] ?? false,
+      createdBy:
+          json['createdBy'] != null ? CreatedBy.fromJson(json['createdBy']) : null,
     );
   }
 
   AppNotification copyWith({
-  int? likeCount,
-  bool? isLikedByMe,
-}) {
-  return AppNotification(
-    id: id,
-    notificationId: notificationId,
-    type: type,
-    title: title,
-    body: body,
-    imageUrl: imageUrl,
-    publishedAt: publishedAt,
-    createdAt: createdAt,
-    likeCount: likeCount ?? this.likeCount,
-    commentCount: commentCount,
-    viewCount: viewCount,
-    commentsEnabled: commentsEnabled,
-    likesEnabled: likesEnabled,
-    isLikedByMe: isLikedByMe ?? this.isLikedByMe,
-    createdBy: createdBy,
-  );
+    int? likeCount,
+    bool? isLikedByMe,
+  }) {
+    return AppNotification(
+      id: id,
+      notificationId: notificationId,
+      type: type,
+      title: title,
+      body: body,
+      imageUrl: imageUrl,
+      publishedAt: publishedAt,
+      createdAt: createdAt,
+      likeCount: likeCount ?? this.likeCount,
+      commentCount: commentCount,
+      viewCount: viewCount,
+      commentsEnabled: commentsEnabled,
+      likesEnabled: likesEnabled,
+      isLikedByMe: isLikedByMe ?? this.isLikedByMe,
+      createdBy: createdBy,
+    );
+  }
 }
 
-}
+// --------------------------------------------------------------------
 
 class CreatedBy {
   final String id;
@@ -127,6 +144,8 @@ class CreatedBy {
     );
   }
 }
+
+// --------------------------------------------------------------------
 
 class Pagination {
   final int page;
@@ -153,3 +172,8 @@ class Pagination {
     );
   }
 }
+
+
+
+
+

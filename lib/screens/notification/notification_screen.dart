@@ -24,12 +24,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
   final NotificationController controller = Get.find<NotificationController>();
 
   @override
-void initState() {
-  super.initState();
-  final controller = Get.find<NotificationController>();
-  controller.refreshNotifications();
-}
-
+  void initState() {
+    super.initState();
+    final controller = Get.find<NotificationController>();
+    controller.refreshNotifications();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +98,9 @@ class NotificationCard extends StatelessWidget {
     final date = item.publishedAt.split("T").first;
 
     return GestureDetector(
-      onTap: () => Get.to(NotificationDetailsScreen(notificationId: item.id),),
+      onTap: () => Get.to(
+        NotificationDetailsScreen(notificationId: item.id),
+      ),
       child: Container(
         margin: EdgeInsets.only(bottom: 14.h),
         padding: EdgeInsets.all(16.r),
@@ -159,7 +160,7 @@ class NotificationCard extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 4.h),
-      
+
                       /// Message
                       appText(
                         item.body,
