@@ -21,9 +21,13 @@ jobs:
       - name: 📥 Download Latest IPA Artifact
         uses: dawidd6/action-download-artifact@v3
         with:
-          workflow: "ios-build.yml"
+          workflow: "Flutter ios.yml"
           name: ios-ipa
           path: release/
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow_search: false
+          workflow_conclusion: success
+
 
       - name: 📂 List IPA
         run: ls -lah release/
