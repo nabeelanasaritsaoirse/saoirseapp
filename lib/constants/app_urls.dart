@@ -123,4 +123,10 @@ class AppURLs {
   //Get all coupons from api
   static String GET_ALL_COUPONS =
       BASE_API + "api/coupons";
+
+  //Post request for Coupon Validation after this API will send the response
+  static String POST_RQ_COUPONS_VALIDATION =
+      BASE_API + "api/installments/validate-coupon";
+
+      
 }
