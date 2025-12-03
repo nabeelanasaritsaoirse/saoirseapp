@@ -37,16 +37,15 @@ jobs:
             
       - name: 🚀 Upload to TestFlight
         env:
-          APP_STORE_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
           fastlane pilot upload \
             --ipa release/*.ipa \
-            --api_key_id "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" \
-            --issuer_id "${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}" \
-            --api_key "$APP_STORE_KEY" \
             --skip_waiting_for_build_processing true \
             --skip_submission true
-              
+
       # Optional summary
       - name: 🧾 Deployment Summary
         run: |
