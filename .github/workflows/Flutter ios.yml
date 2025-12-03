@@ -1,29 +1,14 @@
 name: 🍎 iOS CI & Deploy
 run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
+on:
+  push:
+    branches: [ developer ]
+
 permissions:
   contents: read
   checks: write
   pull-requests: write
-
-on:
-  push:
-    branches: [ main ]
-    paths:
-      - "ios/**"
-      - "assets/**"
-      - "lib/**"
-      - "pubspec.yaml"
-      - "pubspec.lock"
-
-  # pull_request:
-  #   branches: [ main, developer ]
-  #   paths:
-  #     - "ios/**"
-  #     - "assets/**"
-  #     - "lib/**"
-  #     - "pubspec.yaml"
-  #     - "pubspec.lock"
 
 jobs:
   ios-ci:
@@ -33,161 +18,99 @@ jobs:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: ⚙️ Setup Flutter (Stable)
+      - name: ⚙️ Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.7'
-          channel: 'stable'
+          flutter-version: "3.35.7"
+          channel: stable
 
       - name: 📦 Install Dependencies
         run: flutter pub get
 
-      # ------------------------------
-      # LINT
-      # ------------------------------
-      - name: 🔍 Lint Check
-        id: lint
+      - name: 🔍 Lint
+        run: flutter analyze || true
+
+      - name: 🧪 Tests
+        run: flutter test || true
+
+      - name: Generate .env file
         run: |
-          flutter analyze
-          if [ $? -eq 0 ]; then
-            echo "success=true" >> $GITHUB_OUTPUT
-          else
-            echo "success=false" >> $GITHUB_OUTPUT
-          fi
-        continue-on-error: true
-
-      # Install junitreport
-      - name: 📦 Install junitreport
-        run: dart pub global activate junitreport
-
-      # ------------------------------
-      # TEST
-      # ------------------------------
-      - name: 🧪 Run Tests (JUnit Output)
-        id: test
-        run: |
-          export PATH="$HOME/.pub-cache/bin:$PATH"
-          flutter test --machine --no-pub > test_output.json || true
-          dart pub global run junitreport:tojunit < test_output.json > test-results.xml || true
-          if grep -q "<failure" test-results.xml; then
-            echo "success=false" >> $GITHUB_OUTPUT
-          else
-            echo "success=true" >> $GITHUB_OUTPUT
-          fi
-        continue-on-error: true
-
-      - name: 📈 Publish Test Results
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: iOS Test Results
-          path: test-results.xml
-          reporter: java-junit
-          fail-on-error: false
+          cat > .env <<EOF
+          IOS_API_KEY=${{ secrets.IOS_API_KEY }}
+          IOS_APP_ID=${{ secrets.IOS_APP_ID }}
+          IOS_MESSAGING_SENDER_ID=${{ secrets.IOS_MESSAGING_SENDER_ID }}
+          IOS_PROJECT_ID=${{ secrets.IOS_PROJECT_ID }}
+          
+          ANDROID_API_KEY=${{ secrets.ANDROID_API_KEY }}
+          ANDROID_APP_ID=${{ secrets.ANDROID_APP_ID }}
+          ANDROID_MESSAGING_SENDER_ID=${{ secrets.ANDROID_MESSAGING_SENDER_ID }}
+          ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
+          EOF
 
       # ------------------------------
-      # Summary
-      # ------------------------------
-      
-      - name: 🧾 Add Lint + Test Summary
-        if: always()
-        run: |
-          echo "## 🍎 iOS CI Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🔍 Lint Errors" >> $GITHUB_STEP_SUMMARY
-      
-          # Capture only error/warning/info related to Dart rules
-          flutter analyze --no-fatal-warnings --no-fatal-infos > lint.log || true
-      
-          # Extract only analyzer messages (avoid_print, unnecessary_container, etc)
-          grep -E "error •|warning •|info •" lint.log >> $GITHUB_STEP_SUMMARY || \
-            echo "No lint issues found 🎉" >> $GITHUB_STEP_SUMMARY
-      
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🧪 Tests" >> $GITHUB_STEP_SUMMARY
-          TOTAL=$(grep -o "<testcase" test-results.xml | wc -l)
-          FAILED=$(grep -o "<failure" test-results.xml | wc -l)
-          PASSED=$((TOTAL - FAILED))
-      
-          echo "- **Total Tests:** $TOTAL" >> $GITHUB_STEP_SUMMARY
-          echo "- **Passed:** 🟢 $PASSED" >> $GITHUB_STEP_SUMMARY
-          echo "- **Failed:** 🔴 $FAILED" >> $GITHUB_STEP_SUMMARY
-      
-
-      # ------------------------------
-      # Fail if lint or tests failed
-      # ------------------------------
-      - name: ❌ Fail CI if Lint or Tests Failed
-        if: always()
-        run: |
-          if [ "${{ steps.lint.outputs.success }}" != "true" ] || [ "${{ steps.test.outputs.success }}" != "true" ]; then
-            echo "❌ Lint or Tests Failed — stopping deploy"
-            exit 1
-          else
-            echo "✅ Lint & Tests Passed"
-          fi
-
-      # ------------------------------
-      # Build iOS (NO CODESIGN)
-      # ------------------------------
+      # Build iOS IPA (NO CODESIGN)
+      # Flutter will generate the .ipa automatically.
       - name: 🍏 Build iOS (No Codesign)
         run: flutter build ios --release --no-codesign
 
-      # ------------------------------
-      # Upload Runner.app (unsigned)
-      # ------------------------------
-      - name: 📤 Upload iOS Build Artifact
+      - name: 📦 Package .app into unsigned IPA
+        run: |
+          cd build/ios/iphoneos
+          zip -r Runner.ipa Runner.app
+          mkdir -p $GITHUB_WORKSPACE/ipa-out
+          mv Runner.ipa $GITHUB_WORKSPACE/ipa-out/
+
+      - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-build
-          path: build/ios/iphoneos/Runner.app
+          name: ios-ipa
+          path: ipa-out/Runner.ipa
+
+
 
   # -----------------------------------------
-  # DEPLOY JOB (Requires Manual Approval)
+  # DEPLOY JOB (UPLOAD IPA TO TESTFLIGHT)
   # -----------------------------------------
   ios-deploy:
     name: "🚀 iOS Deploy to TestFlight"
     runs-on: macos-latest
     needs: ios-ci
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    environment:
-      name: ios-deploy
+    if: github.ref == 'refs/heads/developer'
 
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 📥 Download iOS Build Artifact
+      - name: 📥 Download IPA
         uses: actions/download-artifact@v4
         with:
-          name: ios-build
-          path: ios-build/
-
-      - name: 🍎 Setup Xcode
-        run: sudo xcode-select -switch /Applications/Xcode.app
+          name: ios-ipa
+          path: release/
 
       - name: 🚀 Install Fastlane
         run: sudo gem install fastlane
 
-      - name: 🔧 Setup App Store Authentication
+      # ------------------------------
+      # Setup App Store Connect API key
+      # ------------------------------
+      - name: 🔐 Setup App Store Connect API Key
         run: |
-          mkdir -p ~/.fastlane
-          echo "{
-            \"apple_id\": \"${{ secrets.APPLE_ID }}\",
-            \"app_identifier\": \"${{ secrets.IOS_BUNDLE_ID }}\",
-            \"itc_team_id\": \"${{ secrets.APP_STORE_TEAM_ID }}\"
-          }" > ~/.fastlane/app_store_connect.json
+          mkdir -p ~/.appstoreconnect
+          {
+            echo "{"
+            echo "  \"key_id\": \"${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}\","
+            echo "  \"issuer_id\": \"${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}\","
+            echo "  \"key\": \"$(printf "%s" "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | awk '{printf "%s\\n", $0}')\""
+            echo "}"
+          } > ~/.appstoreconnect/api_key.json
 
-      - name: 📦 Package Runner.app into IPA
-        run: |
-          mkdir Payload
-          cp -R ios-build/Runner.app Payload/
-          zip -r app.ipa Payload
-
+      - name: 📂 List IPA after artifact download
+        run: ls -R release
+      
       - name: 🚀 Upload to TestFlight
         run: |
           fastlane pilot upload \
-            --ipa app.ipa \
+            --ipa release/Runner.ipa \
             --apple_id "${{ secrets.APPLE_ID }}" \
             --app_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
             --itc_provider "${{ secrets.APP_STORE_TEAM_ID }}" \

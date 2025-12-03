@@ -2,7 +2,8 @@
 
 class AppURLs {
   //base api
-  static String BASE_API = 'https://api.epielio.com/';
+  // static String BASE_API = 'https://api.epielio.com/';
+  static String BASE_API = 'http://13.127.15.87:8080/';
 
   //login api
   static String LOGIN_API = BASE_API + 'api/auth/login';
@@ -41,6 +42,7 @@ class AppURLs {
   static String Wallet = BASE_API + "api/wallet";
   static String WALLET_TRANSACTIONS = BASE_API + "api/wallet/transactions";
   static String ADD_MONEY_WALLET = BASE_API + "api/wallet/add-money";
+  static String WITHDRAWAL_API = BASE_API + "api/wallet/withdraw";
 
   // Category api
   static String CATEGORY_API =
@@ -63,6 +65,10 @@ class AppURLs {
 
   // Address api
   static String ADDRESS_API = BASE_API + "api/users/";
+
+  // KYC api
+  static String KYC_API = BASE_API + "api/kyc/status";
+  static String KYC_POST_API = BASE_API + "api/kyc/submit";
 
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/orders";
@@ -102,11 +108,19 @@ class AppURLs {
   //Log Out Api
   static String LOGOUT_API = BASE_API + "api/auth/logout";
 
-  // Pending Transaction (PAYMENT METHOD API)
+  // Pending Transaction (BEFORE PAYMENT METHOD API RESPONSE)
   static String PENDING_TRANSACTION_PAYMENT_RESPONSE =
       BASE_API + "api/installments/payments/create-combined-razorpay";
+
+  // Pending Transaction (AFTER PAYMENT METHOD API )
+  static String PENDING_TRANSACTION_PAY_DAILY_SELECTED =
+      BASE_API + "api/installments/payments/pay-daily-selected";
 
   // Sub Category Order Listing Page
   static String PRODUCT_LISTING_SUBCATEGORY =
       BASE_API + "api/products/category/";
+  
+  //Get all coupons from api
+  static String GET_ALL_COUPONS =
+      BASE_API + "api/coupons";
 }

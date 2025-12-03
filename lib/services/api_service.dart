@@ -20,7 +20,7 @@ class APIService {
 //  Post Request Funtion
   static Future<T?> postRequest<T>({
     required String url,
-    required Map<String, dynamic> body,
+    Map<String, dynamic>? body,
     required T Function(Map<String, dynamic>) onSuccess,
     Map<String, String>? headers,
     int timeoutSeconds = 15,
@@ -67,11 +67,8 @@ class APIService {
           return null;
 
         case 400:
-          appToast(
-            content: "Bad request. Check parameters.",
-            error: true,
-          );
-          return null;
+          final data = jsonDecode(response.body);
+          return data;
 
         case 401:
           appToast(

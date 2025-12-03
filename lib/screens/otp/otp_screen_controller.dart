@@ -1,8 +1,11 @@
 // ignore_for_file: avoid_print
 
+import 'dart:developer';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/notification/notification_controller.dart';
 
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
@@ -20,12 +23,15 @@ class VerifyOtpController extends GetxController {
     required this.username,
   });
   final List<TextEditingController> otpControllers =
-      List.generate(6, (_) => TextEditingController());
+      List.generate(6, (index) => TextEditingController());
+  final List<FocusNode> focusNodes =
+      List.generate(6, (index) => FocusNode()); //new
 
   var isLoading = false.obs;
   final String phoneNumber;
   final String username;
   final String referral;
+
 
   /// STEP 1 — Verify OTP (Firebase)
   verifyOtp() async {
@@ -67,8 +73,11 @@ class VerifyOtpController extends GetxController {
     print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
 
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
+  final notif = Get.find<NotificationController>();
+  notif.updateToken(data.accessToken!);         // update token in controller
+  notif.service.updateToken(data.accessToken!); 
     if (referral.isNotEmpty) {
-      await Get.find<LoginController>().applyReferralCode(referral);
+      await Get.find<LoginController>().applyReferral(referral);
     }
 
     bool updated = await updateUser(
@@ -81,6 +90,24 @@ class VerifyOtpController extends GetxController {
       isLoading.value = false;
       return;
     }
+
+    final fcmToken = await getDeviceToken();
+    if (fcmToken != null) {
+      log("Assign FCM token to the registerFCM function : $fcmToken");
+      Get.find<NotificationController>().registerFCM(fcmToken);
+    }
+
+    /// ✅ STEP 5 — TOKEN REFRESH LISTENER (Only after login)
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      log("🔄 New FCM token generated: $newToken");
+
+      final accessToken = storage.read(AppConst.ACCESS_TOKEN);
+      if (accessToken != null) {
+        Get.find<NotificationController>().registerFCM(newToken);
+      } else {
+        log("⚠ User logged out — skipping FCM refresh update");
+      }
+    });
 
     print("User Updated Successfully!");
 
@@ -140,10 +167,10 @@ class VerifyOtpController extends GetxController {
   Future<String?> getDeviceToken() async {
     try {
       final token = await FirebaseMessaging.instance.getToken();
-      print("FCM Token: $token");
+      log("FCM Token: $token");
       return token;
     } catch (e) {
-      print("FCM TOKEN ERROR: $e");
+      log("FCM TOKEN ERROR: $e");
       return null;
     }
   }
@@ -153,4 +180,16 @@ class VerifyOtpController extends GetxController {
     appToast(
         content: "Resending OTP...A new OTP has been sent to your number.");
   }
+
+//------------------new-----------------------------
+@override
+ void onClose() {
+  for (var node in focusNodes) {
+    node.dispose();
+  }
+  for (var controller in otpControllers) {
+    controller.dispose();
+  }
+  super.onClose();
+}
 }

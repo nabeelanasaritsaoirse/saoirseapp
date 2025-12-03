@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -40,4 +42,34 @@ class PendingTransactionService {
       },
     );
   }
+
+
+
+
+  //-------------------------------------DAILY INSTALLMENT PAYMENT FUNCTION AFTER PAYMENT PROCESS----------------------------------------------//
+  static Future<Map<String, dynamic>?> payDailySelected(
+      Map<String, dynamic> body) async {
+    try {
+      final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+      final url = AppURLs.PENDING_TRANSACTION_PAY_DAILY_SELECTED;
+
+      final response = await APIService.postRequest<Map<String, dynamic>>(
+        url: url,
+        body: body,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        onSuccess: (data) => data,
+      );
+
+      return response;
+    } catch (e, s) {
+      log("payDailySelected Error: $e\n$s");
+      return null;
+    }
+  }
+
+  
 }

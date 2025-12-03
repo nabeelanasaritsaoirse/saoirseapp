@@ -23,10 +23,30 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+
+         isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+
+    bundle {
+        abi {
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        language {
+            enableSplit = false
+        }
+    }
+
+    packaging {
+      jniLibs {
+        useLegacyPackaging = true
+      }
     }
 
     defaultConfig {
@@ -63,4 +83,6 @@ flutter {
 
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
+
+     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
