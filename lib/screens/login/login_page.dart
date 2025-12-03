@@ -72,25 +72,34 @@ class _LoginPageState extends State<LoginPage> {
                         fontSize: 14.sp,
                       ),
                       SizedBox(height: 28.h),
-                      appText(
-                        AppStrings.Referral_code,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryColor,
-                        fontSize: 15.sp,
-                        fontFamily: "Poppins",
-                      ),
-                      appTextField(
-                        controller: loginController.referrelController,
-                        prefixWidth: 20.w,
-                        hintText: AppStrings.Referral_code,
-                        hintColor: AppColors.black,
-                        textColor: AppColors.black,
-                        hintSize: 15.sp,
-                        validator: (value) {
-                          // Keep using LoginService.referralValidation (returns null if valid)
-                          return LoginService.referralValidation(referral: value ?? "");
-                        },
-                      ),
+                      Obx(() {
+                        return loginController.referralApplied.value
+                            ? SizedBox.shrink() // hide field
+                            : appText(
+                                AppStrings.Referral_code,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.primaryColor,
+                                fontSize: 15.sp,
+                                fontFamily: "Poppins",
+                              );
+                      }),
+                      Obx(() {
+                        return loginController.referralApplied.value
+                            ? SizedBox.shrink() // hide field
+                            : appTextField(
+                                controller: loginController.referrelController,
+                                prefixWidth: 20.w,
+                                hintText: AppStrings.Referral_code,
+                                hintColor: AppColors.black,
+                                textColor: AppColors.black,
+                                hintSize: 15.sp,
+                                validator: (value) {
+                                  // Keep using LoginService.referralValidation (returns null if valid)
+                                  return LoginService.referralValidation(
+                                      referral: value ?? "");
+                                },
+                              );
+                      }),
                       SizedBox(height: 15.h),
                       appText(
                         "Username",
@@ -111,7 +120,8 @@ class _LoginPageState extends State<LoginPage> {
                         textColor: AppColors.black,
                         hintSize: 15.sp,
                         validator: (value) {
-                          return LoginService.usernameValidation(username: value ?? "");
+                          return LoginService.usernameValidation(
+                              username: value ?? "");
                         },
                       ),
                       SizedBox(height: 15.h),
@@ -146,34 +156,35 @@ class _LoginPageState extends State<LoginPage> {
                           textColor: AppColors.black,
                           hintSize: 15.sp,
                           validator: (value) {
-  final raw = value ?? "";
-  final digitsOnly = raw.trim().replaceAll(RegExp(r'\D'), '');
+                            final raw = value ?? "";
+                            final digitsOnly =
+                                raw.trim().replaceAll(RegExp(r'\D'), '');
 
-  if (digitsOnly.isEmpty) {
-    return "Phone number is required";
-  }
+                            if (digitsOnly.isEmpty) {
+                              return "Phone number is required";
+                            }
 
-  if (digitsOnly.length < 7 || digitsOnly.length > 15) {
-    return "Enter a valid phone number";
-  }
+                            if (digitsOnly.length < 7 ||
+                                digitsOnly.length > 15) {
+                              return "Enter a valid phone number";
+                            }
 
-  // Now call your service safely
-  int? serviceResult;
-  try {
-    serviceResult = LoginService.phoneValidation(
-      phone: int.parse(digitsOnly),
-    );
-  } catch (e) {
-    return "Enter a valid phone number";
-  }
+                            // Now call your service safely
+                            int? serviceResult;
+                            try {
+                              serviceResult = LoginService.phoneValidation(
+                                phone: int.parse(digitsOnly),
+                              );
+                            } catch (e) {
+                              return "Enter a valid phone number";
+                            }
 
-  // If service returns null → valid
-  if (serviceResult == null) return null;
+                            // If service returns null → valid
+                            if (serviceResult == null) return null;
 
-  // If service returns an int → convert to error text
-  return "Invalid phone number";
-},
-
+                            // If service returns an int → convert to error text
+                            return "Invalid phone number";
+                          },
                           prefixWidget: GestureDetector(
                             onTap: () => showCountryPickerDialog(context),
                             child: Container(
@@ -322,8 +333,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-
-
 
 // // ignore_for_file: avoid_print
 

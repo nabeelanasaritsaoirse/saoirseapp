@@ -5,7 +5,6 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:saoirse_app/screens/notification/notification_controller.dart';
 
 import '../../constants/app_constant.dart';
@@ -16,46 +15,23 @@ import '../../services/auth_service.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../login/login_controller.dart';
-import 'package:sms_autofill/sms_autofill.dart';
 
-class VerifyOtpController extends GetxController with CodeAutoFill {
+class VerifyOtpController extends GetxController {
   VerifyOtpController({
     required this.phoneNumber,
     required this.referral,
     required this.username,
   });
-  final List<TextEditingController> otpControllers = List.generate(6, (index) => TextEditingController());
-  final List<FocusNode> focusNodes = List.generate(6, (index) => FocusNode());//new
+  final List<TextEditingController> otpControllers =
+      List.generate(6, (index) => TextEditingController());
+  final List<FocusNode> focusNodes =
+      List.generate(6, (index) => FocusNode()); //new
 
   var isLoading = false.obs;
   final String phoneNumber;
   final String username;
   final String referral;
 
-  //-----------------------OTP AUTO FILL--------------------------//
-    @override
-  void onInit() {
-    super.onInit();
-    SmsAutoFill().listenForCode();   // <-- Start listening for OTP SMS
-  }
-  
-   @override
-  void codeUpdated() {
-    if (code != null && code!.length == 6) {
-      autoFillOTP(code!);  // <-- Auto-fill the 6 boxes
-    }
-  }
-
-    void autoFillOTP(String smsCode) {
-    for (int i = 0; i < 6; i++) {
-      otpControllers[i].text = smsCode[i];
-    }
-
-    // Move focus to end
-    focusNodes.last.requestFocus();
-  }
-
-  //--------------------------------------------------------------//
 
   /// STEP 1 — Verify OTP (Firebase)
   verifyOtp() async {
@@ -97,8 +73,11 @@ class VerifyOtpController extends GetxController with CodeAutoFill {
     print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
 
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
+  final notif = Get.find<NotificationController>();
+  notif.updateToken(data.accessToken!);         // update token in controller
+  notif.service.updateToken(data.accessToken!); 
     if (referral.isNotEmpty) {
-      await Get.find<LoginController>().applyReferralCode(referral);
+      await Get.find<LoginController>().applyReferral(referral);
     }
 
     bool updated = await updateUser(
@@ -203,10 +182,8 @@ class VerifyOtpController extends GetxController with CodeAutoFill {
   }
 
 //------------------new-----------------------------
-  @override
+@override
  void onClose() {
-  cancel(); 
-  // Dispose focus nodes
   for (var node in focusNodes) {
     node.dispose();
   }

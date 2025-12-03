@@ -2,7 +2,8 @@
 
 class AppURLs {
   //base api
-  static String BASE_API = 'https://api.epielio.com/';
+  // static String BASE_API = 'https://api.epielio.com/';
+  static String BASE_API = 'http://13.127.15.87:8080/';
 
   //login api
   static String LOGIN_API = BASE_API + 'api/auth/login';
@@ -65,6 +66,10 @@ class AppURLs {
   // Address api
   static String ADDRESS_API = BASE_API + "api/users/";
 
+  // KYC api
+  static String KYC_API = BASE_API + "api/kyc/status";
+  static String KYC_POST_API = BASE_API + "api/kyc/submit";
+
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/orders";
 
@@ -114,4 +119,8 @@ class AppURLs {
   // Sub Category Order Listing Page
   static String PRODUCT_LISTING_SUBCATEGORY =
       BASE_API + "api/products/category/";
+  
+  //Get all coupons from api
+  static String GET_ALL_COUPONS =
+      BASE_API + "api/coupons";
 }

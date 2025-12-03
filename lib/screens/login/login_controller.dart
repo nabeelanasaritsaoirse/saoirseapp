@@ -13,6 +13,7 @@ import '../../main.dart';
 import '../../services/api_service.dart';
 import '../../services/appsflyer_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/refferal_service.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
 
@@ -25,18 +26,23 @@ class LoginController extends GetxController {
   RxBool loading = false.obs;
   Rx<Country?> country = Rx<Country?>(null);
   RxBool fetchFailed = false.obs;
-
+  RxBool referralApplied = false.obs;
+  final ReferralService referralService = ReferralService();
   @override
   void onInit() {
     super.onInit();
     fetchCountryCode();
     loadReferralCode();
+    loadReferralFlag();
+  }
+
+  void loadReferralFlag() {
+    referralApplied.value = storage.read("referral_applied") ?? false;
   }
 
   void loadReferralCode() {
     final referralFromDeepLink = AppsFlyerService.instance.referralFromDeepLink;
     final storedReferral = storage.read('pending_referral_code');
-
     final referralCode = referralFromDeepLink ?? storedReferral;
 
     if (referralCode != null && referralCode.isNotEmpty) {
@@ -131,7 +137,7 @@ class LoginController extends GetxController {
 
     final referralText = referrelController.text.trim();
     if (referralText.isNotEmpty) {
-      await applyReferralCode(referralText);
+      await applyReferral(referralText);
     }
 
     bool updated = await updateUser(data.userId!);
@@ -215,58 +221,38 @@ class LoginController extends GetxController {
   }
 
   // ================= APPLY REFERRAL CODE API =================
-  Future<bool> applyReferralCode(String code) async {
-    try {
-      final token = storage.read(AppConst.ACCESS_TOKEN);
+ Future<bool> applyReferral(String code) async {
+  if (code.isEmpty) return true;
 
-      if (code.isEmpty) {
-        print("No referral code entered → Skipping referral apply");
-        return true; // no referral is NOT an error
-      }
+  final result = await referralService.applyReferralCode(code);
 
-      final response = await APIService.postRequest(
-        url: AppURLs.APPLY_REFERRAL,
-        headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
-        },
-        body: {"referralCode": code},
-        onSuccess: (json) => json,
-      );
-
-      if (response == null) return false;
-
-      print("Referral Response: $response");
-
-      if (response["success"] == true) {
-        appToast(title: "Success", content: response["message"]);
-        return true;
-      }
-
-      // Handle backend error codes
-      switch (response["code"]) {
-        case "REFERRAL_ALREADY_APPLIED":
-          appToast(error: true, content: "Referral already applied");
-          break;
-        case "INVALID_REFERRAL_CODE":
-          appToast(error: true, content: "Invalid referral code");
-          break;
-        case "SELF_REFERRAL":
-          appToast(
-              error: true, content: "You cannot use your own referral code");
-          break;
-        case "REFERRAL_LIMIT_EXCEEDED":
-          appToast(error: true, content: "Referral limit exceeded");
-          break;
-        default:
-          appToast(error: true, content: response["message"]);
-      }
-      return false;
-    } catch (e) {
-      print("Referral Apply Error: $e");
-      return false;
-    }
+  if (result == null) {
+    appToast(error: true, content: "Something went wrong");
+    return false;
   }
+
+  if (result.success == true) {
+    storage.write("referral_applied", true);
+    referralApplied.value = true;
+
+    appToast(title: "Success", content: result.message);
+    return true;
+  }
+
+  // Handle backend error codes
+  switch (result.code) {
+    case "REFERRAL_ALREADY_APPLIED":
+    case "INVALID_REFERRAL_CODE":
+    case "SELF_REFERRAL":
+    case "REFERRAL_LIMIT_EXCEEDED":
+      appToast(error: true, content: result.message);
+      break;
+    default:
+      appToast(error: true, content: result.message);
+  }
+
+  return false;
+}
 }
 
 

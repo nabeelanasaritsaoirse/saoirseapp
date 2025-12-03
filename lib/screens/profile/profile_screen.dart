@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
+import 'package:saoirse_app/screens/kyc/kyc_controller.dart';
 import '/screens/kyc/kycScreen.dart';
 
 import '../../constants/app_assets.dart';
@@ -31,6 +33,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late final ProfileController controller;
+  final kyccontroller = Get.put(KycController());
 
   @override
   void initState() {
@@ -248,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: () {
                       switch (title) {
                         case "KYC":
-                          Get.to(() => kycScreen(kycStatus: "not_submitted"));
+                          Get.to(() => KycScreen());
                           break;
 
                         case "Privacy Policy":

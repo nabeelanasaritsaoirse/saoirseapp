@@ -24,6 +24,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
   final NotificationController controller = Get.find<NotificationController>();
 
   @override
+void initState() {
+  super.initState();
+  final controller = Get.find<NotificationController>();
+  controller.refreshNotifications();
+}
+
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/message/message_screen.dart';
+import 'package:saoirse_app/widgets/app_loader.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -31,7 +33,7 @@ class InviteFriendDetailsScreen extends StatelessWidget {
       // ---------------- BODY ----------------
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: appLoader());
         }
 
         final user = controller.friendDetails.value;
@@ -71,11 +73,14 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           color: AppColors.textBlack,
                         ),
-                        appText(
-                          user.email,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textBlack,
+                        SizedBox(
+                          width: 200.w,
+                          child: appText(user.email,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textBlack,
+                              maxLines: 2,
+                              textAlign: TextAlign.start),
                         ),
                         SizedBox(height: 10.h),
                         Row(
@@ -155,7 +160,9 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                           ),
                         ),
                         appButton(
-                          onTap: () {},
+                          onTap: () {
+                            Get.to(() => PaymentMessageScreen());
+                          },
                           width: 89.w,
                           height: 27.h,
                           padding: EdgeInsets.all(5.w),
