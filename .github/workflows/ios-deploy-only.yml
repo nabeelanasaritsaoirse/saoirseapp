@@ -42,6 +42,13 @@ jobs:
           echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" \
             > ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
 
+      - name: 🔍 Debug API Key Format
+        run: |
+          echo "FIRST LINE:"
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | head -n 1
+          echo "LAST LINE:"
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | tail -n 1
+
       - name: 🚀 Upload to TestFlight
         env:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
