@@ -1,30 +1,39 @@
-name: 🚀 Deploy IPA to TestFlight (No Build)
+name: 🚀 Deploy iOS IPA to TestFlight (No Build)
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:   # manual trigger from GitHub Actions
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
     runs-on: macos-latest
 
     steps:
-      - name: 📥 Checkout repo
+      - name: 📥 Checkout Repo
         uses: actions/checkout@v4
 
-      - name: 📥 Download latest IPA artifact
+      # Download latest IPA from the build workflow
+      - name: 📥 Download Latest IPA Artifact
         uses: dawidd6/action-download-artifact@v3
         with:
-          workflow: "Flutter ios.yml"
+          workflow: "ios-build.yml"
           name: ios-ipa
           path: release/
+
+      - name: 📂 List IPA
+        run: ls -lah release/
 
       - name: 🚀 Install Fastlane
         run: sudo gem install fastlane
 
-      - name: 🔐 Setup API Key
+      # Save the API key locally
+      - name: 🔐 Save App Store API Key
         run: |
           mkdir -p ~/.private_keys
-          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" > ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" \
+            > ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
 
       - name: 🚀 Upload to TestFlight
         env:
@@ -36,3 +45,6 @@ jobs:
             --ipa release/*.ipa \
             --skip_waiting_for_build_processing true \
             --skip_submission true
+
+      - name: 🎉 Done
+        run: echo "🎉 IPA uploaded to TestFlight!"
