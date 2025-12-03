@@ -1,10 +1,9 @@
 name: 🚀 Deploy iOS IPA to TestFlight (No Build)
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
   push:
     branches: [ developer ]
-# manual trigger from GitHub Actions
 
 permissions:
   contents: read
@@ -17,7 +16,7 @@ jobs:
       - name: 📥 Checkout Repo
         uses: actions/checkout@v4
 
-      # Download latest IPA from the build workflow
+      # Download latest IPA built by Flutter ios.yml workflow
       - name: 📥 Download Latest IPA Artifact
         uses: dawidd6/action-download-artifact@v3
         with:
@@ -28,35 +27,34 @@ jobs:
           workflow_search: false
           workflow_conclusion: success
 
-
       - name: 📂 List IPA
         run: ls -lah release/
 
       - name: 🚀 Install Fastlane
         run: sudo gem install fastlane
 
-      # Save the API key locally
-      - name: 🔐 Save App Store API Key
+      # Save the API key locally (using your Key ID: U8592Y2W6C)
+      - name: 🔐 Save App Store Connect API Key
         run: |
           mkdir -p ~/.private_keys
           echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" \
-            > ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+            > ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
+      # Debug header/footer only (safe)
       - name: 🔍 Debug API Key Format
         run: |
           echo "FIRST LINE:"
-          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | head -n 1
+          head -n 1 ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
           echo "LAST LINE:"
-          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | tail -n 1
+          tail -n 1 ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
-      - name: 🚀 Upload to TestFlight
-        env:
-          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+      - name: 🚀 Upload to TestFlight (API Key Auth)
         run: |
           fastlane pilot upload \
             --ipa release/*.ipa \
+            --api_key_path ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8 \
+            --api_key_issuer_id "${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}" \
+            --api_key_key_id "${{ secrets.APP_STORE_CONNECT_KEY_ID }}" \
             --skip_waiting_for_build_processing true \
             --skip_submission true
 
