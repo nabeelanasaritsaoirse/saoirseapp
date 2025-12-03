@@ -119,8 +119,11 @@ class AppURLs {
   // Sub Category Order Listing Page
   static String PRODUCT_LISTING_SUBCATEGORY =
       BASE_API + "api/products/category/";
-  
+
   //Get all coupons from api
-  static String GET_ALL_COUPONS =
-      BASE_API + "api/coupons";
+  static String GET_ALL_COUPONS = BASE_API + "api/coupons";
+
+  //Chat messages
+  static String CREATE_INDIVIDUAL_CHAT_FROM_REFFERAL =
+      BASE_API + "api/chat/conversations/individual";
 }

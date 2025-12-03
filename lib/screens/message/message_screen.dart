@@ -3,15 +3,32 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_colors.dart';
+import '../../constants/app_constant.dart';
+import '../../main.dart';
+import '../../models/converstion_model.dart';
 import '../../models/message_model.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import 'message_controller.dart';
 
 class PaymentMessageScreen extends StatelessWidget {
-  PaymentMessageScreen({super.key});
+  final String conversationId;
+  final List<Participant> participants;
+  late final MessageController controller;
+  PaymentMessageScreen({
+    super.key,
+    required this.conversationId,
+    required this.participants,
+  }) {
+    controller = Get.put(
+      MessageController(
+        conversationId: conversationId,
+        participants: participants,
+      ),
+    );
+  }
 
-  final MessageController controller = Get.put(MessageController());
+  final currentUserId = storage.read(AppConst.USER_ID);
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +48,14 @@ class PaymentMessageScreen extends StatelessWidget {
                   padding: EdgeInsets.all(16.w),
                   itemCount: controller.messages.length,
                   itemBuilder: (context, index) {
-                    final message = controller.messages[index];
-                    return _messageBubble(context, message);
+                    final msg = controller.messages[index];
+                    final currentUserId = storage.read(AppConst.USER_ID);
+
+                    return _messageBubble(
+                      context,
+                      msg,
+                      msg.senderId == currentUserId, // isUser
+                    );
                   },
                 ),
               ),
@@ -99,16 +122,16 @@ class PaymentMessageScreen extends StatelessWidget {
   }
 }
 
-Widget _messageBubble(BuildContext context, Message message) {
+Widget _messageBubble(BuildContext context, ChatMessage message, bool isUser) {
   return Align(
-    alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
+    alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
     child: Container(
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       constraints:
           BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
       decoration: BoxDecoration(
-        color: message.isUser ? Color(0xFF000066) : Colors.white,
+        color: isUser ? Color(0xFF000066) : Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
@@ -123,7 +146,7 @@ Widget _messageBubble(BuildContext context, Message message) {
         message.text,
         fontSize: 15.sp,
         fontWeight: FontWeight.w400,
-        color: message.isUser ? Colors.white : Colors.black87,
+        color: isUser ? Colors.white : Colors.black87,
         fontFamily: "poppins",
         textAlign: TextAlign.start,
         height: 1.4,
