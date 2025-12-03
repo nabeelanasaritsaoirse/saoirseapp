@@ -8,6 +8,9 @@ class AppURLs {
   //login api
   static String LOGIN_API = BASE_API + 'api/auth/login';
 
+  // Noitification
+  static String NOTIFICATION_API = BASE_API + "api/notifications/trigger";
+
   //user details api
   static String USER_UPDATE_API = BASE_API + "api/auth/profiles/";
   static String PROFILE_UPDATE_API = BASE_API + "api/users/";
