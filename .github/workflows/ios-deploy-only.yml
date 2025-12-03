@@ -44,8 +44,10 @@ jobs:
           fastlane pilot upload \
             --ipa release/*.ipa \
             --api_key_path api_key.json \
+            --app_identifier "com.saoirse.epi" \
             --skip_waiting_for_build_processing true \
-            --skip_submission true
+            --skip_submission true \
+            --verbose
 
       # Optional summary
       - name: 🧾 Deployment Summary
