@@ -91,32 +91,14 @@ jobs:
         run: sudo gem install fastlane
 
     
-      # ------------------------------
-      # ✅ FIXED: Proper API Key Setup
-      # ------------------------------
-      - name: 🔐 Setup App Store Connect API Key
+       # Save .p8 file (optional—but OK)
+      - name: 🔐 Save API Key
         run: |
           mkdir -p ~/.appstoreconnect/private_keys
-          
-          # Save the .p8 key file
-          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
-          
-          # Verify key file was created
-          ls -lah ~/.appstoreconnect/private_keys/
-          
-          # Create API key JSON (optional, for reference)
-          cat > ~/.appstoreconnect/api_key.json << 'EOF'
-          {
-            "key_id": "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}",
-            "issuer_id": "${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}",
-            "key_filepath": "~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8",
-            "is_key_content_base64": false
-          }
-          EOF
-
-      # ------------------------------
-      # ✅ FIXED: Use API Key Authentication (NO username/password)
-      # ------------------------------
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" \
+          > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+  
+      # ---- REAL AUTHENTICATION ----
       - name: 🚀 Upload to TestFlight
         env:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
@@ -127,14 +109,6 @@ jobs:
             --ipa release/*.ipa \
             --skip_waiting_for_build_processing true \
             --skip_submission true
-
-      - name: 🎉 Deployment Complete
-        if: success()
-        run: |
-          echo "✅ Successfully uploaded to TestFlight!"
-          echo "🔗 Check your build at: https://appstoreconnect.apple.com"
-
-
 
       # # ------------------------------
       # # Setup App Store Connect API key
