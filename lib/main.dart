@@ -25,6 +25,7 @@ import 'services/appsflyer_service.dart';
 //storage instance
 GetStorage storage = GetStorage();
 
+
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("🟡 Background Message Received: ${message.notification?.title}");
   NotificationServiceHelper.showFlutterNotification(message);
