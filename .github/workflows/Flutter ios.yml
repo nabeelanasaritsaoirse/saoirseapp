@@ -71,7 +71,9 @@ jobs:
           fastlane match appstore \
             --readonly \
             --verbose \
-            --api_key_path api_key.json
+            --api_key_path api_key.json \
+            --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git \
+            --git_branch master
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
