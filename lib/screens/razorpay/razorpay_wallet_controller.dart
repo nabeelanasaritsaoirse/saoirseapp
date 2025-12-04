@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:saoirse_app/screens/transaction_succsess/transactionSuccsess.dart';
+import 'package:saoirse_app/screens/transaction_succsess/transaction_succsess.dart';
 
 import '../../models/razorpay_payment_response.dart';
 import '../../services/payment_service.dart';

@@ -1,12 +1,10 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/edit_profile/edit_profile_screen.dart';
 
 import 'package:saoirse_app/screens/kyc/kyc_controller.dart';
 import '../kyc/kyc_screen.dart';
-
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -14,7 +12,6 @@ import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/profile_menu_card.dart';
-
 import '../order_delivered/order_delivered_screen.dart';
 import '../order_history/order_history_screen.dart';
 import '../pending_transaction/pending_transaction_screen.dart';
@@ -48,14 +45,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: CustomAppBar(
         title: AppStrings.profile_title,
         showBack: false,
-        
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // -------------------- PROFILE BANNER -----------------------
-          
+
             Obx(() {
               if (controller.isLoading.value) {
                 return SizedBox(
@@ -94,12 +90,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     right: 0,
                     child: Column(
                       children: [
-                        CircleAvatar(
-                          radius: 42,
-                          backgroundColor: Colors.grey.shade300,
-                          backgroundImage: user.profilePicture.isNotEmpty
-                              ? NetworkImage(user.profilePicture)
-                              : AssetImage(AppAssets.user_img) as ImageProvider,
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            // Profile image
+                            CircleAvatar(
+                              radius: 42,
+                              backgroundColor: Colors.grey.shade300,
+                              backgroundImage: user.profilePicture.isNotEmpty
+                                  ? NetworkImage(user.profilePicture)
+                                  : AssetImage(AppAssets.user_img)
+                                      as ImageProvider,
+                            ),
+
+                            Positioned(
+                              right: -2,
+                              bottom: -2,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Get.to(() => EditProfileScreen());
+                                },
+                                child: Container(
+                                  width: 28.w,
+                                  height: 28.w,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryColor,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 2,
+                                        offset: Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.edit,
+                                      size: 16.sp,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         SizedBox(height: 12.h),
                         appText(

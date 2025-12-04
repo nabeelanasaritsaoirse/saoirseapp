@@ -486,41 +486,42 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               //   );
               // },
               onPressed: () {
-  bool hasPlan = controller.selectedPlanIndex.value != -1 ||
-      (controller.customDays.value > 0 &&
-          controller.customAmount.value > 0);
+                bool hasPlan = controller.selectedPlanIndex.value != -1 ||
+                    (controller.customDays.value > 0 &&
+                        controller.customAmount.value > 0);
 
-  if (!hasPlan) {
-    WarningDialog.show(
-      title: AppStrings.warning_label,
-      message: AppStrings.checkout_warning_body,
-    );
-    return;
-  }
+                if (!hasPlan) {
+                  WarningDialog.show(
+                    title: AppStrings.warning_label,
+                    message: AppStrings.checkout_warning_body,
+                  );
+                  return;
+                }
 
-  // COMPUTE FINAL SELECTED VALUES
-  int selectedDays;
-  double selectedAmount;
+                // COMPUTE FINAL SELECTED VALUES
+                int selectedDays;
+                double selectedAmount;
 
-  if (controller.selectedPlanIndex.value != -1) {
-    final plan = controller.plans[controller.selectedPlanIndex.value];
-    selectedDays = plan.days;
-    selectedAmount = plan.totalAmount;
-  } else {
-    selectedDays = controller.customDays.value;
-    selectedAmount = controller.customAmount.value;
-  }
+                if (controller.selectedPlanIndex.value != -1) {
+                  final plan =
+                      controller.plans[controller.selectedPlanIndex.value];
+                  selectedDays = plan.days;
+                  selectedAmount = plan.perDayAmount;
+                } else {
+                  selectedDays = controller.customDays.value;
+                  selectedAmount = controller.customAmount.value;
+                }
 
-  // GO TO SELECT ADDRESS
-  Get.to(
-    () => SelectAddress(
-      product: controller.product.value!,
-      selectVarientId: controller.selectedVariantId.value,
-      selectedDays: selectedDays,
-      selectedAmount: selectedAmount,
-    ),
-  );
-},
+                // GO TO SELECT ADDRESS
+                Get.to(
+                  () => SelectAddress(
+                    product: controller.product.value!,
+                    selectVarientId: controller.selectedVariantId.value,
+                    selectedDays: selectedDays,
+                    selectedAmount: selectedAmount,
+                  ),
+                );
+              },
 
               child: Text(
                 AppStrings.checkout,

@@ -71,7 +71,7 @@ class InviteFriendController extends GetxController {
 
   // ---------------- MESSAGE BUTTON ACTION ----------------
 // ---------------- MESSAGE BUTTON ACTION ----------------
-  Future<void> openChat() async {
+  Future<void> openChat({required String name}) async {
     print("\n================ OPEN CHAT =================");
     print("UserId used to create chat: $userId");
     print("============================================");
@@ -95,12 +95,15 @@ class InviteFriendController extends GetxController {
       print(" - ${p.name} (${p.id})");
     }
     print("===============================================\n");
-
+    await Future.delayed(Duration(milliseconds: 100));
     // Navigate to chat screen
     print("➡️ Navigating to PaymentMessageScreen...");
-    Get.to(() => PaymentMessageScreen(
-          conversationId: chat.conversationId,
-          participants: chat.participants,
-        ));
+    Get.to(
+        () => PaymentMessageScreen(
+              conversationId: chat.conversationId,
+              participants: chat.participants,
+              name: name,
+            ),
+        transition: Transition.rightToLeft);
   }
 }

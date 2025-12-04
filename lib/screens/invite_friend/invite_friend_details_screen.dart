@@ -161,7 +161,7 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                         ),
                         appButton(
                           onTap: () {
-                            controller.openChat();
+                            controller.openChat(name: user.name);
                           },
                           width: 89.w,
                           height: 27.h,

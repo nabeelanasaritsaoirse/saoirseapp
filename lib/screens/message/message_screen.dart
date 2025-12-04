@@ -14,11 +14,13 @@ import 'message_controller.dart';
 class PaymentMessageScreen extends StatelessWidget {
   final String conversationId;
   final List<Participant> participants;
+  final String name;
   late final MessageController controller;
   PaymentMessageScreen({
     super.key,
     required this.conversationId,
     required this.participants,
+    required this.name,
   }) {
     controller = Get.put(
       MessageController(
@@ -35,7 +37,7 @@ class PaymentMessageScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.paperColor,
       appBar: CustomAppBar(
-        title: 'Messages',
+        title: name,
         showBack: true,
       ),
       body: Column(
@@ -47,15 +49,15 @@ class PaymentMessageScreen extends StatelessWidget {
                 () => ListView.builder(
                   padding: EdgeInsets.all(16.w),
                   itemCount: controller.messages.length,
+                  controller: controller.scrollController,
                   itemBuilder: (context, index) {
                     final msg = controller.messages[index];
                     final currentUserId = storage.read(AppConst.USER_ID);
-
-                    return _messageBubble(
-                      context,
-                      msg,
-                      msg.senderId == currentUserId, // isUser
-                    );
+                    final friend =
+                        participants.firstWhere((p) => p.id != currentUserId);
+                    return _messageBubble(context, msg,
+                        msg.senderId == currentUserId, friend // isUser
+                        );
                   },
                 ),
               ),
@@ -122,35 +124,94 @@ class PaymentMessageScreen extends StatelessWidget {
   }
 }
 
-Widget _messageBubble(BuildContext context, ChatMessage message, bool isUser) {
-  return Align(
-    alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-    child: Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      constraints:
-          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-      decoration: BoxDecoration(
-        color: isUser ? Color(0xFF000066) : Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            // ignore: deprecated_member_use
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5.r,
-            offset: Offset(0, 2.h),
+Widget _messageBubble(BuildContext context, ChatMessage message, bool isUser,
+    Participant partipant) {
+  final time = TimeOfDay.fromDateTime(message.createdAt)
+      .format(context) // -> 10:25 AM.
+      .replaceAll(" ", ""); // Clean UI
+
+  final tick = tickSymbol(message.deliveryStatus);
+
+  return Column(
+    crossAxisAlignment:
+        isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+    children: [
+      // 🔹 Show other person's name in top (Only incoming messages)
+      if (!isUser)
+        Padding(
+          padding: EdgeInsets.only(left: 6.w, bottom: 2.h),
+          child: appText(
+            partipant.name,
+            fontSize: 11.sp,
+            color: AppColors.black54,
+            fontWeight: FontWeight.w500,
           ),
-        ],
+        ),
+
+      Align(
+        alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
+          margin: EdgeInsets.only(bottom: 6.h),
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+          constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.75),
+          decoration: BoxDecoration(
+            color: isUser ? const Color(0xFF000066) : AppColors.white,
+            borderRadius: BorderRadius.circular(16.r),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withOpacity(0.05),
+                blurRadius: 5.r,
+                offset: Offset(0, 2.h),
+              )
+            ],
+          ),
+          child: appText(
+            message.text,
+            fontSize: 15.sp,
+            fontWeight: FontWeight.w400,
+            color: isUser ? AppColors.white : AppColors.black87,
+            height: 1.4,
+          ),
+        ),
       ),
-      child: appText(
-        message.text,
-        fontSize: 15.sp,
-        fontWeight: FontWeight.w400,
-        color: isUser ? Colors.white : Colors.black87,
-        fontFamily: "poppins",
-        textAlign: TextAlign.start,
-        height: 1.4,
-      ),
-    ),
+
+      // 🔹 Time + ticks row
+      Padding(
+        padding: EdgeInsets.only(
+            bottom: 10.h, left: isUser ? 0 : 6.w, right: isUser ? 6.w : 0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            appText(
+              time, //  message time
+              fontSize: 10.sp,
+              color: Colors.grey.shade600,
+            ),
+            SizedBox(width: 4),
+            appText(
+              tick, // ✓ ✓✓
+              fontSize: 12.sp,
+              color: message.deliveryStatus == "READ"
+                  ? Colors.blueAccent // blue ticks on read
+                  : Colors.grey[600],
+            ),
+          ],
+        ),
+      )
+    ],
   );
+}
+
+String tickSymbol(String status) {
+  switch (status) {
+    case "SENT":
+      return "✓"; // single tick
+    case "DELIVERED":
+      return "✓✓"; // double tick
+    case "READ":
+      return "✓✓"; // blue (handled via color)
+    default:
+      return "•"; // unknown
+  }
 }
