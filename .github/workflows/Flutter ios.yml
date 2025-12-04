@@ -136,11 +136,8 @@ jobs:
             -scheme Runner \
             -configuration Release \
             -archivePath build/ios/Runner.xcarchive \
-            DEVELOPMENT_TEAM=BYQUNNQSQH \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="$SIGNING_CERT" \
-            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
             archive
+
 
           # 2️⃣ Export IPA
           xcodebuild -exportArchive \
