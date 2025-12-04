@@ -103,6 +103,14 @@ jobs:
         run: |
           IDENTITY=$(security find-identity -v -p codesigning | grep "iPhone Distribution" | head -1 | awk -F\" '{print $2}')
           echo "identity=$IDENTITY" >> $GITHUB_OUTPUT
+          
+      - name: 🍫 Install CocoaPods
+        run: |
+          sudo gem install cocoapods -N
+          cd ios
+          pod repo update
+          pod install
+
       # ---------------------------------------------------
       # 🛠️ BUILD IPA
       # ---------------------------------------------------
