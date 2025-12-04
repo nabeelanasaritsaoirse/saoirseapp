@@ -1,6 +1,4 @@
-// To parse this JSON data, do
-//
-//     final kycModel = kycModelFromJson(jsonString);
+
 
 import 'dart:convert';
 

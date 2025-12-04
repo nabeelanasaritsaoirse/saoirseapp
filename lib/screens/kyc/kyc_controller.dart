@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import '/models/LoginAuth/kycModel.dart';
+import 'package:saoirse_app/widgets/app_toast.dart';
+import '../../models/LoginAuth/kyc_model.dart';
 import '/screens/kyc/document_type.dart';
 import '/services/kyc_service.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -109,29 +110,33 @@ class KycController extends GetxController {
 
   bool validateDocuments() {
     if (selfieImage.value == null) {
-      Get.snackbar("Missing", "Please upload selfie");
+      appToast(content: "Please upload selfie", error: true);
       return false;
     }
+
     if (!aadhaarSelected.value && !panSelected.value) {
-      Get.snackbar("Missing", "Select at least one document");
+      appToast(content: "Select at least one document", error: true);
       return false;
     }
+
     if (aadhaarSelected.value) {
       if (aadhaarFront.value == null || aadhaarBack.value == null) {
-        Get.snackbar("Missing", "Please upload Aadhaar front and back");
+        appToast(content: "Please upload Aadhaar front and back", error: true);
         return false;
       }
     }
+
     if (panSelected.value) {
       if (panFront.value == null) {
-        Get.snackbar("Missing", "Please upload PAN front image");
+        appToast(content: "Please upload PAN front image", error: true);
         return false;
       }
       if (panBack.value == null) {
-        Get.snackbar("Missing", "Please upload PAN back image");
+        appToast(content: "Please upload PAN back image", error: true);
         return false;
       }
     }
+
     return true;
   }
 
@@ -223,7 +228,9 @@ class KycController extends GetxController {
       await fetchKycData();
     } catch (e) {
       log("❌ KYC SUBMISSION ERROR: $e");
-      Get.snackbar("Error", "KYC submission failed: $e");
+      appToast(
+          content: "KYC submission failed...! Upload AADHAAR and PAN ",
+          error: true);
     } finally {
       isLoading(false);
     }
