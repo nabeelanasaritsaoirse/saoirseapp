@@ -131,13 +131,16 @@ jobs:
           echo "Using Certificate: $SIGNING_CERT"
           echo "Using Provisioning Profile: $PROFILE_UUID"
 
-          # 1️⃣ Build archive
           xcodebuild -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
             -archivePath build/ios/Runner.xcarchive \
+            -destination 'generic/platform=iOS' \
+            DEVELOPMENT_TEAM=BYQUNNQSQH \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="$SIGNING_CERT" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
             archive
-
 
           # 2️⃣ Export IPA
           xcodebuild -exportArchive \
