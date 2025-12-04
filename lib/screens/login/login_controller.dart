@@ -6,6 +6,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/refferal/referral_controller.dart';
 
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
@@ -221,38 +222,40 @@ class LoginController extends GetxController {
   }
 
   // ================= APPLY REFERRAL CODE API =================
- Future<bool> applyReferral(String code) async {
-  if (code.isEmpty) return true;
+  Future<bool> applyReferral(String code) async {
+    if (code.isEmpty) return true;
 
-  final result = await referralService.applyReferralCode(code);
+    final result = await referralService.applyReferralCode(code);
 
-  if (result == null) {
-    appToast(error: true, content: "Something went wrong");
+    if (result == null) {
+      appToast(error: true, content: "Something went wrong");
+      return false;
+    }
+
+    if (result.success == true) {
+      storage.write("referral_applied", true);
+      referralApplied.value = true;
+
+      appToast(title: "Success", content: result.message);
+      final referralController = Get.find<ReferralController>();
+      referralController.fetchReferralData();
+      return true;
+    }
+
+    // Handle backend error codes
+    switch (result.code) {
+      case "REFERRAL_ALREADY_APPLIED":
+      case "INVALID_REFERRAL_CODE":
+      case "SELF_REFERRAL":
+      case "REFERRAL_LIMIT_EXCEEDED":
+        appToast(error: true, content: result.message);
+        break;
+      default:
+        appToast(error: true, content: result.message);
+    }
+
     return false;
   }
-
-  if (result.success == true) {
-    storage.write("referral_applied", true);
-    referralApplied.value = true;
-
-    appToast(title: "Success", content: result.message);
-    return true;
-  }
-
-  // Handle backend error codes
-  switch (result.code) {
-    case "REFERRAL_ALREADY_APPLIED":
-    case "INVALID_REFERRAL_CODE":
-    case "SELF_REFERRAL":
-    case "REFERRAL_LIMIT_EXCEEDED":
-      appToast(error: true, content: result.message);
-      break;
-    default:
-      appToast(error: true, content: result.message);
-  }
-
-  return false;
-}
 }
 
 

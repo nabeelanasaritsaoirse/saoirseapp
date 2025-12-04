@@ -845,7 +845,10 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
               // THANKS BUTTON (appButton)
               appButton(
-                onTap: () => Get.back(),
+                onTap: () {
+                  Get.back();
+                  controller.fetchReferralData();
+                },
                 buttonColor: Colors.indigo.shade900,
                 height: 48.h,
                 width: double.infinity,
