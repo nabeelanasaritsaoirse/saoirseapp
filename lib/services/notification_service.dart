@@ -3,10 +3,7 @@
 import 'dart:developer';
 
 import 'package:saoirse_app/models/notification_details_response_model.dart';
-
-import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
-import '../main.dart';
 import '../models/notification_response.dart';
 import '../services/api_service.dart';
 
@@ -93,7 +90,9 @@ class NotificationService {
 
       final response = await APIService.postRequest(
         url: url,
-        headers: headers,
+        headers: {
+          "Authorization": "Bearer $token"
+        },
         onSuccess: (data) => data,
       );
 
@@ -221,7 +220,7 @@ class NotificationService {
   }) async {
     log("tocken reached in sendInAppWelcomeNotification ###### :$token");
     return await APIService.postRequest<bool>(
-      url: "",
+      url: AppURLs.NOTIFICATION_API,
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token",
