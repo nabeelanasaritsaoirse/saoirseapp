@@ -6,7 +6,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import '../constants/app_urls.dart';
 import '../constants/app_constant.dart';
-import '../models/LoginAuth/kycModel.dart';
+import '../models/LoginAuth/kyc_model.dart';
 import 'package:path/path.dart' as path;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';

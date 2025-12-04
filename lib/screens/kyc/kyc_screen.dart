@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
-import 'package:saoirse_app/widgets/custom_appbar.dart';
+import '/constants/app_strings.dart';
+import '/widgets/custom_appbar.dart';
 import '/widgets/app_loader.dart';
 import '/constants/app_colors.dart';
 import '/screens/kyc/kyc_controller.dart';
@@ -18,7 +18,7 @@ class KycScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-      appBar: CustomAppBar(
+      appBar: CustomAppBar(showBack: true,
         title: AppStrings.KycTitle,
       ),
       body: Obx(() {
