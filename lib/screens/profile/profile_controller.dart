@@ -39,7 +39,7 @@ class ProfileController extends GetxController {
   Rx<Country?> country = Rx<Country?>(null);
 
   RxInt wishlistCount = 0.obs;
-  var profile = Rxn<UserProfileModel>();
+  Rx<UserProfileModel?> profile = Rx<UserProfileModel?>(null);
   var isLoading = false.obs;
   var errorMessage = "".obs;
 
@@ -76,42 +76,64 @@ class ProfileController extends GetxController {
   }
 
   //Fetch Profile
+  // Future<void> fetchUserProfile() async {
+  //   try {
+  //     print("------------------------------------------");
+  //     print(" Fetching user profile...");
+  //     isLoading(true);
+
+  //     final response = await _profileService.fetchProfile();
+
+  //     if (response == null) {
+  //       print("ERROR: Unable to fetch profile");
+  //       errorMessage("Unable to fetch profile");
+  //     } else {
+  //       print(" PROFILE UPDATED IN CONTROLLER");
+  //       print("Name         : ${response.user.name}");
+  //       print("Email        : ${response.user.email}");
+  //       print("Phone        : ${response.user.phoneNumber}");
+  //       print("------------------------------------------");
+  //       // SET TEXT CONTROLLERS
+  //       profile.value = response;
+
+  //       fullNameController.text = response.user.name;
+  //       emailController.text = response.user.email;
+  //       phoneNumberController.text = response.user.phoneNumber;
+  //       // ------------ FIELD VISIBILITY LOGIC ------------
+  //       final email = response.user.email;
+  //       final phone = response.user.phoneNumber;
+
+  //       showEmailField.value = email.isNotEmpty;
+  //       showPhoneField.value = phone.isNotEmpty;
+
+  //       print("Show Email Field: ${showEmailField.value}");
+  //       print("Show Phone Field: ${showPhoneField.value}");
+  //     }
+  //   } catch (e) {
+  //     print(" Exception Occurred: $e");
+  //     errorMessage("Error: $e");
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
+
+
   Future<void> fetchUserProfile() async {
     try {
-      print("------------------------------------------");
-      print(" Fetching user profile...");
       isLoading(true);
 
-      final response = await _profileService.fetchProfile();
+      final result = await _profileService.fetchProfile();
 
-      if (response == null) {
-        print("ERROR: Unable to fetch profile");
-        errorMessage("Unable to fetch profile");
-      } else {
-        print(" PROFILE UPDATED IN CONTROLLER");
-        print("Name         : ${response.user.name}");
-        print("Email        : ${response.user.email}");
-        print("Phone        : ${response.user.phoneNumber}");
-        print("------------------------------------------");
-        // SET TEXT CONTROLLERS
-        profile.value = response;
+      if (result != null) {
+        profile.value = result;
 
-        fullNameController.text = response.user.name;
-        emailController.text = response.user.email;
-        phoneNumberController.text = response.user.phoneNumber;
-        // ------------ FIELD VISIBILITY LOGIC ------------
-        final email = response.user.email;
-        final phone = response.user.phoneNumber;
-
-        showEmailField.value = email.isNotEmpty;
-        showPhoneField.value = phone.isNotEmpty;
-
-        print("Show Email Field: ${showEmailField.value}");
-        print("Show Phone Field: ${showPhoneField.value}");
+        // Set Text Fields
+        fullNameController.text = result.user.name;
+        emailController.text = result.user.email;
+        phoneNumberController.text = result.user.phoneNumber;
       }
     } catch (e) {
-      print(" Exception Occurred: $e");
-      errorMessage("Error: $e");
+      print("Profile exception: $e");
     } finally {
       isLoading(false);
     }

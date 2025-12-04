@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:saoirse_app/models/product_details_model.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -80,113 +81,155 @@ class CartScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Column(
                       children: [
-                        /// IMAGE
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10.r),
-                          child: item.images.isNotEmpty
-                              ? item.images.first.url.startsWith('http')
-                                  ? Image.network(
-                                      item.images.first.url,
-                                      width: 80.w,
-                                      height: 80.h,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        return Icon(
-                                          Icons.broken_image,
-                                          size: 80.sp,
-                                          color: AppColors.grey,
-                                        );
-                                      },
-                                    )
-                                  : Image.asset(
-                                      item.images.first.url,
-                                      width: 80.w,
-                                      height: 80.h,
-                                      fit: BoxFit.cover,
-                                    )
-                              : Icon(
-                                  Icons.broken_image,
-                                  size: 80.sp,
-                                  color: AppColors.grey,
-                                ),
-                        ),
-
-                        SizedBox(width: 12.w),
-
-                        /// PRODUCT DETAILS
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              appText(
-                                item.name,
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w600,
-                                textAlign: TextAlign.start,
-                              ),
-                              SizedBox(height: 3.h),
-                              appText("red   |   512gb",
-                                  fontSize: 13.sp, color: AppColors.black54),
-                              SizedBox(height: 3.h),
-                              appText("₹ ${item.price}",
-                                  fontSize: 14.sp, fontWeight: FontWeight.bold),
-                              SizedBox(height: 3.h),
-                              appText("Plan - ₹100/200 Day",
-                                  fontSize: 12.sp, color: AppColors.black87)
-                            ],
-                          ),
-                        ),
-
-                        /// DELETE + QUANTITY
-                        Column(
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            /// DELETE ICON
-                            GestureDetector(
-                              onTap: () {
-                                controller.removeCartItem(item.productId);
-                              },
-                              child: const Icon(Iconsax.trash,
-                                  color: AppColors.black),
+                            /// IMAGE
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.r),
+                              child: item.images.isNotEmpty
+                                  ? item.images.first.url.startsWith('http')
+                                      ? Image.network(
+                                          item.images.first.url,
+                                          width: 80.w,
+                                          height: 80.h,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Icon(
+                                              Icons.broken_image,
+                                              size: 80.sp,
+                                              color: AppColors.grey,
+                                            );
+                                          },
+                                        )
+                                      : Image.asset(
+                                          item.images.first.url,
+                                          width: 80.w,
+                                          height: 80.h,
+                                          fit: BoxFit.cover,
+                                        )
+                                  : Icon(
+                                      Icons.broken_image,
+                                      size: 80.sp,
+                                      color: AppColors.grey,
+                                    ),
                             ),
 
-                            SizedBox(height: 20.h),
+                            SizedBox(width: 12.w),
 
-                            /// QUANTITY WIDGET
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10.w, vertical: 5.h),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20.r),
-                                border: Border.all(color: AppColors.black26),
-                              ),
-                              child: Row(
+                            /// PRODUCT DETAILS
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  GestureDetector(
-                                    onTap: () => controller.decreaseQty(index),
-                                    child: Icon(Icons.remove,
-                                        size: 15.sp, color: AppColors.black),
-                                  ),
-                                  SizedBox(width: 10.w),
                                   appText(
-                                    "${item.quantity}",
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.bold,
+                                    item.name,
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w600,
+                                    textAlign: TextAlign.start,
                                   ),
-                                  SizedBox(width: 10.w),
-                                  GestureDetector(
-                                    onTap: () => controller.increaseQty(index),
-                                    child: Icon(Icons.add,
-                                        size: 15.sp, color: AppColors.black),
-                                  ),
+                                  SizedBox(height: 3.h),
+                                  appText("red   |   512gb",
+                                      fontSize: 13.sp,
+                                      color: AppColors.black54),
+                                  SizedBox(height: 3.h),
+                                  appText("₹ ${item.price}",
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.bold),
+                                  SizedBox(height: 3.h),
+                                  appText("Plan - ₹100/200 Day",
+                                      fontSize: 12.sp, color: AppColors.black87)
                                 ],
                               ),
                             ),
+
+                            /// DELETE + QUANTITY
+                            Column(
+                              children: [
+                                /// DELETE ICON
+                                GestureDetector(
+                                  onTap: () {
+                                    controller.removeCartItem(item.productId);
+                                  },
+                                  child: const Icon(Iconsax.trash,
+                                      color: AppColors.black),
+                                ),
+
+                                SizedBox(height: 20.h),
+
+                                /// QUANTITY WIDGET
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10.w, vertical: 5.h),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20.r),
+                                    border:
+                                        Border.all(color: AppColors.black26),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () =>
+                                            controller.decreaseQty(index),
+                                        child: Icon(Icons.remove,
+                                            size: 15.sp,
+                                            color: AppColors.black),
+                                      ),
+                                      SizedBox(width: 10.w),
+                                      appText(
+                                        "${item.quantity}",
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      SizedBox(width: 10.w),
+                                      GestureDetector(
+                                        onTap: () =>
+                                            controller.increaseQty(index),
+                                        child: Icon(Icons.add,
+                                            size: 15.sp,
+                                            color: AppColors.black),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
+                        Align(
+                          alignment: AlignmentGeometry.centerRight,
+                          child: GestureDetector(
+                            onTap: () {
+                              final productDetails =
+                                  controller.convertCartToProductDetails(item);
+
+                              Get.to(() => SelectAddress(
+                                    product: productDetails,
+                                    selectVarientId:
+                                        item.variant?.variantId ?? "",
+                                    selectedDays:
+                                        item.installmentPlan.totalDays,
+                                    selectedAmount:
+                                        item.installmentPlan.dailyAmount,
+                                  ));
+                            },
+                            child: Container(
+                              width: 120.w,
+                              height: 30.h,
+                              decoration: BoxDecoration(
+                                  color: AppColors.primaryColor,
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              child: Center(
+                                child: appText("Buy Now",
+                                    color: AppColors.white,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                        )
                       ],
                     ),
                   );
@@ -226,7 +269,7 @@ class CartScreen extends StatelessWidget {
                   ),
 
                   appButton(
-                      onTap: () => Get.to(SelectAddress()),
+                      onTap: () {},
                       width: 140.w,
                       height: 35.h,
                       buttonColor: AppColors.primaryColor,

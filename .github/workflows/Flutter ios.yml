@@ -47,30 +47,37 @@ jobs:
           ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
           EOF
 
-      # ------------------------------
-      # Build iOS IPA (NO CODESIGN)
-      # Flutter will generate the .ipa automatically.
-      - name: 🍏 Build iOS (No Codesign)
-        run: flutter build ios --release --no-codesign
+      - name: 🍎 Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: 📦 Package .app into unsigned IPA
+      # -----------------------------------------------------
+      # 🔐 FASTLANE MATCH — INSTALL CERTIFICATES AUTOMATICALLY
+      # -----------------------------------------------------
+      - name: 🔐 Install Certificates via Fastlane Match
         run: |
-          cd build/ios/iphoneos
-          zip -r Runner.ipa Runner.app
-          mkdir -p $GITHUB_WORKSPACE/ipa-out
-          mv Runner.ipa $GITHUB_WORKSPACE/ipa-out/
+          sudo gem install fastlane -N
+          fastlane match appstore --readonly --verbose --api_key_path api_key.json
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          APP_STORE_CONNECT_API_KEY_JSON: ${{ secrets.APP_STORE_CONNECT_API_KEY_JSON }}
+        working-directory: ios
+
+      # -----------------------------------------------------
+      # 🍏 BUILD SIGNED IPA
+      # -----------------------------------------------------
+      - name: 🍏 Build Signed IPA
+        run: |
+          flutter build ipa \
+            --release \
+            --export-options-plist=ios/ExportOptions.plist
 
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
-          path: ipa-out/Runner.ipa
+          path: build/ios/ipa/*.ipa
 
 
-
-  # -----------------------------------------
-  # DEPLOY JOB (UPLOAD IPA TO TESTFLIGHT)
-  # -----------------------------------------
   ios-deploy:
     name: "🚀 iOS Deploy to TestFlight"
     runs-on: macos-latest
@@ -78,7 +85,7 @@ jobs:
     if: github.ref == 'refs/heads/developer'
 
     steps:
-      - name: 📥 Checkout Repository
+      - name: 📥 Checkout Repo
         uses: actions/checkout@v4
 
       - name: 📥 Download IPA
@@ -87,33 +94,21 @@ jobs:
           name: ios-ipa
           path: release/
 
-      - name: 🚀 Install Fastlane
-        run: sudo gem install fastlane
-
-      # ------------------------------
-      # Setup App Store Connect API key
-      # ------------------------------
-      - name: 🔐 Setup App Store Connect API Key
-        run: |
-          mkdir -p ~/.appstoreconnect
-          {
-            echo "{"
-            echo "  \"key_id\": \"${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}\","
-            echo "  \"issuer_id\": \"${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}\","
-            echo "  \"key\": \"$(printf "%s" "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | awk '{printf "%s\\n", $0}')\""
-            echo "}"
-          } > ~/.appstoreconnect/api_key.json
-
-      - name: 📂 List IPA after artifact download
-        run: ls -R release
+      - name: Install Fastlane
+        run: sudo gem install fastlane -N
       
+      - name: 🔐 Write API Key JSON
+        run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON }}" > api_key.json
+
       - name: 🚀 Upload to TestFlight
         run: |
           fastlane pilot upload \
-            --ipa release/Runner.ipa \
-            --apple_id "${{ secrets.APPLE_ID }}" \
-            --app_identifier "${{ secrets.IOS_BUNDLE_ID }}" \
-            --itc_provider "${{ secrets.APP_STORE_TEAM_ID }}" \
-            --skip_waiting_for_build_processing true
-        env:
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+            --ipa release/*.ipa \
+            --api_key_path api_key.json \
+            --skip_waiting_for_build_processing true \
+            --skip_submission true \
+            --verbose
+
+      - name: 🧾 Deployment Summary
+        run: |
+          echo "## 🍎 TestFlight Upload Complete" >> $GITHUB_STEP_SUMMARY

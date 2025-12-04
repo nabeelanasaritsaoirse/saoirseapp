@@ -366,6 +366,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         children: [
           /// Add to Cart
           appButton(
+            // onTap: () {
+            //   bool hasPlan = controller.selectedPlanIndex.value != -1 ||
+            //       (controller.customDays.value > 0 &&
+            //           controller.customAmount.value > 0);
+
+            //   if (!hasPlan) {
+            //     WarningDialog.show(
+            //       title: AppStrings.warning_label,
+            //       message: AppStrings.warning_body,
+            //     );
+            //     return;
+            //   }
+
+            //   // cartController.addProductToCart(controller.product.value!.id);
+            // },
             onTap: () {
               bool hasPlan = controller.selectedPlanIndex.value != -1 ||
                   (controller.customDays.value > 0 &&
@@ -373,14 +388,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
               if (!hasPlan) {
                 WarningDialog.show(
-                  title: AppStrings.warning_label,
-                  message: AppStrings.warning_body,
-                );
+                    title: AppStrings.warning_label,
+                    message: AppStrings.warning_body);
                 return;
               }
 
-              cartController.addProductToCart(controller.product.value!.id);
+              final selectedPlan = controller.getSelectedPlan();
+              final selectedVariantId =
+                  controller.selectedVariantId.value.isEmpty
+                      ? null
+                      : controller.selectedVariantId.value;
+
+              cartController.addProductToCart(
+                productId: controller.product.value!.id,
+                variantId: selectedVariantId,
+                days: selectedPlan["days"],
+                dailyAmount: selectedPlan["amount"],
+              );
             },
+
             width: 50.w,
             height: 35.h,
             padding: EdgeInsets.all(0),
@@ -439,26 +465,63 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
                 padding: EdgeInsets.symmetric(vertical: 10.h),
               ),
+              // onPressed: () {
+              //   bool hasPlan = controller.selectedPlanIndex.value != -1 ||
+              //       (controller.customDays.value > 0 &&
+              //           controller.customAmount.value > 0);
+
+              //   if (!hasPlan) {
+              //     WarningDialog.show(
+              //       title: AppStrings.warning_label,
+              //       message: AppStrings.checkout_warning_body,
+              //     );
+              //     return;
+              //   }
+
+              //   Get.to(
+              //     SelectAddress(
+              //       product: controller.product.value!,
+              //       selectVarientId: controller.selectedVariantId.value,
+              //     ),
+              //   );
+              // },
               onPressed: () {
-                bool hasPlan = controller.selectedPlanIndex.value != -1 ||
-                    (controller.customDays.value > 0 &&
-                        controller.customAmount.value > 0);
+  bool hasPlan = controller.selectedPlanIndex.value != -1 ||
+      (controller.customDays.value > 0 &&
+          controller.customAmount.value > 0);
 
-                if (!hasPlan) {
-                  WarningDialog.show(
-                    title: AppStrings.warning_label,
-                    message: AppStrings.checkout_warning_body,
-                  );
-                  return;
-                }
+  if (!hasPlan) {
+    WarningDialog.show(
+      title: AppStrings.warning_label,
+      message: AppStrings.checkout_warning_body,
+    );
+    return;
+  }
 
-                Get.to(
-                  SelectAddress(
-                    product: controller.product.value!,
-                    selectVarientId: controller.selectedVariantId.value,
-                  ),
-                );
-              },
+  // COMPUTE FINAL SELECTED VALUES
+  int selectedDays;
+  double selectedAmount;
+
+  if (controller.selectedPlanIndex.value != -1) {
+    final plan = controller.plans[controller.selectedPlanIndex.value];
+    selectedDays = plan.days;
+    selectedAmount = plan.totalAmount;
+  } else {
+    selectedDays = controller.customDays.value;
+    selectedAmount = controller.customAmount.value;
+  }
+
+  // GO TO SELECT ADDRESS
+  Get.to(
+    () => SelectAddress(
+      product: controller.product.value!,
+      selectVarientId: controller.selectedVariantId.value,
+      selectedDays: selectedDays,
+      selectedAmount: selectedAmount,
+    ),
+  );
+},
+
               child: Text(
                 AppStrings.checkout,
                 style: TextStyle(

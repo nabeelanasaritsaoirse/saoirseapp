@@ -1,115 +1,158 @@
-
-
+import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:get_storage/get_storage.dart';
-
-import '/constants/app_constant.dart';
-import '/constants/app_urls.dart';
-import '/models/LoginAuth/kycModel.dart';
-import '/services/api_service.dart';
 import 'package:http/http.dart' as http;
-
-enum DocumentType { aadhaar, pan }
+import '../constants/app_urls.dart';
+import '../constants/app_constant.dart';
+import '../models/LoginAuth/kycModel.dart';
+import 'package:path/path.dart' as path;
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 
 class KycServices {
-  final storage = GetStorage();
+  final box = GetStorage();
+  // ================================================================
+  // 1️⃣ UPLOAD SINGLE KYC IMAGE (PUT /api/kyc/upload)
+  // ================================================================
+  Future<Map<String, dynamic>> uploadKycImage({
+    required File imageFile,
+    required String type,
+    required String side,
+  }) async {
+    final token = box.read(AppConst.ACCESS_TOKEN);
+    final uri = Uri.parse(AppURLs.KYC_UPLOAD_API);
 
-  /// ================================================================
-  /// GET KYC STATUS
-  /// ================================================================
-  Future<KycModel?> getKyc() async {
-    final token = storage.read(AppConst.ACCESS_TOKEN);
+    final bytes = await imageFile.readAsBytes();
+    final fileLength = bytes.length;
+    final detectedMime =
+        lookupMimeType(imageFile.path, headerBytes: bytes.take(16).toList()) ??
+            'application/octet-stream';
+    final mimeParts = detectedMime.split('/');
 
-    if (token == null || token.isEmpty) {
-      log("❌ No token found for GET KYC");
-      return null;
-    }
+    log('📎 Uploading file: ${imageFile.path}');
+    log('📏 File size bytes: $fileLength');
+    log('🧾 Detected mime: $detectedMime');
+    log('🔤 type field: $type, side field: $side');
 
-    log("📌 GET KYC → ${AppURLs.KYC_API}");
+    Future<http.Response> send(String method) async {
+      var request = http.MultipartRequest(method, uri);
+      request.headers["Authorization"] = "Bearer $token";
+      // Do NOT set Content-Type header here; MultipartRequest will set it with boundary.
+      request.fields["type"] = type;
+      request.fields["side"] = side;
+      
+      final filename = path.basename(imageFile.path);
 
-    try {
-      KycModel? model;
-
-      await APIService.getRequest(
-        url: AppURLs.KYC_API,
-        headers: {
-          "Authorization": "Bearer $token",
-          "Accept": "application/json",
-        },
-        onSuccess: (json) {
-          log("📥 KYC RESPONSE: $json");
-          model = KycModel.fromJson(json);
-        },
+      final multipartFile = http.MultipartFile.fromBytes(
+        "image",
+        bytes,
+        filename: filename,
+        contentType: MediaType(mimeParts[0], mimeParts[1]),
       );
 
-      return model;
-    } catch (e, s) {
-      log("❌ KYC GET ERROR: $e");
-      log(s.toString());
-      return null;
+      request.files.add(multipartFile);
+
+      log("🔐 Request headers before send: ${request.headers}");
+      log("🔗 Request method: $method, endpoint: $uri");
+
+      var streamed = await request.send().timeout(
+            const Duration(seconds: 60),
+            onTimeout: () => throw TimeoutException('Upload took too long'),
+          );
+
+      return await http.Response.fromStream(streamed);
+    }
+
+    // First try per docs: PUT
+    try {
+      log("➡ Trying PUT per API docs...");
+      final putResp = await send("PUT");
+      log("📤 PUT → ${putResp.statusCode}");
+      log("📥 ${putResp.body}");
+      if (putResp.statusCode == 200 || putResp.statusCode == 201) {
+        return jsonDecode(putResp.body);
+      } else if (putResp.statusCode >= 400 && putResp.statusCode < 500) {
+        // Client error: bubble up
+        throw "Upload failed (${putResp.statusCode}): ${putResp.body}";
+      } else {
+        // Server error: try POST fallback
+        log("⚠ PUT returned server error; will try POST fallback.");
+      }
+    } catch (e) {
+      log("❌ PUT attempt threw: $e");
+      // Continue to POST fallback
+    }
+
+    // POST fallback
+    try {
+      log("➡ Trying POST fallback...");
+      final postResp = await send("POST");
+      log("📤 POST → ${postResp.statusCode}");
+      log("📥 ${postResp.body}");
+      if (postResp.statusCode == 200 || postResp.statusCode == 201) {
+        return jsonDecode(postResp.body);
+      } else {
+        throw "Upload failed (${postResp.statusCode}): ${postResp.body}";
+      }
+    } catch (e) {
+      log("❌ POST attempt threw: $e");
+      // Nothing left to try
+      throw "Upload failed: PUT & POST attempts failed. Last error: $e";
     }
   }
 
-  /// ================================================================
-  /// SUBMIT KYC DOCUMENTS (MULTIPART FILES)
-  /// ================================================================
-  ///
-  ///  This function matches the KycController:
-  ///  
-  ///   - type (aadhaar / pan)
-  ///   - front (file)
-  ///   - back (file? optional)
-  ///
-  Future<bool> submitKycMultipart({
-    required String docType,
-    required http.MultipartFile frontFile,
-    http.MultipartFile? backFile,
+  // =====================================================================
+  // 2️⃣ SUBMIT KYC (POST /api/kyc/submit)
+  // =====================================================================
+  Future<Map<String, dynamic>> submitKyc({
+    required List<Map<String, dynamic>> documents,
   }) async {
-    final token = storage.read(AppConst.ACCESS_TOKEN);
+    final token = box.read(AppConst.ACCESS_TOKEN);
+    final uri = Uri.parse(AppURLs.KYC_SUBMIT_API);
 
-    if (token == null || token.isEmpty) {
-      log("❌ No token found for POST KYC");
-      return false;
+    final response = await http.post(
+      uri,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({"documents": documents}),
+    );
+
+    log("📤 SUBMIT DOCS → ${jsonEncode({"documents": documents})}");
+    log("📥 SUBMIT RESPONSE (${response.statusCode}) → ${response.body}");
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      throw "KYC submit failed (${response.statusCode}): ${response.body}";
     }
+  }
 
-    log("📤 SUBMITTING KYC → ${AppURLs.KYC_POST_API}");
+  // =====================================================================
+  // 3️⃣ GET KYC STATUS (GET /api/kyc/status)
+  // =====================================================================
+  Future<KycModel> getKyc() async {
+    final token = box.read(AppConst.ACCESS_TOKEN);
+    final uri = Uri.parse(AppURLs.KYC_API);
 
-    try {
-      var request = http.MultipartRequest(
-        "POST",
-        Uri.parse(AppURLs.KYC_POST_API),
-      );
-
-      // Headers
-      request.headers.addAll({
+    final response = await http.get(
+      uri,
+      headers: {
         "Authorization": "Bearer $token",
         "Accept": "application/json",
-      });
+      },
+    );
 
-      // Body fields
-      request.fields["type"] = docType;
+    log("📥 GET KYC STATUS → ${response.statusCode}");
+    log(response.body);
 
-      // Files
-      request.files.add(frontFile);
-      if (backFile != null) request.files.add(backFile);
-
-      // Send
-      var streamed = await request.send();
-      var response = await http.Response.fromStream(streamed);
-
-      log("📥 RESPONSE CODE: ${response.statusCode}");
-      log("📥 RESPONSE BODY: ${response.body}");
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return true;
-      }
-
-      return false;
-    } catch (e, s) {
-      log("❌ KYC MULTIPART ERROR: $e");
-      log(s.toString());
-      return false;
+    if (response.statusCode == 200) {
+      return kycModelFromJson(response.body);
+    } else {
+      throw "Failed to fetch KYC status (${response.statusCode}): ${response.body}";
     }
   }
 }
-

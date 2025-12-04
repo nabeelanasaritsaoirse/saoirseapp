@@ -8,6 +8,9 @@ class AppURLs {
   //login api
   static String LOGIN_API = BASE_API + 'api/auth/login';
 
+  // Noitification
+  static String NOTIFICATION_API = BASE_API + "api/notifications/trigger";
+
   //user details api
   static String USER_UPDATE_API = BASE_API + "api/auth/profiles/";
   static String PROFILE_UPDATE_API = BASE_API + "api/users/";
@@ -68,7 +71,8 @@ class AppURLs {
 
   // KYC api
   static String KYC_API = BASE_API + "api/kyc/status";
-  static String KYC_POST_API = BASE_API + "api/kyc/submit";
+  static String KYC_SUBMIT_API = BASE_API + "api/kyc/submit";
+  static String KYC_UPLOAD_API = BASE_API + "api/kyc/upload";
 
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/orders";
@@ -119,8 +123,17 @@ class AppURLs {
   // Sub Category Order Listing Page
   static String PRODUCT_LISTING_SUBCATEGORY =
       BASE_API + "api/products/category/";
-  
+
   //Get all coupons from api
-  static String GET_ALL_COUPONS =
-      BASE_API + "api/coupons";
+  static String GET_ALL_COUPONS = BASE_API + "api/coupons";
+
+  //Chat messages
+  static String CREATE_INDIVIDUAL_CHAT_FROM_REFFERAL =
+      BASE_API + "api/chat/conversations/individual";
+
+  //Post request for Coupon Validation after this API will send the response
+  static String POST_RQ_COUPONS_VALIDATION =
+      BASE_API + "api/installments/validate-coupon";
+
+      
 }

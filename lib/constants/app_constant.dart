@@ -2,7 +2,9 @@
 
 class AppConst {
   static String USER_ID = 'User ID';
+  static String USER_NAME = "User name";
   static String ACCESS_TOKEN = 'Access Token';
   static String REFRESH_TOKEN = 'Refresh Token';
   static String REFERRAL_CODE = 'Referral Code';
+  
 }
