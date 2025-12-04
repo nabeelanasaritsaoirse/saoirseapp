@@ -110,7 +110,15 @@ jobs:
         run: |
           IDENTITY=$(security find-identity -v -p codesigning | grep "iPhone Distribution" | head -1 | awk -F\" '{print $2}')
           echo "identity=$IDENTITY" >> $GITHUB_OUTPUT
-          
+
+      - name: 🔄 Clean & Reinstall Pods
+        run: |
+          cd ios
+          rm -rf Pods
+          rm -rf Podfile.lock
+          pod install
+          cd ..
+
 
       # ---------------------------------------------------
       # 🛠️ BUILD IPA
