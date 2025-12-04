@@ -88,6 +88,7 @@ class ProfileService {
   Future<bool> updateProfilePicture(String userId, String imagePath) async {
     try {
       final url = "${AppURLs.BASE_API}api/users/$userId/profile-picture";
+      
 
       print("============================================");
       print(" UPLOADING PROFILE IMAGE");
@@ -109,7 +110,7 @@ class ProfileService {
 
       // ---- Convert to MultipartFile ----
       final multipart = await http.MultipartFile.fromPath(
-        "image", // FIXED FIELD NAME
+        "file", // FIXED FIELD NAME
         newFile.path,
         contentType: MediaType("image", "jpeg"), //FORCE JPEG
       );

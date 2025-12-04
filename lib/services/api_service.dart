@@ -397,42 +397,43 @@ class APIService {
   // Handles image file uploads using POST/PUT.
   // ---------------------------------------------------------------------------
   static Future<http.Response?> uploadImageRequest({
-    required String url,
-    required String method,
-    required http.MultipartFile file,
-    Map<String, String>? headers,
-    Map<String, String>? body,
-    int timeoutSeconds = 20,
-  }) async {
-    try {
-      var request =
-          http.MultipartRequest(method == "PUT" ? "POST" : method, Uri.parse(url));
+  required String url,
+  required String method,
+  required http.MultipartFile file,
+  Map<String, String>? headers,
+  Map<String, String>? body,
+  int timeoutSeconds = 20,
+}) async {
+  try {
+    // 🔥 ACTUALLY USE THE PUT METHOD
+    var request = http.MultipartRequest(method, Uri.parse(url));
 
-      request.files.add(file);
+    request.files.add(file);
 
-      if (headers != null) {
-        request.headers.addAll({
-          ...headers,
-          "Accept": "application/json",
-        });
-      }
-
-      if (body != null) request.fields.addAll(body);
-
-      var streamedResponse =
-          await request.send().timeout(Duration(seconds: timeoutSeconds));
-
-      var response = await http.Response.fromStream(streamedResponse);
-
-      log("Image Upload Response: ${response.statusCode}");
-      log("BODY: ${response.body}");
-
-      return response;
-    } catch (e) {
-      log("UPLOAD ERROR => $e");
-      return null;
+    if (headers != null) {
+      request.headers.addAll({
+        ...headers,
+        "Accept": "application/json",
+      });
     }
+
+    if (body != null) request.fields.addAll(body);
+
+    var streamedResponse =
+        await request.send().timeout(Duration(seconds: timeoutSeconds));
+
+    var response = await http.Response.fromStream(streamedResponse);
+
+    log("Image Upload Response: ${response.statusCode}");
+    log("BODY: ${response.body}");
+
+    return response;
+  } catch (e) {
+    log("UPLOAD ERROR => $e");
+    return null;
   }
+}
+
 }
 
 
