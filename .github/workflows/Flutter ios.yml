@@ -54,17 +54,16 @@ jobs:
         run: sudo gem install fastlane -N
 
       # ---------------------------------------------
-      # 🔐 CREATE api_key.json from GitHub secret
+      # 🔐 CREATE api_key.json
       # ---------------------------------------------
-      - name: 🔐 Create api_key.json (REQUIRED)
-        run: |
-          echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > api_key.json
+      - name: 🔐 Create api_key.json
+        run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > api_key.json
 
       - name: 🔐 Verify api_key.json exists
         run: ls -lah api_key.json
 
       # ---------------------------------------------
-      # 🔐 RUN FASTLANE MATCH  (Install profiles, certs)
+      # 🔐 RUN FASTLANE MATCH
       # ---------------------------------------------
       - name: 🔐 Run Fastlane Match
         run: |
@@ -78,12 +77,11 @@ jobs:
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
-    # ---------------------------------------------
-      # 🔐 Import cert & provisioning profile to system keychain
+      # ---------------------------------------------
+      # 🔐 IMPORT SIGNING ASSETS INTO LOGIN KEYCHAIN
       # ---------------------------------------------
       - name: 🔐 Import Signing Assets to Xcode Keychain
         run: |
-          security list-keychains -s ~/Library/Keychains/login.keychain-db
           security unlock-keychain -p "" ~/Library/Keychains/login.keychain-db
 
           echo ">> Certificates installed:"
@@ -91,8 +89,8 @@ jobs:
 
           echo ">> Provisioning Profiles:"
           ls ~/Library/MobileDevice/Provisioning\ Profiles/
-          
- # ---------------------------------------------------
+
+      # ---------------------------------------------------
       # 🔍 Extract Provisioning Profile UUID
       # ---------------------------------------------------
       - name: 🔍 Get Provisioning Profile UUID
@@ -102,9 +100,8 @@ jobs:
           UUID=$(basename "$PROFILE_PATH" .mobileprovision)
           echo "uuid=$UUID" >> $GITHUB_OUTPUT
 
-
       # ---------------------------------------------------
-      # 🔍 Extract Signing Certificate Identity
+      # 🔍 Extract Certificate Identity
       # ---------------------------------------------------
       - name: 🔍 Get Signing Identity
         id: identity
@@ -112,18 +109,18 @@ jobs:
           IDENTITY=$(security find-identity -v -p codesigning | grep "iPhone Distribution" | head -1 | awk -F\" '{print $2}')
           echo "identity=$IDENTITY" >> $GITHUB_OUTPUT
 
-
       # ---------------------------------------------------
-      # 🍏 Build Signed IPA (Manual Signing)
+      # 🛠️ BUILD IPA
       # ---------------------------------------------------
       - name: 🍏 Build IPA
-        run: |
-          flutter build ipa --release
         env:
-          PROVISIONING_PROFILE_SPECIFIER: ${{ steps.profile.outputs.uuid }}
           CODE_SIGN_STYLE: Manual
-          DEVELOPMENT_TEAM: YOUR_TEAM_ID_HERE
-          CODE_SIGN_IDENTITY: ${{ steps.identity.outputs.identity }}
+          DEVELOPMENT_TEAM: BYQUNNQSQH
+          PROVISIONING_PROFILE_SPECIFIER: ${{ steps.profile.outputs.uuid }}
+          PROVISIONING_PROFILE: ${{ steps.profile.outputs.uuid }}
+          EXPANDED_CODE_SIGN_IDENTITY: ${{ steps.identity.outputs.identity }}
+        run: flutter build ipa --release
+
 
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
