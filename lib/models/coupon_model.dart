@@ -1,7 +1,7 @@
 class Coupon {
   final String id;
   final String couponCode;
-  final String discountType; 
+  final String discountType;
   final double discountValue;
   final String couponType;
   final double minOrderValue;
@@ -21,6 +21,7 @@ class Coupon {
 
   factory Coupon.fromJson(Map<String, dynamic> json) {
     DateTime? expiry;
+
     if (json["expiryDate"] != null && (json["expiryDate"] as String).isNotEmpty) {
       try {
         expiry = DateTime.parse(json["expiryDate"]);
@@ -32,7 +33,7 @@ class Coupon {
     return Coupon(
       id: json["_id"] ?? "",
       couponCode: json["couponCode"] ?? "",
-      discountType: json["discountType"] ?? "flat",
+      discountType: json["discountType"] ?? "",
       discountValue: (json["discountValue"] ?? 0).toDouble(),
       couponType: json["couponType"] ?? "",
       minOrderValue: (json["minOrderValue"] ?? 0).toDouble(),

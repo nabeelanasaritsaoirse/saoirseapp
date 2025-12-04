@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 
 import '../../models/friend_details_response.dart';
 import '../../models/product_detiails_response.dart';
+import '../../services/converstion_service.dart';
 import '../../services/refferal_service.dart';
+import '../message/message_screen.dart';
 
 class InviteFriendController extends GetxController {
   final String userId;
@@ -12,6 +14,7 @@ class InviteFriendController extends GetxController {
   InviteFriendController(this.userId);
 
   final ReferralService _referralService = ReferralService();
+  final ConversationService _chatService = ConversationService();
 
   final friendDetails = Rxn<FriendDetails>();
   final isProductLoading = false.obs;
@@ -64,5 +67,40 @@ class InviteFriendController extends GetxController {
     }
 
     return null;
+  }
+
+  // ---------------- MESSAGE BUTTON ACTION ----------------
+// ---------------- MESSAGE BUTTON ACTION ----------------
+  Future<void> openChat() async {
+    print("\n================ OPEN CHAT =================");
+    print("UserId used to create chat: $userId");
+    print("============================================");
+
+    isLoading.value = true;
+
+    final chat = await _chatService.createIndividualChat(userId);
+
+    isLoading.value = false;
+
+    if (chat == null) {
+      print("❌ Chat creation failed → chat == null");
+      return;
+    }
+
+    print("\n========== CHAT CREATED SUCCESSFULLY ==========");
+    print("Conversation ID: ${chat.conversationId}");
+    print("New conversation?  ${chat.isNewConversation}");
+    print("Participants:");
+    for (var p in chat.participants) {
+      print(" - ${p.name} (${p.id})");
+    }
+    print("===============================================\n");
+
+    // Navigate to chat screen
+    print("➡️ Navigating to PaymentMessageScreen...");
+    Get.to(() => PaymentMessageScreen(
+          conversationId: chat.conversationId,
+          participants: chat.participants,
+        ));
   }
 }

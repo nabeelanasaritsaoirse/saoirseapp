@@ -25,6 +25,7 @@ import 'services/appsflyer_service.dart';
 //storage instance
 GetStorage storage = GetStorage();
 
+
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("🟡 Background Message Received: ${message.notification?.title}");
   NotificationServiceHelper.showFlutterNotification(message);
@@ -76,6 +77,8 @@ Future<void> main() async {
   final savedToken = storage.read(AppConst.ACCESS_TOKEN);
   if (savedToken != null) {
     notif.updateToken(savedToken);
+     notif.refreshNotifications();
+  notif.fetchUnreadCount();
   }
 
   // 🟢 Foreground message listener

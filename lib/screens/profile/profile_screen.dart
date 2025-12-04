@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import 'package:saoirse_app/screens/kyc/kyc_controller.dart';
-import '/screens/kyc/kycScreen.dart';
+import '../kyc/kyc_screen.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -14,7 +14,7 @@ import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/profile_menu_card.dart';
-import '../edit_profile/edit_profile_screen.dart';
+
 import '../order_delivered/order_delivered_screen.dart';
 import '../order_history/order_history_screen.dart';
 import '../pending_transaction/pending_transaction_screen.dart';
@@ -48,33 +48,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: CustomAppBar(
         title: AppStrings.profile_title,
         showBack: false,
+        
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // -------------------- PROFILE BANNER -----------------------
+          
             Obx(() {
-              final user = controller.profile.value?.user;
-
-              if (user == null) {
+              if (controller.isLoading.value) {
                 return SizedBox(
-                  height: 200.h,
+                  height: 200,
                   child: Center(child: appLoader()),
                 );
               }
 
-              // // --- priority logic ---
-              // String primaryContact = "";
-              // if (user.email.isNotEmpty) {
-              //   primaryContact = user.email;
-              // } else if (user.phoneNumber.isNotEmpty) {
-              //   primaryContact = user.phoneNumber;
-              // }
+              final profile = controller.profile.value;
+
+              if (profile == null) {
+                return SizedBox(
+                  height: 200,
+                  child: Center(child: Text("Failed to load profile")),
+                );
+              }
+
+              final user = profile.user;
+
               return Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  // BACKGROUND CONTAINER
                   Container(
                     width: double.infinity,
                     height: 200.h,
@@ -85,61 +88,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   ),
-
-                  // PROFILE - DETAILS
                   Positioned(
-                    top: 39.h, // moves the circle down
+                    top: 39.h,
                     left: 0,
                     right: 0,
                     child: Column(
                       children: [
-                        // PROFILE WITH EDIT BUTTON
-                        Stack(
-                          children: [
-                            CircleAvatar(
-                              radius: 42,
-                              backgroundColor: Colors.grey.shade300,
-                              backgroundImage: user.profilePicture.isNotEmpty
-                                  ? NetworkImage(user.profilePicture)
-                                  : AssetImage(AppAssets.user_img)
-                                      as ImageProvider,
-                            ),
-
-                            // SMALL EDIT ICON
-                            Positioned(
-                              right: 0,
-                              bottom: 0,
-                              child: InkWell(
-                                onTap: () => Get.to(EditProfileScreen()),
-                                child: Container(
-                                  width: 25.w,
-                                  height: 25.h,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: AppColors.primaryColor,
-                                  ),
-                                  child: Icon(
-                                    Icons.edit,
-                                    color: AppColors.white,
-                                    size: 14.sp,
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
+                        CircleAvatar(
+                          radius: 42,
+                          backgroundColor: Colors.grey.shade300,
+                          backgroundImage: user.profilePicture.isNotEmpty
+                              ? NetworkImage(user.profilePicture)
+                              : AssetImage(AppAssets.user_img) as ImageProvider,
                         ),
-
                         SizedBox(height: 12.h),
-
-                        appText(user.name,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textBlack,
-                            fontSize: 18.sp),
-                        // if (primaryContact.isNotEmpty)
-                        //   appText(primaryContact,
-                        //       fontWeight: FontWeight.w400,
-                        //       color: AppColors.textBlack,
-                        //       fontSize: 14.sp)
+                        appText(
+                          user.name,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textBlack,
+                          fontSize: 18.sp,
+                        ),
                       ],
                     ),
                   ),

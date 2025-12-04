@@ -16,42 +16,70 @@ class ProfileService {
   final token = storage.read(AppConst.ACCESS_TOKEN);
 
   // ------- Fetch Profile ---------
-  Future<UserProfileModel?> fetchProfile() async {
+  // Future<UserProfileModel?> fetchProfile() async {
+  //   try {
+  //     final url = AppURLs.MY_PROFILE;
+
+  //     print("==========================================");
+  //     print(" PROFILE API CALL");
+  //     print("URL        : $url");
+  //     print("TOKEN      : $token");
+  //     print("==========================================");
+
+  //     final response = await APIService.getRequest(
+  //       url: url,
+  //       headers: {
+  //         "Authorization": "Bearer $token",
+  //       },
+  //       onSuccess: (data) => data,
+  //     );
+
+  //     print(" RAW RESPONSE: $response");
+
+  //     if (response == null) {
+  //       print(" RESPONSE IS NULL");
+  //       return null;
+  //     }
+
+  //     final parsed = UserProfileModel.fromJson(response);
+
+  //     print(" PARSED SUCCESS:");
+  //     print("User Name  : ${parsed.user.name}");
+  //     print("Email      : ${parsed.user.email}");
+  //     print("Phone      : ${parsed.user.phoneNumber}");
+  //     print("==========================================");
+
+  //     return parsed;
+  //   } catch (e) {
+  //     print(" Profile fetch error: $e");
+  //     return null;
+  //   }
+  // }
+
+      Future<UserProfileModel?> fetchProfile() async {
     try {
       final url = AppURLs.MY_PROFILE;
 
-      print("==========================================");
-      print(" PROFILE API CALL");
-      print("URL        : $url");
-      print("TOKEN      : $token");
-      print("==========================================");
+      print("Calling PROFILE API...");
+      print("TOKEN: $token");
 
-      final response = await APIService.getRequest(
+      final response = await APIService.getRequest<UserProfileModel>(
         url: url,
         headers: {
           "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
         },
-        onSuccess: (data) => data,
+
+        // ⬇️ THIS maps JSON → UserProfileModel
+        onSuccess: (json) {
+          print("PROFILE DATA RECEIVED");
+          return UserProfileModel.fromJson(json);
+        },
       );
 
-      print(" RAW RESPONSE: $response");
-
-      if (response == null) {
-        print(" RESPONSE IS NULL");
-        return null;
-      }
-
-      final parsed = UserProfileModel.fromJson(response);
-
-      print(" PARSED SUCCESS:");
-      print("User Name  : ${parsed.user.name}");
-      print("Email      : ${parsed.user.email}");
-      print("Phone      : ${parsed.user.phoneNumber}");
-      print("==========================================");
-
-      return parsed;
+      return response;
     } catch (e) {
-      print(" Profile fetch error: $e");
+      print("Profile fetch error: $e");
       return null;
     }
   }

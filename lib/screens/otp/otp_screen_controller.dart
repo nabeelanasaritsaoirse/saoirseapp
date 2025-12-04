@@ -32,7 +32,6 @@ class VerifyOtpController extends GetxController {
   final String username;
   final String referral;
 
-
   /// STEP 1 — Verify OTP (Firebase)
   verifyOtp() async {
     isLoading.value = true;
@@ -65,6 +64,7 @@ class VerifyOtpController extends GetxController {
     storage.write(AppConst.ACCESS_TOKEN, data.accessToken);
     storage.write(AppConst.REFRESH_TOKEN, data.refreshToken);
     storage.write(AppConst.REFERRAL_CODE, data.referralCode);
+    storage.write(AppConst.USER_NAME , data.name);
 
     print("✔ SAVED userId: ${storage.read(AppConst.USER_ID)}");
     print("✔ SAVED accessToken: ${storage.read(AppConst.ACCESS_TOKEN)}");
@@ -73,9 +73,9 @@ class VerifyOtpController extends GetxController {
     print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
 
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
-  final notif = Get.find<NotificationController>();
-  notif.updateToken(data.accessToken!);         // update token in controller
-  notif.service.updateToken(data.accessToken!); 
+    final notif = Get.find<NotificationController>();
+    notif.updateToken(data.accessToken!); // update token in controller
+    notif.service.updateToken(data.accessToken!);
     if (referral.isNotEmpty) {
       await Get.find<LoginController>().applyReferral(referral);
     }
@@ -90,6 +90,12 @@ class VerifyOtpController extends GetxController {
       isLoading.value = false;
       return;
     }
+ 
+ 
+notif.updateToken(data.accessToken!);
+await notif.sendWelcomeNotification(username);
+await notif.refreshNotifications();
+await notif.fetchUnreadCount();
 
     final fcmToken = await getDeviceToken();
     if (fcmToken != null) {
@@ -182,14 +188,14 @@ class VerifyOtpController extends GetxController {
   }
 
 //------------------new-----------------------------
-@override
- void onClose() {
-  for (var node in focusNodes) {
-    node.dispose();
+  @override
+  void onClose() {
+    for (var node in focusNodes) {
+      node.dispose();
+    }
+    for (var controller in otpControllers) {
+      controller.dispose();
+    }
+    super.onClose();
   }
-  for (var controller in otpControllers) {
-    controller.dispose();
-  }
-  super.onClose();
-}
 }
