@@ -3,11 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/dashboard/dashboard_screen.dart';
 import 'package:saoirse_app/screens/my_wallet/my_wallet.dart';
-
 import '../../constants/app_strings.dart';
-import '../dashboard/dashboard_controller.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 

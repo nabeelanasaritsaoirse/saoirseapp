@@ -194,7 +194,7 @@ class ProfileController extends GetxController {
 
       if (image != null) {
         profileImage.value = File(image.path);
-        // await uploadUserProfilePicture(image.path);----------(commendd for auto upload)
+        // await uploadUserProfilePicture(image.path);
       }
     } catch (e) {
       print("PICK IMAGE ERROR: $e");

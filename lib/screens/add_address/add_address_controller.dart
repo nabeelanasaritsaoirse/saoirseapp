@@ -46,7 +46,7 @@ class AddAddressController extends GetxController {
 
       appToast(title: "Success", content: "Address added successfully");
 
-      Get.back();
+      
     } else {
       appToast(error: true, title: "Error", content: "Failed to add address");
     }

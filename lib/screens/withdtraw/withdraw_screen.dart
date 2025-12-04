@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import '../../constants/app_colors.dart';
 import '../../widgets/app_toast.dart';
 import '../../widgets/custom_appbar.dart';
-import '../booking_confirmation/booking_confirmation_screen.dart';
 import 'withdraw_controller.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';

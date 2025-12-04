@@ -14,7 +14,6 @@ import '../../models/product_details_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
-import '../product_details/product_details_controller.dart';
 import '../razorpay/razorpay_controller.dart';
 import 'order_details_controller.dart';
 
