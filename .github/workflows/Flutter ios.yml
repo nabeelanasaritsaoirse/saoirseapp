@@ -112,14 +112,18 @@ jobs:
       # ---------------------------------------------------
       # 🛠️ BUILD IPA
       # ---------------------------------------------------
-      - name: 🍏 Build IPA
+      - name: 🍏 Build IPA (with code signing)
         env:
           CODE_SIGN_STYLE: Manual
           DEVELOPMENT_TEAM: BYQUNNQSQH
           PROVISIONING_PROFILE_SPECIFIER: ${{ steps.profile.outputs.uuid }}
           PROVISIONING_PROFILE: ${{ steps.profile.outputs.uuid }}
           EXPANDED_CODE_SIGN_IDENTITY: ${{ steps.identity.outputs.identity }}
-        run: flutter build ipa --release
+        run: |
+          echo "Using Provisioning Profile: $PROVISIONING_PROFILE_SPECIFIER"
+          echo "Using Certificate: $EXPANDED_CODE_SIGN_IDENTITY"
+          flutter build ipa --release
+
 
 
       - name: 📤 Upload IPA Artifact
