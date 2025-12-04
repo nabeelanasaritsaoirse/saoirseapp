@@ -78,6 +78,20 @@ jobs:
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
+    # ---------------------------------------------
+      # 🔐 Import cert & provisioning profile to system keychain
+      # ---------------------------------------------
+      - name: 🔐 Import Signing Assets to Xcode Keychain
+        run: |
+          security list-keychains -s ~/Library/Keychains/login.keychain-db
+          security unlock-keychain -p "" ~/Library/Keychains/login.keychain-db
+
+          echo ">> Certificates installed:"
+          security find-identity -v -p codesigning
+
+          echo ">> Provisioning Profiles:"
+          ls ~/Library/MobileDevice/Provisioning\ Profiles/
+
       # ---------------------------------------------
       # 🛠️ BUILD IOS IPA
       # ---------------------------------------------
