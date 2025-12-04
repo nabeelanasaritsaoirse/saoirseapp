@@ -1,12 +1,8 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
-import 'package:saoirse_app/screens/kyc/kyc_controller.dart';
+import '/screens/kyc/kyc_controller.dart';
 import '../kyc/kyc_screen.dart';
-
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -14,7 +10,6 @@ import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/profile_menu_card.dart';
-
 import '../order_delivered/order_delivered_screen.dart';
 import '../order_history/order_history_screen.dart';
 import '../pending_transaction/pending_transaction_screen.dart';

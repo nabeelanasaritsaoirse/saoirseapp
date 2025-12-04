@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
+import 'package:saoirse_app/widgets/custom_appbar.dart';
 import '/widgets/app_loader.dart';
 import '/constants/app_colors.dart';
 import '/screens/kyc/kyc_controller.dart';
@@ -15,9 +17,9 @@ class KycScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: appText("KYC Status", fontSize: 25, color: AppColors.white),
-        backgroundColor: AppColors.primaryColor,
+      backgroundColor: AppColors.scaffoldColor,
+      appBar: CustomAppBar(
+        title: AppStrings.KycTitle,
       ),
       body: Obx(() {
         if (controller.isLoading.value) return appLoader();
@@ -51,12 +53,10 @@ class KycScreen extends StatelessWidget {
   }
 }
 
-//
-//
-//
+//==========================================================================
 //                 NOT SUBMITTED UI
-//
-//
+//==========================================================================
+
 class NotSubmittedUI extends StatelessWidget {
   const NotSubmittedUI({super.key});
 
@@ -67,7 +67,7 @@ class NotSubmittedUI extends StatelessWidget {
     return SingleChildScrollView(
       padding: EdgeInsets.all(16.r),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(Icons.info_outline, size: 70.sp, color: AppColors.orange),
           SizedBox(height: 8.h),
@@ -105,10 +105,10 @@ class NotSubmittedUI extends StatelessWidget {
               )),
           SizedBox(height: 25.h),
 
-          // ============================
+          // =======================================================================
           //      DOCUMENT SELECTION
-          // ============================
-          appText("Select Document(s)",
+          // =======================================================================
+          appText("Upload Document",
               fontSize: 16.sp, fontWeight: FontWeight.w600),
           SizedBox(height: 12.h),
 
@@ -126,7 +126,7 @@ class NotSubmittedUI extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.credit_card),
+                      Icon(Icons.document_scanner_outlined),
                       SizedBox(width: 10.w),
                       Expanded(child: appText("Aadhaar Card")),
                       Checkbox(
@@ -138,8 +138,9 @@ class NotSubmittedUI extends StatelessWidget {
                 ),
               )),
           SizedBox(height: 10.h),
-
+//=================================================================
           // PAN checkbox
+//=================================================================
           Obx(() => GestureDetector(
                 onTap: () => controller.panSelected.toggle(),
                 child: Container(
@@ -153,22 +154,21 @@ class NotSubmittedUI extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.credit_card),
+                      Icon(Icons.document_scanner_outlined),
                       SizedBox(width: 10.w),
                       Expanded(child: appText("PAN Card")),
                       Checkbox(
                           value: controller.panSelected.value,
-                          onChanged: (_) =>
-                              controller.panSelected.toggle()),
+                          onChanged: (_) => controller.panSelected.toggle()),
                     ],
                   ),
                 ),
               )),
           SizedBox(height: 20.h),
 
-          // ============================
-          //      AADHAAR UPLOADS
-          // ============================
+// ==========================================================================
+//      AADHAAR UPLOADS
+// ==========================================================================
           Obx(() => controller.aadhaarSelected.value
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,7 +176,6 @@ class NotSubmittedUI extends StatelessWidget {
                     appText("Aadhaar Front Image",
                         fontSize: 16.sp, fontWeight: FontWeight.w600),
                     SizedBox(height: 10.h),
-
                     GestureDetector(
                       onTap: controller.pickAadhaarFront,
                       child: Container(
@@ -197,11 +196,9 @@ class NotSubmittedUI extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 20.h),
-
                     appText("Aadhaar Back Image",
                         fontSize: 16.sp, fontWeight: FontWeight.w600),
                     SizedBox(height: 10.h),
-
                     GestureDetector(
                       onTap: controller.pickAadhaarBack,
                       child: Container(
@@ -226,66 +223,68 @@ class NotSubmittedUI extends StatelessWidget {
                 )
               : SizedBox()),
 
-          // ============================
-          //      PAN UPLOADS
-          // ============================
-        Obx(() => controller.panSelected.value
-    ? Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          appText("PAN Front Image",
-              fontSize: 16.sp, fontWeight: FontWeight.w600),
-          SizedBox(height: 10.h),
+          // =========================================================
+          //     PAN UPLOADS
+          // =========================================================
 
-          GestureDetector(
-            onTap: controller.pickPanFront,
-            child: Container(
-              height: 150.h,
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.grey),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: controller.panFront.value == null
-                  ? Center(child: appText("Tap to upload front"))
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(12.r),
-                      child: Image.file(
-                        controller.panFront.value!,
-                        fit: BoxFit.cover,
+          Obx(() => controller.panSelected.value
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    appText("PAN Front Image",
+                        fontSize: 16.sp, fontWeight: FontWeight.w600),
+                    SizedBox(height: 10.h),
+
+                    GestureDetector(
+                      onTap: controller.pickPanFront,
+                      child: Container(
+                        height: 150.h,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppColors.grey),
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: controller.panFront.value == null
+                            ? Center(child: appText("Tap to upload front"))
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(12.r),
+                                child: Image.file(
+                                  controller.panFront.value!,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                       ),
                     ),
-            ),
-          ),
-          SizedBox(height: 20.h),
+                    SizedBox(height: 20.h),
 
-          // 🔥 PAN BACK IMAGE (NEW)
-          appText("PAN Back Image",
-              fontSize: 16.sp, fontWeight: FontWeight.w600),
-          SizedBox(height: 10.h),
+                    // 🔥 PAN BACK IMAGE (NEW)
 
-          GestureDetector(
-            onTap: controller.pickPanBack,
-            child: Container(
-              height: 150.h,
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.grey),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: controller.panBack.value == null
-                  ? Center(child: appText("Tap to upload back"))
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(12.r),
-                      child: Image.file(
-                        controller.panBack.value!,
-                        fit: BoxFit.cover,
+                    appText("PAN Back Image",
+                        fontSize: 16.sp, fontWeight: FontWeight.w600),
+                    SizedBox(height: 10.h),
+
+                    GestureDetector(
+                      onTap: controller.pickPanBack,
+                      child: Container(
+                        height: 150.h,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppColors.grey),
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: controller.panBack.value == null
+                            ? Center(child: appText("Tap to upload back"))
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(12.r),
+                                child: Image.file(
+                                  controller.panBack.value!,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                       ),
                     ),
-            ),
-          ),
-          SizedBox(height: 25.h),
-        ],
-      )
-    : SizedBox()),
+                    SizedBox(height: 25.h),
+                  ],
+                )
+              : SizedBox()),
           // ============================
           //      SUBMIT BUTTON
           // ============================
@@ -300,12 +299,11 @@ class NotSubmittedUI extends StatelessWidget {
     );
   }
 }
-//
-//
-//
+
+//===============================================
 //     PENDING UI
-//
-//
+//===============================================
+
 class PendingUI extends StatelessWidget {
   const PendingUI({super.key});
 
@@ -321,7 +319,7 @@ class PendingUI extends StatelessWidget {
             SizedBox(height: 15.h),
             appText("KYC Pending",
                 fontSize: 22.sp, fontWeight: FontWeight.bold),
-            SizedBox(height: 10),
+            SizedBox(height: 8.h),
             appText("Your documents are under review.",
                 fontSize: 15.sp, fontWeight: FontWeight.w500),
           ],
@@ -331,12 +329,9 @@ class PendingUI extends StatelessWidget {
   }
 }
 
-//
-//
-//
+//=============================================================
 //     APPROVED UI
-//
-//
+//=============================================================
 class ApprovedUI extends StatelessWidget {
   final bool isAuto;
   const ApprovedUI({super.key, required this.isAuto});
@@ -363,12 +358,10 @@ class ApprovedUI extends StatelessWidget {
   }
 }
 
-//
-//
-//
+//======================================================
 //     REJECTED UI
-//
-//
+//======================================================
+
 class RejectedUI extends StatelessWidget {
   const RejectedUI({super.key});
 
