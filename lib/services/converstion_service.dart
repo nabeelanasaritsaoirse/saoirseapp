@@ -69,7 +69,8 @@ class ConversationService {
 
     try {
       final response = await APIService.postRequest(
-        url: "${AppURLs.BASE_API}conversations/$conversationId/messages",
+        url:
+            "${AppURLs.BASE_API}api/chat/conversations/$conversationId/messages",
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -93,4 +94,57 @@ class ConversationService {
       return null;
     }
   }
+
+  Future<List<ChatMessage>> getMessages({
+    required String conversationId,
+    int page = 1,
+    int limit = 50,
+  }) async {
+    final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+    final url =
+        "${AppURLs.BASE_API}api/chat/conversations/$conversationId/messages?page=$page&limit=$limit";
+
+    print("📩 Fetching messages => $url");
+
+    final response = await APIService.getRequest(
+      url: url,
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+      onSuccess: (json) => json,
+    );
+
+    if (response == null) return [];
+
+    print("📬 Messages Loaded = ${response['data']['messages'].length}");
+
+    return (response["data"]["messages"] as List)
+        .map((m) => ChatMessage.fromJson(m))
+        .toList();
+  }
+
+  Future<Map<String, dynamic>?> pollMessages({
+  required DateTime lastPollTime,
+  String? conversationId,
+}) async {
+  final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+  final url =
+      "${AppURLs.BASE_API}api/chat/poll?lastPollTime=${lastPollTime.toIso8601String()}"
+      "${conversationId != null ? "&conversationId=$conversationId" : ""}";
+
+  print("🔁 POLLING => $url");
+
+  final response = await APIService.getRequest(
+    url: url,
+    headers: {"Authorization": "Bearer $token"},
+    onSuccess: (json) => json,
+  );
+
+  if (response == null) return null;
+
+  return response["data"];
+}
+
 }

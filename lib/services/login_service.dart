@@ -1,61 +1,49 @@
 import '../constants/app_strings.dart';
-import '../widgets/app_toast.dart';
 
 class LoginService {
-  //email validation
+  // email validation
   static String? emailValidation({required String email}) {
     if (email.isEmpty ||
         !RegExp(
-          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+          r"^[a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+$",
         ).hasMatch(email)) {
-      appToast(error: true, content: AppStrings.invalid_email);
-
-      return '';
+      return AppStrings.invalid_email;
     }
-
     return null;
   }
 
-  //password validation
+  // password validation
   static String? passValidation({required String pass}) {
     if (pass.isEmpty ||
         !RegExp(
           r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$",
         ).hasMatch(pass)) {
-      appToast(error: true, content: AppStrings.invalid_pass);
-
-      return '';
+      return AppStrings.invalid_pass;
     }
-
     return null;
   }
 
-  //phone validation
+  // phone validation
   static int? phoneValidation({required int phone}) {
     if (phone.toString().length != 10) {
-      appToast(error: true, content: AppStrings.invalid_phone);
-
-      return 0;
+      return 0; // invalid
     }
-
-    return null;
+    return null; // valid
   }
 
+  // username validation
   static String? usernameValidation({required String username}) {
     if (username.isEmpty || !RegExp(r"^[a-zA-Z ]{3,}$").hasMatch(username)) {
-      appToast(error: true, content: AppStrings.invalid_name);
-      return '';
+      return AppStrings.invalid_name;
     }
     return null;
   }
 
-// referral code validation
+  // referral code validation
   static String? referralValidation({required String referral}) {
-    // Example: referral code must be 6–10 alphanumeric
     if (referral.isEmpty ||
         !RegExp(r"^[A-Za-z0-9]{6,10}$").hasMatch(referral)) {
-      appToast(error: true, content: AppStrings.invalid_referral);
-      return '';
+      return AppStrings.invalid_referral;
     }
     return null;
   }

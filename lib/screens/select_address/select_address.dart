@@ -13,7 +13,6 @@ import '../../widgets/app_loader.dart';
 import '../add_address/add_address.dart';
 import '../order_details/order_details_controller.dart';
 import '../order_details/order_details_screen.dart';
-import '../product_details/product_details_controller.dart';
 import 'select_address_controller.dart';
 import '../../models/product_details_model.dart';
 

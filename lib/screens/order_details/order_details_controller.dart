@@ -26,6 +26,10 @@ class OrderDetailsController extends GetxController {
 
   // store last applied coupon code (string) for display
   RxString appliedCouponCode = "".obs;
+  
+ // storing first values for remove coupon
+  double originalAmount = 0.0;
+  int originalDays = 0;
 
   @override
   void onInit() {
@@ -46,7 +50,7 @@ class OrderDetailsController extends GetxController {
     controller.text = coupon.couponCode;
   }
 
-  //-- Apply button tapped 
+  //-- Apply button tapped
   Future<void> applyCouponApi({
     required String couponCode,
     required String productId,
@@ -55,7 +59,6 @@ class OrderDetailsController extends GetxController {
     String variantId = "",
     int quantity = 1,
   }) async {
-    // Basic validation
     if (couponCode.trim().isEmpty) {
       appToast(error: true, content: "Please enter a coupon code");
       return;
@@ -78,7 +81,7 @@ class OrderDetailsController extends GetxController {
     if (Get.isDialogOpen ?? false) Get.back();
 
     if (response == null) {
-      appToast(error: true, content: "Failed to validate coupon. Try again.");
+      appToast(error: true, content: "Invalid coupon");
       return;
     }
 
@@ -87,24 +90,29 @@ class OrderDetailsController extends GetxController {
     appliedCouponCode.value = couponCode.trim();
 
     // Update order amounts/days based on server response so UI displays live changes:
-    // - For INSTANT: pricing.finalPrice may change and installment.dailyAmount stays as provided by server.
-    // - For REDUCE_DAYS: installment.reducedDays may be provided; we still use installment.dailyAmount & totalDays from response.
+    // - For INSTANT: pricing.finalPrice may change and installment.dailyAmount stays as provided by server
+    // - For REDUCE_DAYS: installment.reducedDays may be provided; we still use installment.dailyAmount & totalDays from response
     final inst = response.installment;
     selectedAmount.value = inst.dailyAmount;
     selectedDays.value = inst.totalDays;
 
-    // Optional: you might want to show a toast message with the savings message
+    // Optional message
     if (response.benefits.savingsMessage.isNotEmpty) {
       appToast(title: "Coupon Applied", content: response.benefits.savingsMessage);
     } else {
       appToast(title: "Coupon Applied", content: "Coupon applied successfully");
     }
-
-    // Log for debugging
-    log("Coupon applied → code: $couponCode | type: ${response.coupon.type}");
-    log("Pricing: original ${response.pricing.originalPrice} discount ${response.pricing.discountAmount} final ${response.pricing.finalPrice}");
-    log("Installment: days ${inst.totalDays} daily ${inst.dailyAmount} freeDays ${inst.freeDays} reducedDays ${inst.reducedDays}");
   }
+
+
+  void removeCoupon(TextEditingController controller) {
+  couponValidation.value = null; // remove server response
+  appliedCouponCode.value = "";  // clear coupon code text
+  selectedCoupon.value = null;
+  selectedAmount.value = originalAmount; // restore original daily amount
+  selectedDays.value = originalDays;     // restore original days
+  controller.clear(); // clear text field
+}
 
   //----------------------------COUPONS END-------------------------------------
 
@@ -113,6 +121,7 @@ class OrderDetailsController extends GetxController {
     String variantId = "",
     required String paymentOption,
     required int totalDays,
+    String couponCode = "",
     required Map<String, dynamic> deliveryAddress,
   }) async {
     // Clean delivery address
@@ -133,6 +142,7 @@ class OrderDetailsController extends GetxController {
       "paymentDetails": {
         "totalDays": totalDays,
       },
+      "couponCode": couponCode,
       "deliveryAddress": delivery,
     };
 

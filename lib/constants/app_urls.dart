@@ -2,8 +2,8 @@
 
 class AppURLs {
   //base api
-  // static String BASE_API = 'https://api.epielio.com/';
-  static String BASE_API = 'http://13.127.15.87:8080/';
+  static String BASE_API = 'https://api.epielio.com/';
+//   static String BASE_API = 'http://13.127.15.87:8080/';
 
   //login api
   static String LOGIN_API = BASE_API + 'api/auth/login';
@@ -134,6 +134,4 @@ class AppURLs {
   //Post request for Coupon Validation after this API will send the response
   static String POST_RQ_COUPONS_VALIDATION =
       BASE_API + "api/installments/validate-coupon";
-
-      
 }
