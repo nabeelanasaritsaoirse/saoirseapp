@@ -91,12 +91,39 @@ jobs:
 
           echo ">> Provisioning Profiles:"
           ls ~/Library/MobileDevice/Provisioning\ Profiles/
+          
+ # ---------------------------------------------------
+      # 🔍 Extract Provisioning Profile UUID
+      # ---------------------------------------------------
+      - name: 🔍 Get Provisioning Profile UUID
+        id: profile
+        run: |
+          PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -1)
+          UUID=$(basename "$PROFILE_PATH" .mobileprovision)
+          echo "uuid=$UUID" >> $GITHUB_OUTPUT
 
-      # ---------------------------------------------
-      # 🛠️ BUILD IOS IPA
-      # ---------------------------------------------
+
+      # ---------------------------------------------------
+      # 🔍 Extract Signing Certificate Identity
+      # ---------------------------------------------------
+      - name: 🔍 Get Signing Identity
+        id: identity
+        run: |
+          IDENTITY=$(security find-identity -v -p codesigning | grep "iPhone Distribution" | head -1 | awk -F\" '{print $2}')
+          echo "identity=$IDENTITY" >> $GITHUB_OUTPUT
+
+
+      # ---------------------------------------------------
+      # 🍏 Build Signed IPA (Manual Signing)
+      # ---------------------------------------------------
       - name: 🍏 Build IPA
-        run: flutter build ipa --release
+        run: |
+          flutter build ipa --release
+        env:
+          PROVISIONING_PROFILE_SPECIFIER: ${{ steps.profile.outputs.uuid }}
+          CODE_SIGN_STYLE: Manual
+          DEVELOPMENT_TEAM: YOUR_TEAM_ID_HERE
+          CODE_SIGN_IDENTITY: ${{ steps.identity.outputs.identity }}
 
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
