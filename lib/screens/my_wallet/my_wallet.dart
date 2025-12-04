@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import '../../constants/app_strings.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
