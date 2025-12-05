@@ -119,10 +119,24 @@ jobs:
           flutter pub get
           cd ios && pod install --repo-update && cd ..
 
-      - name: 🔧 Patch Pods project to skip Flutter Run Script (CI)
+      - name: 🔧 Patch Pods project to skip problematic Run Script phases (CI Safe Mode)
         run: |
-          ruby -e "require 'xcodeproj'; p = Xcodeproj::Project.open('ios/Pods/Pods.xcodeproj'); p.targets.each { |t| t.build_phases.each { |phase| if (phase.respond_to?(:name) && phase.name == 'Run Script') || (phase.respond_to?(:shell_script) && phase.shell_script.to_s.include?('flutter')) then phase.shell_script = \"echo 'Skipping Flutter embed Run Script in CI to avoid freeze'\\nexit 0\"; end } }; p.save"
-          
+          ruby - <<'EOF'
+            require 'xcodeproj'
+            project_path = 'ios/Pods/Pods.xcodeproj'
+            project = Xcodeproj::Project.open(project_path)
+      
+            project.targets.each do |t|
+              t.build_phases.each do |phase|
+                if phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
+                  phase.shell_script = "echo 'Skipping problematic Pod Run Script in CI (prevent freeze)'\nexit 0"
+                end
+              end
+            end
+      
+            project.save
+            puts "Patched ALL Pod Run Script phases ✔"
+          EOF
 
       - name: 🍏 Build IPA (Optimized Anti-Freeze Build)
         timeout-minutes: 35
