@@ -113,41 +113,34 @@ jobs:
           flutter pub get
           cd ios && pod install --repo-update && cd ..
 
-      - name: 🔧 Patch Build Scripts (Only Disable Pod Scripts - SAFE VERSION)
+      - name: 🔧 Patch Build Scripts (Safe)
         run: |
           ruby - <<'EOF'
             require 'xcodeproj'
-
             project_path = 'ios/Runner.xcodeproj'
             project = Xcodeproj::Project.open(project_path)
-
             project.targets.each do |target|
               target.build_phases.each do |phase|
-
                 next unless phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
-
-                script = phase.shell_script.to_s
-
-                # ❌ DO NOT TOUCH FLUTTER BUILD PHASES
-                # These are CRITICAL: xcode_backend.sh build & embed_and_thin
-                if script.include?("xcode_backend.sh")
-                  puts "✓ Keeping Flutter script: #{phase.name || 'Flutter Build Phase'}"
+      
+                # Allow Flutter build scripts
+                if phase.shell_script.to_s.include?("xcode_backend.sh")
+                  puts "✓ Keeping Flutter script: #{phase.name}"
                   next
                 end
-
-                # ✅ DISABLE POD-RELATED SCRIPTS ONLY
-                if phase.name&.include?("[CP]")
-                  puts "✗ Disabling Pod script: #{phase.name}"
-                  phase.shell_script = "echo 'Skipping Pod script in CI'; exit 0"
+      
+                # ❗ Only disable Pod manifest check, nothing else
+                if phase.name&.include?("[CP] Check Pods Manifest.lock")
+                  puts "✗ Disabling Pod Manifest Check"
+                  phase.shell_script = "echo 'Skipping manifest check in CI'; exit 0"
                 end
               end
             end
-
             project.save
-            puts ""
-            puts "✔ Successfully patched Pod scripts while preserving Flutter scripts"
+            puts "✔ Safe patch applied"
           EOF
 
+                          
       - name: 🔧 Disable Parallel Builds
         run: |
           ruby - <<'EOF'
