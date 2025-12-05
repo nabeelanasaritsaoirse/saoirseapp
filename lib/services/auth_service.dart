@@ -72,7 +72,7 @@ class AuthService {
         },
         verificationFailed: (FirebaseAuthException e) {
           print(" [OTP FAILED] ${e.code} : ${e.message}");
-          appToast(content: e.message!, error: true);
+          // appToast(content: e.message!, error: true);
         },
         codeSent: (String vId, int? resendToken) {
           print("[CODE SENT] verificationId: $vId");
@@ -87,7 +87,7 @@ class AuthService {
       return true;
     } catch (e) {
       print("[SEND OTP ERROR] $e");
-      appToast(content: "OTP sending failed: $e", error: true);
+      // appToast(content: "OTP sending failed: $e", error: true);
       return false;
     }
   }
