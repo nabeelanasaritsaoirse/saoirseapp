@@ -4,14 +4,7 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 on:
   push:
     branches: [ developer ]
-    # paths:
-    #   - "ios/**"
-    #   - "lib/**"
-    #   - "pubspec.yaml"
-    #   - "pubspec.lock"
-    #   - "assets/*"
 
-# Prevent concurrent runs of the same workflow
 concurrency:
   group: ios-build-${{ github.ref }}
   cancel-in-progress: true
@@ -113,71 +106,62 @@ jobs:
           IDENTITY=$(security find-identity -v -p codesigning | grep "iPhone Distribution" | head -1 | awk -F\" '{print $2}')
           echo "identity=$IDENTITY" >> $GITHUB_OUTPUT
 
-      - name: 🛠️ Flutter Clean & Reset Pods (Critical Fix)
+      - name: 🛠️ Flutter Clean & Reset Pods
         run: |
           rm -rf ios/Pods ios/Podfile.lock ios/Flutter/Flutter.framework ios/Flutter/Flutter.podspec
           flutter clean
           flutter pub get
           cd ios && pod install --repo-update && cd ..
 
-      - name: 🔧 Patch ALL Runner Build Scripts (Fix Xcode Freeze)
+      - name: 🔧 Patch Build Scripts (Only Disable Pod Scripts - SAFE VERSION)
         run: |
           ruby - <<'EOF'
             require 'xcodeproj'
-            path = 'ios/Runner.xcodeproj'
-            project = Xcodeproj::Project.open(path)
-      
+
+            project_path = 'ios/Runner.xcodeproj'
+            project = Xcodeproj::Project.open(project_path)
+
             project.targets.each do |target|
               target.build_phases.each do |phase|
-      
-                if phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
-                  puts "Patching #{phase.name || 'Unnamed Script'}"
-      
-                  # Disable Flutter build script
-                  if phase.shell_script&.include?("xcode_backend.sh")
-                    phase.shell_script = "echo 'Skipping Flutter build script in CI'; exit 0"
-                  end
-      
-                  # Disable Pod resource & embed scripts
-                  if phase.shell_script&.include?("Pods-Runner")
-                    phase.shell_script = "echo 'Skipping Pod script in CI'; exit 0"
-                  end
+
+                next unless phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
+
+                script = phase.shell_script.to_s
+
+                # ❌ DO NOT TOUCH FLUTTER BUILD PHASES
+                # These are CRITICAL: xcode_backend.sh build & embed_and_thin
+                if script.include?("xcode_backend.sh")
+                  puts "✓ Keeping Flutter script: #{phase.name || 'Flutter Build Phase'}"
+                  next
+                end
+
+                # ✅ DISABLE POD-RELATED SCRIPTS ONLY
+                if phase.name&.include?("[CP]")
+                  puts "✗ Disabling Pod script: #{phase.name}"
+                  phase.shell_script = "echo 'Skipping Pod script in CI'; exit 0"
                 end
               end
             end
-      
+
             project.save
-            puts "✔ All Runner build scripts neutralized"
+            puts ""
+            puts "✔ Successfully patched Pod scripts while preserving Flutter scripts"
           EOF
 
-      - name: 🔧 Disable Parallel Builds in Xcode Project (Prevent Duplicate Runs)
+      - name: 🔧 Disable Parallel Builds
         run: |
           ruby - <<'EOF'
             require 'xcodeproj'
             project_path = 'ios/Runner.xcodeproj'
             project = Xcodeproj::Project.open(project_path)
             
-            # Disable parallel builds
             project.root_object.attributes['BuildIndependentTargetsInParallel'] = 'NO'
             
             project.save
             puts "✔ Disabled parallel builds in Runner.xcodeproj"
           EOF
 
-      - name: 🔧 Check for Problematic Pods and Optimize
-        run: |
-          echo "Checking Podfile.lock for known problematic pods..."
-          
-          # Check if certain pods that can cause hangs are present
-          if [ -f "ios/Podfile.lock" ]; then
-            echo "Contents of Podfile.lock:"
-            cat ios/Podfile.lock | head -50
-          fi
-          
-          echo ""
-          echo "✔ Pods check complete"
-
-      - name: 🍏 Build IPA (Single-Threaded, Optimized Build)
+      - name: 🍏 Build IPA (Optimized with Flutter Support)
         timeout-minutes: 60
         env:
           SIGNING_CERT: ${{ steps.identity.outputs.identity }}
@@ -221,44 +205,48 @@ jobs:
           ) &
           MONITOR_PID=$!
           
-          # Build with CORRECT parameter ordering: FLAGS → BUILD SETTINGS → ACTION
-          xcodebuild \
+          # Build archive - Flutter scripts will now run properly
+          xcodebuild archive \
             -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
             -archivePath build/ios/Runner.xcarchive \
             -destination 'generic/platform=iOS' \
-            -jobs 1 \
             -allowProvisioningUpdates \
-            \
             DEVELOPMENT_TEAM=BYQUNNQSQH \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$SIGNING_CERT" \
-            PROVISIONING_PROFILE="$PROFILE_UUID" \
             PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_NAME" \
-            OTHER_CODE_SIGN_FLAGS="--preserve-metadata=entitlements" \
             ENABLE_BITCODE=NO \
             DEBUG_INFORMATION_FORMAT=dwarf \
             COMPILER_INDEX_STORE_ENABLE=NO \
-            \
-            archive 2>&1 | tee xcodebuild.log | grep --line-buffered -E "^\*\*|Compiling|Linking|CodeSign|Processing|error:|warning:|Building|Running script"
+            | tee xcodebuild.log | grep --line-buffered -E "^\*\*|Compiling|Linking|CodeSign|error:|warning:|Building"
+          
+          BUILD_EXIT_CODE=${PIPESTATUS[0]}
           
           # Kill the monitor
           kill $MONITOR_PID 2>/dev/null || true
           
-          BUILD_EXIT_CODE=${PIPESTATUS[0]}
-          
-          if [ $BUILD_EXIT_CODE -ne 0 ]; then
+          # Proper error detection
+          if [ $BUILD_EXIT_CODE -ne 0 ] || grep -q "^\*\* ARCHIVE FAILED \*\*" xcodebuild.log; then
             echo ""
             echo "❌ Archive build FAILED with exit code: $BUILD_EXIT_CODE"
             echo ""
-            echo "Last 50 lines of build log:"
-            tail -50 xcodebuild.log
-            exit $BUILD_EXIT_CODE
+            echo "Last 100 lines of build log:"
+            tail -100 xcodebuild.log
+            exit 1
+          fi
+          
+          # Verify archive actually exists
+          if [ ! -d "build/ios/Runner.xcarchive" ]; then
+            echo ""
+            echo "❌ Archive file was not created at expected path"
+            echo ""
+            exit 1
           fi
           
           echo ""
-          echo "✅ Archive completed successfully"
+          echo "✅ Archive completed and verified successfully"
           echo ""
           echo "================================"
           echo "📦 EXPORTING IPA"
@@ -278,7 +266,7 @@ jobs:
             echo ""
             echo "Export log:"
             cat export.log
-            exit $EXPORT_EXIT_CODE
+            exit 1
           fi
           
           echo ""
@@ -292,7 +280,6 @@ jobs:
         with:
           name: ios-ipa
           path: build/ios/ipa/*.ipa
-
           
       - name: 📋 Upload Build Logs (on failure)
         if: failure()
@@ -309,6 +296,8 @@ jobs:
           echo "Build failed. Cleaning up sensitive files..."
           rm -f api_key.json
           echo "Cleanup completed"
+
+ 
   # =====================================================
   # 🚀 TESTFLIGHT DEPLOY
   # =====================================================
