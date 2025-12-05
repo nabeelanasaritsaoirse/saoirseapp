@@ -120,6 +120,36 @@ jobs:
           flutter pub get
           cd ios && pod install --repo-update && cd ..
 
+      - name: 🔧 Patch ALL Runner Build Scripts (Fix Xcode Freeze)
+        run: |
+          ruby - <<'EOF'
+            require 'xcodeproj'
+            path = 'ios/Runner.xcodeproj'
+            project = Xcodeproj::Project.open(path)
+      
+            project.targets.each do |target|
+              target.build_phases.each do |phase|
+      
+                if phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
+                  puts "Patching #{phase.name || 'Unnamed Script'}"
+      
+                  # Disable Flutter build script
+                  if phase.shell_script&.include?("xcode_backend.sh")
+                    phase.shell_script = "echo 'Skipping Flutter build script in CI'; exit 0"
+                  end
+      
+                  # Disable Pod resource & embed scripts
+                  if phase.shell_script&.include?("Pods-Runner")
+                    phase.shell_script = "echo 'Skipping Pod script in CI'; exit 0"
+                  end
+                end
+              end
+            end
+      
+            project.save
+            puts "✔ All Runner build scripts neutralized"
+          EOF
+
       - name: 🔧 Disable Parallel Builds in Xcode Project (Prevent Duplicate Runs)
         run: |
           ruby - <<'EOF'
@@ -260,8 +290,9 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: ios-ipa-${{ github.sha }}
+          name: ios-ipa
           path: build/ios/ipa/*.ipa
+
           
       - name: 📋 Upload Build Logs (on failure)
         if: failure()
