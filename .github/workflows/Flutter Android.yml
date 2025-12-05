@@ -161,6 +161,8 @@ jobs:
       - name: Generate .env file
         run: |
           cat > .env <<EOF
+          RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}
+          
           IOS_API_KEY=${{ secrets.IOS_API_KEY }}
           IOS_APP_ID=${{ secrets.IOS_APP_ID }}
           IOS_MESSAGING_SENDER_ID=${{ secrets.IOS_MESSAGING_SENDER_ID }}
@@ -204,7 +206,6 @@ jobs:
     name: "🚀 Android Deploy to Google Play"
     runs-on: ubuntu-latest
     needs: android-ci
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: playstore-deploy   # 👈 Nishant must approve
 
@@ -250,21 +251,23 @@ jobs:
 
       - run: gem install fastlane -N
 
-      # - name: 🚀 Deploy to Google Play
-      #   env:
-      #     JSON_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
-      #     PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
-      #   run: |
-      #     echo "$JSON_KEY" > service_account.json
-      #     fastlane supply \
-      #       --aab app-release.aab \
-      #       --json_key service_account.json \
-      #       --package_name "$PACKAGE_NAME" \
-      #       --track internal \
-      #       --skip_upload_screenshots true \
-      #       --skip_upload_images true
+      - name: 🚀 Deploy to Google Play
+        if: github.ref == 'refs/heads/developer' && github.event_name == 'push'
+        env:
+          JSON_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
+        run: |
+          echo "$JSON_KEY" > service_account.json
+          fastlane supply \
+            --aab app-release.aab \
+            --json_key service_account.json \
+            --package_name "$PACKAGE_NAME" \
+            --track internal \
+            --skip_upload_screenshots true \
+            --skip_upload_images true
 
       - name: 🚀 Deploy to Google Play (Production)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           JSON_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
@@ -280,10 +283,13 @@ jobs:
             --skip_upload_images \
             --skip_upload_screenshots
 
-      # Optional — Add summary
       - name: 🧾 Build Summary
         run: |
-          echo "## 🚀 Production Release Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 Google Play Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+            echo "Track: **Production**" >> $GITHUB_STEP_SUMMARY
+          elif [ "${GITHUB_REF}" = "refs/heads/developer" ]; then
+            echo "Track: **Internal Testing**" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "Package: ${{ secrets.PACKAGE_NAME }}" >> $GITHUB_STEP_SUMMARY
-          echo "Track: **Production**" >> $GITHUB_STEP_SUMMARY
-
