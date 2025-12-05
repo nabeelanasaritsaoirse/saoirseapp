@@ -151,7 +151,7 @@ jobs:
           EOF
 
       - name: 🍏 Build IPA (Single-Threaded, Optimized Build)
-        timeout-minutes: 35
+        timeout-minutes: 45
         env:
           SIGNING_CERT: ${{ steps.identity.outputs.identity }}
           PROFILE_UUID: ${{ steps.profile.outputs.uuid }}
@@ -181,7 +181,7 @@ jobs:
           echo "================================"
           echo "🚀 STARTING XCODE ARCHIVE BUILD"
           echo "================================"
-          echo "⚠️  This may take 15-25 minutes"
+          echo "⚠️  This may take 20-30 minutes for Release builds"
           echo ""
           
           # Build with explicit single-threaded execution
@@ -192,6 +192,7 @@ jobs:
             -archivePath build/ios/Runner.xcarchive \
             -destination 'generic/platform=iOS' \
             -jobs 1 \
+            -quiet \
             DEVELOPMENT_TEAM=BYQUNNQSQH \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$SIGNING_CERT" \
@@ -200,6 +201,7 @@ jobs:
             OTHER_CODE_SIGN_FLAGS="--preserve-metadata=entitlements" \
             ENABLE_BITCODE=NO \
             DEBUG_INFORMATION_FORMAT=dwarf \
+            COMPILER_INDEX_STORE_ENABLE=NO \
             -allowProvisioningUpdates \
             archive 2>&1 | tee xcodebuild.log
           
