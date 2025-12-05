@@ -59,10 +59,10 @@ class KycController extends GetxController {
       isLoading(false);
     }
   }
-
-  // =====================================================================
+  
+  // ======================================================================
   // IMAGE PICKERS
-  // =====================================================================
+  // ======================================================================
   Future<void> pickSelfie() async {
     final picked = await picker.pickImage(
         source: ImageSource.camera, imageQuality: 70, maxWidth: 1280);
@@ -231,6 +231,7 @@ class KycController extends GetxController {
       appToast(
           content: "KYC submission failed...! Upload AADHAAR and PAN ",
           error: true);
+  
     } finally {
       isLoading(false);
     }
