@@ -17,7 +17,7 @@ permissions:
 jobs:
   ios-ci:
     runs-on: macos-latest
-    timeout-minutes: 90
+    timeout-minutes: 180
 
     steps:
       - name: 📥 Checkout Repository
