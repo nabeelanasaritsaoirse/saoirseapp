@@ -15,6 +15,7 @@ import '../../services/auth_service.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../login/login_controller.dart';
+import '../refferal/referral_controller.dart';
 
 class VerifyOtpController extends GetxController {
   VerifyOtpController({
@@ -64,7 +65,7 @@ class VerifyOtpController extends GetxController {
     storage.write(AppConst.ACCESS_TOKEN, data.accessToken);
     storage.write(AppConst.REFRESH_TOKEN, data.refreshToken);
     storage.write(AppConst.REFERRAL_CODE, data.referralCode);
-    storage.write(AppConst.USER_NAME , data.name);
+    storage.write(AppConst.USER_NAME, data.name);
 
     print("✔ SAVED userId: ${storage.read(AppConst.USER_ID)}");
     print("✔ SAVED accessToken: ${storage.read(AppConst.ACCESS_TOKEN)}");
@@ -76,8 +77,20 @@ class VerifyOtpController extends GetxController {
     final notif = Get.find<NotificationController>();
     notif.updateToken(data.accessToken!); // update token in controller
     notif.service.updateToken(data.accessToken!);
+
     if (referral.isNotEmpty) {
-      await Get.find<LoginController>().applyReferral(referral);
+      print("\n================== APPLYING REFERRAL ==================");
+      print("Referral From Input: $referral");
+      bool applied = await Get.find<LoginController>().applyReferral(referral);
+
+      if (applied) {
+        print("🎉 Referral Successfully Applied During OTP Login");
+      } else {
+        print("⚠ Referral Failed or Invalid → Continue Login");
+      }
+      print("========================================================\n");
+    } else {
+      print("⚠ No referral entered → Skipping applyReferral()");
     }
 
     bool updated = await updateUser(
@@ -90,13 +103,16 @@ class VerifyOtpController extends GetxController {
       isLoading.value = false;
       return;
     }
- 
- 
-notif.updateToken(data.accessToken!);
-await notif.sendWelcomeNotification(username);
-await notif.refreshNotifications();
-await notif.fetchUnreadCount();
 
+    notif.updateToken(data.accessToken!);
+    await notif.sendWelcomeNotification(username);
+    await notif.refreshNotifications();
+    await notif.fetchUnreadCount();
+    final referralController = Get.find<ReferralController>();
+
+// If user already applied earlier or applying now
+    await referralController.fetchReferrerInfo();
+    print("🔍 Referral Check Complete After OTP Login");
     final fcmToken = await getDeviceToken();
     if (fcmToken != null) {
       log("Assign FCM token to the registerFCM function : $fcmToken");
@@ -141,6 +157,7 @@ await notif.fetchUnreadCount();
       Map<String, dynamic> body = {
         "deviceToken": deviceToken,
         "name": username,
+        "phoneNumber": phoneNumber,
       };
 
       final result = await APIService.putRequest(

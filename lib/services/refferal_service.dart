@@ -9,7 +9,9 @@ import '../models/apply_refferal.dart';
 import '../models/friend_details_response.dart';
 import '../models/product_detiails_response.dart';
 import '../models/referral_response_model.dart';
+import '../models/refferal_info_model.dart';
 import '../services/api_service.dart';
+import '../widgets/app_toast.dart';
 
 class ReferralService {
   //  To fetch referral User List & Data
@@ -96,6 +98,27 @@ class ReferralService {
       return ApplyReferralResponse.fromJson(response);
     } catch (e) {
       print("Referral Error: $e");
+      return null;
+    }
+  }
+
+  Future<ReferrerInfoModel?> getReferrerInfo() async {
+    final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+    final response = await APIService.getRequest(
+      url: AppURLs.REFERRAL_INFO,
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+      onSuccess: (json) => json,
+    );
+
+    if (response == null) return null;
+
+    if (response["success"] == true && response["referredBy"] != null) {
+      return ReferrerInfoModel.fromJson(response["referredBy"]);
+    } else {
+      appToast(error: true, content: "Referral data not found");
       return null;
     }
   }

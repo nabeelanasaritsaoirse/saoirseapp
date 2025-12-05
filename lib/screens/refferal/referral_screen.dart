@@ -9,6 +9,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:saoirse_app/widgets/app_button.dart';
 
 import '../../constants/app_strings.dart';
+import '../../models/refferal_info_model.dart';
 import '../../screens/refferal/referral_controller.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -179,7 +180,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: _buildContentSection(
               loginController: loginController,
-              controller: controller,
+              referralController: controller,
               searchController: searchController,
               focusNode: searchFocusNode,
             ),
@@ -190,7 +191,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
   }
 
   Widget _buildContentSection({
-    required ReferralController controller,
+    required ReferralController referralController,
     required LoginController loginController,
     required TextEditingController searchController,
     required FocusNode focusNode,
@@ -211,18 +212,15 @@ class _ReferralScreenState extends State<ReferralScreen> {
               fontWeight: FontWeight.w600,
               color: AppColors.textBlack,
             ),
-            GestureDetector(
-              onTap: () {
-                if (!loginController.referralApplied.value) {
-                  showReferralInputPopup();
-                }
-              },
-              child: appText(AppStrings.apply_refferal,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.primaryColor,
-                  decoration: TextDecoration.underline),
-            ),
+            Obx(() {
+              if (referralController.referrer.value != null) {
+                print("🟢 Showing ReferredByCard");
+                return referredByCard(referralController.referrer.value!);
+              } else {
+                print("🔵 Showing Apply Referral Button");
+                return applyReferralSection(); // show input + apply button
+              }
+            })
           ],
         ),
 
@@ -806,6 +804,22 @@ class _ReferralScreenState extends State<ReferralScreen> {
     );
   }
 
+  Widget applyReferralSection() {
+    if (loginController.referralApplied.value) return SizedBox(); // hide input
+
+    return GestureDetector(
+      onTap: () => showReferralInputPopup(),
+      child: Text(
+        "Apply Referral",
+        style: TextStyle(
+          decoration: TextDecoration.underline,
+          fontWeight: FontWeight.w600,
+          color: Colors.blue,
+        ),
+      ),
+    );
+  }
+
   void showReferralSuccessPopup() {
     Get.dialog(
       Dialog(
@@ -862,4 +876,30 @@ class _ReferralScreenState extends State<ReferralScreen> {
       ),
     );
   }
+}
+
+Widget referredByCard(ReferrerInfoModel r) {
+  return Container(
+    padding: EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: Colors.green.withOpacity(.1),
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(color: Colors.green),
+    ),
+    child: Row(
+      children: [
+        CircleAvatar(backgroundImage: NetworkImage(r.profilePicture)),
+        SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Referred by:", style: TextStyle(fontWeight: FontWeight.w600)),
+            Text(r.name, style: TextStyle(fontSize: 15)),
+            Text("Code: ${r.referralCode}",
+                style: TextStyle(color: Colors.black54)),
+          ],
+        ),
+      ],
+    ),
+  );
 }

@@ -144,9 +144,14 @@ class LoginController extends GetxController {
     bool updated = await updateUser(data.userId!);
 
     if (updated) {
-      // Step 4: Navigate to Home
+      print("✔ Login + Profile Update SUCCESS");
+      print("🔁 Checking if referral exists...");
+
+      final referralController = Get.find<ReferralController>();
+      await referralController.fetchReferrerInfo();
+
+      print("🔄 Referral Info Loaded -> Navigating Home");
       Get.offAll(() => DashboardScreen());
-      appToast(content: "Login Successful!");
     }
 
     loading.value = false;
@@ -223,22 +228,33 @@ class LoginController extends GetxController {
 
   // ================= APPLY REFERRAL CODE API =================
   Future<bool> applyReferral(String code) async {
-    if (code.isEmpty) return true;
+    print("\n========= APPLYING REFERRAL =========");
+    print("Entered Code: $code");
+    if (code.isEmpty) {
+      print("⚠ Referral Empty → Skipping");
+      return true;
+    }
 
     final result = await referralService.applyReferralCode(code);
 
     if (result == null) {
+      print("❌ API Returned NULL → Something failed");
       appToast(error: true, content: "Something went wrong");
       return false;
     }
 
     if (result.success == true) {
+      print("🎉 Referral Applied Successfully!");
+      print("Message: ${result.message}");
       storage.write("referral_applied", true);
       referralApplied.value = true;
 
       appToast(title: "Success", content: result.message);
       final referralController = Get.find<ReferralController>();
       referralController.fetchReferralData();
+      print("🔁 Fetching new referral info to update UI...");
+      referralController.fetchReferrerInfo();
+      print("🔄 UI updated with referrer info");
       return true;
     }
 
@@ -257,13 +273,3 @@ class LoginController extends GetxController {
     return false;
   }
 }
-
-
-
-
-
-
-
-
-
-
