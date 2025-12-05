@@ -185,7 +185,7 @@ jobs:
           # Start a background process to show we're alive
           (
             while true; do
-              sleep 60
+              sleep 180
               echo "[$(date '+%H:%M:%S')] Build still running..."
             done
           ) &
