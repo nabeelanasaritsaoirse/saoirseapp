@@ -111,13 +111,13 @@ jobs:
           IDENTITY=$(security find-identity -v -p codesigning | grep "iPhone Distribution" | head -1 | awk -F\" '{print $2}')
           echo "identity=$IDENTITY" >> $GITHUB_OUTPUT
 
-      - name: 🔄 Clean & Reinstall Pods
+      - name: 🛠️ Flutter Clean & Reset Pods (Critical Fix)
         run: |
-          cd ios
-          rm -rf Pods
-          rm -rf Podfile.lock
-          pod install
-          cd ..
+          rm -rf ios/Pods ios/Podfile.lock ios/Flutter/Flutter.framework ios/Flutter/Flutter.podspec
+          flutter clean
+          flutter pub get
+          cd ios && pod install --repo-update && cd ..
+
 
       - name: 🍏 Build IPA (Optimized Anti-Freeze Build)
         timeout-minutes: 35
