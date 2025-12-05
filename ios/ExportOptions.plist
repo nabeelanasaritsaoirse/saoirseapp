@@ -28,5 +28,15 @@
 
     <key>stripSwiftSymbols</key>
     <true/>
+
+    <!-- Recommended stability keys -->
+    <key>uploadSymbols</key>
+    <true/>
+    <key>includeManifest</key>
+    <false/>
+    <key>generateAppStoreInformation</key>
+    <false/>
+    <key>thinning</key>
+    <string>none</string>
   </dict>
 </plist>
