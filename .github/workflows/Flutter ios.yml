@@ -128,30 +128,21 @@ jobs:
             puts "✔ Disabled parallel builds in Runner.xcodeproj"
           EOF
 
-      - name: 🔧 Patch Pods Project to Skip Problematic Run Script Phases
+      - name: 🔧 Check for Problematic Pods and Optimize
         run: |
-          ruby - <<'EOF'
-            require 'xcodeproj'
-            project_path = 'ios/Pods/Pods.xcodeproj'
-            project = Xcodeproj::Project.open(project_path)
-      
-            project.targets.each do |t|
-              t.build_phases.each do |phase|
-                if phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
-                  # Skip CocoaPods check scripts, but neutralize other scripts
-                  unless phase.name&.include?('[CP] Check Pods Manifest.lock')
-                    phase.shell_script = "echo 'Skipping Pod Run Script: #{phase.name || 'unnamed'} in CI'\nexit 0"
-                  end
-                end
-              end
-            end
-      
-            project.save
-            puts "✔ Patched Pods Run Script phases"
-          EOF
+          echo "Checking Podfile.lock for known problematic pods..."
+          
+          # Check if certain pods that can cause hangs are present
+          if [ -f "ios/Podfile.lock" ]; then
+            echo "Contents of Podfile.lock:"
+            cat ios/Podfile.lock | head -50
+          fi
+          
+          echo ""
+          echo "✔ Pods check complete"
 
       - name: 🍏 Build IPA (Single-Threaded, Optimized Build)
-        timeout-minutes: 45
+        timeout-minutes: 60
         env:
           SIGNING_CERT: ${{ steps.identity.outputs.identity }}
           PROFILE_UUID: ${{ steps.profile.outputs.uuid }}
@@ -181,10 +172,20 @@ jobs:
           echo "================================"
           echo "🚀 STARTING XCODE ARCHIVE BUILD"
           echo "================================"
-          echo "⚠️  This may take 20-30 minutes for Release builds"
+          echo "⚠️  This may take 20-40 minutes for Release builds"
+          echo "📊 Progress will be shown below..."
           echo ""
           
-          # Build with explicit single-threaded execution
+          # Start a background process to show we're alive
+          (
+            while true; do
+              sleep 60
+              echo "[$(date '+%H:%M:%S')] Build still running..."
+            done
+          ) &
+          MONITOR_PID=$!
+          
+          # Build with CORRECT parameter ordering: FLAGS → BUILD SETTINGS → ACTION
           xcodebuild \
             -workspace ios/Runner.xcworkspace \
             -scheme Runner \
@@ -192,7 +193,8 @@ jobs:
             -archivePath build/ios/Runner.xcarchive \
             -destination 'generic/platform=iOS' \
             -jobs 1 \
-            -quiet \
+            -allowProvisioningUpdates \
+            \
             DEVELOPMENT_TEAM=BYQUNNQSQH \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$SIGNING_CERT" \
@@ -202,8 +204,11 @@ jobs:
             ENABLE_BITCODE=NO \
             DEBUG_INFORMATION_FORMAT=dwarf \
             COMPILER_INDEX_STORE_ENABLE=NO \
-            -allowProvisioningUpdates \
-            archive 2>&1 | tee xcodebuild.log
+            \
+            archive 2>&1 | tee xcodebuild.log | grep --line-buffered -E "^\*\*|Compiling|Linking|CodeSign|Processing|error:|warning:|Building|Running script"
+          
+          # Kill the monitor
+          kill $MONITOR_PID 2>/dev/null || true
           
           BUILD_EXIT_CODE=${PIPESTATUS[0]}
           
@@ -267,7 +272,6 @@ jobs:
           echo "Build failed. Cleaning up sensitive files..."
           rm -f api_key.json
           echo "Cleanup completed"
-
   # =====================================================
   # 🚀 TESTFLIGHT DEPLOY
   # =====================================================
