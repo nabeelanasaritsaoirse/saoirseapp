@@ -119,23 +119,37 @@ jobs:
           pod install
           cd ..
 
-          
-      - name: 🍏 Build IPA (Fixed Manual Signing)
-        timeout-minutes: 30
+      - name: 🍏 Build IPA (Optimized Anti-Freeze Build)
+        timeout-minutes: 35
         env:
           SIGNING_CERT: ${{ steps.identity.outputs.identity }}
           PROFILE_UUID: ${{ steps.profile.outputs.uuid }}
         run: |
           set -exo pipefail
-      
+
+          # 🛠 Fix macOS runner limitations (prevents freezes)
+          sudo sysctl -w kern.maxfiles=655360
+          sudo sysctl -w kern.maxfilesperproc=655360
+
+          export RCT_NO_LAUNCH_PACKAGER=true
+          export NODE_OPTIONS="--max-old-space-size=4096"
+
           PROVISIONING_NAME="match AppStore com.saoirse.epi"
-      
+
           echo "Using Certificate: $SIGNING_CERT"
           echo "Using Provisioning UUID: $PROFILE_UUID"
           echo "Using Provisioning Name: $PROVISIONING_NAME"
-      
-          # 1️⃣ Build archive
-          xcodebuild -workspace ios/Runner.xcworkspace \
+
+          # Create output folders
+          mkdir -p build/ios
+
+          # Install xcpretty for stable logging
+          sudo gem install xcpretty -N
+
+          echo "🚀 Starting Xcode Archive Build..."
+
+          xcodebuild \
+            -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
             -archivePath build/ios/Runner.xcarchive \
@@ -146,14 +160,18 @@ jobs:
             PROVISIONING_PROFILE="$PROFILE_UUID" \
             PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_NAME" \
             OTHER_CODE_SIGN_FLAGS="--preserve-metadata=entitlements" \
-            archive | tee xcodebuild.log
-      
-          # 2️⃣ Export IPA
+            ENABLE_BITCODE=NO \
+            DEBUG_INFORMATION_FORMAT=dwarf \
+            archive | xcpretty
+
+          echo "📦 Archive completed. Exporting IPA..."
+
           xcodebuild -exportArchive \
             -archivePath build/ios/Runner.xcarchive \
             -exportPath build/ios/ipa \
-            -exportOptionsPlist ios/ExportOptions.plist | tee export.log
-      
+            -exportOptionsPlist ios/ExportOptions.plist | xcpretty
+
+          echo "✅ IPA export done."
 
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
