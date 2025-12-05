@@ -17,7 +17,7 @@ permissions:
 jobs:
   ios-ci:
     runs-on: macos-latest
-    timeout-minutes: 180
+    
 
     steps:
       - name: 📥 Checkout Repository
@@ -62,7 +62,6 @@ jobs:
         run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > api_key.json
 
       - name: 🔐 Run Fastlane Match
-        timeout-minutes: 10
         run: |
           fastlane match appstore \
             --readonly \
@@ -98,8 +97,7 @@ jobs:
       # 🔥 CRITICAL FIX: Use flutter build ipa instead of xcodebuild directly
       # This avoids the xcodebuild hanging issue that occurs when Flutter scripts
       # run from xcodebuild in CI environments
-      - name: 🍏 Build IPA using Flutter (Avoids xcodebuild Hang)
-        timeout-minutes: 45
+      - name: 🍏 Build IPA using Flutter (Avoids xcodebuild Hang
         env:
           SIGNING_CERT: ${{ steps.identity.outputs.identity }}
           PROFILE_UUID: ${{ steps.profile.outputs.uuid }}
