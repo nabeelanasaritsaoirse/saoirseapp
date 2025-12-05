@@ -18,7 +18,7 @@ permissions:
 jobs:
   ios-ci:
     runs-on: macos-latest
-    timeout-minutes: 60  # Add overall job timeout
+    timeout-minutes: 60
 
     steps:
       - name: 📥 Checkout Repository
@@ -114,7 +114,21 @@ jobs:
           flutter pub get
           cd ios && pod install --repo-update && cd ..
 
-      - name: 🔧 Patch Pods project to skip problematic Run Script phases (CI Safe Mode)
+      - name: 🔧 Disable Parallel Builds in Xcode Project (Prevent Duplicate Runs)
+        run: |
+          ruby - <<'EOF'
+            require 'xcodeproj'
+            project_path = 'ios/Runner.xcodeproj'
+            project = Xcodeproj::Project.open(project_path)
+            
+            # Disable parallel builds
+            project.root_object.attributes['BuildIndependentTargetsInParallel'] = 'NO'
+            
+            project.save
+            puts "✔ Disabled parallel builds in Runner.xcodeproj"
+          EOF
+
+      - name: 🔧 Patch Pods Project to Skip Problematic Run Script Phases
         run: |
           ruby - <<'EOF'
             require 'xcodeproj'
@@ -124,49 +138,61 @@ jobs:
             project.targets.each do |t|
               t.build_phases.each do |phase|
                 if phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
-                  phase.shell_script = "echo 'Skipping problematic Pod Run Script in CI (prevent freeze)'\nexit 0"
+                  # Skip CocoaPods check scripts, but neutralize other scripts
+                  unless phase.name&.include?('[CP] Check Pods Manifest.lock')
+                    phase.shell_script = "echo 'Skipping Pod Run Script: #{phase.name || 'unnamed'} in CI'\nexit 0"
+                  end
                 end
               end
             end
       
             project.save
-            puts "Patched ALL Pod Run Script phases ✔"
+            puts "✔ Patched Pods Run Script phases"
           EOF
 
-      - name: 🍏 Build IPA (Optimized Anti-Freeze Build)
+      - name: 🍏 Build IPA (Single-Threaded, Optimized Build)
         timeout-minutes: 35
         env:
           SIGNING_CERT: ${{ steps.identity.outputs.identity }}
           PROFILE_UUID: ${{ steps.profile.outputs.uuid }}
         run: |
-          set -exo pipefail
+          set -e
           
-          # 🛠 Fix macOS runner limitations (prevents freezes)
+          echo "================================"
+          echo "🛠 CONFIGURING BUILD ENVIRONMENT"
+          echo "================================"
+          
+          # Fix macOS runner limitations
           sudo sysctl -w kern.maxfiles=655360
           sudo sysctl -w kern.maxfilesperproc=655360
+          
           export RCT_NO_LAUNCH_PACKAGER=true
           export NODE_OPTIONS="--max-old-space-size=4096"
           
           PROVISIONING_NAME="match AppStore com.saoirse.epi"
-          echo "Using Certificate: $SIGNING_CERT"
-          echo "Using Provisioning UUID: $PROFILE_UUID"
-          echo "Using Provisioning Name: $PROVISIONING_NAME"
           
-          # Create output folders
+          echo "✓ Certificate: $SIGNING_CERT"
+          echo "✓ Provisioning UUID: $PROFILE_UUID"
+          echo "✓ Provisioning Name: $PROVISIONING_NAME"
+          
           mkdir -p build/ios
           
-          # Install xcpretty for stable logging
-          sudo gem install xcpretty -N
+          echo ""
+          echo "================================"
+          echo "🚀 STARTING XCODE ARCHIVE BUILD"
+          echo "================================"
+          echo "⚠️  This may take 15-25 minutes"
+          echo ""
           
-          echo "🚀 Starting Xcode Archive Build..."
-          
-          # Run xcodebuild with proper error handling
-          if ! xcodebuild \
+          # Build with explicit single-threaded execution
+          xcodebuild \
             -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
             -archivePath build/ios/Runner.xcarchive \
             -destination 'generic/platform=iOS' \
+            -jobs 1 \
+            -parallelizeTargets NO \
             DEVELOPMENT_TEAM=BYQUNNQSQH \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$SIGNING_CERT" \
@@ -175,29 +201,71 @@ jobs:
             OTHER_CODE_SIGN_FLAGS="--preserve-metadata=entitlements" \
             ENABLE_BITCODE=NO \
             DEBUG_INFORMATION_FORMAT=dwarf \
-            archive | xcpretty; then
-            echo "❌ Archive build failed"
-            exit 1
+            -allowProvisioningUpdates \
+            archive 2>&1 | tee xcodebuild.log
+          
+          BUILD_EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $BUILD_EXIT_CODE -ne 0 ]; then
+            echo ""
+            echo "❌ Archive build FAILED with exit code: $BUILD_EXIT_CODE"
+            echo ""
+            echo "Last 50 lines of build log:"
+            tail -50 xcodebuild.log
+            exit $BUILD_EXIT_CODE
           fi
           
-          echo "📦 Archive completed. Exporting IPA..."
+          echo ""
+          echo "✅ Archive completed successfully"
+          echo ""
+          echo "================================"
+          echo "📦 EXPORTING IPA"
+          echo "================================"
+          echo ""
           
-          if ! xcodebuild -exportArchive \
+          xcodebuild -exportArchive \
             -archivePath build/ios/Runner.xcarchive \
             -exportPath build/ios/ipa \
-            -exportOptionsPlist ios/ExportOptions.plist | xcpretty; then
-            echo "❌ IPA export failed"
-            exit 1
+            -exportOptionsPlist ios/ExportOptions.plist 2>&1 | tee export.log
+          
+          EXPORT_EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $EXPORT_EXIT_CODE -ne 0 ]; then
+            echo ""
+            echo "❌ IPA export FAILED with exit code: $EXPORT_EXIT_CODE"
+            echo ""
+            echo "Export log:"
+            cat export.log
+            exit $EXPORT_EXIT_CODE
           fi
           
-          echo "✅ IPA export done."
+          echo ""
+          echo "✅ IPA export completed successfully"
+          echo ""
+          ls -lh build/ios/ipa/
 
       - name: 📤 Upload IPA Artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: ios-ipa
+          name: ios-ipa-${{ github.sha }}
           path: build/ios/ipa/*.ipa
-
+          
+      - name: 📋 Upload Build Logs (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ github.sha }}
+          path: |
+            xcodebuild.log
+            export.log
+          
+      - name: 🧹 Cleanup on Failure
+        if: failure()
+        run: |
+          echo "Build failed. Cleaning up sensitive files..."
+          rm -f api_key.json
+          echo "Cleanup completed"
 
   # =====================================================
   # 🚀 TESTFLIGHT DEPLOY
