@@ -388,6 +388,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             homeController.mostPopularProducts[index];
                         return ProductCard(
                           productId: product.productId,
+                          showFavorite: false,
                           id: product.id,
                           name: product.name,
                           image: product.images.isNotEmpty
@@ -617,6 +618,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         final product = homeController.trendingProducts[index];
                         return ProductCard(
                           productId: product.productId,
+                          showFavorite: false,
                           id: product.id,
                           name: product.name,
                           image: product.images.isNotEmpty
