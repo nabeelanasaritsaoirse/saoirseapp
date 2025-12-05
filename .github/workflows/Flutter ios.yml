@@ -119,19 +119,22 @@ jobs:
           pod install
           cd ..
 
-
-      # ---------------------------------------------------
-      # 🛠️ BUILD IPA
-      # ---------------------------------------------------
-      - name: 🍏 Build IPA (Xcode Manual Signing)
+          
+      - name: 🍏 Build IPA (Fixed Manual Signing)
+        timeout-minutes: 30
         env:
           SIGNING_CERT: ${{ steps.identity.outputs.identity }}
           PROFILE_UUID: ${{ steps.profile.outputs.uuid }}
         run: |
-          echo "Using Certificate: $SIGNING_CERT"
-          echo "Using Provisioning Profile: $PROFILE_UUID"
+          set -exo pipefail
       
-          # 1️⃣ Build archive (Pods signing disabled)
+          PROVISIONING_NAME="match AppStore com.saoirse.epi"
+      
+          echo "Using Certificate: $SIGNING_CERT"
+          echo "Using Provisioning UUID: $PROFILE_UUID"
+          echo "Using Provisioning Name: $PROVISIONING_NAME"
+      
+          # 1️⃣ Build archive
           xcodebuild -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
@@ -140,17 +143,17 @@ jobs:
             DEVELOPMENT_TEAM=BYQUNNQSQH \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$SIGNING_CERT" \
-            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
+            PROVISIONING_PROFILE="$PROFILE_UUID" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_NAME" \
             OTHER_CODE_SIGN_FLAGS="--preserve-metadata=entitlements" \
-            archive
+            archive | tee xcodebuild.log
       
           # 2️⃣ Export IPA
           xcodebuild -exportArchive \
             -archivePath build/ios/Runner.xcarchive \
             -exportPath build/ios/ipa \
-            -exportOptionsPlist ios/ExportOptions.plist
+            -exportOptionsPlist ios/ExportOptions.plist | tee export.log
+      
 
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
