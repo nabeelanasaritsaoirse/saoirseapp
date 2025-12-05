@@ -4,6 +4,12 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 on:
   push:
     branches: [ developer ]
+    paths:
+      - "ios/**"
+      - "lib/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "assets/*
 
 # Prevent concurrent runs of the same workflow
 concurrency:
