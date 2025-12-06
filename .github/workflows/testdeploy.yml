@@ -1,0 +1,139 @@
+name: iOS Test Deployment
+
+on:
+  push:
+    branches:
+      - nabeela
+ 
+  workflow_dispatch:
+
+env:
+  CERTIFICATES_REPO: nabeelanasaritsaoirse/ios-certificates
+  CERTIFICATES_BRANCH: master
+
+jobs:
+  build-and-deploy:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: main-repo
+      
+      - name: Checkout certificates repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.CERTIFICATES_REPO }}
+          ref: ${{ env.CERTIFICATES_BRANCH }}
+          token: ${{ secrets.KEY_ALIAS }}
+          path: certificates
+      
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: main-repo/ios
+      
+      - name: Install dependencies
+        working-directory: main-repo/ios
+        run: |
+          gem install bundler
+          bundle install
+      
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      
+      - name: Install certificates and provisioning profiles
+        env:
+          CERTIFICATES_PATH: ${{ github.workspace }}/certificates
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          # Create variables
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          
+          # Create temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          
+          # Import certificate
+          security import $CERTIFICATES_PATH/distribution.p12 \
+            -P "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" \
+            -A \
+            -t cert \
+            -f pkcs12 \
+            -k $KEYCHAIN_PATH
+          
+          security list-keychain -d user -s $KEYCHAIN_PATH
+          
+          # Install provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $CERTIFICATES_PATH/*.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+      
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: main-repo/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+      
+      - name: Install CocoaPods dependencies
+        working-directory: main-repo/ios
+        run: |
+          pod install
+      
+      - name: Build iOS App
+        working-directory: main-repo/ios
+        env:
+          KEYCHAIN_PATH: ${{ runner.temp }}/app-signing.keychain-db
+        run: |
+          xcodebuild -workspace YourApp.xcworkspace \
+            -scheme YourScheme \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath $RUNNER_TEMP/YourApp.xcarchive \
+            -allowProvisioningUpdates \
+            OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN_PATH" \
+            archive
+      
+      - name: Export IPA
+        working-directory: main-repo/ios
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath $RUNNER_TEMP/YourApp.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath $RUNNER_TEMP/build \
+            -allowProvisioningUpdates
+      
+      - name: Upload to TestFlight
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_JSON: ${{ secrets.APP_STORE_CONNECT_API_KEY_JSON }}
+        run: |
+          # Save API key to file
+          echo "$APP_STORE_CONNECT_API_KEY_JSON" > $RUNNER_TEMP/AuthKey.p8
+          
+          xcrun altool --upload-app \
+            --type ios \
+            --file $RUNNER_TEMP/build/YourApp.ipa \
+            --apiKey $APP_STORE_CONNECT_API_KEY_ID \
+            --apiIssuer $APP_STORE_CONNECT_ISSUER_ID \
+            --apiKeyPath $RUNNER_TEMP/AuthKey.p8
+      
+      - name: Upload IPA as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-app-${{ github.sha }}
+          path: ${{ runner.temp }}/build/*.ipa
+          retention-days: 30
+      
+      - name: Clean up keychain
+        if: always()
+        run: |
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
