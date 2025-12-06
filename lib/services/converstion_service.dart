@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -11,11 +13,11 @@ class ConversationService {
     final token = await storage.read(AppConst.ACCESS_TOKEN);
     final body = {'withUserId': userId};
 
-    print("\n================ CREATE INDIVIDUAL CHAT API ================");
-    print("URL: ${AppURLs.CREATE_INDIVIDUAL_CHAT_FROM_REFFERAL}");
-    print("TOKEN: $token");
-    print("REQUEST BODY: $body");
-    print("============================================================");
+    log("\n================ CREATE INDIVIDUAL CHAT API ================");
+    log("URL: ${AppURLs.CREATE_INDIVIDUAL_CHAT_FROM_REFFERAL}");
+    log("TOKEN: $token");
+    log("REQUEST BODY: $body");
+    log("============================================================");
 
     try {
       final response = await APIService.postRequest(
@@ -28,25 +30,25 @@ class ConversationService {
         onSuccess: (json) => json,
       );
 
-      print("\n------ API RAW RESPONSE ------");
-      print(response);
-      print("------------------------------\n");
+      log("\n------ API RAW RESPONSE ------");
+      log("RESPONSE: $response");
+      log("------------------------------\n");
 
       if (response == null) {
-        print("❌ Response is NULL");
+        log("❌ Response is NULL");
         return null;
       }
 
       if (response['success'] == true) {
-        print("✅ SUCCESS → Creating ConversationModel");
+        log("✅ SUCCESS → Creating ConversationModel");
         return ConversationModel.fromJson(response['data']);
       }
 
-      print("❌ API Error: ${response['message']}");
+      log("❌ API Error: ${response['message']}");
       appToast(error: true, content: response['message']);
       return null;
     } catch (e) {
-      print("⚠️ Chat Error Exception: $e");
+      log("⚠️ Chat Error Exception: $e");
       return null;
     }
   }
@@ -62,10 +64,10 @@ class ConversationService {
       "text": text,
     };
 
-    print("\n========== SEND MESSAGE ==========");
-    print("URL: ${AppURLs.BASE_API}conversations/$conversationId/messages");
-    print("BODY: $body");
-    print("=================================");
+    log("\n========== SEND MESSAGE ==========");
+    log("URL: ${AppURLs.BASE_API}conversations/$conversationId/messages");
+    log("BODY: $body");
+    log("=================================");
 
     try {
       final response = await APIService.postRequest(
@@ -79,7 +81,7 @@ class ConversationService {
         onSuccess: (json) => json,
       );
 
-      print("RAW RESPONSE: $response");
+      log("RAW RESPONSE: $response");
 
       if (response == null) return null;
 
@@ -90,7 +92,7 @@ class ConversationService {
       appToast(error: true, content: response['message']);
       return null;
     } catch (e) {
-      print("Send Message Error: $e");
+      log("Send Message Error: $e");
       return null;
     }
   }
@@ -105,7 +107,7 @@ class ConversationService {
     final url =
         "${AppURLs.BASE_API}api/chat/conversations/$conversationId/messages?page=$page&limit=$limit";
 
-    print("📩 Fetching messages => $url");
+    log("📩 Fetching messages => $url");
 
     final response = await APIService.getRequest(
       url: url,
@@ -117,7 +119,7 @@ class ConversationService {
 
     if (response == null) return [];
 
-    print("📬 Messages Loaded = ${response['data']['messages'].length}");
+    log("📬 Messages Loaded = ${response['data']['messages'].length}");
 
     return (response["data"]["messages"] as List)
         .map((m) => ChatMessage.fromJson(m))
@@ -125,26 +127,25 @@ class ConversationService {
   }
 
   Future<Map<String, dynamic>?> pollMessages({
-  required DateTime lastPollTime,
-  String? conversationId,
-}) async {
-  final token = await storage.read(AppConst.ACCESS_TOKEN);
+    required DateTime lastPollTime,
+    String? conversationId,
+  }) async {
+    final token = await storage.read(AppConst.ACCESS_TOKEN);
 
-  final url =
-      "${AppURLs.BASE_API}api/chat/poll?lastPollTime=${lastPollTime.toIso8601String()}"
-      "${conversationId != null ? "&conversationId=$conversationId" : ""}";
+    final url =
+        "${AppURLs.BASE_API}api/chat/poll?lastPollTime=${lastPollTime.toIso8601String()}"
+        "${conversationId != null ? "&conversationId=$conversationId" : ""}";
 
-  print("🔁 POLLING => $url");
+    log("🔁 POLLING => $url");
 
-  final response = await APIService.getRequest(
-    url: url,
-    headers: {"Authorization": "Bearer $token"},
-    onSuccess: (json) => json,
-  );
+    final response = await APIService.getRequest(
+      url: url,
+      headers: {"Authorization": "Bearer $token"},
+      onSuccess: (json) => json,
+    );
 
-  if (response == null) return null;
+    if (response == null) return null;
 
-  return response["data"];
-}
-
+    return response["data"];
+  }
 }

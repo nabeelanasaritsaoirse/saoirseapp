@@ -16,6 +16,7 @@ class ProductCard extends StatelessWidget {
     required this.price,
     required this.isFavorite,
     this.id,
+    this.showFavorite = false,
     this.onFavoriteTap,
     this.margin,
   });
@@ -26,6 +27,7 @@ class ProductCard extends StatelessWidget {
   final String brand;
   final String image;
   final String price;
+  final bool showFavorite;
   final bool isFavorite;
   final VoidCallback? onFavoriteTap;
   final EdgeInsets? margin;
@@ -103,6 +105,27 @@ class ProductCard extends StatelessWidget {
                   //     ),
                   //   ),
                   // ),
+                  if (showFavorite)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: GestureDetector(
+                        onTap: onFavoriteTap,
+                        child: Container(
+                          width: 26.w,
+                          height: 26.w,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            size: 14.sp,
+                            color: isFavorite ? Colors.red : Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

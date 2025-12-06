@@ -61,7 +61,12 @@ class MessageController extends GetxController {
       final newMsgs = data["conversations"][0]["newMessages"] as List;
 
       for (var msg in newMsgs) {
-        messages.add(ChatMessage.fromJson(msg)); // 🔥 append new message
+        final incoming = ChatMessage.fromJson(msg);
+
+        // ⛔ avoid duplicate messages
+        if (!messages.any((m) => m.messageId == incoming.messageId)) {
+          messages.add(incoming);
+        }
       }
     }
     scrollToBottom();
@@ -105,6 +110,7 @@ class MessageController extends GetxController {
 
     if (message != null) {
       messages.add(message);
+      pollNewMessages();
       textController.clear();
       scrollToBottom();
     }

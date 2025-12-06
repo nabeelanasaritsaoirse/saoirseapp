@@ -52,8 +52,7 @@ Future<void> main() async {
           projectId: dotenv.env['ANDROID_PROJECT_ID'] ?? '',
         ));
     
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-     log("📌 FCM TOKEN: $fcmToken");
+    
   // Background handler registration
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 

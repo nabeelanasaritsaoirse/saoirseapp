@@ -36,70 +36,39 @@ class KycServices {
     log('🧾 Detected mime: $detectedMime');
     log('🔤 type field: $type, side field: $side');
 
-    Future<http.Response> send(String method) async {
-      var request = http.MultipartRequest(method, uri);
-      request.headers["Authorization"] = "Bearer $token";
-      // Do NOT set Content-Type header here; MultipartRequest will set it with boundary.
-      request.fields["type"] = type;
-      request.fields["side"] = side;
-      
-      final filename = path.basename(imageFile.path);
+    var request = http.MultipartRequest("PUT", uri);
+    request.headers["Authorization"] = "Bearer $token";
 
-      final multipartFile = http.MultipartFile.fromBytes(
-        "image",
-        bytes,
-        filename: filename,
-        contentType: MediaType(mimeParts[0], mimeParts[1]),
-      );
+    // text fields
+    request.fields["type"] = type; // selfie / aadhaar / pan / ...
+    request.fields["side"] = side; // front / back
 
-      request.files.add(multipartFile);
+    final filename = path.basename(imageFile.path);
+    final multipartFile = http.MultipartFile.fromBytes(
+      "image",
+      bytes,
+      filename: filename,
+      contentType: MediaType(mimeParts[0], mimeParts[1]),
+    );
+    request.files.add(multipartFile);
 
-      log("🔐 Request headers before send: ${request.headers}");
-      log("🔗 Request method: $method, endpoint: $uri");
+    log("🔐 Request headers before send: ${request.headers}");
+    log("🔗 Request method: PUT, endpoint: $uri");
 
-      var streamed = await request.send().timeout(
-            const Duration(seconds: 60),
-            onTimeout: () => throw TimeoutException('Upload took too long'),
-          );
+    final streamed = await request.send().timeout(
+          const Duration(seconds: 60),
+          onTimeout: () => throw TimeoutException('Upload took too long'),
+        );
 
-      return await http.Response.fromStream(streamed);
-    }
+    final resp = await http.Response.fromStream(streamed);
 
-    // First try per docs: PUT
-    try {
-      log("➡ Trying PUT per API docs...");
-      final putResp = await send("PUT");
-      log("📤 PUT → ${putResp.statusCode}");
-      log("📥 ${putResp.body}");
-      if (putResp.statusCode == 200 || putResp.statusCode == 201) {
-        return jsonDecode(putResp.body);
-      } else if (putResp.statusCode >= 400 && putResp.statusCode < 500) {
-        // Client error: bubble up
-        throw "Upload failed (${putResp.statusCode}): ${putResp.body}";
-      } else {
-        // Server error: try POST fallback
-        log("⚠ PUT returned server error; will try POST fallback.");
-      }
-    } catch (e) {
-      log("❌ PUT attempt threw: $e");
-      // Continue to POST fallback
-    }
+    log("📤 PUT → ${resp.statusCode}");
+    log("📥 ${resp.body}");
 
-    // POST fallback
-    try {
-      log("➡ Trying POST fallback...");
-      final postResp = await send("POST");
-      log("📤 POST → ${postResp.statusCode}");
-      log("📥 ${postResp.body}");
-      if (postResp.statusCode == 200 || postResp.statusCode == 201) {
-        return jsonDecode(postResp.body);
-      } else {
-        throw "Upload failed (${postResp.statusCode}): ${postResp.body}";
-      }
-    } catch (e) {
-      log("❌ POST attempt threw: $e");
-      // Nothing left to try
-      throw "Upload failed: PUT & POST attempts failed. Last error: $e";
+    if (resp.statusCode == 200 || resp.statusCode == 201) {
+      return jsonDecode(resp.body);
+    } else {
+      throw "Upload failed (${resp.statusCode}): ${resp.body}";
     }
   }
 

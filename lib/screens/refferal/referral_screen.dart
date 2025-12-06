@@ -2,6 +2,8 @@
 // Behaves exactly as requested
 // No design or UI property changes
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,6 +11,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:saoirse_app/widgets/app_button.dart';
 
 import '../../constants/app_strings.dart';
+import '../../models/refferal_info_model.dart';
 import '../../screens/refferal/referral_controller.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -82,7 +85,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.lightGrey,
       resizeToAvoidBottomInset: true,
       appBar: CustomAppBar(
         title: AppStrings.refferalTitle,
@@ -179,7 +182,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: _buildContentSection(
               loginController: loginController,
-              controller: controller,
+              referralController: controller,
               searchController: searchController,
               focusNode: searchFocusNode,
             ),
@@ -190,7 +193,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
   }
 
   Widget _buildContentSection({
-    required ReferralController controller,
+    required ReferralController referralController,
     required LoginController loginController,
     required TextEditingController searchController,
     required FocusNode focusNode,
@@ -211,18 +214,15 @@ class _ReferralScreenState extends State<ReferralScreen> {
               fontWeight: FontWeight.w600,
               color: AppColors.textBlack,
             ),
-            GestureDetector(
-              onTap: () {
-                if (!loginController.referralApplied.value) {
-                  showReferralInputPopup();
-                }
-              },
-              child: appText(AppStrings.apply_refferal,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.primaryColor,
-                  decoration: TextDecoration.underline),
-            ),
+            Obx(() {
+              if (referralController.referrer.value != null) {
+                log("🟢 Showing ReferredByCard");
+                return referredByCard(referralController.referrer.value!);
+              } else {
+                log("🔵 Showing Apply Referral Button");
+                return applyReferralSection(); // show input + apply button
+              }
+            })
           ],
         ),
 
@@ -727,6 +727,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                     padding: EdgeInsets.all(10.r),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
+                      // ignore: deprecated_member_use
                       color: AppColors.green.withOpacity(0.1),
                     ),
                     child: Icon(Iconsax.tick_circle,
@@ -806,6 +807,22 @@ class _ReferralScreenState extends State<ReferralScreen> {
     );
   }
 
+  Widget applyReferralSection() {
+    if (loginController.referralApplied.value) return SizedBox(); // hide input
+
+    return GestureDetector(
+      onTap: () => showReferralInputPopup(),
+      child: Text(
+        "Apply Referral",
+        style: TextStyle(
+          decoration: TextDecoration.underline,
+          fontWeight: FontWeight.w600,
+          color: Colors.blue,
+        ),
+      ),
+    );
+  }
+
   void showReferralSuccessPopup() {
     Get.dialog(
       Dialog(
@@ -822,6 +839,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                 padding: EdgeInsets.all(12.r),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
+                  // ignore: deprecated_member_use
                   color: AppColors.green.withOpacity(0.1),
                 ),
                 child: Icon(
@@ -862,4 +880,42 @@ class _ReferralScreenState extends State<ReferralScreen> {
       ),
     );
   }
+}
+
+Widget referredByCard(ReferrerInfoModel r) {
+  return GestureDetector(
+    onTap: () {
+      log("👆 ReferredBy Clicked → Navigating to Friend Details");
+      log("📩 Passing UserId = ${r.userId}");
+
+      Get.to(() => InviteFriendDetailsScreen(
+            userId: r.userId, // <-- Passing user ID
+          ));
+    },
+    child: Container(
+      padding: EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        // ignore: deprecated_member_use
+        color: Colors.green.withOpacity(.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.green),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(backgroundImage: NetworkImage(r.profilePicture)),
+          SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Referred by:",
+                  style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(r.name, style: TextStyle(fontSize: 15)),
+              Text("Code: ${r.referralCode}",
+                  style: TextStyle(color: Colors.black54)),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
 }

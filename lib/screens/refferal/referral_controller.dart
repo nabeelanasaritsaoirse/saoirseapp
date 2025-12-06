@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../constants/app_constant.dart';
 import '../../main.dart';
 import '../../models/referral_response_model.dart';
+import '../../models/refferal_info_model.dart';
 import '../../services/refferal_service.dart';
 import '../../widgets/app_toast.dart';
 
@@ -21,12 +22,38 @@ class ReferralController extends GetxController {
 
   final referrals = <Referral>[].obs;
   final filteredReferrals = <Referral>[].obs;
+  Rxn<ReferrerInfoModel> referrer = Rxn<ReferrerInfoModel>();
 
   @override
   void onInit() {
     super.onInit();
     loadReferralFromStorage();
     fetchReferralData();
+    fetchReferrerInfo();
+  }
+
+  Future<void> fetchReferrerInfo() async {
+    log("\n================ FETCH REFERRER INFO ================");
+    log("📡 Calling API: /api/referral/referrer-info");
+    isLoading.value = true;
+
+    final result = await _referralService.getReferrerInfo();
+
+    if (result != null) {
+      log("✅ Referrer found:");
+      log("ID     : ${result.userId}");
+      log("Name   : ${result.name}");
+      log("Email  : ${result.email}");
+      log("Photo  : ${result.profilePicture}");
+      log("Code   : ${result.referralCode}");
+    } else {
+      log("❌ No referrer data / null received");
+    }
+
+    referrer.value = result;
+
+    isLoading.value = false;
+    log("=====================================================\n");
   }
 
   // ---------------------------------------------------------------------------

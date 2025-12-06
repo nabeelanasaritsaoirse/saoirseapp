@@ -20,7 +20,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   //navigation
-  _splashScreen() {
+  void _splashScreen() {
     bool isLogin = !(storage.read(AppConst.USER_ID) == null);
 
     Future.delayed(const Duration(seconds: 2), () async {

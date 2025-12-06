@@ -160,6 +160,7 @@ Widget _messageBubble(BuildContext context, ChatMessage message, bool isUser,
             borderRadius: BorderRadius.circular(16.r),
             boxShadow: [
               BoxShadow(
+                // ignore: deprecated_member_use
                 color: AppColors.black.withOpacity(0.05),
                 blurRadius: 5.r,
                 offset: Offset(0, 2.h),
