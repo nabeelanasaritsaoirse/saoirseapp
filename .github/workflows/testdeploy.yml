@@ -93,7 +93,21 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pods-
 
-    - name: Install CocoaPods
+    - name: 🔧 Prepare Flutter iOS
+      working-directory: main-repo
+      run: |
+        flutter pub get
+        flutter build ios --release --no-codesign
+
+    - name: Cache CocoaPods
+      uses: actions/cache@v4
+      with:
+        path: main-repo/ios/Pods
+        key: ${{ runner.os }}-pods-${{ hashFiles('main-repo/ios/Podfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pods-
+    
+    - name: Install CocoaPods dependencies
       working-directory: main-repo/ios
       run: |
         pod install
