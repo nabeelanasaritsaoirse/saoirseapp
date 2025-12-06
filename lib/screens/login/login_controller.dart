@@ -147,7 +147,7 @@ class LoginController extends GetxController {
       print("✔ Login + Profile Update SUCCESS");
       print("🔁 Checking if referral exists...");
 
-      final referralController = Get.find<ReferralController>();
+      final referralController = Get.put(ReferralController());
       await referralController.fetchReferrerInfo();
 
       print("🔄 Referral Info Loaded -> Navigating Home");
