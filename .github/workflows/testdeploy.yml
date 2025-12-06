@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - nabeela
- 
   workflow_dispatch:
 
 env:
@@ -26,7 +25,6 @@ jobs:
         with:
           repository: ${{ env.CERTIFICATES_REPO }}
           ref: ${{ env.CERTIFICATES_BRANCH }}
-          token: ${{ secrets.KEY_ALIAS }}
           path: certificates
       
       - name: Set up Ruby
