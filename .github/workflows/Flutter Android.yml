@@ -278,7 +278,6 @@ jobs:
             --json_key service_account.json \
             --package_name "$PACKAGE_NAME" \
             --track production \
-            --skip_upload_metadata \
             --skip_upload_changelogs \
             --skip_upload_images \
             --skip_upload_screenshots
