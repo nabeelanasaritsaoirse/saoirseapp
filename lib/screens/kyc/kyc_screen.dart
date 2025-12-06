@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/LoginAuth/kyc_model.dart';
 import '/constants/app_strings.dart';
 import '/widgets/custom_appbar.dart';
 import '/widgets/app_loader.dart';
@@ -18,7 +19,8 @@ class KycScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-      appBar: CustomAppBar(showBack: true,
+      appBar: CustomAppBar(
+        showBack: true,
         title: AppStrings.KycTitle,
       ),
       body: Obx(() {
@@ -29,8 +31,7 @@ class KycScreen extends StatelessWidget {
         }
 
         if (controller.kyc.value == null) {
-          return
-           const Center(child: Text("No KYC data found"));
+          return const Center(child: Text("No KYC data found"));
         }
 
         final status = controller.kyc.value!.status;
@@ -224,9 +225,9 @@ class NotSubmittedUI extends StatelessWidget {
                 )
               : SizedBox()),
 
-          // =========================================================
-          //     PAN UPLOADS
-          // =========================================================
+// ==============================================================================
+//     PAN UPLOADS
+// ==============================================================================
 
           Obx(() => controller.panSelected.value
               ? Column(
@@ -304,7 +305,6 @@ class NotSubmittedUI extends StatelessWidget {
 //===============================================
 //     PENDING UI
 //===============================================
-
 class PendingUI extends StatelessWidget {
   const PendingUI({super.key});
 
@@ -362,13 +362,13 @@ class ApprovedUI extends StatelessWidget {
 //======================================================
 //     REJECTED UI
 //======================================================
-
 class RejectedUI extends StatelessWidget {
   const RejectedUI({super.key});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<KycController>();
+    final note = controller.kyc.value?.rejectionNote ?? "No reason provided";
 
     return Center(
       child: Padding(
@@ -378,20 +378,52 @@ class RejectedUI extends StatelessWidget {
           children: [
             Icon(Icons.cancel, size: 100.sp, color: AppColors.red),
             SizedBox(height: 12.sp),
+
             appText("KYC Rejected",
                 fontSize: 20.sp, fontWeight: FontWeight.bold),
             SizedBox(height: 10.sp),
-            appText("Please check your details and try again.",
-                fontSize: 16.sp, fontWeight: FontWeight.w500),
-            SizedBox(height: 20.h),
+
+            ///  SHOW REJECTION NOTE
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                appText("Reason:",
+                    fontSize: 15.sp, fontWeight: FontWeight.bold),
+                SizedBox(height: 10.sp),
+                SizedBox(
+                  width: 4.sp,
+                ),
+                appText(
+                  note, // <-- backend reason shown here
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.red,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+            SizedBox(height: 20.sp),
+
             appButton(
               buttonText: "Resubmit KYC",
               buttonColor: AppColors.primaryColor,
               onTap: () {
-                controller.selectedDocType.value = null;
-                controller.frontImage.value = null;
-                controller.backImage.value = null;
-                controller.kyc.value = null;
+                controller.selfieImage.value = null;
+                controller.aadhaarFront.value = null;
+                controller.aadhaarBack.value = null;
+                controller.panFront.value = null;
+                controller.panBack.value = null;
+
+                controller.aadhaarSelected.value = false;
+                controller.panSelected.value = false;
+
+                // SWITCH TO NOT SUBMITTED UI
+                controller.kyc.value = KycModel(
+                  kycExists: false,
+                  status: "not_submitted",
+                );
+
+                controller.update();
               },
             ),
           ],
