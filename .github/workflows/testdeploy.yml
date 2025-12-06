@@ -92,12 +92,19 @@ jobs:
         key: ${{ runner.os }}-pods-${{ hashFiles('main-repo/ios/Podfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-pods-
-
+          
+    - name: 🧩 Install Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
+    
     - name: 🔧 Prepare Flutter iOS
       working-directory: main-repo
       run: |
         flutter pub get
         flutter build ios --release --no-codesign
+
 
     - name: Cache CocoaPods
       uses: actions/cache@v4
