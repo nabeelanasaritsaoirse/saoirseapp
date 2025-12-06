@@ -46,6 +46,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.scaffoldColor,
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
@@ -87,7 +88,8 @@ class _LoginPageState extends State<LoginPage> {
                         return loginController.referralApplied.value
                             ? SizedBox.shrink() // hide field
                             : appTextField(
-                                controller: loginController.referrelController,
+                                controller:
+                                    loginController.referreltextController,
                                 prefixWidth: 20.w,
                                 hintText: AppStrings.Referral_code,
                                 hintColor: AppColors.black,
@@ -245,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
                                             phoneNumber:
                                                 loginController.fullPhoneNumber,
                                             referral: loginController
-                                                .referrelController.text,
+                                                .referreltextController.text,
                                             username: loginController
                                                 .emailController.text,
                                           ));

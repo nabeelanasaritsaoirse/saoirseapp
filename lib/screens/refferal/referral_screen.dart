@@ -2,6 +2,8 @@
 // Behaves exactly as requested
 // No design or UI property changes
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -83,7 +85,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.lightGrey,
       resizeToAvoidBottomInset: true,
       appBar: CustomAppBar(
         title: AppStrings.refferalTitle,
@@ -214,10 +216,10 @@ class _ReferralScreenState extends State<ReferralScreen> {
             ),
             Obx(() {
               if (referralController.referrer.value != null) {
-                print("🟢 Showing ReferredByCard");
+                log("🟢 Showing ReferredByCard");
                 return referredByCard(referralController.referrer.value!);
               } else {
-                print("🔵 Showing Apply Referral Button");
+                log("🔵 Showing Apply Referral Button");
                 return applyReferralSection(); // show input + apply button
               }
             })
@@ -725,6 +727,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                     padding: EdgeInsets.all(10.r),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
+                      // ignore: deprecated_member_use
                       color: AppColors.green.withOpacity(0.1),
                     ),
                     child: Icon(Iconsax.tick_circle,
@@ -836,6 +839,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                 padding: EdgeInsets.all(12.r),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
+                  // ignore: deprecated_member_use
                   color: AppColors.green.withOpacity(0.1),
                 ),
                 child: Icon(
@@ -882,6 +886,7 @@ Widget referredByCard(ReferrerInfoModel r) {
   return Container(
     padding: EdgeInsets.all(14),
     decoration: BoxDecoration(
+      // ignore: deprecated_member_use
       color: Colors.green.withOpacity(.1),
       borderRadius: BorderRadius.circular(10),
       border: Border.all(color: Colors.green),

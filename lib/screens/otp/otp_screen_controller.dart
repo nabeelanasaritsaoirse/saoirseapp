@@ -34,7 +34,7 @@ class VerifyOtpController extends GetxController {
   final String referral;
 
   /// STEP 1 — Verify OTP (Firebase)
-  verifyOtp() async {
+  Future<void> verifyOtp() async {
     isLoading.value = true;
 
     String otp = otpControllers.map((c) => c.text).join();
@@ -78,21 +78,6 @@ class VerifyOtpController extends GetxController {
     notif.updateToken(data.accessToken!); // update token in controller
     notif.service.updateToken(data.accessToken!);
 
-    if (referral.isNotEmpty) {
-      print("\n================== APPLYING REFERRAL ==================");
-      print("Referral From Input: $referral");
-      bool applied = await Get.find<LoginController>().applyReferral(referral);
-
-      if (applied) {
-        print("🎉 Referral Successfully Applied During OTP Login");
-      } else {
-        print("⚠ Referral Failed or Invalid → Continue Login");
-      }
-      print("========================================================\n");
-    } else {
-      print("⚠ No referral entered → Skipping applyReferral()");
-    }
-
     bool updated = await updateUser(
       userId: data.userId!,
       name: username,
@@ -103,15 +88,26 @@ class VerifyOtpController extends GetxController {
       isLoading.value = false;
       return;
     }
+    if (referral.isNotEmpty) {
+      print("\n========== APPLY REFERRAL DURING OTP LOGIN ==========");
+      bool applied = await Get.find<LoginController>().applyReferral(referral);
 
+      print(applied
+          ? "🎉 Referral Applied Successfully"
+          : "⚠ Referral Failed or Invalid");
+
+      final referralCtrl = Get.isRegistered<ReferralController>()
+          ? Get.find<ReferralController>()
+          : Get.put(ReferralController());
+      await referralCtrl.fetchReferrerInfo();
+      // <-- required
+      print("🔍 Referrer Info Retrieved After OTP Login");
+      print("=====================================================\n");
+    }
     notif.updateToken(data.accessToken!);
     await notif.sendWelcomeNotification(username);
     await notif.refreshNotifications();
     await notif.fetchUnreadCount();
-    final referralController = Get.put(ReferralController());
-
-// If user already applied earlier or applying now
-    await referralController.fetchReferrerInfo();
     print("🔍 Referral Check Complete After OTP Login");
     final fcmToken = await getDeviceToken();
     if (fcmToken != null) {

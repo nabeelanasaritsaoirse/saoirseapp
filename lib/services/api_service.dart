@@ -372,7 +372,7 @@ class APIService {
   // INTERNET CONNECTIVITY CHECK
   // Listens for internet changes and logs connection status.
   // ---------------------------------------------------------------------------
-  static checkConnection(BuildContext context) {
+  static void checkConnection(BuildContext context) {
     Connectivity().checkConnectivity().then((result) {
       if (result == ConnectivityResult.none) {
         internet = false;

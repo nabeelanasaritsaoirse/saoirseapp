@@ -9,7 +9,7 @@ import '../constants/app_colors.dart';
 import 'app_button.dart';
 import 'app_text.dart';
 
-appDialogBox({
+void appDialogBox({
   required String title,
   required String content,
   required String confirmText,

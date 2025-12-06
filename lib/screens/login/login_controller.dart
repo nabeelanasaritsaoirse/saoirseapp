@@ -22,7 +22,7 @@ import 'package:http/http.dart' as http;
 
 class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();
-  TextEditingController referrelController = TextEditingController();
+  TextEditingController referreltextController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   RxBool loading = false.obs;
   Rx<Country?> country = Rx<Country?>(null);
@@ -47,7 +47,7 @@ class LoginController extends GetxController {
     final referralCode = referralFromDeepLink ?? storedReferral;
 
     if (referralCode != null && referralCode.isNotEmpty) {
-      referrelController.text = referralCode;
+      referreltextController.text = referralCode;
     }
   }
 
@@ -100,7 +100,7 @@ class LoginController extends GetxController {
   }
 
   //google login
-  googleLogin() async {
+  Future<void> googleLogin() async {
     loading.value = true;
 
     // Clear previous session
@@ -136,19 +136,21 @@ class LoginController extends GetxController {
 
     // Step 3: Update user with FCM + referral
 
-    final referralText = referrelController.text.trim();
+    bool updated = await updateUser(data.userId!);
+    final referralText = referreltextController.text.trim();
     if (referralText.isNotEmpty) {
       await applyReferral(referralText);
     }
 
-    bool updated = await updateUser(data.userId!);
+    final r = Get.isRegistered<ReferralController>()
+        ? Get.find<ReferralController>()
+        : Get.put(ReferralController());
 
+    await r.fetchReferrerInfo();
+    print("🌿 Google Login Referral Info Loaded");
     if (updated) {
       print("✔ Login + Profile Update SUCCESS");
       print("🔁 Checking if referral exists...");
-
-      final referralController = Get.put(ReferralController());
-      await referralController.fetchReferrerInfo();
 
       print("🔄 Referral Info Loaded -> Navigating Home");
       Get.offAll(() => DashboardScreen());
