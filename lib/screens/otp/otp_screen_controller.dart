@@ -108,7 +108,7 @@ class VerifyOtpController extends GetxController {
     await notif.sendWelcomeNotification(username);
     await notif.refreshNotifications();
     await notif.fetchUnreadCount();
-    final referralController = Get.find<ReferralController>();
+    final referralController = Get.put(ReferralController());
 
 // If user already applied earlier or applying now
     await referralController.fetchReferrerInfo();
