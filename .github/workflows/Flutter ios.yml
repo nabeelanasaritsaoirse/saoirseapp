@@ -216,7 +216,6 @@ jobs:
 
       # ---------------------- BUILD FLUTTER FRAMEWORKS -------------------------
       - name: 🔨 Pre-build Flutter iOS (No Code Sign)
-        timeout-minutes: 15
         run: |
           echo "================================"
           echo "🔨 PRE-BUILDING FLUTTER"
@@ -230,7 +229,6 @@ jobs:
 
       # ---------------------- XCODE ARCHIVE -------------------------
       - name: 🏗️ Build Archive with xcodebuild
-        timeout-minutes: 25
         env:
           SIGNING_CERT: ${{ steps.signing.outputs.signing_identity }}
           PROFILE_UUID: ${{ steps.signing.outputs.profile_uuid }}
@@ -276,7 +274,6 @@ jobs:
           echo "✅ Archive created successfully"
 
       - name: 📦 Export IPA
-        timeout-minutes: 10
         run: |
           set -e
           
