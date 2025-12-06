@@ -883,28 +883,39 @@ class _ReferralScreenState extends State<ReferralScreen> {
 }
 
 Widget referredByCard(ReferrerInfoModel r) {
-  return Container(
-    padding: EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      // ignore: deprecated_member_use
-      color: Colors.green.withOpacity(.1),
-      borderRadius: BorderRadius.circular(10),
-      border: Border.all(color: Colors.green),
-    ),
-    child: Row(
-      children: [
-        CircleAvatar(backgroundImage: NetworkImage(r.profilePicture)),
-        SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Referred by:", style: TextStyle(fontWeight: FontWeight.w600)),
-            Text(r.name, style: TextStyle(fontSize: 15)),
-            Text("Code: ${r.referralCode}",
-                style: TextStyle(color: Colors.black54)),
-          ],
-        ),
-      ],
+  return GestureDetector(
+    onTap: () {
+      log("👆 ReferredBy Clicked → Navigating to Friend Details");
+      log("📩 Passing UserId = ${r.userId}");
+
+      Get.to(() => InviteFriendDetailsScreen(
+            userId: r.userId, // <-- Passing user ID
+          ));
+    },
+    child: Container(
+      padding: EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        // ignore: deprecated_member_use
+        color: Colors.green.withOpacity(.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.green),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(backgroundImage: NetworkImage(r.profilePicture)),
+          SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Referred by:",
+                  style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(r.name, style: TextStyle(fontSize: 15)),
+              Text("Code: ${r.referralCode}",
+                  style: TextStyle(color: Colors.black54)),
+            ],
+          ),
+        ],
+      ),
     ),
   );
 }
