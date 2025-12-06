@@ -128,14 +128,24 @@ jobs:
           sudo gem install fastlane -N
           sudo gem install cocoapods -N
 
-      - name: 🍫 Install Pods (with fixed Podfile)
-        timeout-minutes: 10
+      - name: 🧨 Remove all cached iOS build folders
         run: |
+          echo "Cleaning old iOS build state..."
+          rm -rf ios/Pods
+          rm -rf ios/Podfile.lock
+          rm -rf ios/.symlinks
+          rm -rf ios/Flutter/Flutter.framework
+          rm -rf ios/Flutter/App.framework
+          rm -rf build/ios
+          echo "Cleaned!"
+          
+      - name: 🔄 Re-run Flutter pod setup
+        run: |
+          flutter clean
+          flutter pub get
           cd ios
-          rm -rf Pods Podfile.lock
           pod install --repo-update
           cd ..
-
       # ---------------------- APP STORE SIGNING -------------------------
       - name: 🔐 Create api_key.json
         run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > api_key.json
