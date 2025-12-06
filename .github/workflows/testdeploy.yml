@@ -37,9 +37,9 @@ jobs:
 
     - name: 🔐 Install Certificates with Fastlane Match
       id: signing
+      env:
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}   # ✅ REQUIRED!!
       run: |
-        bundle install || true
-
         fastlane match appstore \
           --readonly \
           --verbose \
@@ -47,14 +47,15 @@ jobs:
           --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git \
           --git_branch master \
           --app_identifier com.saoirse.epi
-
+    
         PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -1)
         PROFILE_UUID=$(basename "$PROFILE_PATH" .mobileprovision)
-
+    
         CERT_NAME=$(security find-identity -v -p codesigning | head -1 | awk -F\" '{print $2}')
-
+    
         echo "profile_uuid=$PROFILE_UUID" >> $GITHUB_OUTPUT
         echo "signing_identity=$CERT_NAME" >> $GITHUB_OUTPUT
+
 
     # -------------------- EXPORTOPTIONS -----------------
     - name: 📝 Create ExportOptions.plist
