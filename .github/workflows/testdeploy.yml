@@ -7,123 +7,150 @@ on:
       
   workflow_dispatch:
 
-env:
-  CERTIFICATES_REPO: nabeelanasaritsaoirse/ios-certificates
-  CERTIFICATES_BRANCH: master
-
 jobs:
   build-and-deploy:
     runs-on: macos-latest
-    
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          path: main-repo
-      
-      - name: Checkout certificates repository
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.CERTIFICATES_REPO }}
-          ref: ${{ env.CERTIFICATES_BRANCH }}
-          path: certificates
-      
-      - name: Set up Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
-      
-      - name: Install certificates and provisioning profiles
-        env:
-          CERTIFICATES_PATH:  ${{ env.CERTIFICATES_REPO }}/certificates
-          KEYCHAIN_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-        run: |
-          # Create variables
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-          
-          # Create temporary keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          
-          # Import certificate
-          security import $CERTIFICATES_PATH/distribution.p12 \
-            -P "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" \
-            -A \
-            -t cert \
-            -f pkcs12 \
-            -k $KEYCHAIN_PATH
-          
-          security list-keychain -d user -s $KEYCHAIN_PATH
-          
-          # Install provisioning profile
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $CERTIFICATES_PATH/*.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-      
-      - name: Cache CocoaPods
-        uses: actions/cache@v4
-        with:
-          path: main-repo/ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('main-repo/ios/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
-      
-      - name: Install CocoaPods dependencies
-        working-directory: main-repo/ios
-        run: |
-          if [ -f "Podfile" ]; then
-            pod install
-          else
-            echo "No Podfile found, skipping CocoaPods installation"
-          fi
-      
-      - name: Build iOS App
-        working-directory: main-repo/ios
-        env:
-          KEYCHAIN_PATH: ${{ runner.temp }}/app-signing.keychain-db
-        run: |
-          xcodebuild -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -sdk iphoneos \
-            -archivePath $RUNNER_TEMP/Runner.xcarchive \
-            -allowProvisioningUpdates \
-            OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN_PATH" \
-            archive
-      
-      - name: Export IPA
-        working-directory: main-repo/ios
-        run: |
-          xcodebuild -exportArchive \
-            -archivePath $RUNNER_TEMP/Runner.xcarchive \
-            -exportOptionsPlist ExportOptions.plist \
-            -exportPath $RUNNER_TEMP/build \
-            -allowProvisioningUpdates
-      
-      - name: Upload to TestFlight
-        env:
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY_JSON: ${{ secrets.APP_STORE_CONNECT_API_KEY_JSON }}
-        run: |
-          # Save API key to file
-          echo "$APP_STORE_CONNECT_API_KEY_JSON" > $RUNNER_TEMP/AuthKey.p8
-          
-          xcrun altool --upload-app \
-            --type ios \
-            --file $RUNNER_TEMP/build/Runner.ipa \
-            --apiKey $APP_STORE_CONNECT_API_KEY_ID \
-            --apiIssuer $APP_STORE_CONNECT_ISSUER_ID \
-            --apiKeyPath $RUNNER_TEMP/AuthKey.p8
-      
-      - name: Upload IPA as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-app-${{ github.sha }}
-          path: ${{ runner.temp }}/build/*.ipa
-          retention-days: 30
-      
-      - name: Clean up keychain
-        if: always()
-        run: |
-          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
+    # -------------------- CHECKOUT --------------------
+    - name: Checkout main repository
+      uses: actions/checkout@v4
+      with:
+        path: main-repo
+
+    - name: Checkout certificates repository (Match repo)
+      uses: actions/checkout@v4
+      with:
+        repository: nabeelanasaritsaoirse/ios-certificates
+        ref: master
+        path: certificates
+
+    # -------------------- XCODE ------------------------
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+
+    # -------------------- FASTLANE MATCH ----------------
+    - name: 🔐 Create App Store Connect API Key
+      run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > api_key.json
+
+    - name: 🔐 Install Certificates with Fastlane Match
+      id: signing
+      run: |
+        bundle install || true
+
+        fastlane match appstore \
+          --readonly \
+          --verbose \
+          --api_key_path api_key.json \
+          --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git \
+          --git_branch master \
+          --app_identifier com.saoirse.epi
+
+        PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -1)
+        PROFILE_UUID=$(basename "$PROFILE_PATH" .mobileprovision)
+
+        CERT_NAME=$(security find-identity -v -p codesigning | head -1 | awk -F\" '{print $2}')
+
+        echo "profile_uuid=$PROFILE_UUID" >> $GITHUB_OUTPUT
+        echo "signing_identity=$CERT_NAME" >> $GITHUB_OUTPUT
+
+    # -------------------- EXPORTOPTIONS -----------------
+    - name: 📝 Create ExportOptions.plist
+      run: |
+        cat > main-repo/ios/ExportOptions.plist <<'EOF'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>uploadSymbols</key>
+            <true/>
+            <key>compileBitcode</key>
+            <false/>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>teamID</key>
+            <string>BYQUNNQSQH</string>
+            <key>provisioningProfiles</key>
+            <dict>
+                <key>com.saoirse.epi</key>
+                <string>match AppStore com.saoirse.epi</string>
+            </dict>
+        </dict>
+        </plist>
+        EOF
+
+    # -------------------- COCOAPODS ---------------------
+    - name: Cache CocoaPods
+      uses: actions/cache@v4
+      with:
+        path: main-repo/ios/Pods
+        key: ${{ runner.os }}-pods-${{ hashFiles('main-repo/ios/Podfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pods-
+
+    - name: Install CocoaPods
+      working-directory: main-repo/ios
+      run: |
+        pod install
+
+    # -------------------- BUILD -------------------------
+    - name: 🏗️ Build iOS App (Archive)
+      working-directory: main-repo/ios
+      env:
+        SIGNING_CERT: ${{ steps.signing.outputs.signing_identity }}
+        PROFILE_UUID: ${{ steps.signing.outputs.profile_uuid }}
+      run: |
+        xcodebuild archive \
+          -workspace Runner.xcworkspace \
+          -scheme Runner \
+          -sdk iphoneos \
+          -configuration Release \
+          -archivePath $RUNNER_TEMP/Runner.xcarchive \
+          DEVELOPMENT_TEAM=BYQUNNQSQH \
+          CODE_SIGN_STYLE=Manual \
+          CODE_SIGN_IDENTITY="$SIGNING_CERT" \
+          PROVISIONING_PROFILE_SPECIFIER="$PROFILE_UUID" \
+          COMPILER_INDEX_STORE_ENABLE=NO
+
+    # -------------------- EXPORT IPA --------------------
+    - name: 📦 Export IPA
+      working-directory: main-repo/ios
+      run: |
+        xcodebuild -exportArchive \
+          -archivePath $RUNNER_TEMP/Runner.xcarchive \
+          -exportOptionsPlist ExportOptions.plist \
+          -exportPath $RUNNER_TEMP/build
+
+    # -------------------- TESTFLIGHT UPLOAD -------------
+    - name: 🚀 Upload to TestFlight
+      env:
+        APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+        APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        APP_STORE_CONNECT_API_KEY_JSON: ${{ secrets.APP_STORE_CONNECT_API_KEY_JSON }}
+      run: |
+        echo "$APP_STORE_CONNECT_API_KEY_JSON" > $RUNNER_TEMP/AuthKey.p8
+
+        xcrun altool --upload-app \
+          --type ios \
+          --file $RUNNER_TEMP/build/Runner.ipa \
+          --apiKey $APP_STORE_CONNECT_API_KEY_ID \
+          --apiIssuer $APP_STORE_CONNECT_ISSUER_ID \
+          --apiKeyPath $RUNNER_TEMP/AuthKey.p8
+
+    # -------------------- ARTIFACT -----------------------
+    - name: Upload IPA as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-app-${{ github.sha }}
+        path: ${{ runner.temp }}/build/*.ipa
+        retention-days: 30
+
+    # -------------------- CLEANUP ------------------------
+    - name: Clean up keychain
+      if: always()
+      run: |
+        security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
