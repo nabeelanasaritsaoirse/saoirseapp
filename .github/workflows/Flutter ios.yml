@@ -39,7 +39,7 @@ jobs:
       - name: 🧪 Tests
         run: flutter test || true
 
-      - name: Generate .env file
+      - name: 🔑 Generate .env file
         run: |
           cat > .env <<EOF
           IOS_API_KEY=${{ secrets.IOS_API_KEY }}
@@ -53,77 +53,90 @@ jobs:
           ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
           EOF
 
-      - name: 🍎 Select Xcode version
-        run: sudo xcode-select -s /Applications/Xcode.app
+      # ✅ FIX #2: Copy .env to iOS Runner directory
+      - name: 📋 Copy .env for iOS
+        run: |
+          mkdir -p ios/Runner
+          cp .env ios/Runner/.env
+          echo "✅ .env copied to ios/Runner/"
 
-      # 🔥 CRITICAL FIX: Fix Podfile BEFORE installing pods
+      # ---------------------- FIX PODFILE -------------------------
       - name: 🔧 Fix Podfile (Remove arm64 exclusion bug)
         run: |
-          cat > ios/Podfile <<'PODFILE'
-          # Uncomment this line to define a global platform for your project
+          cat > ios/Podfile <<'EOF'
           platform :ios, '15.0'
-          
-          # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
           ENV['COCOAPODS_DISABLE_STATS'] = 'true'
-          
+
           project 'Runner', {
             'Debug' => :debug,
             'Profile' => :release,
             'Release' => :release,
           }
-          
+
           def flutter_root
             generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
             unless File.exist?(generated_xcode_build_settings_path)
-              raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+              raise "#{generated_xcode_build_settings_path} must exist. Run 'flutter pub get' first."
             end
-          
+
             File.foreach(generated_xcode_build_settings_path) do |line|
               matches = line.match(/FLUTTER_ROOT\=(.*)/)
               return matches[1].strip if matches
             end
-          
-            raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+
+            raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}"
           end
-          
+
           require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
-          
+
           flutter_ios_podfile_setup
-          
+
           target 'Runner' do
             use_frameworks!
             flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-          
+
             target 'RunnerTests' do
               inherit! :search_paths
             end
           end
-          
+
           post_install do |installer|
             installer.pods_project.targets.each do |target|
               flutter_additional_ios_build_settings(target)
-              
+
               target.build_configurations.each do |config|
-                # Disable code signing for pods (CI will sign the main app)
+                # Disable code signing for pods
                 config.build_settings["CODE_SIGNING_ALLOWED"] = "NO"
                 config.build_settings["CODE_SIGN_IDENTITY"] = ""
                 
                 # ✅ CRITICAL: Do NOT exclude arm64 for device builds
-                # The original Podfile had this bug: config.build_settings['EXCLUDED_ARCHS[sdk=iphoneos*]'] = 'arm64'
-                # This is only needed for simulator on M1, NOT for device builds
-                
-                # Ensure proper architecture support
+                # Original Podfile had: config.build_settings['EXCLUDED_ARCHS[sdk=iphoneos*]'] = 'arm64'
+                # This was causing Flutter.h not found and all build failures
                 config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
               end
             end
           end
-          PODFILE
+          EOF
           
-          echo "✅ Podfile fixed - removed arm64 exclusion bug"
+          echo "✅ Podfile fixed - removed arm64 exclusion"
 
-      - name: 🚀 Install Fastlane
-        run: sudo gem install fastlane -N
+      - name: 🍎 Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode.app
 
+      - name: 🚀 Install Fastlane & CocoaPods
+        run: |
+          sudo gem install fastlane -N
+          sudo gem install cocoapods -N
+
+      - name: 🍫 Install Pods (with fixed Podfile)
+        timeout-minutes: 10
+        run: |
+          cd ios
+          rm -rf Pods Podfile.lock
+          pod install --repo-update
+          cd ..
+
+      # ---------------------- APP STORE SIGNING -------------------------
       - name: 🔐 Create api_key.json
         run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > api_key.json
 
@@ -140,111 +153,150 @@ jobs:
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
-      - name: 🔐 Import Signing Assets
+      - name: 🔍 Get Provisioning & Signing Identity
+        id: signing
         run: |
-          security unlock-keychain -p "" ~/Library/Keychains/login.keychain-db
-          echo ">> Certificates:"
-          security find-identity -v -p codesigning
-          echo ">> Profiles:"
-          ls ~/Library/MobileDevice/Provisioning\ Profiles/
-
-      - name: 🔍 Get Provisioning Profile UUID
-        id: profile
-        run: |
+          # Get provisioning profile UUID
           PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -1)
           UUID=$(basename "$PROFILE_PATH" .mobileprovision)
-          echo "uuid=$UUID" >> $GITHUB_OUTPUT
+          
+          # Get signing identity
+          IDENTITY=$(security find-identity -v -p codesigning \
+            | grep "iPhone Distribution" \
+            | head -1 | awk -F\" '{print $2}')
+          
+          echo "profile_uuid=$UUID" >> $GITHUB_OUTPUT
+          echo "signing_identity=$IDENTITY" >> $GITHUB_OUTPUT
+          
+          echo "✓ Profile UUID: $UUID"
+          echo "✓ Signing Identity: $IDENTITY"
 
-      - name: 🔍 Get Signing Identity
-        id: identity
+      # ✅ FIX #3: Ensure ExportOptions.plist exists with correct values
+      - name: 📝 Create ExportOptions.plist
         run: |
-          IDENTITY=$(security find-identity -v -p codesigning | grep "iPhone Distribution" | head -1 | awk -F\" '{print $2}')
-          echo "identity=$IDENTITY" >> $GITHUB_OUTPUT
+          cat > ios/ExportOptions.plist <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>uploadSymbols</key>
+              <true/>
+              <key>uploadBitcode</key>
+              <false/>
+              <key>compileBitcode</key>
+              <false/>
+              <key>destination</key>
+              <string>export</string>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>teamID</key>
+              <string>BYQUNNQSQH</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>com.saoirse.epi</key>
+                  <string>match AppStore com.saoirse.epi</string>
+              </dict>
+          </dict>
+          </plist>
+          EOF
+          
+          echo "✅ ExportOptions.plist created"
 
-      - name: 🍫 Install CocoaPods (with fixed Podfile)
-        timeout-minutes: 10
+      # ---------------------- BUILD FLUTTER FRAMEWORKS -------------------------
+      - name: 🔨 Pre-build Flutter iOS (No Code Sign)
+        timeout-minutes: 15
         run: |
-          cd ios
-          rm -rf Pods Podfile.lock
-          pod install --repo-update
-          cd ..
+          echo "================================"
+          echo "🔨 PRE-BUILDING FLUTTER"
+          echo "================================"
+          
+          # This generates Flutter.framework and App.framework
+          # without calling xcodebuild (prevents hang)
+          flutter build ios --release --no-codesign
+          
+          echo "✅ Flutter frameworks built"
 
-      - name: 🔧 Configure Xcode Project for Manual Signing
+      # ---------------------- XCODE ARCHIVE -------------------------
+      - name: 🏗️ Build Archive with xcodebuild
+        timeout-minutes: 25
         env:
-          SIGNING_CERT: ${{ steps.identity.outputs.identity }}
-          PROFILE_UUID: ${{ steps.profile.outputs.uuid }}
-        run: |
-          ruby - <<'RUBY'
-            require 'xcodeproj'
-            
-            project_path = 'ios/Runner.xcodeproj'
-            project = Xcodeproj::Project.open(project_path)
-            
-            provisioning_name = "match AppStore com.saoirse.epi"
-            
-            project.targets.each do |target|
-              next unless target.name == 'Runner'
-              
-              target.build_configurations.each do |config|
-                next unless config.name == 'Release'
-                
-                config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
-                config.build_settings['DEVELOPMENT_TEAM'] = 'BYQUNNQSQH'
-                config.build_settings['CODE_SIGN_IDENTITY'] = ENV['SIGNING_CERT']
-                config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = provisioning_name
-                config.build_settings['PROVISIONING_PROFILE'] = ENV['PROFILE_UUID']
-              end
-            end
-            
-            # Disable parallel builds to avoid race conditions
-            project.root_object.attributes['BuildIndependentTargetsInParallel'] = 'NO'
-            
-            project.save
-            puts "✔ Xcode project configured"
-          RUBY
-
-      - name: 🍏 Build IPA using Flutter CLI
-        timeout-minutes: 40
+          SIGNING_CERT: ${{ steps.signing.outputs.signing_identity }}
+          PROFILE_UUID: ${{ steps.signing.outputs.profile_uuid }}
         run: |
           set -e
           
           echo "================================"
-          echo "🚀 BUILDING IPA"
+          echo "🏗️ BUILDING ARCHIVE"
           echo "================================"
           
-          export RCT_NO_LAUNCH_PACKAGER=true
+          mkdir -p build/ios
           
-          # Build IPA - Flutter handles signing via ExportOptions.plist
-          flutter build ipa \
-            --release \
-            --export-options-plist=ios/ExportOptions.plist \
-            2>&1 | tee flutter_build.log
+          # ✅ FIX #1: Removed -allowProvisioningUpdates (causes 20+ min hang in CI)
+          xcodebuild archive \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath build/ios/Runner.xcarchive \
+            -destination 'generic/platform=iOS' \
+            DEVELOPMENT_TEAM=BYQUNNQSQH \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="$SIGNING_CERT" \
+            PROVISIONING_PROFILE="$PROFILE_UUID" \
+            PROVISIONING_PROFILE_SPECIFIER="match AppStore com.saoirse.epi" \
+            ENABLE_BITCODE=NO \
+            DEBUG_INFORMATION_FORMAT=dwarf \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            | tee xcodebuild.log | grep -E "^\*\*|error:|warning:|Compiling|Linking|CodeSign"
           
           BUILD_EXIT_CODE=${PIPESTATUS[0]}
           
           if [ $BUILD_EXIT_CODE -ne 0 ]; then
-            echo ""
-            echo "❌ Build FAILED with exit code: $BUILD_EXIT_CODE"
-            echo ""
-            echo "Last 100 lines:"
-            tail -100 flutter_build.log
+            echo "❌ Archive build FAILED"
+            tail -100 xcodebuild.log
             exit 1
           fi
           
-          # Verify IPA was created
-          IPA_PATH=$(find build/ios/ipa -name "*.ipa" 2>/dev/null | head -1)
-          
-          if [ -z "$IPA_PATH" ] || [ ! -f "$IPA_PATH" ]; then
-            echo ""
-            echo "❌ IPA file not found"
-            echo ""
-            echo "Directory contents:"
-            ls -R build/ios/
+          if [ ! -d "build/ios/Runner.xcarchive" ]; then
+            echo "❌ Archive not created"
             exit 1
           fi
           
-          echo ""
-          echo "✅ IPA build completed successfully"
+          echo "✅ Archive created successfully"
+
+      - name: 📦 Export IPA
+        timeout-minutes: 10
+        run: |
+          set -e
+          
+          echo "================================"
+          echo "📦 EXPORTING IPA"
+          echo "================================"
+          
+          xcodebuild -exportArchive \
+            -archivePath build/ios/Runner.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            | tee export.log
+          
+          EXPORT_EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $EXPORT_EXIT_CODE -ne 0 ]; then
+            echo "❌ Export FAILED"
+            cat export.log
+            exit 1
+          fi
+          
+          IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -1)
+          
+          if [ -z "$IPA_PATH" ]; then
+            echo "❌ IPA not found"
+            ls -R build/ios/ipa
+            exit 1
+          fi
+          
+          echo "✅ IPA exported successfully"
           echo "📦 IPA: $IPA_PATH"
           ls -lh "$IPA_PATH"
 
@@ -254,51 +306,53 @@ jobs:
         with:
           name: ios-ipa
           path: build/ios/ipa/*.ipa
-          
+
       - name: 📋 Upload Build Logs (on failure)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: build-logs-${{ github.sha }}
           path: |
-            flutter_build.log
-          
+            xcodebuild.log
+            export.log
+
       - name: 🧹 Cleanup
         if: always()
         run: rm -f api_key.json
 
-  # =====================================================
+
+  # ---------------------------------------------------------
   # 🚀 TESTFLIGHT DEPLOY
-  # =====================================================
+  # ---------------------------------------------------------
   ios-deploy:
-    name: "🚀 iOS Deploy to TestFlight"
-    runs-on: macos-latest
+    name: "🚀 Deploy to TestFlight"
     needs: ios-ci
+    runs-on: macos-latest
     if: github.ref == 'refs/heads/developer'
-    
+
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
-        
+
       - name: 📦 Download IPA
         uses: actions/download-artifact@v4
         with:
           name: ios-ipa
           path: build/ios/ipa
-          
+
       - name: 🚀 Install Fastlane
         run: sudo gem install fastlane -N
-        
+
       - name: 🔐 Create api_key.json
         run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > api_key.json
-        
+
       - name: 🚀 Upload to TestFlight
         run: |
           fastlane pilot upload \
             --api_key_path api_key.json \
             --ipa build/ios/ipa/*.ipa \
             --skip_waiting_for_build_processing
-            
+
       - name: 🧹 Cleanup
         if: always()
         run: rm -f api_key.json
