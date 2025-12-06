@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - nabeela
-      
   workflow_dispatch:
 
 jobs:
@@ -31,6 +30,13 @@ jobs:
       with:
         xcode-version: latest-stable
 
+    # -------------------- FLUTTER INSTALL ----------------
+    - name: 🧩 Install Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
+
     # -------------------- FASTLANE MATCH ----------------
     - name: 🔐 Create App Store Connect API Key
       run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > api_key.json
@@ -38,7 +44,7 @@ jobs:
     - name: 🔐 Install Certificates with Fastlane Match
       id: signing
       env:
-        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}   # ✅ REQUIRED!!
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       run: |
         fastlane match appstore \
           --readonly \
@@ -47,15 +53,14 @@ jobs:
           --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git \
           --git_branch master \
           --app_identifier com.saoirse.epi
-    
+
         PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -1)
         PROFILE_UUID=$(basename "$PROFILE_PATH" .mobileprovision)
-    
+
         CERT_NAME=$(security find-identity -v -p codesigning | head -1 | awk -F\" '{print $2}')
-    
+
         echo "profile_uuid=$PROFILE_UUID" >> $GITHUB_OUTPUT
         echo "signing_identity=$CERT_NAME" >> $GITHUB_OUTPUT
-
 
     # -------------------- EXPORTOPTIONS -----------------
     - name: 📝 Create ExportOptions.plist
@@ -84,40 +89,17 @@ jobs:
         </plist>
         EOF
 
-    # -------------------- COCOAPODS ---------------------
-    - name: Cache CocoaPods
-      uses: actions/cache@v4
-      with:
-        path: main-repo/ios/Pods
-        key: ${{ runner.os }}-pods-${{ hashFiles('main-repo/ios/Podfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-pods-
-          
-    - name: 🧩 Install Flutter SDK
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.24.0'
-        channel: 'stable'
-    
+    # -------------------- PREPARE FLUTTER ----------------
     - name: 🔧 Prepare Flutter iOS
       working-directory: main-repo
       run: |
         flutter pub get
         flutter build ios --release --no-codesign
 
-
-    - name: Cache CocoaPods
-      uses: actions/cache@v4
-      with:
-        path: main-repo/ios/Pods
-        key: ${{ runner.os }}-pods-${{ hashFiles('main-repo/ios/Podfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-pods-
-    
+    # -------------------- COCOAPODS ---------------------
     - name: Install CocoaPods dependencies
       working-directory: main-repo/ios
-      run: |
-        pod install
+      run: pod install
 
     # -------------------- BUILD -------------------------
     - name: 🏗️ Build iOS App (Archive)
