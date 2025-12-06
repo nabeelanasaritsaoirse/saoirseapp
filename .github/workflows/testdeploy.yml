@@ -35,7 +35,7 @@ jobs:
       
       - name: Install certificates and provisioning profiles
         env:
-          CERTIFICATES_PATH: ${{ github.workspace }}/certificates
+          CERTIFICATES_PATH:  ${{ env.CERTIFICATES_REPO }}/certificates
           KEYCHAIN_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
           # Create variables
