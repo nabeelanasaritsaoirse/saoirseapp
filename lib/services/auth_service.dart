@@ -174,7 +174,7 @@ class AuthService {
     }
   }
 
-  static signOut() async {
+  static Future<void> signOut() async {
     try {
       await auth.signOut();
       await GoogleSignIn.instance.signOut();

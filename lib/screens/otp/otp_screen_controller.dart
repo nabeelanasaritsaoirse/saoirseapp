@@ -34,7 +34,7 @@ class VerifyOtpController extends GetxController {
   final String referral;
 
   /// STEP 1 — Verify OTP (Firebase)
-  verifyOtp() async {
+  Future<void> verifyOtp() async {
     isLoading.value = true;
 
     String otp = otpControllers.map((c) => c.text).join();

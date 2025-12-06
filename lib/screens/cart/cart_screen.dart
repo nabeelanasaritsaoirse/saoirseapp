@@ -211,6 +211,7 @@ class CartScreen extends StatelessWidget {
                                         item.installmentPlan.totalDays,
                                     selectedAmount:
                                         item.installmentPlan.dailyAmount,
+                                        quantity: item.quantity,
                                   ));
                             },
                             child: Container(
