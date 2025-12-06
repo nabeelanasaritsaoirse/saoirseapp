@@ -6,6 +6,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/notification/notification_controller.dart';
 import 'package:saoirse_app/screens/refferal/referral_controller.dart';
 
 import '../../constants/app_constant.dart';
@@ -22,7 +23,7 @@ import 'package:http/http.dart' as http;
 
 class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();
-  TextEditingController referrelController = TextEditingController();
+  TextEditingController referreltextController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   RxBool loading = false.obs;
   Rx<Country?> country = Rx<Country?>(null);
@@ -47,7 +48,7 @@ class LoginController extends GetxController {
     final referralCode = referralFromDeepLink ?? storedReferral;
 
     if (referralCode != null && referralCode.isNotEmpty) {
-      referrelController.text = referralCode;
+      referreltextController.text = referralCode;
     }
   }
 
@@ -100,7 +101,7 @@ class LoginController extends GetxController {
   }
 
   //google login
-  googleLogin() async {
+  Future<void> googleLogin() async {
     loading.value = true;
 
     // Clear previous session
@@ -135,20 +136,26 @@ class LoginController extends GetxController {
     print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
 
     // Step 3: Update user with FCM + referral
+    final fcmToken = await getDeviceToken();
+if (fcmToken != null) {
+  Get.find<NotificationController>().registerFCM(fcmToken);
+}
 
-    final referralText = referrelController.text.trim();
+    bool updated = await updateUser(data.userId!);
+    final referralText = referreltextController.text.trim();
     if (referralText.isNotEmpty) {
       await applyReferral(referralText);
     }
 
-    bool updated = await updateUser(data.userId!);
+    final r = Get.isRegistered<ReferralController>()
+        ? Get.find<ReferralController>()
+        : Get.put(ReferralController());
 
+    await r.fetchReferrerInfo();
+    print("🌿 Google Login Referral Info Loaded");
     if (updated) {
       print("✔ Login + Profile Update SUCCESS");
       print("🔁 Checking if referral exists...");
-
-      final referralController = Get.put(ReferralController());
-      await referralController.fetchReferrerInfo();
 
       print("🔄 Referral Info Loaded -> Navigating Home");
       Get.offAll(() => DashboardScreen());

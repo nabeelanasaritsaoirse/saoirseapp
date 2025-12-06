@@ -23,6 +23,7 @@ class OrderDetailsScreen extends StatelessWidget {
   final String? selectVarientId;
   final int selectedDays;
   final double selectedAmount;
+  final int? quantity;
 
   OrderDetailsScreen({
     super.key,
@@ -30,7 +31,7 @@ class OrderDetailsScreen extends StatelessWidget {
     this.product,
     required this.selectedDays,
     required this.selectedAmount,
-    this.selectVarientId,
+    this.selectVarientId, this.quantity,
   });
   final orderController = Get.find<OrderDetailsController>();
   final razorpayController = Get.put(RazorpayController());
@@ -38,7 +39,7 @@ class OrderDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     log("DEBUG → incoming selectVarientId: $selectVarientId");
-    
+
     if (orderController.originalAmount == 0.0) {
       orderController.originalAmount = selectedAmount;
       orderController.originalDays = selectedDays;
@@ -47,14 +48,15 @@ class OrderDetailsScreen extends StatelessWidget {
     final couponController = TextEditingController();
     final pricing = product!.pricing;
 
-    final String? productImageUrl = product != null && product!.images.isNotEmpty
-        ? product!.images
-            .firstWhere(
-              (img) => img.isPrimary,
-              orElse: () => product!.images.first,
-            )
-            .url
-        : null;
+    final String? productImageUrl =
+        product != null && product!.images.isNotEmpty
+            ? product!.images
+                .firstWhere(
+                  (img) => img.isPrimary,
+                  orElse: () => product!.images.first,
+                )
+                .url
+            : null;
 
     return Scaffold(
       backgroundColor: AppColors.paperColor,
@@ -89,9 +91,13 @@ class OrderDetailsScreen extends StatelessWidget {
                     spacing: 15.w,
                     children: [
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 4.h),
-                        decoration: BoxDecoration(border: Border.all(color: AppColors.grey), borderRadius: BorderRadius.circular(4.r)),
-                        child: appText(AppStrings.address, fontSize: 11.sp, fontWeight: FontWeight.w600),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 15.w, vertical: 4.h),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.grey),
+                            borderRadius: BorderRadius.circular(4.r)),
+                        child: appText(AppStrings.address,
+                            fontSize: 11.sp, fontWeight: FontWeight.w600),
                       ),
                       appText(
                         addresses.name,
@@ -108,18 +114,37 @@ class OrderDetailsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 2.h,
                         children: [
-                          appText(addresses.addressLine1, fontSize: 12.sp, fontWeight: FontWeight.w600, height: 1.3.h, textAlign: TextAlign.left),
+                          appText(addresses.addressLine1,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                              height: 1.3.h,
+                              textAlign: TextAlign.left),
                           Row(
                             spacing: 5.w,
                             children: [
-                              appText("${addresses.city},", fontSize: 12.sp, fontWeight: FontWeight.w600, height: 1.3.h, textAlign: TextAlign.left),
-                              appText(addresses.pincode, fontSize: 12.sp, fontWeight: FontWeight.w600, height: 1.3.h, textAlign: TextAlign.left),
+                              appText("${addresses.city},",
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.3.h,
+                                  textAlign: TextAlign.left),
+                              appText(addresses.pincode,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.3.h,
+                                  textAlign: TextAlign.left),
                             ],
                           ),
-                          appText(addresses.country, fontSize: 12.sp, fontWeight: FontWeight.w600, height: 1.3.h, textAlign: TextAlign.left),
+                          appText(addresses.country,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                              height: 1.3.h,
+                              textAlign: TextAlign.left),
                           Row(
                             children: [
-                              appText(AppStrings.phone, fontSize: 12.sp, fontWeight: FontWeight.w600, color: AppColors.grey),
+                              appText(AppStrings.phone,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.grey),
                               appText(
                                 addresses.phoneNumber,
                                 fontSize: 12.sp,
@@ -142,7 +167,10 @@ class OrderDetailsScreen extends StatelessWidget {
                               buttonColor: AppColors.primaryColor,
                               borderRadius: BorderRadius.circular(8.r),
                               child: Center(
-                                child: appText(AppStrings.change, fontSize: 12.sp, fontWeight: FontWeight.w600, color: AppColors.white),
+                                child: appText(AppStrings.change,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.white),
                               ))
                         ],
                       )
@@ -338,7 +366,8 @@ class OrderDetailsScreen extends StatelessWidget {
                   // MAIN PRODUCT BOX
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
                     constraints: BoxConstraints(minHeight: 80.h),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8.r),
@@ -380,7 +409,8 @@ class OrderDetailsScreen extends StatelessWidget {
                             children: [
                               // NAME + QTY
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: appText(
@@ -393,7 +423,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                     ),
                                   ),
                                   appText(
-                                    "${AppStrings.qty} 1",
+                                    "${AppStrings.qty} $quantity",
                                     fontSize: 13.sp,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -403,7 +433,10 @@ class OrderDetailsScreen extends StatelessWidget {
                               // ----------- VARIANT (COLOR / SIZE) --------------
                               if (product!.hasVariants)
                                 appText(
-                                  selectVarientId != null && selectVarientId!.isNotEmpty ? "Variant: $selectVarientId" : "",
+                                  selectVarientId != null &&
+                                          selectVarientId!.isNotEmpty
+                                      ? "Variant: $selectVarientId"
+                                      : "",
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -473,7 +506,8 @@ class OrderDetailsScreen extends StatelessWidget {
                             width: 180.w,
                             child: appTextField(
                               borderRadius: BorderRadius.circular(15.w),
-                              contentPadding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 8.h, horizontal: 8.w),
                               controller: couponController,
                               hintText: AppStrings.coupen_hint,
                               hintSize: 13.sp,
@@ -488,7 +522,8 @@ class OrderDetailsScreen extends StatelessWidget {
                                   couponCode: couponController.text.trim(),
                                   productId: product!.id,
                                   totalDays: orderController.selectedDays.value,
-                                  dailyAmount: orderController.selectedAmount.value,
+                                  dailyAmount:
+                                      orderController.selectedAmount.value,
                                   variantId: selectVarientId ?? "",
                                   quantity: 1,
                                 );
@@ -498,7 +533,10 @@ class OrderDetailsScreen extends StatelessWidget {
                               buttonColor: AppColors.primaryColor,
                               padding: EdgeInsets.all(0.w),
                               child: Center(
-                                child: appText(AppStrings.apply, fontSize: 13.sp, fontWeight: FontWeight.w600, color: AppColors.white),
+                                child: appText(AppStrings.apply,
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.white),
                               )),
                         ],
                       ),
@@ -523,16 +561,20 @@ class OrderDetailsScreen extends StatelessWidget {
                               children: orderController.coupons.map((coupon) {
                                 return GestureDetector(
                                   onTap: () {
-                                    orderController.selectCoupon(coupon, couponController);
+                                    orderController.selectCoupon(
+                                        coupon, couponController);
                                   },
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 15.w, vertical: 8.h),
                                     decoration: BoxDecoration(
-                                      border: Border.all(color: AppColors.grey, width: 1.w),
+                                      border: Border.all(
+                                          color: AppColors.grey, width: 1.w),
                                       borderRadius: BorderRadius.circular(5.r),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       spacing: 4.h,
                                       children: [
                                         appText(
@@ -585,20 +627,43 @@ class OrderDetailsScreen extends StatelessWidget {
 
                                   // How it works (longer explanation)
                                   if (b.howItWorksMessage.isNotEmpty)
-                                    appText(b.howItWorksMessage, fontSize: 12.sp, fontWeight: FontWeight.w600, color: AppColors.textBlack),
+                                    appText(b.howItWorksMessage,
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textBlack),
 
                                   SizedBox(height: 10.h),
 
                                   // Price details from server (use your buildPriceInfo helper)
-                                  buildPriceInfo(label: "Original Price", content: "₹ ${p.originalPrice.toStringAsFixed(0)}"),
-                                  buildPriceInfo(label: "Discount", content: "- ₹ ${p.discountAmount.toStringAsFixed(0)}"),
-                                  buildPriceInfo(label: "Final Price", content: "₹ ${p.finalPrice.toStringAsFixed(0)}"),
+                                  buildPriceInfo(
+                                      label: "Original Price",
+                                      content:
+                                          "₹ ${p.originalPrice.toStringAsFixed(0)}"),
+                                  buildPriceInfo(
+                                      label: "Discount",
+                                      content:
+                                          "- ₹ ${p.discountAmount.toStringAsFixed(0)}"),
+                                  buildPriceInfo(
+                                      label: "Final Price",
+                                      content:
+                                          "₹ ${p.finalPrice.toStringAsFixed(0)}"),
 
                                   // Installment details
-                                  buildPriceInfo(label: "Installment Days", content: "${ins.totalDays}"),
-                                  buildPriceInfo(label: "Daily Amount", content: "₹ ${ins.dailyAmount.toStringAsFixed(0)}"),
-                                  if (ins.freeDays > 0) buildPriceInfo(label: "Free Days", content: "${ins.freeDays}"),
-                                  if (ins.reducedDays != null) buildPriceInfo(label: "Reduced Days", content: "${ins.reducedDays}"),
+                                  buildPriceInfo(
+                                      label: "Installment Days",
+                                      content: "${ins.totalDays}"),
+                                  buildPriceInfo(
+                                      label: "Daily Amount",
+                                      content:
+                                          "₹ ${ins.dailyAmount.toStringAsFixed(0)}"),
+                                  if (ins.freeDays > 0)
+                                    buildPriceInfo(
+                                        label: "Free Days",
+                                        content: "${ins.freeDays}"),
+                                  if (ins.reducedDays != null)
+                                    buildPriceInfo(
+                                        label: "Reduced Days",
+                                        content: "${ins.reducedDays}"),
 
                                   SizedBox(height: 8.h),
 
@@ -612,7 +677,8 @@ class OrderDetailsScreen extends StatelessWidget {
                               );
                             }),
                             Obx(() {
-                              if (orderController.couponValidation.value == null) {
+                              if (orderController.couponValidation.value ==
+                                  null) {
                                 return SizedBox.shrink();
                               }
 
@@ -620,10 +686,12 @@ class OrderDetailsScreen extends StatelessWidget {
                                 alignment: Alignment.centerRight,
                                 child: GestureDetector(
                                   onTap: () {
-                                    orderController.removeCoupon(couponController);
+                                    orderController
+                                        .removeCoupon(couponController);
                                   },
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10.w, vertical: 5.h),
                                     decoration: BoxDecoration(
                                       color: Colors.red.shade100,
                                       borderRadius: BorderRadius.circular(5.r),
@@ -684,12 +752,24 @@ class OrderDetailsScreen extends StatelessWidget {
                       final p = v.pricing;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 5.h,
                         children: [
-                          buildPriceInfo(label: product!.name, content: "₹ ${p.originalPrice.toStringAsFixed(0)}"),
-                          buildPriceInfo(label: AppStrings.shipping_charge, content: "Free"),
-                          if (p.discountAmount > 0) buildPriceInfo(label: "Discount", content: "- ₹ ${p.discountAmount.toStringAsFixed(0)}"),
+                          buildPriceInfo(
+                              label: product!.name,
+                              content:
+                                  "₹ ${p.originalPrice.toStringAsFixed(0)}"),
+                          buildPriceInfo(
+                              label: AppStrings.shipping_charge,
+                              content: "Free"),
+                          if (p.discountAmount > 0)
+                            buildPriceInfo(
+                                label: "Discount",
+                                content:
+                                    "- ₹ ${p.discountAmount.toStringAsFixed(0)}"),
                           Divider(color: AppColors.grey),
-                          buildPriceInfo(label: AppStrings.total_amount, content: "₹ ${p.finalPrice.toStringAsFixed(0)}"),
+                          buildPriceInfo(
+                              label: AppStrings.total_amount,
+                              content: "₹ ${p.finalPrice.toStringAsFixed(0)}"),
                         ],
                       );
                     }
@@ -697,11 +777,17 @@ class OrderDetailsScreen extends StatelessWidget {
                     // Fallback: show original product pricing when no coupon applied
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 5.h,
                       children: [
-                        buildPriceInfo(label: product!.name, content: "₹ ${pricing.finalPrice}"),
-                        buildPriceInfo(label: AppStrings.shipping_charge, content: "Free"),
+                        buildPriceInfo(
+                            label: product!.name,
+                            content: "₹ ${pricing.finalPrice}"),
+                        buildPriceInfo(
+                            label: AppStrings.shipping_charge, content: "Free"),
                         Divider(color: AppColors.grey),
-                        buildPriceInfo(label: AppStrings.total_amount, content: "₹ ${pricing.finalPrice}"),
+                        buildPriceInfo(
+                            label: AppStrings.total_amount,
+                            content: "₹ ${pricing.finalPrice}"),
                       ],
                     );
                   }),
@@ -709,10 +795,14 @@ class OrderDetailsScreen extends StatelessWidget {
                   // ---------- Plan & Pay Now (apply coupon after automatically update) ----------
                   Obx(() {
                     return buildPriceInfo(
-                        label: AppStrings.your_plan, content: "₹${orderController.selectedAmount.value}/ ${orderController.selectedDays.value} Days");
+                        label: AppStrings.your_plan,
+                        content:
+                            "₹${orderController.selectedAmount.value}/ ${orderController.selectedDays.value} Days");
                   }),
                   Obx(() {
-                    return buildPriceInfo(label: AppStrings.pay_now, content: "₹${orderController.selectedAmount.value}");
+                    return buildPriceInfo(
+                        label: AppStrings.pay_now,
+                        content: "₹${orderController.selectedAmount.value}");
                   }),
                 ],
               ),
@@ -778,7 +868,8 @@ class OrderDetailsScreen extends StatelessWidget {
             color: AppColors.grey,
             maxLines: isProductName ? 2 : 1,
             softWrap: isProductName,
-            overflow: isProductName ? TextOverflow.visible : TextOverflow.ellipsis,
+            overflow:
+                isProductName ? TextOverflow.visible : TextOverflow.ellipsis,
           ),
         ),
         SizedBox(width: 10.w),

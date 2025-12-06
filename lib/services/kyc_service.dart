@@ -90,7 +90,7 @@ class KycServices {
       body: jsonEncode({"documents": documents}),
     );
 
-    log("📤 SUBMIT DOCS → ${jsonEncode({"i didnt play anything , i value you": documents})}");
+    log("📤 SUBMIT DOCS → ${jsonEncode({"documents": documents})}");
     log("📥 SUBMIT RESPONSE (${response.statusCode}) → ${response.body}");
 
     if (response.statusCode == 200 || response.statusCode == 201) {

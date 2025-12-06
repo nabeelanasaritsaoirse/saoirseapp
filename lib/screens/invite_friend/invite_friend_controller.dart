@@ -72,9 +72,9 @@ class InviteFriendController extends GetxController {
   // ---------------- MESSAGE BUTTON ACTION ----------------
 // ---------------- MESSAGE BUTTON ACTION ----------------
   Future<void> openChat({required String name}) async {
-    print("\n================ OPEN CHAT =================");
-    print("UserId used to create chat: $userId");
-    print("============================================");
+    log("\n================ OPEN CHAT =================");
+    log("UserId used to create chat: $userId");
+    log("============================================");
 
     isLoading.value = true;
 
@@ -83,21 +83,21 @@ class InviteFriendController extends GetxController {
     isLoading.value = false;
 
     if (chat == null) {
-      print("❌ Chat creation failed → chat == null");
+      log("❌ Chat creation failed → chat == null");
       return;
     }
 
-    print("\n========== CHAT CREATED SUCCESSFULLY ==========");
-    print("Conversation ID: ${chat.conversationId}");
-    print("New conversation?  ${chat.isNewConversation}");
-    print("Participants:");
+    log("\n========== CHAT CREATED SUCCESSFULLY ==========");
+    log("Conversation ID: ${chat.conversationId}");
+    log("New conversation?  ${chat.isNewConversation}");
+    log("Participants:");
     for (var p in chat.participants) {
-      print(" - ${p.name} (${p.id})");
+      log(" - ${p.name} (${p.id})");
     }
-    print("===============================================\n");
+    log("===============================================\n");
     await Future.delayed(Duration(milliseconds: 100));
     // Navigate to chat screen
-    print("➡️ Navigating to PaymentMessageScreen...");
+    log("➡️ Navigating to PaymentMessageScreen...");
     Get.to(
         () => PaymentMessageScreen(
               conversationId: chat.conversationId,

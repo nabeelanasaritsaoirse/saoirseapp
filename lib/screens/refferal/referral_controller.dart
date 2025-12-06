@@ -33,27 +33,27 @@ class ReferralController extends GetxController {
   }
 
   Future<void> fetchReferrerInfo() async {
-    print("\n================ FETCH REFERRER INFO ================");
-    print("📡 Calling API: /api/referral/referrer-info");
+    log("\n================ FETCH REFERRER INFO ================");
+    log("📡 Calling API: /api/referral/referrer-info");
     isLoading.value = true;
 
     final result = await _referralService.getReferrerInfo();
 
     if (result != null) {
-      print("✅ Referrer found:");
-      print("ID     : ${result.userId}");
-      print("Name   : ${result.name}");
-      print("Email  : ${result.email}");
-      print("Photo  : ${result.profilePicture}");
-      print("Code   : ${result.referralCode}");
+      log("✅ Referrer found:");
+      log("ID     : ${result.userId}");
+      log("Name   : ${result.name}");
+      log("Email  : ${result.email}");
+      log("Photo  : ${result.profilePicture}");
+      log("Code   : ${result.referralCode}");
     } else {
-      print("❌ No referrer data / null received");
+      log("❌ No referrer data / null received");
     }
 
     referrer.value = result;
 
     isLoading.value = false;
-    print("=====================================================\n");
+    log("=====================================================\n");
   }
 
   // ---------------------------------------------------------------------------

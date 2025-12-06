@@ -21,13 +21,14 @@ class SelectAddress extends StatelessWidget {
   final String? selectVarientId;
   final int selectedDays; // NEW
   final double selectedAmount;
+  final int? quantity;
 
   SelectAddress({
     super.key,
     this.product,
     this.selectVarientId,
     required this.selectedDays,
-    required this.selectedAmount,
+    required this.selectedAmount,this.quantity,
   });
 
   final SelectAddressController controller = Get.put(SelectAddressController());
@@ -124,6 +125,7 @@ class SelectAddress extends StatelessWidget {
         selectedDays: selectedDays,
         selectVarientId: selectVarientId ?? "",
         selectedAmount: selectedAmount,
+        quantity: quantity,
       ));
 },
 

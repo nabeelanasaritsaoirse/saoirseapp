@@ -2,7 +2,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '../constants/app_colors.dart';
 
-appToast({
+void appToast({
   required String content,
   String title = 'Message',
   bool error = false,

@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:async';
+import 'dart:developer';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
@@ -11,7 +12,6 @@ import '../models/product_detiails_response.dart';
 import '../models/referral_response_model.dart';
 import '../models/refferal_info_model.dart';
 import '../services/api_service.dart';
-import '../widgets/app_toast.dart';
 
 class ReferralService {
   //  To fetch referral User List & Data
@@ -74,13 +74,17 @@ class ReferralService {
   // To apply referral code
   Future<ApplyReferralResponse?> applyReferralCode(String referralCode) async {
     try {
+      final token = storage.read(AppConst.ACCESS_TOKEN);
       final url = AppURLs.APPLY_REFERRAL;
 
       print("APPLY REFERRAL");
       print("URL: $url");
       print("Token: $token");
       print("Referral Code: $referralCode");
-
+      if (token == null || token.isEmpty) {
+        print("❌ Token Missing - Cannot Apply Referral");
+        return null;
+      }
       final response = await APIService.postRequest(
         url: url,
         headers: {
@@ -118,7 +122,7 @@ class ReferralService {
     if (response["success"] == true && response["referredBy"] != null) {
       return ReferrerInfoModel.fromJson(response["referredBy"]);
     } else {
-      appToast(error: true, content: "Referral data not found");
+      log("Referrer Info Error: ${response["message"]}");
       return null;
     }
   }
