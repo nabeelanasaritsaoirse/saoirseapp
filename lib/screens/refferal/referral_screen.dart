@@ -885,8 +885,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
 Widget referredByCard(ReferrerInfoModel r) {
   return GestureDetector(
     onTap: () {
-      print("👆 ReferredBy Clicked → Navigating to Friend Details");
-      print("📩 Passing UserId = ${r.userId}");
+      log("👆 ReferredBy Clicked → Navigating to Friend Details");
+      log("📩 Passing UserId = ${r.userId}");
 
       Get.to(() => InviteFriendDetailsScreen(
             userId: r.userId, // <-- Passing user ID
