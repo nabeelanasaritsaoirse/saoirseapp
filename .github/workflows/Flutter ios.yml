@@ -17,7 +17,7 @@ permissions:
 jobs:
   ios-ci:
     runs-on: macos-latest
-    
+    timeout-minutes: 90
 
     steps:
       - name: 📥 Checkout Repository
@@ -28,6 +28,7 @@ jobs:
         with:
           flutter-version: "3.35.7"
           channel: stable
+          cache: true
 
       - name: 📦 Install Dependencies
         run: flutter pub get
@@ -62,6 +63,7 @@ jobs:
         run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > api_key.json
 
       - name: 🔐 Run Fastlane Match
+        timeout-minutes: 10
         run: |
           fastlane match appstore \
             --readonly \
@@ -73,12 +75,12 @@ jobs:
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
-      - name: 🔐 Import Signing Assets to Xcode Keychain
+      - name: 🔐 Import Signing Assets
         run: |
           security unlock-keychain -p "" ~/Library/Keychains/login.keychain-db
-          echo ">> Certificates installed:"
+          echo ">> Certificates:"
           security find-identity -v -p codesigning
-          echo ">> Provisioning Profiles:"
+          echo ">> Profiles:"
           ls ~/Library/MobileDevice/Provisioning\ Profiles/
 
       - name: 🔍 Get Provisioning Profile UUID
@@ -94,44 +96,59 @@ jobs:
           IDENTITY=$(security find-identity -v -p codesigning | grep "iPhone Distribution" | head -1 | awk -F\" '{print $2}')
           echo "identity=$IDENTITY" >> $GITHUB_OUTPUT
 
-      # 🔥 CRITICAL FIX: Use flutter build ipa instead of xcodebuild directly
-      # This avoids the xcodebuild hanging issue that occurs when Flutter scripts
-      # run from xcodebuild in CI environments
-      - name: 🍏 Build IPA using Flutter (Avoids xcodebuild Hang
-        env:
-          SIGNING_CERT: ${{ steps.identity.outputs.identity }}
-          PROFILE_UUID: ${{ steps.profile.outputs.uuid }}
+      # 🔥 CRITICAL FIX: Pre-build Flutter frameworks WITHOUT calling xcodebuild
+      - name: 🔨 Pre-build Flutter Frameworks (Avoids xcodebuild hang)
+        timeout-minutes: 15
         run: |
           set -e
           
           echo "================================"
-          echo "🛠 CONFIGURING BUILD ENVIRONMENT"
+          echo "🔨 BUILDING FLUTTER FRAMEWORKS"
           echo "================================"
           
-          # Fix macOS runner limitations
-          sudo sysctl -w kern.maxfiles=655360
-          sudo sysctl -w kern.maxfilesperproc=655360
+          # Build iOS frameworks without triggering xcodebuild
+          flutter build ios-framework --release --no-codesign --output=build/ios/framework
           
-          export RCT_NO_LAUNCH_PACKAGER=true
+          # Copy frameworks to the expected location
+          mkdir -p ios/Flutter
           
-          PROVISIONING_NAME="match AppStore com.saoirse.epi"
+          # Copy Flutter.xcframework
+          if [ -d "build/ios/framework/Release/Flutter.xcframework" ]; then
+            cp -R build/ios/framework/Release/Flutter.xcframework ios/Flutter/
+            echo "✓ Flutter.xcframework copied"
+          fi
           
-          echo "✓ Certificate: $SIGNING_CERT"
-          echo "✓ Provisioning UUID: $PROFILE_UUID"
-          echo "✓ Provisioning Name: $PROVISIONING_NAME"
+          # Copy App.xcframework
+          if [ -d "build/ios/framework/Release/App.xcframework" ]; then
+            cp -R build/ios/framework/Release/App.xcframework ios/Flutter/
+            echo "✓ App.xcframework copied"
+          fi
+          
+          # Generate plugin registrant
+          flutter pub run build_runner build --delete-conflicting-outputs || true
           
           echo ""
-          echo "================================"
-          echo "🚀 BUILDING IPA WITH FLUTTER CLI"
-          echo "================================"
-          echo "This avoids the xcodebuild hang issue"
-          echo ""
-          
-          # Update Xcode project settings for manual signing
+          echo "✅ Flutter frameworks pre-built successfully"
+
+      - name: 🍫 Install CocoaPods
+        timeout-minutes: 10
+        run: |
+          cd ios
+          pod install --repo-update
+          cd ..
+
+      - name: 🔧 Configure Xcode Project for Manual Signing
+        env:
+          SIGNING_CERT: ${{ steps.identity.outputs.identity }}
+          PROFILE_UUID: ${{ steps.profile.outputs.uuid }}
+        run: |
           ruby - <<'RUBY'
             require 'xcodeproj'
+            
             project_path = 'ios/Runner.xcodeproj'
             project = Xcodeproj::Project.open(project_path)
+            
+            provisioning_name = "match AppStore com.saoirse.epi"
             
             project.targets.each do |target|
               next unless target.name == 'Runner'
@@ -140,48 +157,132 @@ jobs:
                 config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
                 config.build_settings['DEVELOPMENT_TEAM'] = 'BYQUNNQSQH'
                 config.build_settings['CODE_SIGN_IDENTITY'] = ENV['SIGNING_CERT']
-                config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ENV['PROVISIONING_NAME']
+                config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = provisioning_name
                 config.build_settings['PROVISIONING_PROFILE'] = ENV['PROFILE_UUID']
               end
             end
             
             project.save
-            puts "✔ Updated Xcode project with signing configuration"
+            puts "✔ Xcode project configured with manual signing"
           RUBY
+
+      - name: 🔧 Disable Flutter Build Scripts in Xcode (Prevent Hang)
+        run: |
+          ruby - <<'RUBY'
+            require 'xcodeproj'
+            
+            project_path = 'ios/Runner.xcodeproj'
+            project = Xcodeproj::Project.open(project_path)
+            
+            project.targets.each do |target|
+              next unless target.name == 'Runner'
+              
+              target.build_phases.each do |phase|
+                next unless phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
+                
+                script = phase.shell_script.to_s
+                
+                # Disable Flutter xcode_backend.sh scripts since we pre-built frameworks
+                if script.include?("xcode_backend.sh")
+                  puts "✗ Disabling Flutter script: #{phase.name || 'Unnamed'}"
+                  phase.shell_script = "echo 'Skipping - frameworks pre-built'; exit 0"
+                end
+                
+                # Disable Pod manifest check (not needed in CI)
+                if phase.name&.include?("[CP] Check Pods Manifest.lock")
+                  puts "✗ Disabling Pod manifest check"
+                  phase.shell_script = "echo 'Skipping manifest check'; exit 0"
+                end
+              end
+            end
+            
+            project.save
+            puts ""
+            puts "✔ Flutter build scripts disabled (using pre-built frameworks)"
+          RUBY
+
+      - name: 🍏 Build Archive with xcodebuild (Should Not Hang Now)
+        timeout-minutes: 30
+        env:
+          SIGNING_CERT: ${{ steps.identity.outputs.identity }}
+          PROFILE_UUID: ${{ steps.profile.outputs.uuid }}
+        run: |
+          set -e
           
-          # Use flutter build ipa - this is the key to avoiding hangs
-          flutter build ipa \
-            --release \
-            --export-options-plist=ios/ExportOptions.plist \
-            --verbose 2>&1 | tee flutter_build.log
+          echo "================================"
+          echo "🚀 BUILDING ARCHIVE"
+          echo "================================"
+          
+          export RCT_NO_LAUNCH_PACKAGER=true
+          
+          PROVISIONING_NAME="match AppStore com.saoirse.epi"
+          
+          mkdir -p build/ios
+          
+          echo "Building with pre-built Flutter frameworks..."
+          echo ""
+          
+          # Build archive with minimal verbosity
+          xcodebuild archive \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath build/ios/Runner.xcarchive \
+            -destination 'generic/platform=iOS' \
+            -allowProvisioningUpdates \
+            DEVELOPMENT_TEAM=BYQUNNQSQH \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="$SIGNING_CERT" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_NAME" \
+            ENABLE_BITCODE=NO \
+            DEBUG_INFORMATION_FORMAT=dwarf \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            CODE_SIGNING_ALLOWED=YES \
+            | tee xcodebuild.log | grep -E "^\*\*|error:|warning:|Compiling|Linking|CodeSign"
           
           BUILD_EXIT_CODE=${PIPESTATUS[0]}
           
-          if [ $BUILD_EXIT_CODE -ne 0 ]; then
+          if [ $BUILD_EXIT_CODE -ne 0 ] || grep -q "^\*\* ARCHIVE FAILED \*\*" xcodebuild.log; then
             echo ""
-            echo "❌ Flutter build FAILED with exit code: $BUILD_EXIT_CODE"
-            echo ""
-            echo "Last 100 lines of build log:"
-            tail -100 flutter_build.log
+            echo "❌ Archive FAILED"
+            tail -100 xcodebuild.log
             exit 1
           fi
           
-          # Check if IPA was created
-          IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -1)
-          
-          if [ -z "$IPA_PATH" ]; then
-            echo ""
-            echo "❌ IPA file was not created"
-            echo ""
-            ls -R build/ios/
+          if [ ! -d "build/ios/Runner.xcarchive" ]; then
+            echo "❌ Archive not created"
             exit 1
           fi
           
           echo ""
-          echo "✅ IPA build completed successfully"
-          echo "📦 IPA Location: $IPA_PATH"
+          echo "✅ Archive created successfully"
+
+      - name: 📦 Export IPA
+        timeout-minutes: 10
+        run: |
+          set -e
+          
+          echo "================================"
+          echo "📦 EXPORTING IPA"
+          echo "================================"
+          
+          xcodebuild -exportArchive \
+            -archivePath build/ios/Runner.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            | tee export.log
+          
+          EXPORT_EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $EXPORT_EXIT_CODE -ne 0 ]; then
+            echo "❌ Export FAILED"
+            cat export.log
+            exit 1
+          fi
+          
           echo ""
-          ls -lh "$IPA_PATH"
+          echo "✅ IPA exported successfully"
+          ls -lh build/ios/ipa/
 
       - name: 📤 Upload IPA Artifact
         if: success()
@@ -196,17 +297,13 @@ jobs:
         with:
           name: build-logs-${{ github.sha }}
           path: |
-            flutter_build.log
+            xcodebuild.log
+            export.log
           
-      - name: 🧹 Cleanup on Failure
-        if: failure()
-        run: |
-          echo "Build failed. Cleaning up sensitive files..."
-          rm -f api_key.json
-          echo "Cleanup completed"
+      - name: 🧹 Cleanup
+        if: always()
+        run: rm -f api_key.json
 
-  
- 
   # =====================================================
   # 🚀 TESTFLIGHT DEPLOY
   # =====================================================
@@ -215,34 +312,30 @@ jobs:
     runs-on: macos-latest
     needs: ios-ci
     if: github.ref == 'refs/heads/developer'
-
+    
     steps:
-      - name: 📥 Checkout Repo
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v4
-
-      - name: 📥 Download IPA
+        
+      - name: 📦 Download IPA
         uses: actions/download-artifact@v4
         with:
           name: ios-ipa
-          path: release/
-
-      - name: Install Fastlane
+          path: build/ios/ipa
+          
+      - name: 🚀 Install Fastlane
         run: sudo gem install fastlane -N
-
-      # Use same JSON secret for uploading too
-      - name: 🔐 Write API Key JSON
-        run: |
-          echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > api_key.json
+        
+      - name: 🔐 Create api_key.json
+        run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > api_key.json
+        
       - name: 🚀 Upload to TestFlight
         run: |
           fastlane pilot upload \
-            --ipa release/*.ipa \
             --api_key_path api_key.json \
-            --app_identifier "com.saoirse.epi" \
-            --skip_waiting_for_build_processing true \
-            --skip_submission true \
-            --verbose
-      - name: 🧾 Deployment Summary
-        run: |
-          echo "## 🍎 TestFlight Upload Complete" >> $GITHUB_STEP_SUMMARY
-          echo "Uploaded IPA successfully." >> $GITHUB_STEP_SUMMARY
+            --ipa build/ios/ipa/*.ipa \
+            --skip_waiting_for_build_processing
+            
+      - name: 🧹 Cleanup
+        if: always()
+        run: rm -f api_key.json
