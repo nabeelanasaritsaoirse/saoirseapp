@@ -6,6 +6,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/notification/notification_controller.dart';
 import 'package:saoirse_app/screens/refferal/referral_controller.dart';
 
 import '../../constants/app_constant.dart';
@@ -135,6 +136,10 @@ class LoginController extends GetxController {
     print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
 
     // Step 3: Update user with FCM + referral
+    final fcmToken = await getDeviceToken();
+if (fcmToken != null) {
+  Get.find<NotificationController>().registerFCM(fcmToken);
+}
 
     bool updated = await updateUser(data.userId!);
     final referralText = referreltextController.text.trim();

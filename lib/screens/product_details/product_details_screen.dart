@@ -519,6 +519,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     selectVarientId: controller.selectedVariantId.value,
                     selectedDays: selectedDays,
                     selectedAmount: selectedAmount,
+                  
                   ),
                 );
               },
