@@ -26,12 +26,24 @@ class ProductlistingController extends GetxController {
 
   @override
   void onInit() {
-//new
+    // new: get categoryId from arguments
     final args = Get.arguments;
     if (args != null && args is Map && args['categoryId'] != null) {
       categoryId = args['categoryId'] as String?;
     }
 
+    // When searchQuery changes, wait 400ms, then call API
+    debounce<String>(
+      searchQuery,
+      (_) {
+        page = 1;
+        hasNextPage.value = true;
+        fetchProducts(); // this will clear products when page == 1
+      },
+      time: const Duration(milliseconds: 400),
+    );
+
+    // initial load
     fetchProducts();
 
     super.onInit();
@@ -43,6 +55,7 @@ class ProductlistingController extends GetxController {
     try {
       if (page == 1) {
         isLoading(true); // first page loader
+        products.clear();
       } else {
         isMoreLoading(true); // bottom loader
       }
@@ -73,9 +86,6 @@ class ProductlistingController extends GetxController {
 
     // RESET DATA
     page = 1;
-    products.clear();
     hasNextPage.value = true;
-
-    fetchProducts(); // reload with search
   }
 }

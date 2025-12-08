@@ -332,21 +332,23 @@ class SubCategoryCard extends StatelessWidget {
                     );
                   }
 
-                  // Image available: show network image, fallback to icon on error
-                  return Image.network(
-                    imageUrl,
-                    height: 70.h,
-                    width: 70.w,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Center(
-                        child: Icon(
-                          Icons.image_outlined,
-                          size: 40.sp,
-                          color: AppColors.grey,
-                        ),
-                      );
-                    },
+                  // Image available: show network image, fallback to icon on errorreturn Image.
+                  return Center(
+                    child: Image.network(
+                      imageUrl,
+                      height: 75.h,
+                      width: 80.w,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(
+                          child: Icon(
+                            Icons.image_outlined,
+                            size: 50.sp,
+                            color: AppColors.grey,
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
               ),

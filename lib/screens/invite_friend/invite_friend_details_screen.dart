@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/widgets/app_loader.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -9,6 +8,7 @@ import '../../constants/app_strings.dart';
 import '../../models/friend_details_response.dart';
 import '../../screens/invite_friend/invite_friend_controller.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/product_details_dialog.dart';
@@ -55,7 +55,7 @@ class InviteFriendDetailsScreen extends StatelessWidget {
               // ---------------- HEADER ----------------
               Container(
                 width: double.infinity,
-                height: 140.h,
+                constraints: BoxConstraints(minHeight: 140.h),
                 padding: EdgeInsets.symmetric(vertical: 5.h),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -93,20 +93,23 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                               padding: EdgeInsets.all(6.w),
                               borderRadius: BorderRadius.circular(10.r),
                               buttonColor: AppColors.buttonSecondary,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  appText(
-                                    AppStrings.total_product,
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  appText(
-                                    "${user.totalProducts}",
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ],
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    appText(
+                                      AppStrings.total_product,
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    appText(
+                                      "${user.totalProducts}",
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
 
@@ -118,20 +121,23 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                               padding: EdgeInsets.all(6.w),
                               borderRadius: BorderRadius.circular(10.r),
                               buttonColor: AppColors.mediumGreen,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  appText(
-                                    AppStrings.my_commission,
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  appText(
-                                    "₹${user.totalCommission}",
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ],
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    appText(
+                                      AppStrings.my_commission,
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    appText(
+                                      "₹${user.totalCommission}",
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
