@@ -5,10 +5,6 @@ on:
   push:
     branches: [ developer ]
 
-concurrency:
-  group: ios-build-${{ github.ref }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
   checks: write
