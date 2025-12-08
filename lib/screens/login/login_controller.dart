@@ -6,8 +6,6 @@ import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/notification/notification_controller.dart';
-import 'package:saoirse_app/screens/refferal/referral_controller.dart';
 
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
@@ -21,6 +19,9 @@ import '../dashboard/dashboard_screen.dart';
 
 import 'package:http/http.dart' as http;
 
+import '../notification/notification_controller.dart';
+import '../refferal/referral_controller.dart';
+
 class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();
   TextEditingController referreltextController = TextEditingController();
@@ -30,6 +31,7 @@ class LoginController extends GetxController {
   RxBool fetchFailed = false.obs;
   RxBool referralApplied = false.obs;
   final ReferralService referralService = ReferralService();
+  final formKey = GlobalKey<FormState>();
   @override
   void onInit() {
     super.onInit();
@@ -137,9 +139,9 @@ class LoginController extends GetxController {
 
     // Step 3: Update user with FCM + referral
     final fcmToken = await getDeviceToken();
-if (fcmToken != null) {
-  Get.find<NotificationController>().registerFCM(fcmToken);
-}
+    if (fcmToken != null) {
+      Get.find<NotificationController>().registerFCM(fcmToken);
+    }
 
     bool updated = await updateUser(data.userId!);
     final referralText = referreltextController.text.trim();
