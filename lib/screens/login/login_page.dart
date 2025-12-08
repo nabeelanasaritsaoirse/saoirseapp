@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:country_phone_validator/country_phone_validator.dart' as cpv;
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -165,35 +166,60 @@ class _LoginPageState extends State<LoginPage> {
                                 textColor: AppColors.black,
                                 hintSize: 15.sp,
                                 validator: (value) {
+                                  // final raw = value ?? "";
+                                  // final digitsOnly =
+                                  //     raw.trim().replaceAll(RegExp(r'\D'), '');
+
+                                  // if (digitsOnly.isEmpty) {
+                                  //   return "Phone number is required";
+                                  // }
+
+                                  // if (digitsOnly.length < 7 ||
+                                  //     digitsOnly.length > 15) {
+                                  //   return "Enter a valid phone number";
+                                  // }
+
+                                  // // Now call your service safely
+                                  // int? serviceResult;
+                                  // try {
+                                  //   serviceResult =
+                                  //       LoginService.phoneValidation(
+                                  //     phone: int.parse(digitsOnly),
+                                  //   );
+                                  // } catch (e) {
+                                  //   return "Enter a valid phone number";
+                                  // }
+
+                                  // // If service returns null → valid
+                                  // if (serviceResult == null) return null;
+
+                                  // // If service returns an int → convert to error text
+                                  // return "Invalid phone number";
                                   final raw = value ?? "";
                                   final digitsOnly =
-                                      raw.trim().replaceAll(RegExp(r'\D'), '');
+                                      raw.replaceAll(RegExp(r'\D'), '');
 
+                                  final selectedCountry =
+                                      loginController.country.value;
                                   if (digitsOnly.isEmpty) {
                                     return "Phone number is required";
                                   }
-
-                                  if (digitsOnly.length < 7 ||
-                                      digitsOnly.length > 15) {
-                                    return "Enter a valid phone number";
+                                  if (selectedCountry == null) {
+                                    return "Please select a country";
                                   }
 
-                                  // Now call your service safely
-                                  int? serviceResult;
-                                  try {
-                                    serviceResult =
-                                        LoginService.phoneValidation(
-                                      phone: int.parse(digitsOnly),
-                                    );
-                                  } catch (e) {
-                                    return "Enter a valid phone number";
+                                  final dialCode =
+                                      '+${selectedCountry.phoneCode}';
+                                  // or selectedCountry.dialCode depending on your Country object
+
+                                  final isValid =
+                                      cpv.CountryUtils.validatePhoneNumber(
+                                          digitsOnly, dialCode);
+
+                                  if (!isValid) {
+                                    return "Invalid number for ${selectedCountry.name}";
                                   }
-
-                                  // If service returns null → valid
-                                  if (serviceResult == null) return null;
-
-                                  // If service returns an int → convert to error text
-                                  return "Invalid phone number";
+                                  return null;
                                 },
                                 prefixWidget: GestureDetector(
                                   onTap: () => showCountryPickerDialog(context),

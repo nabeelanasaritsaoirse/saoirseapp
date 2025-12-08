@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unused_local_variable, deprecated_member_use
 
 import 'dart:developer';
 
@@ -1116,7 +1116,6 @@ class OrderDetailsScreen extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(10.w),
                           decoration: BoxDecoration(
-                            // ignore: deprecated_member_use
                             color: AppColors.primaryColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10.r),
                           ),
@@ -1166,7 +1165,6 @@ class OrderDetailsScreen extends StatelessWidget {
                                   orderController.selectedPaymentMethod.value ==
                                           "wallet"
                                       ? AppColors.primaryColor
-                                      // ignore: deprecated_member_use
                                       : AppColors.grey.withOpacity(0.5),
                               width: 2,
                             ),
@@ -1203,14 +1201,12 @@ class OrderDetailsScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: orderController.selectedPaymentMethod.value ==
                               "razorpay"
-                          // ignore: deprecated_member_use
                           ? AppColors.primaryColor.withOpacity(0.08)
                           : AppColors.white,
                       border: Border.all(
                         color: orderController.selectedPaymentMethod.value ==
                                 "razorpay"
                             ? AppColors.primaryColor
-                            // ignore: deprecated_member_use
                             : AppColors.grey.withOpacity(0.3),
                         width: 1.5,
                       ),
@@ -1222,7 +1218,6 @@ class OrderDetailsScreen extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(10.w),
                           decoration: BoxDecoration(
-                            // ignore: deprecated_member_use
                             color: AppColors.primaryColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10.r),
                           ),

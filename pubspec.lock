@@ -233,6 +233,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  country_phone_validator:
+    dependency: "direct main"
+    description:
+      name: country_phone_validator
+      sha256: "669124932f77db39aafc08e71c9980e60d65a3bc5527a9e594695a647341225d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   country_picker:
     dependency: "direct main"
     description:
@@ -609,10 +617,10 @@ packages:
     dependency: "direct main"
     description:
       name: get
-      sha256: c79eeb4339f1f3deffd9ec912f8a923834bec55f7b49c9e882b8fef2c139d425
+      sha256: "5ed34a7925b85336e15d472cc4cfe7d9ebf4ab8e8b9f688585bf6b50f4c3d79a"
       url: "https://pub.dev"
     source: hosted
-    version: "4.7.2"
+    version: "4.7.3"
   get_storage:
     dependency: "direct main"
     description:
@@ -633,10 +641,10 @@ packages:
     dependency: "direct main"
     description:
       name: google_fonts
-      sha256: "517b20870220c48752eafa0ba1a797a092fb22df0d89535fd9991e86ee2cdd9c"
+      sha256: ba03d03bcaa2f6cb7bd920e3b5027181db75ab524f8891c8bc3aa603885b8055
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.2"
+    version: "6.3.3"
   google_identity_services_web:
     dependency: transitive
     description:
@@ -657,10 +665,10 @@ packages:
     dependency: transitive
     description:
       name: google_sign_in_android
-      sha256: "13759dc6dbff7501452830995d1a4446e4af172050e16a0091f98fcf607fa2c7"
+      sha256: "5ec98ab35387c68c0050495bb211bd88375873723a80fae7c2e9266ea0bdd8bb"
       url: "https://pub.dev"
     source: hosted
-    version: "7.2.6"
+    version: "7.2.7"
   google_sign_in_ios:
     dependency: transitive
     description:
@@ -769,10 +777,10 @@ packages:
     dependency: transitive
     description:
       name: image_picker_ios
-      sha256: "997d100ce1dda5b1ba4085194c5e36c9f8a1fb7987f6a36ab677a344cd2dc986"
+      sha256: "956c16a42c0c708f914021666ffcd8265dde36e673c9fa68c81f7d085d9774ad"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.13+2"
+    version: "0.8.13+3"
   image_picker_linux:
     dependency: transitive
     description:
@@ -1286,10 +1294,10 @@ packages:
     dependency: transitive
     description:
       name: time
-      sha256: "370572cf5d1e58adcb3e354c47515da3f7469dac3a95b447117e728e7be6f461"
+      sha256: "46187cf30bffdab28c56be9a63861b36e4ab7347bf403297595d6a97e10c789f"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.5"
+    version: "2.1.6"
   timezone:
     dependency: transitive
     description:
