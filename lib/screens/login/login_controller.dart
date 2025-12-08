@@ -30,6 +30,7 @@ class LoginController extends GetxController {
   RxBool fetchFailed = false.obs;
   RxBool referralApplied = false.obs;
   final ReferralService referralService = ReferralService();
+  final formKey = GlobalKey<FormState>();
   @override
   void onInit() {
     super.onInit();
@@ -137,9 +138,9 @@ class LoginController extends GetxController {
 
     // Step 3: Update user with FCM + referral
     final fcmToken = await getDeviceToken();
-if (fcmToken != null) {
-  Get.find<NotificationController>().registerFCM(fcmToken);
-}
+    if (fcmToken != null) {
+      Get.find<NotificationController>().registerFCM(fcmToken);
+    }
 
     bool updated = await updateUser(data.userId!);
     final referralText = referreltextController.text.trim();

@@ -103,163 +103,185 @@ class _LoginPageState extends State<LoginPage> {
                               );
                       }),
                       SizedBox(height: 15.h),
-                      appText(
-                        "Username",
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryColor,
-                        fontSize: 15.sp,
-                        fontFamily: "Poppins",
-                      ),
-                      appTextField(
-                        controller: loginController.emailController,
-                        suffixWidget: Icon(
-                          Icons.visibility_rounded,
-                          color: AppColors.black,
-                        ),
-                        prefixWidth: 20.w,
-                        hintText: "Username",
-                        hintColor: AppColors.black,
-                        textColor: AppColors.black,
-                        hintSize: 15.sp,
-                        validator: (value) {
-                          return LoginService.usernameValidation(
-                              username: value ?? "");
-                        },
-                      ),
-                      SizedBox(height: 15.h),
-                      appText(
-                        AppStrings.phoneNumber,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryColor,
-                        fontSize: 15.sp,
-                        fontFamily: "Poppins",
-                      ),
-                      Obx(() {
-                        if (loginController.loading.value &&
-                            loginController.country.value == null) {
-                          // Still waiting for API (max 5 sec)
-                          return const Center(
-                            child: CircularProgressIndicator(
-                                color: AppColors.primaryColor),
-                          );
-                        }
-
-                        final country = loginController.country.value;
-
-                        return appTextField(
-                          controller: loginController.phoneController,
-                          onFieldSubmitted: (phoneNumber) {
-                            final fullNumber = loginController.fullPhoneNumber;
-                            appToast(content: fullNumber);
-                          },
-                          prefixWidth: 70.w,
-                          hintText: AppStrings.phoneNumber,
-                          textInputType: TextInputType.phone,
-                          hintColor: AppColors.black,
-                          textColor: AppColors.black,
-                          hintSize: 15.sp,
-                          validator: (value) {
-                            final raw = value ?? "";
-                            final digitsOnly =
-                                raw.trim().replaceAll(RegExp(r'\D'), '');
-
-                            if (digitsOnly.isEmpty) {
-                              return "Phone number is required";
-                            }
-
-                            if (digitsOnly.length < 7 ||
-                                digitsOnly.length > 15) {
-                              return "Enter a valid phone number";
-                            }
-
-                            // Now call your service safely
-                            int? serviceResult;
-                            try {
-                              serviceResult = LoginService.phoneValidation(
-                                phone: int.parse(digitsOnly),
-                              );
-                            } catch (e) {
-                              return "Enter a valid phone number";
-                            }
-
-                            // If service returns null → valid
-                            if (serviceResult == null) return null;
-
-                            // If service returns an int → convert to error text
-                            return "Invalid phone number";
-                          },
-                          prefixWidget: GestureDetector(
-                            onTap: () => showCountryPickerDialog(context),
-                            child: Container(
-                              height: 55.h,
-                              alignment: Alignment.center,
-                              child: Text(
-                                // defensive access to avoid unexpected null errors
-                                "${country?.flagEmoji ?? ''}+${country?.phoneCode ?? ''}",
-                                style: TextStyle(
-                                  color: AppColors.black,
-                                  fontSize: 15.sp,
-                                ),
-                              ),
+                      Form(
+                        key: loginController.formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            appText(
+                              "Username",
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.primaryColor,
+                              fontSize: 15.sp,
+                              fontFamily: "Poppins",
                             ),
-                          ),
-                        );
-                      }),
-                      SizedBox(height: 15.h),
-                      Center(
-                        child: Obx(() {
-                          return loginController.loading.value
-                              ? SizedBox(
-                                  height: 40.h,
-                                  width: 150.w,
-                                  child: Center(
-                                    child: appLoader(),
-                                  ),
-                                )
-                              : appButton(
-                                  onTap: () async {
-                                    print("[SEND OTP BUTTON PRESSED]");
-
-                                    if (!loginController.validateInputs()) {
-                                      print("Validation Failed");
-                                      return;
-                                    }
-
-                                    loginController.loading.value =
-                                        true; // START LOADING
-
-                                    print("✔ Validation Passed");
-                                    print(
-                                        "Phone Number = ${loginController.fullPhoneNumber}");
-
-                                    bool isSent = await AuthService.sendOTP(
-                                      loginController.fullPhoneNumber,
-                                    );
-
-                                    print("📨 sendOTP Result: $isSent");
-
-                                    loginController.loading.value =
-                                        false; // STOP LOADING
-
-                                    if (isSent) {
-                                      print("Navigating to VerifyOTPScreen");
-                                      Get.to(() => VerifyOTPScreen(
-                                            phoneNumber:
-                                                loginController.fullPhoneNumber,
-                                            referral: loginController
-                                                .referreltextController.text,
-                                            username: loginController
-                                                .emailController.text,
-                                          ));
-                                    }
-                                  },
-                                  buttonColor: AppColors.primaryColor,
-                                  buttonText: AppStrings.send_otp,
-                                  textColor: AppColors.white,
-                                  height: 40.h,
-                                  width: 150.w,
+                            appTextField(
+                              controller: loginController.emailController,
+                              suffixWidget: Icon(
+                                Icons.visibility_rounded,
+                                color: AppColors.black,
+                              ),
+                              prefixWidth: 20.w,
+                              hintText: "Username",
+                              hintColor: AppColors.black,
+                              textColor: AppColors.black,
+                              hintSize: 15.sp,
+                              validator: (value) {
+                                return LoginService.usernameValidation(
+                                    username: value ?? "");
+                              },
+                            ),
+                            SizedBox(height: 15.h),
+                            appText(
+                              AppStrings.phoneNumber,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.primaryColor,
+                              fontSize: 15.sp,
+                              fontFamily: "Poppins",
+                            ),
+                            Obx(() {
+                              if (loginController.loading.value &&
+                                  loginController.country.value == null) {
+                                // Still waiting for API (max 5 sec)
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                      color: AppColors.primaryColor),
                                 );
-                        }),
+                              }
+
+                              final country = loginController.country.value;
+
+                              return appTextField(
+                                controller: loginController.phoneController,
+                                onFieldSubmitted: (phoneNumber) {
+                                  final fullNumber =
+                                      loginController.fullPhoneNumber;
+                                  appToast(content: fullNumber);
+                                },
+                                prefixWidth: 70.w,
+                                hintText: AppStrings.phoneNumber,
+                                textInputType: TextInputType.phone,
+                                hintColor: AppColors.black,
+                                textColor: AppColors.black,
+                                hintSize: 15.sp,
+                                validator: (value) {
+                                  final raw = value ?? "";
+                                  final digitsOnly =
+                                      raw.trim().replaceAll(RegExp(r'\D'), '');
+
+                                  if (digitsOnly.isEmpty) {
+                                    return "Phone number is required";
+                                  }
+
+                                  if (digitsOnly.length < 7 ||
+                                      digitsOnly.length > 15) {
+                                    return "Enter a valid phone number";
+                                  }
+
+                                  // Now call your service safely
+                                  int? serviceResult;
+                                  try {
+                                    serviceResult =
+                                        LoginService.phoneValidation(
+                                      phone: int.parse(digitsOnly),
+                                    );
+                                  } catch (e) {
+                                    return "Enter a valid phone number";
+                                  }
+
+                                  // If service returns null → valid
+                                  if (serviceResult == null) return null;
+
+                                  // If service returns an int → convert to error text
+                                  return "Invalid phone number";
+                                },
+                                prefixWidget: GestureDetector(
+                                  onTap: () => showCountryPickerDialog(context),
+                                  child: Container(
+                                    height: 55.h,
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      // defensive access to avoid unexpected null errors
+                                      "${country?.flagEmoji ?? ''}+${country?.phoneCode ?? ''}",
+                                      style: TextStyle(
+                                        color: AppColors.black,
+                                        fontSize: 15.sp,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                            SizedBox(height: 15.h),
+                            Center(
+                              child: Obx(() {
+                                return loginController.loading.value
+                                    ? SizedBox(
+                                        height: 40.h,
+                                        width: 150.w,
+                                        child: Center(
+                                          child: appLoader(),
+                                        ),
+                                      )
+                                    : appButton(
+                                        onTap: () async {
+                                          print("[SEND OTP BUTTON PRESSED]");
+
+                                          // if (!loginController.validateInputs()) {
+                                          //   print("Validation Failed");
+                                          //   return;
+                                          // }
+                                          if (!loginController
+                                              .formKey.currentState!
+                                              .validate()) {
+                                            print(
+                                                "❌ Validation Failed — Required Fields Missing");
+                                            return;
+                                          }
+                                          print("✔ Validation Passed");
+                                          print(
+                                              "Phone: ${loginController.fullPhoneNumber}");
+                                          loginController.loading.value =
+                                              true; // START LOADING
+
+                                          print("✔ Validation Passed");
+                                          print(
+                                              "Phone Number = ${loginController.fullPhoneNumber}");
+
+                                          bool isSent =
+                                              await AuthService.sendOTP(
+                                            loginController.fullPhoneNumber,
+                                          );
+
+                                          print("📨 sendOTP Result: $isSent");
+
+                                          loginController.loading.value =
+                                              false; // STOP LOADING
+
+                                          if (isSent) {
+                                            print(
+                                                "Navigating to VerifyOTPScreen");
+                                            Get.to(() => VerifyOTPScreen(
+                                                  phoneNumber: loginController
+                                                      .fullPhoneNumber,
+                                                  referral: loginController
+                                                      .referreltextController
+                                                      .text,
+                                                  username: loginController
+                                                      .emailController.text,
+                                                ));
+                                          }
+                                        },
+                                        buttonColor: AppColors.primaryColor,
+                                        buttonText: AppStrings.send_otp,
+                                        textColor: AppColors.white,
+                                        height: 40.h,
+                                        width: 150.w,
+                                      );
+                              }),
+                            ),
+                          ],
+                        ),
                       ),
                       SizedBox(height: 15.h),
                       Row(

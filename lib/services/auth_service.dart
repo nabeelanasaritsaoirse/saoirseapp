@@ -13,6 +13,7 @@ class AuthService {
   static FirebaseAuth auth = FirebaseAuth.instance;
   static GoogleSignInAccount? googleUser;
   static String? verificationId;
+  static int? _resendToken;
 
   static Future<LoginResponse?> loginWithIdToken(String idToken) async {
     try {
@@ -60,8 +61,10 @@ class AuthService {
   }
 
   /// STEP 1: SEND OTP
-  static Future<bool> sendOTP(String phone) async {
+  static Future<bool> sendOTP(String phone, {bool isResend = false}) async {
     print("[SEND OTP] Requesting OTP for: $phone");
+    print("Is Resend    : $isResend");
+    print("Resend Token : $_resendToken");
     try {
       await auth.verifyPhoneNumber(
         phoneNumber: phone,
@@ -77,11 +80,14 @@ class AuthService {
         codeSent: (String vId, int? resendToken) {
           print("[CODE SENT] verificationId: $vId");
           verificationId = vId;
+          _resendToken = resendToken;
+          print("resendToken   : $resendToken");
         },
         codeAutoRetrievalTimeout: (String vId) {
           print("[TIMEOUT] Auto-retrieval timed out");
           verificationId = vId;
         },
+        forceResendingToken: isResend ? _resendToken : null,
       );
       print("[SEND OTP COMPLETED]");
       return true;

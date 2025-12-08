@@ -1,11 +1,14 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
@@ -15,7 +18,11 @@ class VerifyOTPScreen extends StatelessWidget {
   final String phoneNumber;
   final String referral;
   final String username;
-  VerifyOTPScreen({super.key, required this.phoneNumber, required this.referral, required this.username});
+  VerifyOTPScreen(
+      {super.key,
+      required this.phoneNumber,
+      required this.referral,
+      required this.username});
 
   late final VerifyOtpController controller = Get.put(
     VerifyOtpController(
@@ -81,7 +88,6 @@ class VerifyOTPScreen extends StatelessWidget {
 
                 SizedBox(height: 40.h),
 
-
                 /// OTP Boxes
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -98,7 +104,7 @@ class VerifyOTPScreen extends StatelessWidget {
                         keyboardType: TextInputType.number,
                         maxLength: 1,
                         style: TextStyle(
-                          fontSize: 20.sp, 
+                          fontSize: 20.sp,
                           fontWeight: FontWeight.bold,
                           color: AppColors.black,
                           height: 1.2,
@@ -111,7 +117,7 @@ class VerifyOTPScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10.r),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: EdgeInsets.symmetric(vertical: 15.h), 
+                          contentPadding: EdgeInsets.symmetric(vertical: 15.h),
                         ),
                         onChanged: (value) {
                           if (value.isNotEmpty && index < 5) {
@@ -128,7 +134,11 @@ class VerifyOTPScreen extends StatelessWidget {
                 SizedBox(height: 20.h),
 
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () async {
+                    bool sent =
+                        await AuthService.sendOTP(phoneNumber, isResend: true);
+                    log("🔁 RESEND STATUS: $sent");
+                  },
                   child: appText(
                     "Resend code",
                     fontWeight: FontWeight.w500,
