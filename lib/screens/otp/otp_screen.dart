@@ -128,7 +128,7 @@ class VerifyOTPScreen extends StatelessWidget {
                 SizedBox(height: 20.h),
 
                 GestureDetector(
-                  onTap: () {},
+                  onTap: ()=> controller.verifyOtp,
                   child: appText(
                     "Resend code",
                     fontWeight: FontWeight.w500,

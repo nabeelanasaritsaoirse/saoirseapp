@@ -16,18 +16,21 @@ import '../razorpay/razorpay_controller.dart';
 class OrderDetailsController extends GetxController {
   RxInt selectedDays = 0.obs;
   RxDouble selectedAmount = 0.0.obs;
+  var selectedPaymentMethod = "razorpay".obs;
+  var quantity = 1.obs;
   String orderid = "";
 
   // ------------------------- COUPONS -----------------------------------------
   RxList<Coupon> coupons = <Coupon>[].obs;
   Rx<Coupon?> selectedCoupon = Rx<Coupon?>(null);
   // store the last validation response (null if none)
-  Rx<CouponValidationResponse?> couponValidation = Rx<CouponValidationResponse?>(null);
+  Rx<CouponValidationResponse?> couponValidation =
+      Rx<CouponValidationResponse?>(null);
 
   // store last applied coupon code (string) for display
   RxString appliedCouponCode = "".obs;
-  
- // storing first values for remove coupon
+
+  // storing first values for remove coupon
   double originalAmount = 0.0;
   int originalDays = 0;
 
@@ -41,7 +44,10 @@ class OrderDetailsController extends GetxController {
     final all = await CouponService.fetchCoupons();
 
     // filter only INSTANT & REDUCE_DAYS
-    coupons.value = all.where((c) => c.couponType == "INSTANT" || c.couponType == "REDUCE_DAYS").toList();
+    coupons.value = all
+        .where(
+            (c) => c.couponType == "INSTANT" || c.couponType == "REDUCE_DAYS")
+        .toList();
   }
 
   //selected coupon show text field
@@ -98,21 +104,21 @@ class OrderDetailsController extends GetxController {
 
     // Optional message
     if (response.benefits.savingsMessage.isNotEmpty) {
-      appToast(title: "Coupon Applied", content: response.benefits.savingsMessage);
+      appToast(
+          title: "Coupon Applied", content: response.benefits.savingsMessage);
     } else {
       appToast(title: "Coupon Applied", content: "Coupon applied successfully");
     }
   }
 
-
   void removeCoupon(TextEditingController controller) {
-  couponValidation.value = null; // remove server response
-  appliedCouponCode.value = "";  // clear coupon code text
-  selectedCoupon.value = null;
-  selectedAmount.value = originalAmount; // restore original daily amount
-  selectedDays.value = originalDays;     // restore original days
-  controller.clear(); // clear text field
-}
+    couponValidation.value = null; // remove server response
+    appliedCouponCode.value = ""; // clear coupon code text
+    selectedCoupon.value = null;
+    selectedAmount.value = originalAmount; // restore original daily amount
+    selectedDays.value = originalDays; // restore original days
+    controller.clear(); // clear text field
+  }
 
   //----------------------------COUPONS END-------------------------------------
 
@@ -209,5 +215,25 @@ class OrderDetailsController extends GetxController {
     selectedDays.value = days;
     selectedAmount.value = amount;
     log("CUSTOM PLAN SELECTED → $days Days | ₹$amount");
+  }
+
+  void selectPaymentMethod(String method) {
+    selectedPaymentMethod.value = method;
+  }
+
+  void increaseQty() {
+    if (quantity.value >= 10) {
+      appToaster(content: "Maximum quantity is 10", error: true);
+      return;
+    }
+    quantity.value++;
+  }
+
+  void decreaseQty() {
+    if (quantity.value <= 1) {
+      appToaster(content: "Minimum quantity is 1", error: true);
+      return;
+    }
+    quantity.value--;
   }
 }

@@ -96,10 +96,16 @@ class PaymentDetails {
   final int emiNumber;
   final bool isCommissionProcessed;
 
+  /// 🆕 New optional fields from API
+  final String? paymentId;
+  final String? signature;
+
   PaymentDetails({
     required this.orderId,
     required this.emiNumber,
     required this.isCommissionProcessed,
+    this.paymentId,
+    this.signature,
   });
 
   factory PaymentDetails.fromJson(Map<String, dynamic> json) {
@@ -107,6 +113,11 @@ class PaymentDetails {
       orderId: json["orderId"] ?? "",
       emiNumber: json["emiNumber"] ?? 0,
       isCommissionProcessed: json["isCommissionProcessed"] ?? false,
+
+      /// 🆕 Safely parse new fields if present
+      paymentId: json["paymentId"],
+      signature: json["signature"],
     );
   }
 }
+
