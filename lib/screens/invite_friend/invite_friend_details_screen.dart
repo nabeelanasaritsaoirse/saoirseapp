@@ -55,7 +55,7 @@ class InviteFriendDetailsScreen extends StatelessWidget {
               // ---------------- HEADER ----------------
               Container(
                 width: double.infinity,
-                height: 140.h,
+                constraints: BoxConstraints(minHeight: 140.h),
                 padding: EdgeInsets.symmetric(vertical: 5.h),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -75,17 +75,13 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                         SizedBox(
                           width: 200.w,
                           child: appText(user.email,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textBlack,
-                              maxLines: 2,
-                              textAlign: TextAlign.start),
+                              fontSize: 12.sp, fontWeight: FontWeight.w500, color: AppColors.textBlack, maxLines: 2, textAlign: TextAlign.start),
                         ),
                         SizedBox(height: 10.h),
                         Row(
                           spacing: 8.w,
                           children: [
-                            // Total Products
+                           // Total Products
                             appButton(
                               onTap: () {},
                               width: 96.w,
@@ -93,24 +89,27 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                               padding: EdgeInsets.all(6.w),
                               borderRadius: BorderRadius.circular(10.r),
                               buttonColor: AppColors.buttonSecondary,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  appText(
-                                    AppStrings.total_product,
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  appText(
-                                    "${user.totalProducts}",
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ],
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    appText(
+                                      AppStrings.total_product,
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    appText(
+                                      "${user.totalProducts}",
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
 
-                            // Total Commission
+                          // Total Commission
                             appButton(
                               onTap: () {},
                               width: 96.w,
@@ -118,20 +117,23 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                               padding: EdgeInsets.all(6.w),
                               borderRadius: BorderRadius.circular(10.r),
                               buttonColor: AppColors.mediumGreen,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  appText(
-                                    AppStrings.my_commission,
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  appText(
-                                    "₹${user.totalCommission}",
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ],
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    appText(
+                                      AppStrings.my_commission,
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    appText(
+                                      "₹${user.totalCommission}",
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -153,8 +155,7 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                               fit: BoxFit.cover,
                               image: user.profilePicture.isNotEmpty
                                   ? NetworkImage(user.profilePicture)
-                                  : AssetImage(AppAssets.profile_image)
-                                      as ImageProvider,
+                                  : AssetImage(AppAssets.profile_image) as ImageProvider,
                             ),
                           ),
                         ),
@@ -213,8 +214,7 @@ class InviteFriendDetailsScreen extends StatelessWidget {
 }
 
 // ---------------- PRODUCT CARD USING API MODEL ----------------
-Widget _buildProductCard(BuildContext context, FriendProduct product,
-    InviteFriendController controller) {
+Widget _buildProductCard(BuildContext context, FriendProduct product, InviteFriendController controller) {
   final bool isPending = product.pendingDays > 0;
 
   // Format date
@@ -331,8 +331,7 @@ Widget _buildProductCard(BuildContext context, FriendProduct product,
                 padding: EdgeInsets.all(0.w),
                 borderRadius: BorderRadius.circular(6.r),
                 onTap: () async {
-                  final productDetails =
-                      await controller.getProductDetails(product.productId);
+                  final productDetails = await controller.getProductDetails(product.productId);
 
                   if (productDetails != null && Get.context != null) {
                     showProductDetailsDialog(Get.context!, productDetails);

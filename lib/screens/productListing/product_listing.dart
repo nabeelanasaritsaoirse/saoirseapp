@@ -31,8 +31,7 @@ class _ProductListingState extends State<ProductListing> {
     }
 
     scrollController.addListener(() {
-      if (scrollController.position.pixels ==
-          scrollController.position.maxScrollExtent) {
+      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
         Get.find<ProductlistingController>().fetchProducts();
       }
     });
@@ -40,8 +39,7 @@ class _ProductListingState extends State<ProductListing> {
 
   @override
   Widget build(BuildContext context) {
-    final ProductlistingController productlistingController =
-        Get.find<ProductlistingController>();
+    final ProductlistingController productlistingController = Get.find<ProductlistingController>();
 
     productlistingController.products;
 
@@ -65,10 +63,11 @@ class _ProductListingState extends State<ProductListing> {
               controller: productlistingController.nameContoller,
               hintText: "Search",
               hintColor: AppColors.textBlack,
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 20.w, vertical: 10),
               fillColor: AppColors.white,
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10),
               borderRadius: BorderRadius.circular(15.r),
+              onChanged: productlistingController.performSearch,
+              textColor: AppColors.textBlack,
             ),
           ),
           actions: [
@@ -161,8 +160,7 @@ class _ProductListingState extends State<ProductListing> {
           // ),
           Expanded(
             child: Obx(() {
-              if (productlistingController.isLoading.value &&
-                  productlistingController.products.isEmpty) {
+              if (productlistingController.isLoading.value && productlistingController.products.isEmpty) {
                 return Center(child: appLoader());
               }
 
@@ -194,9 +192,7 @@ class _ProductListingState extends State<ProductListing> {
                           productId: product.id,
                           name: product.name,
                           brand: product.brand,
-                          image: product.images.isNotEmpty
-                              ? product.images.last.url
-                              : "https://via.placeholder.com/200",
+                          image: product.images.isNotEmpty ? product.images.last.url : "https://via.placeholder.com/200",
                           price: product.pricing.finalPrice.toStringAsFixed(0),
                           isFavorite: false));
                 },
