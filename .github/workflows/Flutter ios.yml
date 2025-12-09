@@ -69,10 +69,10 @@ jobs:
         run: |
           cd ios
           # Distribution certificate (for signing IPA)
-          fastlane match appstore --readonly --api_key_path api_key.json --git_branch master
-          
+          fastlane match appstore --readonly --api_key_path ./ios/api_key.json --git_branch master
+
           # Development certificate (required by Xcode archiver)
-          fastlane match development --readonly --api_key_path api_key.json --git_branch master
+          # fastlane match development --readonly --api_key_path api_key.json --git_branch master
 
       # ---------------- iOS Dependencies ----------------
       - name: 🧨 Reset Pods
