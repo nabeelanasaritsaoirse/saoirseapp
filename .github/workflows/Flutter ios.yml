@@ -50,9 +50,7 @@ jobs:
           EOF
 
       - name: 📋 Copy .env to iOS Runner
-        run: |
-          mkdir -p ios/Runner
-          cp .env ios/Runner/.env
+        run: cp .env ios/Runner/.env
 
       # ---------------- Fastlane + Match ----------------
       - name: 🚀 Install Fastlane & CocoaPods
@@ -63,14 +61,15 @@ jobs:
       - name: 🔐 Create API Key File
         run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > ios/api_key.json
 
-      - name: 🔐 Download Certificates via Match
-        run: |
-          cd ios
-          MATCH_PASSWORD="${{ secrets.MATCH_PASSWORD }}"  fastlane match appstore --readonly --api_key_path api_key.json --git_branch master
-          # MATCH_PASSWORD="${{ secrets.MATCH_PASSWORD }}" fastlane match development --readonly --api_key_path api_key.json --git_branch master
-
+      - name: 🔐 Download AppStore Certificates
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        run: |
+          cd ios
+          fastlane match appstore \
+            --readonly \
+            --api_key_path api_key.json \
+            --git_branch master
 
       # ---------------- iOS Dependencies ----------------
       - name: 🧨 Reset Pods
@@ -80,13 +79,13 @@ jobs:
           pod install --repo-update
 
       # ---------------- Build Flutter (no signing) ----------------
-      - name: 🔨 Build Flutter iOS Framework (No Codesign)
+      - name: 🔨 Build Flutter iOS (No Sign)
         run: flutter build ios --release --no-codesign
 
       # ---------------- Create ExportOptions.plist ----------------
       - name: 📝 Create ExportOptions.plist
         run: |
-          cat > ios/ExportOptions.plist <<'EOF'
+          cat > ios/ExportOptions.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
            "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -94,14 +93,6 @@ jobs:
           <dict>
             <key>method</key>
             <string>app-store</string>
-            <key>uploadSymbols</key>
-            <true/>
-            <key>uploadBitcode</key>
-            <false/>
-            <key>compileBitcode</key>
-            <false/>
-            <key>destination</key>
-            <string>export</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>teamID</key>
@@ -115,7 +106,7 @@ jobs:
           </plist>
           EOF
 
-      # ---------------- Build + Archive ----------------
+      # ---------------- Xcode Archive ----------------
       - name: 🏗️ Archive Build
         run: |
           xcodebuild archive \
@@ -152,38 +143,3 @@ jobs:
           path: |
             xcodebuild.log
             export.log
-
-  # -----------------------------------------------------
-  # 🚀 TestFlight Upload Stage
-  # -----------------------------------------------------
-  ios-deploy:
-    name: "🚀 Deploy to TestFlight"
-    needs: ios-ci
-    runs-on: macos-latest
-    if: github.ref == 'refs/heads/developer'
-
-    steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: 📦 Download IPA
-        uses: actions/download-artifact@v4
-        with:
-          name: ios-ipa
-          path: build/ios/ipa
-
-      - name: 🚀 Install Fastlane
-        run: sudo gem install fastlane -N
-
-      - name: 🔐 Create api_key.json
-        run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > api_key.json
-
-      - name: 🚀 Upload to TestFlight
-        run: |
-          fastlane pilot upload \
-            --api_key_path api_key.json \
-            --ipa build/ios/ipa/*.ipa \
-            --skip_waiting_for_build_processing
-
-      - name: 🧹 Cleanup
-        run: rm -f api_key.json
