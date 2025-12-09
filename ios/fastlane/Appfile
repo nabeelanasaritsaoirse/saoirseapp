@@ -1,0 +1,4 @@
+app_identifier("com.saoirse.epi")
+apple_id("nishant.it.saoirse@gmail.com")
+team_id("BYQUNNQSQH")
+api_key_path("./api_key.json")
