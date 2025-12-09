@@ -67,12 +67,16 @@ jobs:
           ${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}
           EOF
 
-      - name: 🔐 Download Certificates via Match (AppStore Only)
+      - name: 🔐 Download Certificates via Match (AppStore + Development)
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
           cd ios
+          # AppStore signing
           fastlane match appstore --readonly --api_key_path ./api_key.json --git_branch master
+      
+          # Development cert required for archive
+          fastlane match development --readonly --api_key_path ./api_key.json --git_branch master
 
       # ---------------- iOS Dependencies ----------------
       - name: 🧨 Reset Pods
