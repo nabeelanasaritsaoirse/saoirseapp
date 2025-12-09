@@ -136,25 +136,41 @@ jobs:
           echo "Applied manual signing for Release build"
 
       # ---------------- Build + Archive ----------------
+      # - name: 🏗️ Archive Build
+      #   run: |
+      #     xcodebuild archive \
+      #       -workspace ios/Runner.xcworkspace \
+      #       -scheme Runner \
+      #       -configuration Release \
+      #       -archivePath build/ios/Runner.xcarchive \
+      #       -destination 'generic/platform=iOS' \
+      #       DEVELOPMENT_TEAM=BYQUNNQSQH \
+      #       CODE_SIGN_STYLE=Manual \
+      #       PROVISIONING_PROFILE_SPECIFIER="match AppStore com.saoirse.epi" \
+      #       | tee xcodebuild.log
+
       - name: 🏗️ Archive Build
         run: |
+          mkdir -p ios/build/ios
+      
           xcodebuild archive \
             -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
-            -archivePath build/ios/Runner.xcarchive \
+            -archivePath ios/build/ios/Runner.xcarchive \
             -destination 'generic/platform=iOS' \
             DEVELOPMENT_TEAM=BYQUNNQSQH \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE_SPECIFIER="match AppStore com.saoirse.epi" \
             | tee xcodebuild.log
 
+
       # ---------------- Export IPA ----------------
       - name: 📦 Export IPA
         run: |
           xcodebuild -exportArchive \
-            -archivePath build/ios/Runner.xcarchive \
-            -exportPath build/ios/ipa \
+            -archivePath ios/build/ios/Runner.xcarchive \
+            -exportPath ios/build/ios/ipa \
             -exportOptionsPlist ios/ExportOptions.plist \
             | tee export.log
 
