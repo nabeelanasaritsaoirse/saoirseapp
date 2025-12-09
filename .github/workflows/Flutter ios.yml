@@ -3,7 +3,7 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
 on:
   push:
-    branches: [ nabeeela ]   # CHECK THIS SPELLING
+    branches: [ nabeeela ]
 
 concurrency:
   group: ios-build-${{ github.ref }}
@@ -64,13 +64,12 @@ jobs:
           ${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}
           EOF
 
-      - name: 🔐 Download Certificates via Match (AppStore + Development)
+      - name: 🔐 Download Certificates via Match
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
           cd ios
           fastlane match appstore --readonly --api_key_path ./api_key.json --git_branch master
-          # fastlane match development --readonly --api_key_path ./api_key.json --git_branch master
 
       - name: 🧨 Reset Pods
         run: |
@@ -91,10 +90,6 @@ jobs:
           <dict>
             <key>method</key>
             <string>app-store</string>
-            <key>uploadSymbols</key>
-            <true/>
-            <key>compileBitcode</key>
-            <false/>
             <key>teamID</key>
             <string>BYQUNNQSQH</string>
             <key>signingStyle</key>
@@ -108,42 +103,30 @@ jobs:
           </plist>
           EOF
 
-      # - name: 🔧 Force Manual AppStore Signing
-      #   run: |
-      #     FILE="ios/Runner.xcodeproj/project.pbxproj"
-      #     sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$FILE"
-      #     sed -i '' 's/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer"/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution"/g' "$FILE"
-      #     sed -i '' 's/DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = BYQUNNQSQH;/g' "$FILE"
-      #     sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = .*/PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.saoirse.epi";/g' "$FILE"
-
-      - name: 🔧 Force App Store Signing (Fix Development Certificate Issue)
+      # -------------------- FIXED SIGNING BLOCK --------------------
+      - name: 🔧 Apply Runner-only Signing Patch
         run: |
           FILE="ios/Runner.xcodeproj/project.pbxproj"
 
-          echo "🔧 Updating signing settings in project.pbxproj..."
+          echo "🔧 Applying signing only to Runner Release…"
 
-          # 1. Force Manual Signing everywhere
-          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$FILE"
+          # Ensure Release config uses Manual signing
+          sed -i '' '/\/\* Release \*\//,/}/ s/CODE_SIGN_STYLE = .*/CODE_SIGN_STYLE = Manual;/' "$FILE"
 
-          # 2. Replace all Development signing identities with Distribution
-          sed -i '' 's/Apple Development:[^"]*/iPhone Distribution: Samuel Victor Machael (BYQUNNQSQH)/g' "$FILE"
+          # Set TEAM
+          sed -i '' '/\/\* Release \*\//,/}/ s/DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = BYQUNNQSQH;/' "$FILE"
 
-          # 3. Replace any developer identity in SDK sections
-          sed -i '' 's/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "Apple Development:[^"]*"/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Samuel Victor Machael (BYQUNNQSQH)"/g' "$FILE"
+          # Set correct provisioning profile
+          sed -i '' '/\/\* Release \*\//,/}/ s/PROVISIONING_PROFILE_SPECIFIER = .*/PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.saoirse.epi";/' "$FILE"
 
-          # 4. Force team ID
-          sed -i '' 's/DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = BYQUNNQSQH;/g' "$FILE"
+          echo "✅ Runner Release signing applied."
+      # --------------------------------------------------------------
 
-          # 5. Set provisioning profile for Release build
-          sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = .*;/PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.saoirse.epi";/g' "$FILE"
-
-          echo "✅ App Store signing applied successfully."
-          
       - name: 🏗️ Archive Build
         run: |
-          cd ios   # <--- REQUIRED FIX
+          cd ios
           mkdir -p build/ios
-      
+
           xcodebuild clean archive \
             -workspace Runner.xcworkspace \
             -scheme Runner \
@@ -153,25 +136,22 @@ jobs:
             DEVELOPMENT_TEAM=BYQUNNQSQH \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE_SPECIFIER="match AppStore com.saoirse.epi" \
-            -allowProvisioningUpdates \
             | tee ../xcodebuild.log
-
 
       - name: 📦 Export IPA
         run: |
-          cd ios   # <--- REQUIRED FIX
+          cd ios
           xcodebuild -exportArchive \
             -archivePath build/ios/Runner.xcarchive \
             -exportPath build/ios/ipa \
             -exportOptionsPlist ExportOptions.plist \
             | tee ../export.log
 
-
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
-          path: ios/build/ios/ipa/*.ipa   # FIXED PATH
+          path: ios/build/ios/ipa/*.ipa
 
       - name: 📋 Upload Logs if Failure
         if: failure()
@@ -181,6 +161,7 @@ jobs:
           path: |
             xcodebuild.log
             export.log
+
 
   ios-deploy:
     name: "🚀 Deploy to TestFlight"
