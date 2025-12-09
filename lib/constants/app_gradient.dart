@@ -16,12 +16,6 @@ class AppGradients {
     colors: [AppColors.lightBlack, AppColors.transparent],
   );
 
-  static final LinearGradient adverticementGradient = LinearGradient(
-    colors: [AppColors.gradientPink, AppColors.gradientBlue],
-    begin: Alignment.topLeft,
-    end: Alignment.centerRight,
-  );
-
   static final LinearGradient succesGradient = LinearGradient(
     colors: [AppColors.gradientLightBlue, AppColors.gradientDarkBlue],
     begin: Alignment.topCenter,

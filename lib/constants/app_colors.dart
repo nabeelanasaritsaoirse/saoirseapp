@@ -22,21 +22,17 @@ class AppColors {
   static const Color shadowColor = Colors.black12;
   static const Color darkGray = Color(0x99000000);
   static const Color mediumGray = Color(0xFF757575);
-  static const Color yellow = Color(0xFFFFF9C4);
 
   //  Accent / Secondary Colors
   static const Color lightAmber = Color(0xFFF4BD46);
   static const Color mediumAmber = Color(0xFFF4BB00);
-  static const Color darkAmber = Color.fromARGB(255, 112, 90, 10);
   static final Color lightBlack = Colors.black.withValues(alpha: 0.15);
   static const Color green = Colors.green;
   static const Color red = Colors.red;
   static const Color orange = Colors.orange;
   static const Color blueshade = Color.fromARGB(255, 175, 214, 246);
-  static const Color blue = Colors.blue;
   static const Color mediumBlue = Color.fromARGB(255, 29, 16, 211);
   static const Color skyBlue = Color(0xFF9BBBFC);
-  static const Color lightRed = Color(0xFFFF5B5B);
   static const Color lightGreen = Color(0xFFE8F5E9);
   static const Color buttonSecondary = Color(0xFF9BBEF4);
   static const Color mediumGreen = Color(0xFFA0D69A);
@@ -44,7 +40,6 @@ class AppColors {
   // 🎨 Gradient Colors
   static const Color gradientLightBlue = Color(0xFF4F4FBC);
   static const Color gradientBlue = Color(0xFF4D0A8E);
-  static const Color gradientPink = Color(0xFFCE048C);
   static const Color gradientDarkBlue = Color(0xFF000062);
   static const Color whiteGradient = Color(0x40FFFFFF);
 }

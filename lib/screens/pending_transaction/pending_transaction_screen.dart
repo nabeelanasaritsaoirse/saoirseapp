@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../constants/app_assets.dart';
 import '../../constants/app_strings.dart';
-import '../../dummy/dummy_assets.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
 import '/constants/app_colors.dart';
@@ -78,7 +78,7 @@ class PendingTransaction extends StatelessWidget {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8.r),
                               child: Image.asset(
-                                DummyAssets.mobile,
+                                AppAssets.mobile,
                                 width: 80.w,
                                 height: 70.h,
                                 fit: BoxFit.contain,

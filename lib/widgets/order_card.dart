@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../constants/app_assets.dart';
 import '../constants/app_colors.dart';
-import '../dummy/dummy_assets.dart';
 import '../models/order_history_model.dart';
 import 'app_dateformatter.dart';
 import 'app_text.dart';
@@ -54,7 +54,7 @@ class OrderCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.lightGrey,
                     image: DecorationImage(
-                      image: AssetImage(DummyAssets.mobile),
+                      image: AssetImage(AppAssets.mobile),
                       fit: BoxFit.contain,
                     ),
                   ),

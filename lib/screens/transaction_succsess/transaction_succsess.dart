@@ -1,10 +1,10 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/my_wallet/my_wallet.dart';
+
+import '../../constants/app_assets.dart';
 import '../../constants/app_strings.dart';
+import '../my_wallet/my_wallet.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 
@@ -29,7 +29,7 @@ class _TransactionsuccsessState extends State<Transactionsuccsess> {
               SizedBox(
                 height: 220.h,
                 child: Image.asset(
-                  'assets/images/payment_Sucsess.1.jpg',
+                  AppAssets.payment_success,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -60,10 +60,10 @@ class _TransactionsuccsessState extends State<Transactionsuccsess> {
                 height: 45.h,
                 width: 300.w,
                 buttonColor: AppColors.primaryColor,
-              onTap: () {
-  // Just close the success screen and go back to the Wallet screen
-  Get.off(() => WalletScreen());
-},
+                onTap: () {
+                  // Just close the success screen and go back to the Wallet screen
+                  Get.off(() => WalletScreen());
+                },
               )
             ],
           ),

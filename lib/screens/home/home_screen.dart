@@ -40,14 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
   InvestmentStatusController investmentController =
       Get.put(InvestmentStatusController());
 
-  // Refactored Icon box
-
-  final List<String> imageList = [
-    AppAssets.success_image_1,
-    AppAssets.success_image_2,
-    AppAssets.success_image_3,
-  ];
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

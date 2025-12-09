@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -23,7 +25,7 @@ class InviteFriendDetailsScreen extends StatelessWidget {
     final controller = Get.put(InviteFriendController(userId));
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.paperColor,
       appBar: CustomAppBar(
         title: AppStrings.refferal_details,
         showBack: true,
@@ -55,139 +57,191 @@ class InviteFriendDetailsScreen extends StatelessWidget {
               // ---------------- HEADER ----------------
               Container(
                 width: double.infinity,
-                constraints: BoxConstraints(minHeight: 140.h),
                 padding: EdgeInsets.symmetric(vertical: 5.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // LEFT SIDE
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      spacing: 6.h,
-                      children: [
-                        appText(
-                          user.name,
-                          fontSize: 17.sp,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textBlack,
-                        ),
-                        SizedBox(
-                          width: 200.w,
-                          child: appText(user.email,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textBlack,
-                              maxLines: 2,
-                              textAlign: TextAlign.start),
-                        ),
-                        SizedBox(height: 10.h),
-                        Row(
-                          spacing: 8.w,
-                          children: [
-                            // Total Products
-                            appButton(
-                              onTap: () {},
-                              width: 96.w,
-                              height: 45.h,
-                              padding: EdgeInsets.all(6.w),
-                              borderRadius: BorderRadius.circular(10.r),
-                              buttonColor: AppColors.buttonSecondary,
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    appText(
-                                      AppStrings.total_product,
-                                      fontSize: 10.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    appText(
-                                      "${user.totalProducts}",
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                            // Total Commission
-                            appButton(
-                              onTap: () {},
-                              width: 96.w,
-                              height: 45.h,
-                              padding: EdgeInsets.all(6.w),
-                              borderRadius: BorderRadius.circular(10.r),
-                              buttonColor: AppColors.mediumGreen,
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    appText(
-                                      AppStrings.my_commission,
-                                      fontSize: 10.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    appText(
-                                      "₹${user.totalCommission}",
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFFE3F2FD).withOpacity(0.6),
+                      Color(0xFFF3E5F5).withOpacity(0.6),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(16.r),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.8),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    // Top shadow
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      blurRadius: 15,
+                      spreadRadius: 1,
+                      offset: Offset(0, -4),
                     ),
-
-                    // RIGHT SIDE (PROFILE PICTURE + MESSAGE)
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      spacing: 8.h,
-                      children: [
-                        Container(
-                          width: 80.w,
-                          height: 80.h,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: user.profilePicture.isNotEmpty
-                                  ? NetworkImage(user.profilePicture)
-                                  : AssetImage(AppAssets.profile_image)
-                                      as ImageProvider,
-                            ),
-                          ),
-                        ),
-                        appButton(
-                          onTap: () {
-                            controller.openChat(name: user.name);
-                          },
-                          width: 89.w,
-                          height: 27.h,
-                          padding: EdgeInsets.all(5.w),
-                          buttonColor: AppColors.mediumAmber,
-                          borderColor: AppColors.darkGray,
-                          child: Center(
-                            child: appText(
-                              AppStrings.message,
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
+                    // Bottom shadow
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.25),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                      offset: Offset(0, 8),
+                    ),
+                    // Left shadow
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.15),
+                      blurRadius: 15,
+                      spreadRadius: 1,
+                      offset: Offset(-4, 0),
+                    ),
+                    // Right shadow
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.15),
+                      blurRadius: 15,
+                      spreadRadius: 1,
+                      offset: Offset(4, 0),
                     ),
                   ],
                 ),
+                child: Padding(
+                  padding: EdgeInsets.all(12.w),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      // LEFT SIDE - Name and Buttons
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            width: 200.w,
+                            height: 40.h,
+                            alignment: Alignment.center,
+                            child: appText(
+                              user.name,
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textBlack,
+                            ),
+                          ),
+
+                          SizedBox(height: 8.h),
+
+                          // Buttons Row
+                          Row(
+                            spacing: 8.w,
+                            children: [
+                              // Total Products
+                              appButton(
+                                onTap: () {},
+                                width: 96.w,
+                                height: 45.h,
+                                padding: EdgeInsets.all(6.w),
+                                borderRadius: BorderRadius.circular(10.r),
+                                buttonColor: AppColors.buttonSecondary,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      appText(
+                                        AppStrings.total_product,
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      appText(
+                                        "${user.totalProducts}",
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              // Total Commission
+                              appButton(
+                                onTap: () {},
+                                width: 96.w,
+                                height: 45.h,
+                                padding: EdgeInsets.all(6.w),
+                                borderRadius: BorderRadius.circular(10.r),
+                                buttonColor: AppColors.mediumGreen,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      appText(
+                                        AppStrings.my_commission,
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      appText(
+                                        "₹${user.totalCommission}",
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+
+                      Spacer(),
+
+                      // RIGHT SIDE - Profile Picture and Message Button
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        spacing: 8.h,
+                        children: [
+                          Container(
+                            width: 80.w,
+                            height: 80.h,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.8),
+                                width: 2,
+                              ),
+                              image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: user.profilePicture.isNotEmpty
+                                    ? NetworkImage(user.profilePicture)
+                                    : AssetImage(AppAssets.user_img)
+                                        as ImageProvider,
+                              ),
+                            ),
+                          ),
+                          appButton(
+                            onTap: () {
+                              controller.openChat(name: user.name);
+                            },
+                            width: 89.w,
+                            height: 32.h,
+                            padding: EdgeInsets.all(5.w),
+                            buttonColor: AppColors.mediumAmber,
+                            borderColor: AppColors.darkGray,
+                            borderRadius: BorderRadius.circular(10.r),
+                            child: Center(
+                              child: appText(
+                                AppStrings.message,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
 
-              SizedBox(height: 10.h),
+              SizedBox(height: 4.h),
               Divider(color: AppColors.grey),
               SizedBox(height: 10.h),
 

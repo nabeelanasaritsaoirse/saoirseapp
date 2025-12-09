@@ -10,12 +10,6 @@ class AppAssets {
 
   //images
   static String onBoard_img = image_path + 'onBoard_img.jpg';
-  static String game_product = "assets/images/ad_image_1.png";
-  static String remote_product = "assets/images/ad_image_2.png";
-  static String earpod_product = "assets/images/product_image_2.png";
-  static String success_image_1 = "assets/images/success_image_1.jpeg";
-  static String success_image_2 = "assets/images/success_image_2.jpeg";
-  static String success_image_3 = "assets/images/success_image_3.jpeg";
   static String refer_image = "assets/images/refer_image.png";
   static String notification = "assets/icons/notification.png";
   static String add_banner = "assets/images/add_banner.jpeg";
@@ -31,10 +25,6 @@ class AppAssets {
   static String delete = "assets/icons/delete.png";
 
   // Product details page
-  static String iphone = "assets/images/phone.png";
-  static String iphoneRed = "assets/images/iphone_red.png";
-  static String iphoneYellow = "assets/images/Iphone_yellow.png";
-  static String iphoneblack = "assets/images/iphone_black.png";
   static String upiImage = "assets/images/upi.png";
   static String paytmImage = "assets/images/paytm.png";
   static String paypalImage = "assets/images/paypal.png";
@@ -67,9 +57,11 @@ class AppAssets {
   static String faq = "assets/icons/faq.png";
   static String about = "assets/icons/about.png";
   static String logout = "assets/icons/log_out.png";
-  static String kyc ="assets/icons/KYC.png";
+  static String kyc = "assets/icons/KYC.png";
 
+  //Dummy Assets for image needed response
+  static String mobile = "assets/images/phone.png";
 
-  // Edit Profile Screen
-  static String edit_profile_bg = "assets/images/dummy_profile.jpg";
+  //Payment Success Image
+  static String payment_success = "assets/images/payment_Sucsess.1.jpg";
 }
