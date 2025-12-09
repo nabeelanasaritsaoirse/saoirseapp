@@ -113,6 +113,24 @@ jobs:
           </plist>
           EOF
 
+      - name: 🔧 Force Manual AppStore Signing (No Development Cert Needed)
+        run: |
+          FILE="ios/Runner.xcodeproj/project.pbxproj"
+          
+          # Force manual signing
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$FILE"
+
+          # Set distribution signing identity
+          sed -i '' 's/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer"/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution"/g' "$FILE"
+
+          # Set team
+          sed -i '' 's/DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = BYQUNNQSQH;/g' "$FILE"
+
+          # Set provisioning profile for Release
+          sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = .*/PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.saoirse.epi";/g' "$FILE"
+          
+          echo "Applied manual signing for Release build"
+
       # ---------------- Build + Archive ----------------
       - name: 🏗️ Archive Build
         run: |
