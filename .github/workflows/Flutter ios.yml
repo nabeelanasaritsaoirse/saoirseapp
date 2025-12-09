@@ -131,27 +131,26 @@ jobs:
       - name: 🏗️ Archive Build
         run: |
           cd ios
-          mkdir -p build/ios
-
           xcodebuild clean archive \
             -workspace Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
-            -archivePath build/ios/Runner.xcarchive \
+            -archivePath ../build/ios/archive/Runner.xcarchive \
             -destination 'generic/platform=iOS' \
             DEVELOPMENT_TEAM=BYQUNNQSQH \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE_SPECIFIER="match AppStore com.saoirse.epi" \
             -allowProvisioningUpdates \
             | tee ../xcodebuild.log
+      
 
       # ---------------- Export IPA ----------------
       - name: 📦 Export IPA
         run: |
           cd ios
           xcodebuild -exportArchive \
-            -archivePath build/ios/Runner.xcarchive \
-            -exportPath build/ios/ipa \
+            -archivePath ../build/ios/archive/Runner.xcarchive \
+            -exportPath ../build/ios/ipa \
             -exportOptionsPlist ExportOptions.plist \
             | tee ../export.log
 
@@ -160,7 +159,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
-          path: ios/build/ios/ipa/*.ipa
+          path: build/ios/ipa/*.ipa
+
 
   # ---------------- TestFlight Deployment ----------------
   ios-deploy:
