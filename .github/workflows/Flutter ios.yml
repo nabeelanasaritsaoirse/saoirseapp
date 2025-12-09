@@ -66,8 +66,9 @@ jobs:
       - name: 🔐 Download Certificates via Match
         run: |
           cd ios
-          MATCH_PASSWORD="${{ secrets.MATCH_PASSWORD }}" fastlane match appstore --readonly --verbose
-          MATCH_PASSWORD="${{ secrets.MATCH_PASSWORD }}" fastlane match development --readonly --verbose
+          MATCH_PASSWORD="${{ secrets.MATCH_PASSWORD }}"  fastlane match appstore --readonly --api_key_path api_key.json --git_branch master
+          # MATCH_PASSWORD="${{ secrets.MATCH_PASSWORD }}" fastlane match development --readonly --api_key_path api_key.json --git_branch master
+
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
