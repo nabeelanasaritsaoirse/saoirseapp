@@ -108,13 +108,37 @@ jobs:
           </plist>
           EOF
 
-      - name: 🔧 Force Manual AppStore Signing
+      # - name: 🔧 Force Manual AppStore Signing
+      #   run: |
+      #     FILE="ios/Runner.xcodeproj/project.pbxproj"
+      #     sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$FILE"
+      #     sed -i '' 's/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer"/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution"/g' "$FILE"
+      #     sed -i '' 's/DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = BYQUNNQSQH;/g' "$FILE"
+      #     sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = .*/PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.saoirse.epi";/g' "$FILE"
+
+      - name: 🔧 Force App Store Signing (Fix Development Certificate Issue)
         run: |
           FILE="ios/Runner.xcodeproj/project.pbxproj"
+
+          echo "🔧 Updating signing settings in project.pbxproj..."
+
+          # 1. Force Manual Signing everywhere
           sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$FILE"
-          sed -i '' 's/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer"/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution"/g' "$FILE"
+
+          # 2. Replace all Development signing identities with Distribution
+          sed -i '' 's/Apple Development:[^"]*/iPhone Distribution: Samuel Victor Machael (BYQUNNQSQH)/g' "$FILE"
+
+          # 3. Replace any developer identity in SDK sections
+          sed -i '' 's/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "Apple Development:[^"]*"/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Samuel Victor Machael (BYQUNNQSQH)"/g' "$FILE"
+
+          # 4. Force team ID
           sed -i '' 's/DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = BYQUNNQSQH;/g' "$FILE"
-          sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = .*/PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.saoirse.epi";/g' "$FILE"
+
+          # 5. Set provisioning profile for Release build
+          sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = .*;/PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.saoirse.epi";/g' "$FILE"
+
+          echo "✅ App Store signing applied successfully."
+
 
       - name: 🏗️ Archive Build
         run: |
