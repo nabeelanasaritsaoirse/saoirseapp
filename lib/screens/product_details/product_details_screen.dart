@@ -43,6 +43,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       ),
     );
     super.initState();
+    controller.checkIfInWishlist(widget.productId);
   }
 
   @override
@@ -253,7 +254,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   /// FAVORITE BUTTON
                   Obx(() {
                     return GestureDetector(
-                      onTap: controller.toggleFavorite,
+                      onTap: () => controller.toggleFavorite(product.id),
                       child: Container(
                         width: 40.w,
                         height: 40.h,
@@ -519,7 +520,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     selectVarientId: controller.selectedVariantId.value,
                     selectedDays: selectedDays,
                     selectedAmount: selectedAmount,
-                  
                   ),
                 );
               },

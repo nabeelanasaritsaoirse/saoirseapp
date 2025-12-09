@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -62,7 +63,12 @@ class CartScreen extends StatelessWidget {
                 itemCount: controller.cartData.value!.products.length,
                 itemBuilder: (context, index) {
                   final item = controller.cartData.value!.products[index];
-
+                  final variantText = buildVariantText({
+                    "color": item.variant?.attributes.color,
+                    "weight": item.variant?.attributes.weight,
+                    "size": item.variant?.attributes.size,
+                    "material": item.variant?.attributes.material,
+                  });
                   return Container(
                     margin: EdgeInsets.only(bottom: 15.h),
                     padding: EdgeInsets.all(10.w),
@@ -129,16 +135,19 @@ class CartScreen extends StatelessWidget {
                                     textAlign: TextAlign.start,
                                   ),
                                   SizedBox(height: 3.h),
-                                  appText("red   |   512gb",
-                                      fontSize: 13.sp,
-                                      color: AppColors.black54),
+                                  if (variantText.isNotEmpty)
+                                    appText(variantText,
+                                        fontSize: 13.sp,
+                                        color: AppColors.black54),
                                   SizedBox(height: 3.h),
-                                  appText("₹ ${item.price}",
+                                  appText("₹ ${item.finalPrice}",
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.bold),
                                   SizedBox(height: 3.h),
-                                  appText("Plan - ₹100/200 Day",
-                                      fontSize: 12.sp, color: AppColors.black87)
+                                  appText(
+                                      "Plan - ₹${item.installmentPlan.dailyAmount}/${item.installmentPlan.totalDays} Days",
+                                      fontSize: 12.sp,
+                                      color: AppColors.black87)
                                 ],
                               ),
                             ),
@@ -211,7 +220,7 @@ class CartScreen extends StatelessWidget {
                                         item.installmentPlan.totalDays,
                                     selectedAmount:
                                         item.installmentPlan.dailyAmount,
-                                        quantity: item.quantity,
+                                    quantity: item.quantity,
                                   ));
                             },
                             child: Container(
@@ -243,5 +252,47 @@ class CartScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String buildVariantText(Map<String, dynamic>? attributes) {
+    if (attributes == null) return '';
+
+    // Filter only non-null & non-empty values
+    Map<String, String> valid = {};
+    attributes.forEach((k, v) {
+      if (v != null && v.toString().trim().isNotEmpty) {
+        valid[k] = v.toString().trim();
+      }
+    });
+
+    if (valid.isEmpty) return ""; // No values → Hide widget
+
+    String? color = valid["color"];
+    String? weight = valid["weight"];
+
+    // Convert remaining attributes (exclude color & weight)
+    List<String> others = valid.entries
+        .where((e) => e.key != "color" && e.key != "weight")
+        .map((e) => e.value)
+        .toList();
+
+    //  color + weight available → show only these two
+    if (color != null && weight != null) {
+      return "$color   |   $weight";
+    }
+
+    //  color exists → color + one fallback (if exists)
+    if (color != null) {
+      if (weight != null) return "$color   |   $weight";
+      if (others.isNotEmpty) return "$color   |   ${others.first}";
+      return color; // only one → show it
+    }
+
+    // 3no color → use weight + fallback (max 2)
+    List<String> finalList = [];
+    if (weight != null) finalList.add(weight);
+    finalList.addAll(others);
+
+    return finalList.take(2).join("   |   "); // one or two both show
   }
 }
