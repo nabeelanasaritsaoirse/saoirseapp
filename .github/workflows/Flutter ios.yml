@@ -119,7 +119,7 @@ jobs:
                 end
               end
             end
-              EOF
+            EOF
           else
             echo "Podfile already patched (AUTO_PATCH_PRIVACY_SIGNING_FOR_CI)."
           fi
