@@ -1,9 +1,9 @@
 // ignore_for_file: avoid_print
 
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/product_details_model.dart';
 
 import '../../models/cart_response_model.dart';
+import '../../models/product_details_model.dart';
 import '../../services/cart_service.dart';
 import '../../widgets/app_toast.dart';
 
