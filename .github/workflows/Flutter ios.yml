@@ -61,18 +61,18 @@ jobs:
           sudo gem install cocoapods -N
 
       - name: 🔐 Create API Key File
-        run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}" > ios/api_key.json
+        run: |
+          mkdir -p ios
+          cat << 'EOF' > ios/api_key.json
+          ${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}
+          EOF
 
-      - name: 🔐 Download Certificates via Match (AppStore + Development)
+      - name: 🔐 Download Certificates via Match (AppStore Only)
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
           cd ios
-          # Distribution certificate (for signing IPA)
-          fastlane match appstore --readonly --api_key_path ./ios/api_key.json --git_branch master
-
-          # Development certificate (required by Xcode archiver)
-          # fastlane match development --readonly --api_key_path api_key.json --git_branch master
+          fastlane match appstore --readonly --api_key_path ./api_key.json --git_branch master
 
       # ---------------- iOS Dependencies ----------------
       - name: 🧨 Reset Pods
