@@ -93,8 +93,6 @@ jobs:
           # If Podfile already contains our helper, skip adding it again.
           if ! grep -q "AUTO_PATCH_PRIVACY_SIGNING_FOR_CI" Podfile 2>/dev/null; then
             cat >> Podfile <<'EOF'
-
-            # AUTO_PATCH_PRIVACY_SIGNING_FOR_CI
             post_install do |installer|
               installer.pods_project.targets.each do |target|
                 target.build_configurations.each do |config|
@@ -121,12 +119,12 @@ jobs:
                 end
               end
             end
-            
-            EOF
-                      else
-                        echo "Podfile already patched (AUTO_PATCH_PRIVACY_SIGNING_FOR_CI)."
-                      fi
-                      cd ..
+              EOF
+          else
+            echo "Podfile already patched (AUTO_PATCH_PRIVACY_SIGNING_FOR_CI)."
+          fi
+          cd ..
+
 
       - name: 🧨 Install Pods (repo update)
         run: |
