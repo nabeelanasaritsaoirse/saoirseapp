@@ -159,11 +159,13 @@ jobs:
 
       - name: 📦 Export IPA
         run: |
+          cd ios   # <--- REQUIRED FIX
           xcodebuild -exportArchive \
-            -archivePath ios/build/ios/Runner.xcarchive \
-            -exportPath ios/build/ios/ipa \
-            -exportOptionsPlist ios/ExportOptions.plist \
-            | tee export.log
+            -archivePath build/ios/Runner.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist ExportOptions.plist \
+            | tee ../export.log
+
 
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
