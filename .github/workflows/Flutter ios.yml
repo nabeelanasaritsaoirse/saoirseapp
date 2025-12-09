@@ -70,7 +70,7 @@ jobs:
         run: |
           cd ios
           fastlane match appstore --readonly --api_key_path ./api_key.json --git_branch master
-          fastlane match development --readonly --api_key_path ./api_key.json --git_branch master
+          # fastlane match development --readonly --api_key_path ./api_key.json --git_branch master
 
       - name: 🧨 Reset Pods
         run: |
@@ -138,13 +138,12 @@ jobs:
           sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = .*;/PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.saoirse.epi";/g' "$FILE"
 
           echo "✅ App Store signing applied successfully."
-
-
+          
       - name: 🏗️ Archive Build
         run: |
           mkdir -p ios/build/ios
-
-          xcodebuild archive \
+      
+          xcodebuild clean archive \
             -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
@@ -153,7 +152,9 @@ jobs:
             DEVELOPMENT_TEAM=BYQUNNQSQH \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE_SPECIFIER="match AppStore com.saoirse.epi" \
+            -allowProvisioningUpdates \
             | tee xcodebuild.log
+
 
       - name: 📦 Export IPA
         run: |
