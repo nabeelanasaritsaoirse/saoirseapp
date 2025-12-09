@@ -123,6 +123,10 @@ jobs:
 
           echo "✅ Runner Release signing applied."
 
+      - name: 🔨 Prepare Flutter build for Xcode 16
+        run: flutter build ios --release --no-codesign --config-only
+
+
       # ---------------- Archive ----------------
       - name: 🏗️ Archive Build
         run: |
