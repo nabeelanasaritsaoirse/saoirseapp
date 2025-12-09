@@ -104,7 +104,7 @@ class ProductDetailsController extends GetxController {
 
       if (removed) {
         isFavorite(false);
-        appToast(content: "Removed from wishlist");
+        appToaster(content: "Removed from wishlist");
       } else {
         appToast(content: "Failed to remove from wishlist", error: true);
       }
@@ -116,7 +116,7 @@ class ProductDetailsController extends GetxController {
 
     if (added) {
       isFavorite(true);
-      appToast(content: "Added to wishlist");
+      appToaster(content: "Added to wishlist");
     } else {
       appToast(content: "Failed to add wishlist", error: true);
     }

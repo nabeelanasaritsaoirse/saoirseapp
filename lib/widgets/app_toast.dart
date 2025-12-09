@@ -21,7 +21,7 @@ void appToaster({
     msg: content,
     toastLength: Toast.LENGTH_SHORT,
     gravity: ToastGravity.BOTTOM,
-    backgroundColor: error ? AppColors.red : AppColors.green,
+    backgroundColor: error ? AppColors.black : AppColors.black,
     textColor: AppColors.white,
     fontSize: 14.0,
   );
