@@ -86,44 +86,44 @@ jobs:
         run: |
           rm -rf ios/Pods ios/Podfile.lock ios/.symlinks ios/Flutter/Flutter.framework ios/Flutter/App.framework || true
 
-      - name: 🔧 Patch Podfile to avoid manual signing for privacy/resource bundles
-        run: |
-          set -euo pipefail
-          cd ios
-          # If Podfile already contains our helper, skip adding it again.
-          if ! grep -q "AUTO_PATCH_PRIVACY_SIGNING_FOR_CI" Podfile 2>/dev/null; then
-            cat >> Podfile <<'EOF'
-            post_install do |installer|
-              installer.pods_project.targets.each do |target|
-                target.build_configurations.each do |config|
-                  # Ensure pods don't try to use manual provisioning (privacy/resource bundles)
-                  if target.name.downcase.include?('privacy') || target.name.end_with?('-Resources') || target.name.end_with?('_Resources')
-                    config.build_settings['CODE_SIGN_IDENTITY'] = ''
-                    config.build_settings['CODE_SIGN_STYLE'] = 'Automatic'
-                    config.build_settings.delete('PROVISIONING_PROFILE_SPECIFIER')
-                    config.build_settings.delete('DEVELOPMENT_TEAM')
-                  end
+      # - name: 🔧 Patch Podfile to avoid manual signing for privacy/resource bundles
+      #   run: |
+      #     set -euo pipefail
+      #     cd ios
+      #     # If Podfile already contains our helper, skip adding it again.
+      #     if ! grep -q "AUTO_PATCH_PRIVACY_SIGNING_FOR_CI" Podfile 2>/dev/null; then
+      #       cat >> Podfile <<'EOF'
+      #       post_install do |installer|
+      #         installer.pods_project.targets.each do |target|
+      #           target.build_configurations.each do |config|
+      #             # Ensure pods don't try to use manual provisioning (privacy/resource bundles)
+      #             if target.name.downcase.include?('privacy') || target.name.end_with?('-Resources') || target.name.end_with?('_Resources')
+      #               config.build_settings['CODE_SIGN_IDENTITY'] = ''
+      #               config.build_settings['CODE_SIGN_STYLE'] = 'Automatic'
+      #               config.build_settings.delete('PROVISIONING_PROFILE_SPECIFIER')
+      #               config.build_settings.delete('DEVELOPMENT_TEAM')
+      #             end
             
-                  # Raise minimum iOS target to 12.0 for pods that demand newer runtime
-                  if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
-                    begin
-                      if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 12.0
-                        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
-                      end
-                    rescue
-                      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
-                    end
-                  else
-                    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
-                  end
-                end
-              end
-            end
-            EOF
-          else
-            echo "Podfile already patched (AUTO_PATCH_PRIVACY_SIGNING_FOR_CI)."
-          fi
-          cd ..
+      #             # Raise minimum iOS target to 12.0 for pods that demand newer runtime
+      #             if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+      #               begin
+      #                 if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 12.0
+      #                   config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+      #                 end
+      #               rescue
+      #                 config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+      #               end
+      #             else
+      #               config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+      #             end
+      #           end
+      #         end
+      #       end
+      #       EOF
+      #     else
+      #       echo "Podfile already patched (AUTO_PATCH_PRIVACY_SIGNING_FOR_CI)."
+      #     fi
+      #     cd ..
 
 
       - name: 🧨 Install Pods (repo update)
