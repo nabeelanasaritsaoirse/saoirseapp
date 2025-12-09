@@ -47,7 +47,7 @@ class ProductDetailsController extends GetxController {
     super.onInit();
     scrollController.addListener(_scrollListener);
     fetchProductDetails();
-    checkIfInWishlist();
+    checkIfInWishlist(productId);
   }
 
   // FETCH PRODUCT DETAILS
@@ -70,37 +70,29 @@ class ProductDetailsController extends GetxController {
     }
   }
 
-  Future<void> checkIfInWishlist() async {
-    // ✅ Check if id is null before using it
-    if (id == null) {
-      log("ID is null, skipping wishlist check");
-      return;
-    }
-
+  Future<void> checkIfInWishlist(String id) async {
     try {
-      final exists = await wishlistService.checkWishlist(id!);
+      final exists = await wishlistService.checkWishlist(id);
       isFavorite.value = exists;
     } catch (e) {
       log("ERROR CHECKING WISHLIST: $e");
     }
   }
 
-  Future<void> toggleFavorite() async {
+  Future<void> toggleFavorite(String id) async {
     final productData = product.value;
 
     if (productData == null) {
       appToast(content: "Product not loaded");
       return;
     }
-
-    // Check if id is null
-    if (id == null) {
-      appToast(content: "Product ID not available", error: true);
+    if (id.isEmpty) {
+      appToast(content: "Invalid Product ID", error: true);
       return;
     }
 
     if (isFavorite.value) {
-      final removed = await wishlistService.removeFromWishlist(id!);
+      final removed = await wishlistService.removeFromWishlist(id);
 
       if (removed) {
         isFavorite(false);
@@ -112,7 +104,7 @@ class ProductDetailsController extends GetxController {
       return;
     }
 
-    final added = await wishlistService.addToWishlist(id!);
+    final added = await wishlistService.addToWishlist(id);
 
     if (added) {
       isFavorite(true);
