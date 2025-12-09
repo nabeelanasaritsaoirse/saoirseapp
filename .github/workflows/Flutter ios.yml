@@ -3,7 +3,7 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
 on:
   push:
-    branches: [ nabeeela ]
+    branches: [ nabeeela ]   # CHECK THIS SPELLING
 
 concurrency:
   group: ios-build-${{ github.ref }}
@@ -20,7 +20,6 @@ jobs:
     timeout-minutes: 90
 
     steps:
-      # ---------------- Git + Flutter setup ----------------
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
@@ -34,7 +33,6 @@ jobs:
       - name: 📦 Flutter Pub Get
         run: flutter pub get
 
-      # ---------------- Environment ----------------
       - name: 🔑 Create .env file
         run: |
           cat > .env <<EOF
@@ -54,7 +52,6 @@ jobs:
           mkdir -p ios/Runner
           cp .env ios/Runner/.env
 
-      # ---------------- Fastlane + Match ----------------
       - name: 🚀 Install Fastlane & CocoaPods
         run: |
           sudo gem install fastlane -N
@@ -72,24 +69,18 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
           cd ios
-          # AppStore signing
           fastlane match appstore --readonly --api_key_path ./api_key.json --git_branch master
-      
-          # Development cert required for archive
           fastlane match development --readonly --api_key_path ./api_key.json --git_branch master
 
-      # ---------------- iOS Dependencies ----------------
       - name: 🧨 Reset Pods
         run: |
           rm -rf ios/Pods ios/Podfile.lock ios/.symlinks ios/Flutter/Flutter.framework ios/Flutter/App.framework
           cd ios
           pod install --repo-update
 
-      # ---------------- Build Flutter (no signing) ----------------
       - name: 🔨 Build Flutter iOS Framework (No Codesign)
         run: flutter build ios --release --no-codesign
 
-      # ---------------- Create ExportOptions.plist ----------------
       - name: 📝 Create ExportOptions.plist
         run: |
           cat > ios/ExportOptions.plist <<'EOF'
@@ -117,42 +108,18 @@ jobs:
           </plist>
           EOF
 
-      - name: 🔧 Force Manual AppStore Signing (No Development Cert Needed)
+      - name: 🔧 Force Manual AppStore Signing
         run: |
           FILE="ios/Runner.xcodeproj/project.pbxproj"
-          
-          # Force manual signing
           sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$FILE"
-
-          # Set distribution signing identity
           sed -i '' 's/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer"/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution"/g' "$FILE"
-
-          # Set team
           sed -i '' 's/DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = BYQUNNQSQH;/g' "$FILE"
-
-          # Set provisioning profile for Release
           sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = .*/PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.saoirse.epi";/g' "$FILE"
-          
-          echo "Applied manual signing for Release build"
-
-      # ---------------- Build + Archive ----------------
-      # - name: 🏗️ Archive Build
-      #   run: |
-      #     xcodebuild archive \
-      #       -workspace ios/Runner.xcworkspace \
-      #       -scheme Runner \
-      #       -configuration Release \
-      #       -archivePath build/ios/Runner.xcarchive \
-      #       -destination 'generic/platform=iOS' \
-      #       DEVELOPMENT_TEAM=BYQUNNQSQH \
-      #       CODE_SIGN_STYLE=Manual \
-      #       PROVISIONING_PROFILE_SPECIFIER="match AppStore com.saoirse.epi" \
-      #       | tee xcodebuild.log
 
       - name: 🏗️ Archive Build
         run: |
           mkdir -p ios/build/ios
-      
+
           xcodebuild archive \
             -workspace ios/Runner.xcworkspace \
             -scheme Runner \
@@ -164,8 +131,6 @@ jobs:
             PROVISIONING_PROFILE_SPECIFIER="match AppStore com.saoirse.epi" \
             | tee xcodebuild.log
 
-
-      # ---------------- Export IPA ----------------
       - name: 📦 Export IPA
         run: |
           xcodebuild -exportArchive \
@@ -178,7 +143,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
-          path: build/ios/ipa/*.ipa
+          path: ios/build/ios/ipa/*.ipa   # FIXED PATH
 
       - name: 📋 Upload Logs if Failure
         if: failure()
@@ -189,9 +154,6 @@ jobs:
             xcodebuild.log
             export.log
 
-  # -----------------------------------------------------
-  # 🚀 TestFlight Upload Stage
-  # -----------------------------------------------------
   ios-deploy:
     name: "🚀 Deploy to TestFlight"
     needs: ios-ci
@@ -223,3 +185,4 @@ jobs:
 
       - name: 🧹 Cleanup
         run: rm -f api_key.json
+
