@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import '../constants/app_assets.dart';
 import '../constants/app_colors.dart';
 import '../models/order_history_model.dart';
 import 'app_dateformatter.dart';
@@ -53,11 +51,15 @@ class OrderCard extends StatelessWidget {
                   height: 72.h,
                   decoration: BoxDecoration(
                     color: AppColors.lightGrey,
-                    image: DecorationImage(
-                      image: AssetImage(AppAssets.mobile),
-                      fit: BoxFit.contain,
-                    ),
+                    borderRadius: BorderRadius.circular(5),
                   ),
+                  child: order.image.isNotEmpty
+                      ? Image.network(
+                          order.image,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) => Icon(Icons.image_not_supported, size: 30, color: Colors.grey),
+                        )
+                      : Icon(Icons.image_not_supported, size: 30, color: Colors.grey),
                 ),
 
                 SizedBox(width: 12.w),
@@ -69,11 +71,7 @@ class OrderCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         appText(order.name,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textBlack,
-                            maxLines: 2,
-                            textAlign: TextAlign.start),
+                            fontSize: 16.sp, fontWeight: FontWeight.w600, color: AppColors.textBlack, maxLines: 2, textAlign: TextAlign.start),
                         SizedBox(height: 4.h),
                         appText(
                           order.color,
@@ -128,8 +126,7 @@ class OrderCard extends StatelessWidget {
                       SizedBox(height: 8.h),
                       _textSpan('Order ID : ', order.id),
                       SizedBox(height: 8.h),
-                      _textSpan(
-                          'Invested : ', '${order.currency} ${order.invested}'),
+                      _textSpan('Invested : ', '${order.currency} ${order.invested}'),
                     ],
                   ),
                 ),
@@ -142,26 +139,15 @@ class OrderCard extends StatelessWidget {
                     RichText(
                       text: TextSpan(
                         children: [
-                          TextSpan(
-                              text: 'Status : ',
-                              style: TextStyle(
-                                  fontSize: 15.sp,
-                                  color: AppColors.textGray,
-                                  fontWeight: FontWeight.w500)),
-                          TextSpan(
-                              text: order.status,
-                              style: TextStyle(
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: statusColor)),
+                          TextSpan(text: 'Status : ', style: TextStyle(fontSize: 15.sp, color: AppColors.textGray, fontWeight: FontWeight.w500)),
+                          TextSpan(text: order.status, style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500, color: statusColor)),
                         ],
                       ),
                     ),
                     SizedBox(height: 8.h),
                     _textSpan('Open : ', DateFormatter.format(order.openDate)),
                     SizedBox(height: 8.h),
-                    _textSpan(
-                        'Close : ', DateFormatter.format(order.closeDate)),
+                    _textSpan('Close : ', DateFormatter.format(order.closeDate)),
                   ],
                 ),
               ],
@@ -177,18 +163,8 @@ class OrderCard extends StatelessWidget {
     return RichText(
       text: TextSpan(
         children: [
-          TextSpan(
-              text: label,
-              style: TextStyle(
-                  fontSize: 15.sp,
-                  color: AppColors.textGray,
-                  fontWeight: FontWeight.w500)),
-          TextSpan(
-              text: value,
-              style: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textBlack)),
+          TextSpan(text: label, style: TextStyle(fontSize: 15.sp, color: AppColors.textGray, fontWeight: FontWeight.w500)),
+          TextSpan(text: value, style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500, color: AppColors.textBlack)),
         ],
       ),
       maxLines: maxLines,

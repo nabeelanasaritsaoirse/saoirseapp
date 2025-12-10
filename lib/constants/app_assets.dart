@@ -16,6 +16,7 @@ class AppAssets {
 
   //icons
   static String google_icon = "assets/icons/google_icon.webp";
+  static String qr_code_icon = "assets/images/qr_code_icon.png";
 
   // Categroy Screens
   static String search = "assets/icons/search.png";

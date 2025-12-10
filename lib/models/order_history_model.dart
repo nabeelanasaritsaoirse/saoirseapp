@@ -59,6 +59,12 @@ class OrderHistoryItem {
     final attributes = variant?["attributes"] ?? {};
     final payment = json["paymentDetails"] ?? {};
 
+    final images = (product["images"] as List?) ?? [];
+    String imageUrl = "";
+    if (images.isNotEmpty && images[0]?["url"] != null) {
+    imageUrl = images[0]["url"];
+    }
+
     return OrderHistoryItem(
         id: json["_id"] ?? "",
         name: product["name"] ?? "",
@@ -66,7 +72,7 @@ class OrderHistoryItem {
         storage: product["variantId"] ?? "", // no storage provided in API
         price: pricing["finalPrice"] ?? 0,
         qty: 1, // API has no quantity field, default 1
-        image: "", // API returns images array but now empty
+        image: imageUrl,  // API returns images array but now empty
         dailyPlan:
             "₹${payment["dailyAmount"] ?? 0}/${payment["totalDuration"] ?? 0} Days",
         status: json["orderStatus"] ?? "",
