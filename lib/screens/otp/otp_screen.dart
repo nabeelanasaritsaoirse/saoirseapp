@@ -133,20 +133,29 @@ class VerifyOTPScreen extends StatelessWidget {
 
                 SizedBox(height: 20.h),
 
-                GestureDetector(
-                  onTap: () async {
-                    bool sent =
-                        await AuthService.sendOTP(phoneNumber, isResend: true);
-                    log("🔁 RESEND STATUS: $sent");
-                  },
-                  child: appText(
-                    "Resend code",
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.primaryColor,
-                    fontSize: 14.sp,
-                    fontFamily: "Poppins",
-                  ),
-                ),
+                Obx(() {
+                  return GestureDetector(
+                    onTap: controller.canResend.value
+                        ? () async {
+                            bool sent = await AuthService.sendOTP(phoneNumber,
+                                isResend: true);
+                            if (sent) controller.startTimer();
+                          }
+                        : null, // 🔐 disabled until timer ends
+
+                    child: appText(
+                      controller.canResend.value
+                          ? "Resend code" // after timer ends
+                          : "Resend in ${controller.secondsRemaining}s", // countdown
+                      fontWeight: FontWeight.w500,
+                      color: controller.canResend.value
+                          ? AppColors.primaryColor // active color
+                          : AppColors.grey, // disabled color
+                      fontSize: 14.sp,
+                      fontFamily: "Poppins",
+                    ),
+                  );
+                }),
 
                 SizedBox(height: 40.h),
 

@@ -649,7 +649,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 75.h,
                       ),
                       appButton(
-                          onTap: () {},
+                          onTap: () {
+                            Get.to(() => ProductListing());
+                          },
                           buttonColor: AppColors.white,
                           borderRadius: BorderRadius.circular(5.r),
                           padding: EdgeInsets.all(0),

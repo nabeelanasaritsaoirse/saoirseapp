@@ -65,24 +65,6 @@ class NotificationList extends StatelessWidget {
   Widget build(BuildContext context) {
     return NotificationInfiniteScroll(
       controller: controller,
-      child: ListView.builder(
-        padding: EdgeInsets.all(16.r),
-        itemCount: controller.notifications.length +
-            (controller.hasMore.value ? 1 : 0),
-        itemBuilder: (context, index) {
-          /// SHOW LOADER AT END WHILE PAGINATING
-          if (index == controller.notifications.length) {
-            return Padding(
-              padding: EdgeInsets.all(16.r),
-              child: Center(child: appLoader()),
-            );
-          }
-
-          final item = controller.notifications[index];
-
-          return NotificationCard(item);
-        },
-      ),
     );
   }
 }
@@ -186,12 +168,10 @@ class NotificationCard extends StatelessWidget {
 
 /// INFINITE SCROLL (pagination)
 class NotificationInfiniteScroll extends StatefulWidget {
-  final Widget child;
   final NotificationController controller;
 
   const NotificationInfiniteScroll({
     super.key,
-    required this.child,
     required this.controller,
   });
 
@@ -220,6 +200,28 @@ class _NotificationInfiniteScrollState
 
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(controller: scrollController, child: widget.child);
+    return Obx(() {
+      return ListView.builder(
+        controller: scrollController,
+        padding: EdgeInsets.all(16.r),
+        itemCount: widget.controller.notifications.length +
+            (widget.controller.hasMore.value ? 1 : 0),
+        itemBuilder: (context, index) {
+          /// SHOW LOADER AT END WHILE PAGINATING
+          if (index == widget.controller.notifications.length) {
+            return widget.controller.isLoading.value
+                ? Padding(
+                    padding: EdgeInsets.all(16.r),
+                    child: Center(child: appLoader()),
+                  )
+                : const SizedBox.shrink();
+          }
+
+          final item = widget.controller.notifications[index];
+
+          return NotificationCard(item);
+        },
+      );
+    });
   }
 }
