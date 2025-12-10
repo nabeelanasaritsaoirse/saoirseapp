@@ -23,7 +23,7 @@ env:
 jobs:
   ios-ci:
     runs-on: macos-latest
-    timeout-minutes: 90
+    timeout-minutes: 120  # Increased timeout
 
     steps:
       # ---------------- Checkout ----------------
@@ -54,7 +54,7 @@ jobs:
           ANDROID_MESSAGING_SENDER_ID=${{ secrets.ANDROID_MESSAGING_SENDER_ID }}
           ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
           EOF
-
+      
       - name: 📋 Copy .env to iOS Runner
         run: |
           mkdir -p ios/Runner
@@ -83,18 +83,32 @@ jobs:
           fastlane match appstore --readonly --api_key_path ./api_key.json --git_branch master
           cd ..
 
+      # ---------------- Cache DerivedData ----------------
+      - name: 💾 Cache Xcode DerivedData
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData
+            ios/Pods
+          key: ${{ runner.os }}-xcode-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-xcode-
+
       # ---------------- Podfile Signing Fix ----------------
       - name: 📌 Export TEAM_ID for Podfile
         run: echo "TEAM_ID=${{ env.TEAM_ID }}" >> $GITHUB_ENV
 
-      - name: 🧨 Reset Pods
-        run: rm -rf ios/Pods ios/Podfile.lock
+      - name: 🧨 Reset Pods (if not cached)
+        run: |
+          if [ ! -d "ios/Pods" ]; then
+            echo "Pods not cached, installing fresh..."
+            rm -rf ios/Podfile.lock
+          fi
       
       - name: 🧨 Install Pods
         run: |
           cd ios
           pod install --repo-update
-
 
       # ---------------- Flutter build ----------------
       - name: 🔨 Build Flutter iOS (No Codesign)
@@ -127,25 +141,27 @@ jobs:
           </plist>
           EOF
 
-     # ---------------- Archive ----------------
-      - name: 🏗️ Archive Build (Runner only)
+      # ---------------- Archive ----------------
+      - name: 🏗️ Archive Build (arm64 only - faster)
         run: |
           set -e
           cd ios
           mkdir -p ../${{ env.ARCHIVE_DIR }}
           mkdir -p ../${{ env.IPA_DIR }}
-          xcodebuild clean archive \
+          xcodebuild archive \
             -workspace Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
             -archivePath ../${{ env.ARCHIVE_DIR }}/Runner.xcarchive \
             -destination 'generic/platform=iOS' \
+            -arch arm64 \
             DEVELOPMENT_TEAM=${{ env.TEAM_ID }} \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE_SPECIFIER="match AppStore ${{ env.BUNDLE_ID }}" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
+            ONLY_ACTIVE_ARCH=NO \
             | tee ../xcodebuild.log
-            
+
       - name: ✅ Verify Archive
         run: |
           if [ ! -d "${{ env.ARCHIVE_DIR }}/Runner.xcarchive" ]; then
@@ -185,13 +201,13 @@ jobs:
           path: ${{ env.IPA_DIR }}/*.ipa
 
       - name: 📋 Upload build logs
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ios-build-logs
           path: |
-            ios/xcodebuild.log
-            ios/export.log
-
+            xcodebuild.log
+            export.log
 
   # ---------------- TestFlight Deployment ----------------
   ios-deploy:
