@@ -83,14 +83,13 @@ jobs:
           fastlane match appstore --readonly --api_key_path ./api_key.json --git_branch master
           cd ..
 
-      # ---------------- Reset Pods ----------------
-      - name: 🧨 Reset Pods
-        run: |
-          rm -rf ios/Pods ios/Podfile.lock ios/.symlinks
+      # ---------------- Podfile Signing Fix ----------------
+      - name: 📌 Export TEAM_ID for Podfile
+        run: echo "TEAM_ID=${{ env.TEAM_ID }}" >> $GITHUB_ENV
 
-    
-          
-      # ---------------- Install Pods ----------------
+      - name: 🧨 Reset Pods
+        run: rm -rf ios/Podfile.lock
+
       - name: 🧨 Install Pods
         run: |
           cd ios
@@ -191,6 +190,7 @@ jobs:
           path: |
             ios/xcodebuild.log
             ios/export.log
+
 
   # ---------------- TestFlight Deployment ----------------
   ios-deploy:
