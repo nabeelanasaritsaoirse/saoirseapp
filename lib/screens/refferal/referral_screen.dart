@@ -16,6 +16,7 @@ import '../../models/refferal_info_model.dart';
 import '../../screens/refferal/referral_controller.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
+import '../../services/converstion_service.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
@@ -24,6 +25,7 @@ import '../../widgets/custom_appbar.dart';
 import '../../widgets/referral_qr_popup.dart';
 import '../invite_friend/invite_friend_details_screen.dart';
 import '../login/login_controller.dart';
+import '../message/message_screen.dart';
 import '../my_wallet/my_wallet.dart';
 import '../notification/notification_controller.dart';
 import '../notification/notification_screen.dart';
@@ -914,13 +916,31 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
 Widget referredByCard(ReferrerInfoModel r) {
   return GestureDetector(
-    onTap: () {
-      log("👆 ReferredBy Clicked → Navigating to Friend Details");
-      log("📩 Passing UserId = ${r.userId}");
+    onTap: () async {
+      // LOGS (optional)
+      log("👆 ReferredBy Clicked → Opening Chat Directly");
+      log("📩 Friend UserId = ${r.userId}");
 
-      Get.to(() => InviteFriendDetailsScreen(
-            userId: r.userId,
-          ));
+      // Create chat
+      final chat = await ConversationService().createIndividualChat(r.userId);
+
+      if (chat == null) {
+        log("❌ Chat creation failed");
+        return;
+      }
+
+      // Navigate to Chat Screen (PaymentMessageScreen)
+      Get.to(
+        () => PaymentMessageScreen(
+          conversationId: chat.conversationId,
+          participants: chat.participants,
+          name: r.name,
+          profilePic: r.profilePicture,
+          referralCode: r.referralCode,
+          showProfileButton: true,
+        ),
+        transition: Transition.rightToLeft,
+      );
     },
     child: Stack(
       clipBehavior: Clip.none,

@@ -1,6 +1,5 @@
 // ignore_for_file: unused_local_variable, body_might_complete_normally_nullable, deprecated_member_use
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -190,6 +189,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   // ----------------- IMAGE SECTION -----------------
+  // ----------------- IMAGE SECTION -----------------
   Widget buildImageSection(ProductDetailsData product) {
     return Column(
       children: [
@@ -197,18 +197,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           children: [
             buildCarousel(product),
 
-            /// PAGE INDICATOR
+            /// PAGE INDICATOR (ALWAYS USE mergedImages)
             Positioned(
               bottom: 10.h,
               left: 0,
               right: 0,
               child: Obx(() {
                 final index = controller.currentImageIndex.value;
+                final images = controller.mergedImages;
 
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: product.images.asMap().entries.map((entry) {
-                    final i = entry.key;
+                  children: List.generate(images.length, (i) {
                     return AnimatedContainer(
                       duration: Duration(milliseconds: 300),
                       width: index == i ? 18.w : 8.w,
@@ -220,7 +220,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             index == i ? AppColors.black : AppColors.textBlack,
                       ),
                     );
-                  }).toList(),
+                  }),
                 );
               }),
             ),
@@ -263,13 +263,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                            controller.isFavorite.value
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            size: 22,
-                            color: controller.isFavorite.value
-                                ? AppColors.red
-                                : AppColors.black),
+                          controller.isFavorite.value
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          size: 22,
+                          color: controller.isFavorite.value
+                              ? AppColors.red
+                              : AppColors.black,
+                        ),
                       ),
                     );
                   }),
@@ -367,21 +368,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         children: [
           /// Add to Cart
           appButton(
-            // onTap: () {
-            //   bool hasPlan = controller.selectedPlanIndex.value != -1 ||
-            //       (controller.customDays.value > 0 &&
-            //           controller.customAmount.value > 0);
-
-            //   if (!hasPlan) {
-            //     WarningDialog.show(
-            //       title: AppStrings.warning_label,
-            //       message: AppStrings.warning_body,
-            //     );
-            //     return;
-            //   }
-
-            //   // cartController.addProductToCart(controller.product.value!.id);
-            // },
             onTap: () {
               bool hasPlan = controller.selectedPlanIndex.value != -1 ||
                   (controller.customDays.value > 0 &&
@@ -407,7 +393,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 dailyAmount: selectedPlan["amount"],
               );
             },
-
             width: 50.w,
             height: 35.h,
             padding: EdgeInsets.all(0),
@@ -466,26 +451,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
                 padding: EdgeInsets.symmetric(vertical: 10.h),
               ),
-              // onPressed: () {
-              //   bool hasPlan = controller.selectedPlanIndex.value != -1 ||
-              //       (controller.customDays.value > 0 &&
-              //           controller.customAmount.value > 0);
-
-              //   if (!hasPlan) {
-              //     WarningDialog.show(
-              //       title: AppStrings.warning_label,
-              //       message: AppStrings.checkout_warning_body,
-              //     );
-              //     return;
-              //   }
-
-              //   Get.to(
-              //     SelectAddress(
-              //       product: controller.product.value!,
-              //       selectVarientId: controller.selectedVariantId.value,
-              //     ),
-              //   );
-              // },
               onPressed: () {
                 bool hasPlan = controller.selectedPlanIndex.value != -1 ||
                     (controller.customDays.value > 0 &&
@@ -523,7 +488,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                 );
               },
-
               child: Text(
                 AppStrings.checkout,
                 style: TextStyle(
@@ -540,47 +504,78 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   // ----------------- CAROUSEL -----------------
-  Widget buildCarousel(ProductDetailsData product) {
-    if (product.images.isEmpty) {
-      return Container(
-        color: AppColors.lightGrey,
-        height: 280.h,
-        alignment: Alignment.center,
-        child: Icon(
-          Icons.broken_image,
-          size: 36.sp,
-          color: AppColors.grey,
-        ),
-      );
-    }
 
-    return CarouselSlider(
-      options: CarouselOptions(
-        height: 280.h,
-        viewportFraction: 1.0,
-        enableInfiniteScroll: false,
-        onPageChanged: (index, reason) {
-          controller.currentImageIndex.value = index;
-        },
-      ),
-      items: product.images.map((img) {
+  Widget buildCarousel(ProductDetailsData product) {
+    return Obx(() {
+      final images = controller.mergedImages;
+
+      if (images.isEmpty) {
         return Container(
-          alignment: Alignment.center,
           color: AppColors.lightGrey,
-          child: Padding(
-            padding: EdgeInsets.all(15.0.w),
-            child: Image.network(
-              img.url,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Icon(
-                Icons.broken_image_outlined,
-                size: 36.sp,
-                color: Colors.grey,
-              ),
-            ),
+          height: 280.h,
+          alignment: Alignment.center,
+          child: Icon(
+            Icons.broken_image,
+            size: 36.sp,
+            color: AppColors.grey,
           ),
         );
-      }).toList(),
-    );
+      }
+
+      return SizedBox(
+        height: 280.h,
+        child: Stack(
+          children: [
+            /// PAGEVIEW USING mergedImages
+            PageView.builder(
+              controller: controller.pageController,
+              itemCount: images.length,
+              onPageChanged: (i) => controller.currentImageIndex.value = i,
+              itemBuilder: (_, i) {
+                final img = images[i];
+                return Container(
+                  alignment: Alignment.center,
+                  color: AppColors.lightGrey,
+                  child: Padding(
+                    padding: EdgeInsets.all(15.w),
+                    child: Image.network(
+                      img.url,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                );
+              },
+            ),
+
+            /// DOT INDICATOR USING mergedImages
+            Positioned(
+              bottom: 10.h,
+              left: 0,
+              right: 0,
+              child: Obx(() {
+                final index = controller.currentImageIndex.value;
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(images.length, (i) {
+                    return AnimatedContainer(
+                      duration: Duration(milliseconds: 250),
+                      width: index == i ? 18.w : 8.w,
+                      height: 6.h,
+                      margin: EdgeInsets.symmetric(horizontal: 2.w),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4.r),
+                        color:
+                            index == i ? AppColors.black : AppColors.textBlack,
+                      ),
+                    );
+                  }),
+                );
+              }),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
