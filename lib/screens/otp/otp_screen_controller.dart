@@ -6,7 +6,6 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/notification/notification_controller.dart';
 
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
@@ -16,6 +15,7 @@ import '../../services/auth_service.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../login/login_controller.dart';
+import '../notification/notification_controller.dart';
 import '../refferal/referral_controller.dart';
 
 class VerifyOtpController extends GetxController {

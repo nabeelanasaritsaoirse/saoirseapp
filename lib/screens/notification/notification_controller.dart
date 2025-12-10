@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 import 'package:get/get.dart';
+
 import '../../models/notification_details_response_model.dart';
 import '../../models/notification_response.dart';
 import '../../services/notification_service.dart';
