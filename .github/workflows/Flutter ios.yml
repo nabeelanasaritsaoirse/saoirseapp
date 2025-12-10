@@ -88,13 +88,13 @@ jobs:
         run: echo "TEAM_ID=${{ env.TEAM_ID }}" >> $GITHUB_ENV
 
       - name: 🧨 Reset Pods
-        run: rm -rf ios/Podfile.lock
-
+        run: rm -rf ios/Pods ios/Podfile.lock
+      
       - name: 🧨 Install Pods
         run: |
           cd ios
           pod install --repo-update
-          cd ..
+
 
       # ---------------- Flutter build ----------------
       - name: 🔨 Build Flutter iOS (No Codesign)
