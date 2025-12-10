@@ -29,7 +29,8 @@ class ProductDetailsController extends GetxController {
 
   RxBool isLoading = true.obs;
   Rx<ProductDetailsData?> product = Rx<ProductDetailsData?>(null);
-
+  RxList<ImageData> mergedImages = <ImageData>[].obs;
+  final PageController pageController = PageController();
   RxInt currentImageIndex = 0.obs;
   RxBool isFavorite = false.obs;
   RxInt selectedPlanIndex = (-1).obs;
@@ -51,24 +52,59 @@ class ProductDetailsController extends GetxController {
   }
 
   // FETCH PRODUCT DETAILS
+  // Future<void> fetchProductDetails() async {
+  //   try {
+  //     isLoading(true);
+
+  //     final result = await productService.fetchProductDetails(productId);
+  //     product.value = result;
+
+  //     if (result != null && result.hasVariants && result.variants.isNotEmpty) {
+  //       selectedVariantId.value = result.variants.first.variantId;
+  //       log("Default Variant Selected: ${selectedVariantId.value}");
+  //     }
+  //   } catch (e) {
+  //     log("ERROR FETCHING PRODUCT DETAILS: $e");
+  //     appToast(content: "Failed to load product details");
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
+
   Future<void> fetchProductDetails() async {
-    try {
-      isLoading(true);
+  try {
+    isLoading(true);
 
-      final result = await productService.fetchProductDetails(productId);
-      product.value = result;
+    final result = await productService.fetchProductDetails(productId);
+    product.value = result;
 
-      if (result != null && result.hasVariants && result.variants.isNotEmpty) {
-        selectedVariantId.value = result.variants.first.variantId;
-        log("Default Variant Selected: ${selectedVariantId.value}");
+    if (result == null) return;
+
+    // Start with base images
+    mergedImages.assignAll(result.images);
+
+    // If it has variants → override only the first image
+    if (result.hasVariants && result.variants.isNotEmpty) {
+      final firstVariant = result.variants.first;
+      selectedVariantId.value = firstVariant.variantId;
+
+      if (firstVariant.images.isNotEmpty) {
+        mergedImages[0] = firstVariant.images.first;
       }
-    } catch (e) {
-      log("ERROR FETCHING PRODUCT DETAILS: $e");
-      appToast(content: "Failed to load product details");
-    } finally {
-      isLoading(false);
     }
+
+    // Reset page
+    currentImageIndex.value = 0;
+    pageController.jumpToPage(0);
+
+  } catch (e) {
+    log("ERROR: $e");
+  } finally {
+    isLoading(false);
   }
+}
+
+
 
   Future<void> checkIfInWishlist(String id) async {
     try {
@@ -265,11 +301,44 @@ class ProductDetailsController extends GetxController {
     Get.back();
   }
 
-  void selectVariantById(String variantId) {
-    selectedVariantId.value = variantId;
+ void selectVariantById(String variantId) {
+  selectedVariantId.value = variantId;
 
-    log("Selected variantId: $variantId");
+  final data = product.value;
+  if (data == null) return;
+
+  final variant = data.variants.firstWhere(
+    (v) => v.variantId == variantId,
+    orElse: () => data.variants.first,
+  );
+
+  // Always start with base product images
+  mergedImages.assignAll(data.images);
+
+  // Replace only the FIRST image if variant has its own image
+  if (variant.images.isNotEmpty) {
+    mergedImages[0] = variant.images.first;
   }
+
+  // Reset slider
+  currentImageIndex.value = 0;
+
+  Future.delayed(Duration(milliseconds: 50), () {
+    if (pageController.hasClients) {
+      pageController.animateToPage(
+        0,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  });
+}
+
+
+
+
+
+
 
   Variant? getSelectedVariant() {
     if (selectedVariantId.value.isEmpty) return null;

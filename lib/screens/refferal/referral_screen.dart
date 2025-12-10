@@ -8,6 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:saoirse_app/screens/invite_friend/invite_friend_controller.dart';
+import 'package:saoirse_app/screens/message/message_screen.dart';
+import 'package:saoirse_app/services/converstion_service.dart';
 import 'package:saoirse_app/widgets/app_button.dart';
 
 import '../../constants/app_strings.dart';
@@ -884,38 +887,55 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
 Widget referredByCard(ReferrerInfoModel r) {
   return GestureDetector(
-    onTap: () {
-      log("👆 ReferredBy Clicked → Navigating to Friend Details");
-      log("📩 Passing UserId = ${r.userId}");
+      onTap: () async {
+        // LOGS (optional)
+        log("👆 ReferredBy Clicked → Opening Chat Directly");
+        log("📩 Friend UserId = ${r.userId}");
 
-      Get.to(() => InviteFriendDetailsScreen(
-            userId: r.userId, // <-- Passing user ID
-          ));
-    },
-    child: Container(
-      padding: EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        // ignore: deprecated_member_use
-        color: Colors.green.withOpacity(.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.green),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(backgroundImage: NetworkImage(r.profilePicture)),
-          SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Referred by:",
-                  style: TextStyle(fontWeight: FontWeight.w600)),
-              Text(r.name, style: TextStyle(fontSize: 15)),
-              Text("Code: ${r.referralCode}",
-                  style: TextStyle(color: Colors.black54)),
-            ],
+        // Create chat
+        final chat = await ConversationService().createIndividualChat(r.userId);
+
+        if (chat == null) {
+          log("❌ Chat creation failed");
+          return;
+        }
+
+        // Navigate to Chat Screen (PaymentMessageScreen)
+        Get.to(
+          () => PaymentMessageScreen(
+            conversationId: chat.conversationId,
+            participants: chat.participants,
+            name: r.name,
+            profilePic: r.profilePicture,
+            referralCode: r.referralCode,
+            showProfileButton: true,
           ),
-        ],
-      ),
-    ),
-  );
+          transition: Transition.rightToLeft,
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          // ignore: deprecated_member_use
+          color: Colors.green.withOpacity(.1),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.green),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(backgroundImage: NetworkImage(r.profilePicture)),
+            SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Referred by:",
+                    style: TextStyle(fontWeight: FontWeight.w600)),
+                Text(r.name, style: TextStyle(fontSize: 15)),
+                Text("Code: ${r.referralCode}",
+                    style: TextStyle(color: Colors.black54)),
+              ],
+            ),
+          ],
+        ),
+      ));
 }
