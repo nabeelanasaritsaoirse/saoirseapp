@@ -133,9 +133,9 @@ jobs:
           EOF
 
       # ---------------- Disable ThinBinary (Fix Xcode 16 hang) ----------------
-      - name: 🩹 Disable ThinBinary Script (Fix Flutter CI Hang)
+      - name: 🩹 Disable ThinBinary Script (Fix Flutter Xcode 16 Hang)
         run: |
-          sed -i.bak 's|"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh" thin|echo "Skipping ThinBinary in CI"|g' ios/Flutter/Flutter.xcodeproj/project.pbxproj
+          sed -i '' 's|xcode_backend.sh\" thin|echo \"Skipping ThinBinary in CI\"|g' ios/Runner.xcodeproj/project.pbxproj
 
       # ---------------- Archive ----------------
       - name: 🏗️ Archive Build (Runner only)
