@@ -23,7 +23,7 @@ env:
 jobs:
   ios-ci:
     runs-on: macos-latest
-    timeout-minutes: 120  # Increased timeout
+    
 
     steps:
       # ---------------- Checkout ----------------
@@ -111,8 +111,8 @@ jobs:
           pod install --repo-update
 
       # ---------------- Flutter build ----------------
-      - name: 🔨 Build Flutter iOS (No Codesign)
-        run: flutter build ios --release --no-codesign
+      # - name: 🔨 Build Flutter iOS (No Codesign)
+      #   run: flutter build ios --release --no-codesign
 
       - name: 🔨 Prepare Flutter for Xcode 16
         run: flutter build ios --release --no-codesign --config-only
