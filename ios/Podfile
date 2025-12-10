@@ -1,7 +1,5 @@
-# Uncomment this line to define a global platform for your project
 platform :ios, '15.0'
 
-# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
 project 'Runner', {
@@ -37,28 +35,23 @@ target 'Runner' do
   end
 end
 
+
 post_install do |installer|
-  team_id = ENV['TEAM_ID'] || 'BYQUNNQSQH'  # fallback for CI safety
+  team_id = ENV['TEAM_ID'] || 'BYQUNNQSQH'
+  bundle_id = ENV['BUNDLE_ID'] || 'com.saoirse.epi'
 
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
 
     target.build_configurations.each do |config|
-      #
-      # 1) Remove signing from ALL pods (default safe behavior)
-      #
+
+      # 1) Remove signing from all pods by default
       config.build_settings.delete('CODE_SIGNING_ALLOWED')
       config.build_settings.delete('CODE_SIGN_IDENTITY')
       config.build_settings.delete('PROVISIONING_PROFILE_SPECIFIER')
       config.build_settings.delete('DEVELOPMENT_TEAM')
 
-      #
-      # 2) Add SIGNING ONLY for:
-      #    - privacy pods
-      #    - resource bundles
-      #    - Pods-Runner
-      #    - Runner
-      #
+      # 2) Enable signing ONLY for privacy pods + resources + Pods-Runner + Runner
       if target.name.downcase.include?("privacy") ||
          target.name.end_with?("-Resources") ||
          target.name.end_with?("_Resources") ||
@@ -66,13 +59,13 @@ post_install do |installer|
          target.name == "Runner"
 
         config.build_settings['DEVELOPMENT_TEAM'] = team_id
-        config.build_settings['CODE_SIGN_STYLE'] = 'Automatic'
+        config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
         config.build_settings['CODE_SIGNING_ALLOWED'] = 'YES'
+        config.build_settings['CODE_SIGN_IDENTITY'] = 'iPhone Distribution'
+        config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = "match AppStore #{bundle_id}"
       end
 
-      #
-      # 3) Xcode 16 / Firebase related build settings
-      #
+      # 3) Required Xcode 16 / Firebase build settings
       config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'NO'
       config.build_settings['DEAD_CODE_STRIPPING'] = 'NO'
       config.build_settings['TAPI_VERIFY_MODE'] = 'ErrorsOnly'
@@ -80,9 +73,7 @@ post_install do |installer|
       config.build_settings['DISABLE_DIAMOND_PROBLEM_DIAGNOSTIC'] = 'YES'
       config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
 
-      #
       # 4) Enforce minimum iOS 12.0 deployment target
-      #
       current = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
 
       begin
@@ -94,6 +85,7 @@ post_install do |installer|
       if needs_update
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
       end
+
     end
   end
 end
