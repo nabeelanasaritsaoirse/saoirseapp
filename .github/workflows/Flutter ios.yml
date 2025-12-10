@@ -23,7 +23,6 @@ env:
 jobs:
   ios-ci:
     runs-on: macos-latest
-    
 
     steps:
       # ---------------- Checkout ----------------
@@ -54,7 +53,7 @@ jobs:
           ANDROID_MESSAGING_SENDER_ID=${{ secrets.ANDROID_MESSAGING_SENDER_ID }}
           ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
           EOF
-      
+
       - name: 📋 Copy .env to iOS Runner
         run: |
           mkdir -p ios/Runner
@@ -66,7 +65,7 @@ jobs:
           sudo gem install fastlane -N
           sudo gem install cocoapods -N
 
-      # ---------------- App Store Connect Key ----------------
+      # ---------------- API Key ----------------
       - name: 🔐 Write App Store Connect API Key
         run: |
           mkdir -p ios
@@ -78,12 +77,10 @@ jobs:
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
-          set -e
           cd ios
           fastlane match appstore --readonly --api_key_path ./api_key.json --git_branch master
-          cd ..
 
-      # ---------------- Cache DerivedData ----------------
+      # ---------------- Cache Pods / DerivedData ----------------
       - name: 💾 Cache Xcode DerivedData
         uses: actions/cache@v3
         with:
@@ -94,30 +91,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-xcode-
 
-      # ---------------- Podfile Signing Fix ----------------
-      - name: 📌 Export TEAM_ID for Podfile
-        run: echo "TEAM_ID=${{ env.TEAM_ID }}" >> $GITHUB_ENV
-
+      # ---------------- Pods ----------------
       - name: 🧨 Reset Pods (if not cached)
         run: |
           if [ ! -d "ios/Pods" ]; then
             echo "Pods not cached, installing fresh..."
             rm -rf ios/Podfile.lock
           fi
-      
+
       - name: 🧨 Install Pods
         run: |
           cd ios
           pod install --repo-update
 
       # ---------------- Flutter build ----------------
-      # - name: 🔨 Build Flutter iOS (No Codesign)
-      #   run: flutter build ios --release --no-codesign
-
       - name: 🔨 Prepare Flutter for Xcode 16
         run: flutter build ios --release --no-codesign --config-only
 
-      # ---------------- Create ExportOptions.plist ----------------
+      # ---------------- ExportOptions ----------------
       - name: 📝 Create ExportOptions.plist
         run: |
           cat > ios/ExportOptions.plist <<EOF
@@ -129,68 +120,67 @@ jobs:
             <key>method</key>
             <string>app-store</string>
             <key>teamID</key>
-            <string>${{ env.TEAM_ID }}</string>
+            <string>${TEAM_ID}</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>provisioningProfiles</key>
             <dict>
-              <key>${{ env.BUNDLE_ID }}</key>
-              <string>match AppStore ${{ env.BUNDLE_ID }}</string>
+              <key>${BUNDLE_ID}</key>
+              <string>match AppStore ${BUNDLE_ID}</string>
             </dict>
           </dict>
           </plist>
           EOF
 
+      # ---------------- Disable ThinBinary (Fix Xcode 16 hang) ----------------
+      - name: 🩹 Disable ThinBinary Script (Fix Flutter CI Hang)
+        run: |
+          sed -i.bak 's|"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh" thin|echo "Skipping ThinBinary in CI"|g' ios/Flutter/Flutter.xcodeproj/project.pbxproj
+
       # ---------------- Archive ----------------
-           # ---------------- Archive ----------------
       - name: 🏗️ Archive Build (Runner only)
         run: |
-          set -e
           cd ios
-          mkdir -p ../${{ env.ARCHIVE_DIR }}
-          mkdir -p ../${{ env.IPA_DIR }}
+          mkdir -p ../${ARCHIVE_DIR}
+          mkdir -p ../${IPA_DIR}
+
           xcodebuild archive \
             -workspace Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
-            -archivePath ../${{ env.ARCHIVE_DIR }}/Runner.xcarchive \
+            -archivePath ../${ARCHIVE_DIR}/Runner.xcarchive \
             -destination 'generic/platform=iOS' \
-            DEVELOPMENT_TEAM=${{ env.TEAM_ID }} \
+            DEVELOPMENT_TEAM=${TEAM_ID} \
             CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE_SPECIFIER="match AppStore ${{ env.BUNDLE_ID }}" \
+            PROVISIONING_PROFILE_SPECIFIER="match AppStore ${BUNDLE_ID}" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
             | tee ../xcodebuild.log
 
-
       - name: ✅ Verify Archive
         run: |
-          if [ ! -d "${{ env.ARCHIVE_DIR }}/Runner.xcarchive" ]; then
+          if [ ! -d "${ARCHIVE_DIR}/Runner.xcarchive" ]; then
             echo "❌ Archive not created!"
             tail -n 200 xcodebuild.log || true
             exit 1
           fi
-          echo "✅ Archive created successfully."
-          ls -lh ${{ env.ARCHIVE_DIR }}
 
       # ---------------- Export IPA ----------------
       - name: 📦 Export IPA
         run: |
-          set -e
           cd ios
           xcodebuild -exportArchive \
-            -archivePath ../${{ env.ARCHIVE_DIR }}/Runner.xcarchive \
-            -exportPath ../${{ env.IPA_DIR }} \
+            -archivePath ../${ARCHIVE_DIR}/Runner.xcarchive \
+            -exportPath ../${IPA_DIR} \
             -exportOptionsPlist ExportOptions.plist \
             | tee ../export.log || true
 
       - name: ✅ Verify IPA
         run: |
-          if ls ${{ env.IPA_DIR }}/*.ipa 1>/dev/null 2>&1; then
+          if ls ${IPA_DIR}/*.ipa 1>/dev/null 2>&1; then
             echo "✅ IPA Exported Successfully!"
-            ls -lh ${{ env.IPA_DIR }}/*.ipa
           else
-            echo "❌ IPA NOT FOUND!"
-            tail -n 300 export.log || true
+            echo "❌ IPA export failed!"
+            tail -n 200 export.log || true
             exit 1
           fi
 
@@ -209,12 +199,13 @@ jobs:
             xcodebuild.log
             export.log
 
+
   # ---------------- TestFlight Deployment ----------------
   ios-deploy:
     name: "🚀 Deploy to TestFlight"
     needs: ios-ci
     runs-on: macos-latest
-    if: github.ref == 'refs/heads/developer'
+    if: github.ref_name == 'nabeeela'   # ← FIXED
 
     steps:
       - name: 📥 Checkout Repository
