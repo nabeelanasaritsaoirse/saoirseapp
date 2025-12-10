@@ -2,23 +2,26 @@
 // Behaves exactly as requested
 // No design or UI property changes
 
+// ignore_for_file: deprecated_member_use
+
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:saoirse_app/widgets/app_button.dart';
 
 import '../../constants/app_strings.dart';
 import '../../models/refferal_info_model.dart';
 import '../../screens/refferal/referral_controller.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/referral_qr_popup.dart';
 import '../invite_friend/invite_friend_details_screen.dart';
 import '../login/login_controller.dart';
 import '../my_wallet/my_wallet.dart';
@@ -226,7 +229,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
           ],
         ),
 
-        SizedBox(height: 10.h),
+        SizedBox(height: 15.h),
 
         Center(
           child: Obx(() {
@@ -296,40 +299,69 @@ class _ReferralScreenState extends State<ReferralScreen> {
               );
             }
 
-            //referral code is fetched successfully
-            return Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 20.w,
-                vertical: 10.h,
-              ),
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.shadowColor),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  appText(
-                    'Code:  ${controller.referralCode.value}',
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textBlack,
+            // referral code is fetched successfully - WITH QR CODE BUTTON
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 10.h,
                   ),
-                  SizedBox(width: 8.w),
-                  InkWell(
-                    onTap: controller.copyReferralCode,
-                    child: Icon(
-                      Icons.copy,
-                      size: 18.sp,
-                      color: AppColors.grey,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.shadowColor),
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      appText(
+                        'Code:  ${controller.referralCode.value}',
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textBlack,
+                      ),
+                      SizedBox(width: 8.w),
+                      InkWell(
+                        onTap: controller.copyReferralCode,
+                        child: Icon(
+                          Icons.copy,
+                          size: 18.sp,
+                          color: AppColors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(width: 12.w),
+
+                // QR Code Button
+                SizedBox(
+                  height: 42.h,
+                  width: 44.h,
+                  child: InkWell(
+                    onTap: () {
+                      showReferralQrPopup(context);
+                    },
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.shadowColor),
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      padding: EdgeInsets.all(8.w),
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: Image.asset(AppAssets.qr_code_icon),
+                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           }),
         ),
-
         SizedBox(height: 20.h),
 
         appText(
@@ -727,7 +759,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
                     padding: EdgeInsets.all(10.r),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      // ignore: deprecated_member_use
                       color: AppColors.green.withOpacity(0.1),
                     ),
                     child: Icon(Iconsax.tick_circle,
@@ -839,7 +870,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
                 padding: EdgeInsets.all(12.r),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  // ignore: deprecated_member_use
                   color: AppColors.green.withOpacity(0.1),
                 ),
                 child: Icon(
@@ -889,33 +919,44 @@ Widget referredByCard(ReferrerInfoModel r) {
       log("📩 Passing UserId = ${r.userId}");
 
       Get.to(() => InviteFriendDetailsScreen(
-            userId: r.userId, // <-- Passing user ID
+            userId: r.userId,
           ));
     },
-    child: Container(
-      padding: EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        // ignore: deprecated_member_use
-        color: Colors.green.withOpacity(.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.green),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(backgroundImage: NetworkImage(r.profilePicture)),
-          SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Referred by:",
-                  style: TextStyle(fontWeight: FontWeight.w600)),
-              Text(r.name, style: TextStyle(fontSize: 15)),
-              Text("Code: ${r.referralCode}",
-                  style: TextStyle(color: Colors.black54)),
-            ],
+    child: Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.centerRight,
+      children: [
+        Container(
+          padding: EdgeInsets.only(left: 9, right: 55, top: 8, bottom: 8),
+          decoration: BoxDecoration(
+              color: Color(0xFFE8F5E9),
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(color: Colors.green)),
+          child: Text(
+            "Referred by",
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
           ),
-        ],
-      ),
+        ),
+        Positioned(
+          right: -12,
+          child: Container(
+            padding: EdgeInsets.all(5),
+            decoration: BoxDecoration(
+                color: Color(0xFFE8F5E9),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.green)),
+            child: CircleAvatar(
+              radius: 25,
+              backgroundImage: NetworkImage(r.profilePicture),
+              backgroundColor: Colors.grey[300],
+            ),
+          ),
+        ),
+      ],
     ),
   );
 }

@@ -1,16 +1,21 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:android_intent_plus/android_intent.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../constants/app_constant.dart';
 import '../../main.dart';
 import '../../models/referral_response_model.dart';
 import '../../models/refferal_info_model.dart';
 import '../../services/refferal_service.dart';
 import '../../widgets/app_toast.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ReferralController extends GetxController {
   final ReferralService _referralService = ReferralService();
@@ -23,6 +28,7 @@ class ReferralController extends GetxController {
   final referrals = <Referral>[].obs;
   final filteredReferrals = <Referral>[].obs;
   Rxn<ReferrerInfoModel> referrer = Rxn<ReferrerInfoModel>();
+  String get referralLink => _referralLink();
 
   @override
   void onInit() {
@@ -238,6 +244,45 @@ class ReferralController extends GetxController {
         referrals.where((ref) =>
             ref.referredUser!.name.toLowerCase().contains(query.toLowerCase())),
       );
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Share QR as image (used by QR popup)
+  // ---------------------------------------------------------------------------
+  Future<void> shareQrImage({
+    required GlobalKey qrKey,
+    String? message,
+  }) async {
+    try {
+      final renderObject = qrKey.currentContext?.findRenderObject();
+      if (renderObject == null || renderObject is! RenderRepaintBoundary) {
+        log("❌ QR RenderRepaintBoundary not found");
+        return;
+      }
+
+      final ui.Image image = await renderObject.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) {
+        log("❌ QR ByteData is null");
+        return;
+      }
+
+      final Uint8List pngBytes = byteData.buffer.asUint8List();
+
+      final tempDir = await getTemporaryDirectory();
+      final file = File("${tempDir.path}/referral_qr.png");
+      await file.writeAsBytes(pngBytes);
+
+      final params = ShareParams(
+        files: [XFile(file.path)],
+        text: message ??
+            "Join this app & earn rewards! Use my referral link: $referralLink",
+      );
+
+      await SharePlus.instance.share(params);
+    } catch (e, st) {
+      log("QR Image Share Error: $e\n$st");
     }
   }
 
