@@ -142,7 +142,8 @@ jobs:
           EOF
 
       # ---------------- Archive ----------------
-      - name: 🏗️ Archive Build (arm64 only - faster)
+           # ---------------- Archive ----------------
+      - name: 🏗️ Archive Build (Runner only)
         run: |
           set -e
           cd ios
@@ -154,13 +155,12 @@ jobs:
             -configuration Release \
             -archivePath ../${{ env.ARCHIVE_DIR }}/Runner.xcarchive \
             -destination 'generic/platform=iOS' \
-            -arch arm64 \
             DEVELOPMENT_TEAM=${{ env.TEAM_ID }} \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE_SPECIFIER="match AppStore ${{ env.BUNDLE_ID }}" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            ONLY_ACTIVE_ARCH=NO \
             | tee ../xcodebuild.log
+
 
       - name: ✅ Verify Archive
         run: |
