@@ -14,3 +14,4 @@ echo "Detected bump: $BUMP"
 flutter pub run pubspec_bump:$BUMP
 flutter pub run pubspec_bump:build
 flutter pub run pubspec_bump:changelog
+
