@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/converstion_model.dart';
@@ -33,6 +34,9 @@ class MessageController extends GetxController {
   RxString friendName = ''.obs;
   var isSending = false.obs;
   final RxString inputText = ''.obs;
+
+   DateTime lastSendTime = DateTime.now().subtract(Duration(seconds: 2));
+  final int sendCooldownMs = 700; 
 
   @override
   void onInit() {
@@ -101,6 +105,19 @@ class MessageController extends GetxController {
   }
 
   Future<void> sendMessage() async {
+        final now = DateTime.now();
+
+    //ignore if tapped too fast
+    if (now.difference(lastSendTime).inMilliseconds < sendCooldownMs) {
+      return;
+    }
+
+    // update throttle timestamp
+    lastSendTime = now;
+
+    // if already sending, ignore
+    if (isSending.value) return;
+    
     final text = textController.text.trim();
     if (text.isEmpty) {
       appToast(error: true, content: "Text message cannot be empty");
@@ -227,6 +244,31 @@ class MessageController extends GetxController {
           mode: LaunchMode.externalApplication);
     }
   }
+
+  Future<void> shareToInstagram(String code) async {
+  final link = _referralLink(code);
+  final message = "Hey! Join me on this app using my referral code: $link";
+
+  final url = Uri.parse("instagram://share");
+
+  if (await canLaunchUrl(url)) {
+    // ignore: deprecated_member_use
+    await Share.share(
+      message,
+      subject: "Referral",
+    );
+  } else {
+    // Fallback to normal text sharing options
+    // ignore: deprecated_member_use
+    await Share.share(
+      message,
+      subject: "Referral",
+    );
+  }
+}
+
+
+  
 
   Future<void> shareToGmail(String code) async {
     final link = _referralLink(code);

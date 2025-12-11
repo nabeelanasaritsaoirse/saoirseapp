@@ -420,6 +420,16 @@ class _ReferralScreenState extends State<ReferralScreen> {
               ),
               SizedBox(width: 12.w),
               _buildSocialButton(
+                image: AppAssets.instagram,
+                label: "Instagram",
+                color: AppColors.transparent,
+                onTap: controller.shareToInstagram,
+                width: 40.h,
+                height: 40.h,
+                radius: 60.r,
+              ),
+              SizedBox(width: 12.w),
+              _buildSocialButton(
                 image: AppAssets.gmail,
                 label: AppStrings.gmail,
                 color: AppColors.transparent,

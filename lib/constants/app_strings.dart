@@ -69,6 +69,7 @@ class AppStrings {
   static String facebook = 'Facebook';
   static String telegram = 'Telegram';
   static String twitter = 'Twitter';
+  static String instagram = 'Instagram';
   static String gmail = 'Gmail';
   static String more = 'More';
   static String your_refferal = "Your referral";
