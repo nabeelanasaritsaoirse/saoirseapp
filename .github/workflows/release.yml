@@ -1,0 +1,57 @@
+name: Automated Release Publishing
+
+on:
+  push:
+    tags:
+      - 'v*'   # Runs when versioning workflow creates v1.2.3 tags
+
+permissions:
+  contents: write     # required to publish GitHub Release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: vars
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Generate Auto Release Notes Template
+        id: notes
+        run: |
+          echo "# 🚀 Release v${VERSION}" > RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          echo "## ✨ New Features" >> RELEASE_NOTES.md
+          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 --exclude="$TAG")..HEAD | grep "^feat:" >> RELEASE_NOTES.md || echo "- None" >> RELEASE_NOTES.md
+          
+          echo "" >> RELEASE_NOTES.md
+          echo "## 🐞 Fixes" >> RELEASE_NOTES.md
+          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 --exclude="$TAG")..HEAD | grep "^fix:" >> RELEASE_NOTES.md || echo "- None" >> RELEASE_NOTES.md
+          
+          echo "" >> RELEASE_NOTES.md
+          echo "## 🔥 Breaking Changes" >> RELEASE_NOTES.md
+          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 --exclude="$TAG")..HEAD | grep "BREAKING CHANGE" >> RELEASE_NOTES.md || echo "- None" >> RELEASE_NOTES.md
+          
+          echo "" >> RELEASE_NOTES.md
+          echo "## 🛠 Internal Improvements" >> RELEASE_NOTES.md
+          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 --exclude="$TAG")..HEAD | grep -E "chore:|refactor:" >> RELEASE_NOTES.md || echo "- None" >> RELEASE_NOTES.md
+          
+          echo "" >> RELEASE_NOTES.md
+          echo "## 📦 Build" >> RELEASE_NOTES.md
+          echo "Version: ${VERSION}" >> RELEASE_NOTES.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: "Release v${{ env.VERSION }}"
+          body_path: RELEASE_NOTES.md
