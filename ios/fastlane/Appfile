@@ -1,16 +1,8 @@
-# Git repo for certificates
-git_url("https://github.com/nabeelanasaritsaoirse/ios-certificates.git")
+# ---------------------------
+# Appfile for Saoirse iOS
+# ---------------------------
 
-# Store signing assets in Git
-storage_mode("git")
-
-# Default type for match (App Store certificates)
-type("appstore")
-
-# Path to your API key
-api_key_path("./api_key.json")
-
-# App identifiers
-app_identifier([
-  "com.saoirse.epi"
-])
+app_identifier "com.saoirse.epi"
+apple_id "samvictormichael@gmail.com"   # Account Holder / Admin
+team_id "BYQUNNQSQH"                    # Your Apple Developer Team ID
+itunes_connect_id "com.saoirse.epi"
