@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Make version script executable
+        run: chmod +x tools/version.sh
+
       - name: Run version automation
         run: tools/version.sh
 
