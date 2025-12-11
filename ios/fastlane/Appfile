@@ -1,0 +1,8 @@
+# ---------------------------
+# Appfile for Saoirse iOS
+# ---------------------------
+
+app_identifier "com.saoirse.epi"
+apple_id "samvictormichael@gmail.com"   # Account Holder / Admin
+team_id "BYQUNNQSQH"                    # Your Apple Developer Team ID
+itunes_connect_id "com.saoirse.epi"
