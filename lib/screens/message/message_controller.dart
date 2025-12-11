@@ -147,6 +147,7 @@ class MessageController extends GetxController {
     scrollController.dispose();
     _pollTimer?.cancel();
     super.onClose();
+
   }
 
   void copyReferralCode() {
@@ -157,8 +158,8 @@ class MessageController extends GetxController {
       );
       return;
     }
-
-    // Copy to clipboard
+      
+    
     Clipboard.setData(
       ClipboardData(text: referralCode.value),
     );
