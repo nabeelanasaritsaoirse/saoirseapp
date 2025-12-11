@@ -78,7 +78,7 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
           cd ios
-          fastlane match appstore --readonly --api_key_path ./api_key.json --git_branch master
+          fastlane match appstore --readonly --api_key_path ./api_key.json --git_branch main
 
       # ---------------- Cache Pods / DerivedData ----------------
       - name: 💾 Cache Xcode DerivedData
