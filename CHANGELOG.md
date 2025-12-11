@@ -1,3 +1,3 @@
-## Version 1.2.6+72
+## Version 1.2.7+73
 
-- Update auto-version.yml
+- Create release.yml
