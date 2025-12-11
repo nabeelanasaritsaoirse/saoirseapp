@@ -59,7 +59,7 @@ jobs:
           mkdir -p ios/Runner
           cp .env ios/Runner/.env
 
-      # ---------------- Fastlane / CocoaPods ----------------
+      # ---------------- Fastlane & CocoaPods ----------------
       - name: 🚀 Install Fastlane & CocoaPods
         run: |
           sudo gem install fastlane -N
@@ -72,13 +72,40 @@ jobs:
           echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > ios/api_key.json
           chmod 600 ios/api_key.json
 
+      # ---------------- Keychain ----------------
+      - name: 🔓 Unlock macOS keychain
+        run: |
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings build.keychain
+
       # ---------------- Certificates (Match) ----------------
       - name: 🔐 Download Certificates (Match)
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
           cd ios
-          fastlane match appstore --readonly --api_key_path ./api_key.json --git_branch main
+          fastlane match appstore \
+            --readonly \
+            --api_key_path ./api_key.json \
+            --git_branch main \
+            --keychain_name build.keychain \
+            --keychain_password ""
+
+      # ---------------- Import .p12 into Keychain (Required for Xcode signing) ----------------
+      - name: 🔐 Import Certificate into Keychain
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        run: |
+          CERT_PATH=$(find ~/. -name "*.p12" | head -n 1)
+          if [ -z "$CERT_PATH" ]; then
+            echo "❌ No .p12 certificate found!"
+            exit 1
+          fi
+          echo "📌 Importing certificate: $CERT_PATH"
+          security import "$CERT_PATH" -k build.keychain -P "$MATCH_PASSWORD" -A
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
 
       # ---------------- Cache Pods / DerivedData ----------------
       - name: 💾 Cache Xcode DerivedData
@@ -153,9 +180,11 @@ jobs:
             DEVELOPMENT_TEAM=${TEAM_ID} \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE_SPECIFIER="match AppStore com.saoirse.epi" \
+            OTHER_CODE_SIGN_FLAGS="--keychain build.keychain" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
             | tee ../xcodebuild.log
 
+      # ---------------- Verify Archive ----------------
       - name: ✅ Verify Archive
         run: |
           if [ ! -d "${ARCHIVE_DIR}/Runner.xcarchive" ]; then
@@ -174,6 +203,7 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             | tee ../export.log || true
 
+      # ---------------- Verify IPA ----------------
       - name: ✅ Verify IPA
         run: |
           if ls ${IPA_DIR}/*.ipa 1>/dev/null 2>&1; then
@@ -184,12 +214,14 @@ jobs:
             exit 1
           fi
 
+      # ---------------- Upload IPA Artifact ----------------
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
           path: ${{ env.IPA_DIR }}/*.ipa
 
+      # ---------------- Upload Logs ----------------
       - name: 📋 Upload build logs
         if: always()
         uses: actions/upload-artifact@v4
