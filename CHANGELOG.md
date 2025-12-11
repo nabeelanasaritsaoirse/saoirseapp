@@ -1,3 +1,3 @@
-## Version 1.2.5+71
+## Version 1.2.6+72
 
-- 
+- Update auto-version.yml
