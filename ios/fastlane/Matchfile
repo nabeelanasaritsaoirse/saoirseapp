@@ -1,8 +1,19 @@
-git_url "https://github.com/nabeelanasaritsaoirse/ios-certificates.git"
+# Git repo for certificates
+git_url("https://github.com/nabeelanasaritsaoirse/ios-certificates.git")
 
-storage_mode "git"
-type "appstore"
-app_identifier ["com.saoirse.epi"]
-team_id "BYQUNNQSQH"
+# Store signing assets in Git
+storage_mode("git")
 
-readonly true
+# Default type for match (App Store certificates)
+type("appstore")
+
+# Path to your API key
+api_key_path("./api_key.json")
+
+# Apple Developer Team ID
+team_id("BYQUNNQSQH")
+
+# App identifiers
+app_identifier([
+  "com.saoirse.epi"
+])
