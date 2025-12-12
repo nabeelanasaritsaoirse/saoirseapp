@@ -338,6 +338,16 @@ class PaymentMessageScreen extends StatelessWidget {
                         ),
                         SizedBox(width: 12.w),
                         buildSocialButton(
+                          image: AppAssets.instagram,
+                          label: AppStrings.instagram,
+                          color: AppColors.transparent,
+                          onTap: () => controller.shareToInstagram(referralCode),
+                          width: 28.h,
+                          height: 28.h,
+                          radius: 40.r,
+                        ),
+                        SizedBox(width: 12.w),
+                        buildSocialButton(
                           image: AppAssets.gmail,
                           label: AppStrings.gmail,
                           color: AppColors.transparent,
