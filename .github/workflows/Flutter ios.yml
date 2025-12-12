@@ -3,7 +3,8 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
 on:
   push:
-    branches: [ nabeeela ]
+    tags:
+      - "v*"
 
 concurrency:
   group: ios-build-${{ github.ref }}
@@ -24,6 +25,9 @@ env:
 jobs:
   ios-ci:
     runs-on: macos-latest
+    outputs:
+      version_name: ${{ steps.version.outputs.VERSION_NAME }}
+      build_number: ${{ steps.version.outputs.BUILD_NUMBER }}
 
     steps:
       - name: 📥 Checkout Repository
@@ -38,6 +42,26 @@ jobs:
 
       - name: 📦 Flutter Pub Get
         run: flutter pub get
+
+      - name: 🔢 Read Version from pubspec.yaml
+        id: version
+        run: |
+          VERSION_LINE=$(grep "^version:" pubspec.yaml)
+          VERSION_NAME=$(echo "$VERSION_LINE" | cut -d '+' -f 1 | sed 's/version: //')
+          BUILD_NUMBER=$(echo "$VERSION_LINE" | cut -d '+' -f 2)
+          
+          # If no build number in pubspec, use run number
+          if [ -z "$BUILD_NUMBER" ]; then
+            BUILD_NUMBER=$GITHUB_RUN_NUMBER
+          fi
+          
+          echo "Version Name: $VERSION_NAME"
+          echo "Build Number: $BUILD_NUMBER"
+          echo "Tag: ${{ github.ref_name }}"
+          
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+
 
       - name: 🔑 Create .env file
         run: |
@@ -197,7 +221,8 @@ jobs:
     name: "🚀 Deploy to TestFlight"
     needs: ios-ci
     runs-on: macos-latest
-    if: github.ref_name == 'nabeeela'
+    environment:
+      name: ios-deploy
 
     steps:
       - name: 📥 Checkout Repository
