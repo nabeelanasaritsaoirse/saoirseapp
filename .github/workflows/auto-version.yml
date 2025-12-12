@@ -1,38 +1,41 @@
-name: Auto Version & Changelog
+name: 📌 Auto Version & Changelog
 
 on:
-  push:
+  pull_request:
     branches:
       - main
+    types:
+      - closed
 
 permissions:
   contents: write
 
 jobs:
   version:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      
+
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-      
+
       - name: Install dependencies
         run: flutter pub get
-      
-      # 🔥 Add this block (Option 3 recommended)
+
       - name: Make version script executable
         run: chmod +x tools/version.sh
-      
+
       - name: Run version automation
         run: tools/version.sh
 
-      - name: Commit & push new version
+      - name: Commit & push version bump
         run: |
           git config user.name "CI Bot"
           git config user.email "ci@saoirse.com"
@@ -40,7 +43,7 @@ jobs:
           git commit -m "ci: automated version bump" || echo "No changes"
           git push
 
-      - name: Tag version
+      - name: Create tag
         run: |
           VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
           git tag v$VERSION
