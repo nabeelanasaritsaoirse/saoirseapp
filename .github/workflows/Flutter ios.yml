@@ -75,10 +75,13 @@ jobs:
       # ---------------- Keychain ----------------
       - name: 🔓 Unlock macOS keychain
         run: |
-          security create-keychain -p "" build.keychain
+          KEYCHAIN_PASSWORD="ci_keychain_pass"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security set-keychain-settings build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -lut 7200 build.keychain
+        env:
+          KEYCHAIN_PASSWORD: ci_keychain_pass
 
       # ---------------- Certificates (Match) ----------------
       - name: 🔐 Download Certificates (Match)
@@ -91,7 +94,7 @@ jobs:
             --api_key_path ./api_key.json \
             --git_branch main \
             --keychain_name build.keychain \
-            --keychain_password ""
+            --keychain_password "ci_keychain_pass"
 
       # ---------------- Import .p12 into Keychain (Required for Xcode signing) ----------------
       - name: 🔐 Import Certificate into Keychain
