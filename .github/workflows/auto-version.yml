@@ -60,7 +60,6 @@ jobs:
 
   tag:
     needs: version
-    if: needs.version.outputs.pr_created != 'true'
     runs-on: ubuntu-latest
 
     steps:
