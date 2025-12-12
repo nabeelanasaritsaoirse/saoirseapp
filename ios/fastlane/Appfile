@@ -2,7 +2,14 @@
 # Appfile for Saoirse iOS
 # ---------------------------
 
+# Main app identifier
 app_identifier "com.saoirse.epi"
-apple_id "samvictormichael@gmail.com"   # Account Holder / Admin
-team_id "BYQUNNQSQH"                    # Your Apple Developer Team ID
+
+# Apple ID used for App Store Connect
+apple_id "samvictormichael@gmail.com"
+
+# Apple Developer Team ID
+team_id "BYQUNNQSQH"
+
+# Optional but recommended — bundle ID for App Store Connect
 itunes_connect_id "com.saoirse.epi"
