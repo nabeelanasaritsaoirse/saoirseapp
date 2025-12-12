@@ -8,13 +8,8 @@ permissions:
 
 on:
   push:
-    branches: [ main ]
-    paths:
-      - "android/**"
-      - "lib/**"
-      - "pubspec.yaml"
-      - "pubspec.lock"
-      - "assets/**"
+    tags:
+      - "v*"
 
   # pull_request:
   #   branches: [ main, developer ]
@@ -27,7 +22,6 @@ on:
 jobs:
   android-ci:
     runs-on: ubuntu-latest
-
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
@@ -173,21 +167,18 @@ jobs:
           ANDROID_MESSAGING_SENDER_ID=${{ secrets.ANDROID_MESSAGING_SENDER_ID }}
           ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
           EOF
-
-      - name: 🔢 Auto version bump using run number
+          
+      - name: 🔢 Read version from pubspec & generate versionCode
         run: |
           VERSION_LINE=$(grep "^version:" pubspec.yaml)
           VERSION_NAME=$(echo "$VERSION_LINE" | cut -d '+' -f 1 | sed 's/version: //')
-
-          # Correct way
-          NEW_VERSION_CODE=$GITHUB_RUN_NUMBER
-
-          echo "🔧 versionName: $VERSION_NAME"
-          echo "🔧 New versionCode: $NEW_VERSION_CODE"
-
-          sed -i "s/^version:.*/version: $VERSION_NAME+$NEW_VERSION_CODE/" pubspec.yaml
-
-          grep version: pubspec.yaml
+          VERSION_CODE=$GITHUB_RUN_NUMBER
+      
+          echo "Version Name: $VERSION_NAME"
+          echo "Version Code: $VERSION_CODE"
+      
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+          echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
 
       - name: 🏗️ Build Android APK & AAB
         run: |
