@@ -1,9 +1,6 @@
-## Version 1.3.3+78
+## Version 1.3.4+79
 
-- Merge pull request #245 from nabeelanasaritsaoirse/versioning
+- Merge pull request #247 from nabeelanasaritsaoirse/versioning
 - Update auto-version.yml
-- Merge pull request #244 from nabeelanasaritsaoirse/ci/version-bump-21
+- Merge pull request #246 from nabeelanasaritsaoirse/ci/version-bump-23
 - ci: automated version bump
-- Merge pull request #243 from nabeelanasaritsaoirse/versioning
-- Delete .github/workflows/auto-tag.yml
-- Update auto-version.yml
