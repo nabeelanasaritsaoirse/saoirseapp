@@ -1,0 +1,123 @@
+name: 📌 Auto Version & Tag
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ closed ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  version-bump:
+    # Only run for merged PRs that are NOT version bump PRs
+    if: >
+      github.event.pull_request.merged == true &&
+      !contains(github.event.pull_request.title, 'ci: automated version bump')
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.CI_PAT }}
+
+      - name: ⚙️ Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: 🔢 Run version bump script
+        id: bump
+        run: |
+          chmod +x tools/version.sh
+          tools/version.sh
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
+          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: 📝 Commit & Push Version Bump
+        run: |
+          git config user.name "CI Bot"
+          git config user.email "ci@saoirse.com"
+          
+          BRANCH="ci/version-bump-${{ github.run_number }}"
+          git checkout -b $BRANCH
+          git add pubspec.yaml CHANGELOG.md
+          
+          # Only commit if there are changes
+          if git diff --cached --quiet; then
+            echo "No version changes detected"
+            exit 0
+          fi
+          
+          git commit -m "ci: automated version bump to ${{ steps.bump.outputs.new_version }}"
+          git push origin $BRANCH
+
+      - name: 🔀 Create & Auto-Merge PR
+        env:
+          GH_TOKEN: ${{ secrets.CI_PAT }}
+        run: |
+          BRANCH="ci/version-bump-${{ github.run_number }}"
+          
+          # Create PR
+          PR_URL=$(gh pr create \
+            --base main \
+            --head $BRANCH \
+            --title "ci: automated version bump to ${{ steps.bump.outputs.new_version }}" \
+            --body "Automated version bump to **${{ steps.bump.outputs.new_version }}**" \
+            --label "automated" | tail -n1)
+          
+          echo "Created PR: $PR_URL"
+          
+          # Enable auto-merge (requires branch protection rules allowing it)
+          gh pr merge $PR_URL --auto --squash || echo "Auto-merge not available, manual merge required"
+
+  create-tag:
+    # This job only runs when a version bump PR is merged
+    if: >
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.title, 'ci: automated version bump')
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.CI_PAT }}
+
+      - name: 🔢 Get Version from pubspec.yaml
+        id: version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Version detected: $VERSION"
+
+      - name: 🏷️ Create & Push Tag
+        run: |
+          git config user.name "CI Bot"
+          git config user.email "ci@saoirse.com"
+          
+          TAG="v${{ steps.version.outputs.VERSION }}"
+          
+          # Check if tag already exists
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "⚠️ Tag $TAG already exists, skipping"
+            exit 0
+          fi
+          
+          echo "✅ Creating tag: $TAG"
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
+          
+          echo "🚀 Tag $TAG pushed successfully!"
+
+      - name: 📊 Summary
+        run: |
+          echo "## 🏷️ Tag Created Successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** v${{ steps.version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This will trigger the Android Build & Deploy workflow." >> $GITHUB_STEP_SUMMARY
