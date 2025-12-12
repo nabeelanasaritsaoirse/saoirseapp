@@ -3,7 +3,7 @@ name: 🚀 Deploy iOS IPA to TestFlight (No Build)
 on:
   workflow_dispatch:
   push:
-   branches: [ developer ]
+   branches: [ nabeeela ]
 
 jobs:
   deploy:

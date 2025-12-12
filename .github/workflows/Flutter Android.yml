@@ -22,6 +22,9 @@ on:
 jobs:
   android-ci:
     runs-on: ubuntu-latest
+    outputs:
+      version_name: ${{ steps.version.outputs.VERSION_NAME }}
+      version_code: ${{ steps.version.outputs.VERSION_CODE }}
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
@@ -169,6 +172,7 @@ jobs:
           EOF
           
       - name: 🔢 Read version from pubspec & generate versionCode
+        id: version
         run: |
           VERSION_LINE=$(grep "^version:" pubspec.yaml)
           VERSION_NAME=$(echo "$VERSION_LINE" | cut -d '+' -f 1 | sed 's/version: //')
@@ -176,9 +180,13 @@ jobs:
       
           echo "Version Name: $VERSION_NAME"
           echo "Version Code: $VERSION_CODE"
+          echo "Tag: ${{ github.ref_name }}"
       
           echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
           echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_OUTPUT
+
 
       - name: 🏗️ Build Android APK & AAB
         run: |
@@ -242,23 +250,21 @@ jobs:
 
       - run: gem install fastlane -N
 
-      - name: 🚀 Deploy to Google Play
-        if: github.ref == 'refs/heads/developer' && github.event_name == 'push'
-        env:
-          JSON_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
-          PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
-        run: |
-          echo "$JSON_KEY" > service_account.json
-          fastlane supply \
-            --aab app-release.aab \
-            --json_key service_account.json \
-            --package_name "$PACKAGE_NAME" \
-            --track internal \
-            --skip_upload_screenshots true \
-            --skip_upload_images true
+      # - name: 🚀 Deploy to Google Play
+      #   env:
+      #     JSON_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+      #     PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
+      #   run: |
+      #     echo "$JSON_KEY" > service_account.json
+      #     fastlane supply \
+      #       --aab app-release.aab \
+      #       --json_key service_account.json \
+      #       --package_name "$PACKAGE_NAME" \
+      #       --track internal \
+      #       --skip_upload_screenshots true \
+      #       --skip_upload_images true
 
       - name: 🚀 Deploy to Google Play (Production)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           JSON_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
