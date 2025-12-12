@@ -36,8 +36,6 @@ jobs:
       - name: Run version automation
         run: tools/version.sh
 
-      # --- FIX: Cannot push to protected main branch ---
-      # Create separate branch & open PR automatically
       - name: Commit & create PR for version bump
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,6 +57,3 @@ jobs:
             --head $BRANCH \
             --title "ci: automated version bump" \
             --body "Automated version bump after merging PR #${{ github.event.pull_request.number }}"
-
-      # Tagging will happen only after the PR is merged,
-      # so this step is intentionally removed.
