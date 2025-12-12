@@ -1,5 +1,7 @@
-## Version 1.3.1+76
+## Version 1.3.2+77
 
+- Merge pull request #241 from nabeelanasaritsaoirse/ci/version-bump-18
+- ci: automated version bump
 - Merge pull request #240 from nabeelanasaritsaoirse/versioning
 - Update auto-tag.yml
 - Update auto-version.yml
