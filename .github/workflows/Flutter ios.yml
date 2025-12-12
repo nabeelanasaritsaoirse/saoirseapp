@@ -25,21 +25,19 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      # ---------------- Checkout ----------------
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      # ---------------- Flutter Setup ----------------
       - name: ⚙️ Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.35.7"
           channel: stable
+          cache: true
 
       - name: 📦 Flutter Pub Get
         run: flutter pub get
 
-      # ---------------- ENV file ----------------
       - name: 🔑 Create .env file
         run: |
           cat > .env <<EOF
@@ -53,34 +51,30 @@ jobs:
           ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
           EOF
 
-      - name: 📋 Copy .env to Runner
+      - name: 📋 Copy .env to iOS Runner
         run: |
           mkdir -p ios/Runner
           cp .env ios/Runner/.env
 
-      # ---------------- Fastlane & CocoaPods ----------------
       - name: 🚀 Install Fastlane & CocoaPods
         run: |
           sudo gem install fastlane -N
           sudo gem install cocoapods -N
 
-      # ---------------- App Store Connect API Key ----------------
-      - name: 🔐 Write ASC API Key
+      - name: 🔐 Write App Store Connect API Key
         run: |
+          mkdir -p ios
           echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > ios/api_key.json
           chmod 600 ios/api_key.json
 
-      # ---------------- Keychain Setup ----------------
-      - name: 🔓 Setup Keychain
+      - name: 🔓 Unlock macOS keychain
         run: |
-          KEYCHAIN_PASSWORD="ci_keychain_pass"
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security create-keychain -p "" build.keychain
           security default-keychain -s build.keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security set-keychain-settings -lut 7200 build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings build.keychain
 
-      # ---------------- Download Certificates via Match ----------------
-      - name: 🔐 Fastlane Match
+      - name: 🔐 Download Certificates (Match)
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
@@ -90,21 +84,19 @@ jobs:
             --api_key_path ./api_key.json \
             --git_branch main \
             --keychain_name build.keychain \
-            --keychain_password "ci_keychain_pass"
+            --keychain_password ""
 
-      # ---------------- Cache Pods / DerivedData ----------------
       - name: 💾 Cache Xcode DerivedData
         uses: actions/cache@v3
         with:
           path: |
             ~/Library/Developer/Xcode/DerivedData
             ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          key: ${{ runner.os }}-xcode-${{ hashFiles('ios/Podfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-pods-
+            ${{ runner.os }}-xcode-
 
-      # ---------------- Pods ----------------
-      - name: 🧨 Reset Pods if not cached
+      - name: 🧨 Reset Pods (if not cached)
         run: |
           if [ ! -d "ios/Pods" ]; then
             rm -rf ios/Podfile.lock
@@ -115,12 +107,10 @@ jobs:
           cd ios
           pod install --repo-update
 
-      # ---------------- Flutter iOS Build ----------------
       - name: 🔨 Prepare Flutter for Xcode 16
         run: flutter build ios --release --no-codesign --config-only
 
-      # ---------------- ExportOptions.plist ----------------
-      - name: 📝 Create Export Options
+      - name: 📝 Create ExportOptions.plist
         run: |
           cat > ios/ExportOptions.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
@@ -137,64 +127,70 @@ jobs:
             <key>provisioningProfiles</key>
             <dict>
               <key>${BUNDLE_ID}</key>
-              <string>AppStore_${BUNDLE_ID}</string>
+              <string>match AppStore ${BUNDLE_ID}</string>
             </dict>
           </dict>
           </plist>
           EOF
 
-      # ---------------- ThinBinary Fix ----------------
       - name: 🩹 Disable Flutter ThinBinary
         run: sed -i '' 's/Thin Binary/Thin Binary Disabled by CI/g' ios/Runner.xcodeproj/project.pbxproj
 
-      # ---------------- Archive Build ----------------
-      - name: 🏗️ Archive Build
+      - name: 🏗️ Archive Build (Runner only)
         run: |
           cd ios
-          mkdir -p ../${ARCHIVE_DIR} ../${IPA_DIR}
+          mkdir -p ../${ARCHIVE_DIR}
+          mkdir -p ../${IPA_DIR}
+
           xcodebuild archive \
             -workspace Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
-            -archivePath ../build/ios/archive/Runner.xcarchive \
-            -destination generic/platform=iOS \
-            DEVELOPMENT_TEAM=BYQUNNQSQH \
+            -archivePath ../${ARCHIVE_DIR}/Runner.xcarchive \
+            -destination 'generic/platform=iOS' \
+            DEVELOPMENT_TEAM=${TEAM_ID} \
             CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE_SPECIFIER="AppStore_com.saoirse.epi" \
+            PROVISIONING_PROFILE_SPECIFIER="match AppStore com.saoirse.epi" \
             OTHER_CODE_SIGN_FLAGS="--keychain build.keychain" \
-            CODE_SIGN_IDENTITY="Apple Distribution"
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            | tee ../xcodebuild.log
 
-
-      # ---------------- Verify Archive ----------------
       - name: ✅ Verify Archive
         run: |
           if [ ! -d "${ARCHIVE_DIR}/Runner.xcarchive" ]; then
             echo "❌ Archive not created!"
+            tail -n 200 xcodebuild.log || true
             exit 1
           fi
 
-      # ---------------- Export IPA ----------------
       - name: 📦 Export IPA
         run: |
           cd ios
           xcodebuild -exportArchive \
             -archivePath ../${ARCHIVE_DIR}/Runner.xcarchive \
             -exportPath ../${IPA_DIR} \
-            -exportOptionsPlist ExportOptions.plist
+            -exportOptionsPlist ExportOptions.plist \
+            | tee ../export.log || true
 
-      # ---------------- Verify IPA ----------------
-      - name: ✅ Verify IPA Export
+      - name: ✅ Verify IPA
         run: |
-          ls ${IPA_DIR}/*.ipa || (echo "❌ IPA not found!" && exit 1)
+          ls ${IPA_DIR}/*.ipa || (echo "❌ IPA export failed!" && exit 1)
 
-      # ---------------- Upload Artifact ----------------
-      - name: 📤 Upload IPA
+      - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
           path: ${{ env.IPA_DIR }}/*.ipa
 
-  # ---------------- TestFlight Deployment ----------------
+      - name: 📋 Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-logs
+          path: |
+            xcodebuild.log
+            export.log
+
   ios-deploy:
     name: "🚀 Deploy to TestFlight"
     needs: ios-ci
