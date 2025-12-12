@@ -2,10 +2,8 @@ name: 📌 Auto Version & Changelog
 
 on:
   pull_request:
-    branches:
-      - main
-    types:
-      - closed
+    branches: [ main ]
+    types: [ closed ]
 
 permissions:
   contents: write
@@ -13,11 +11,17 @@ permissions:
 
 jobs:
   version:
-    if: github.event.pull_request.merged == true
+    if: >
+      github.event.pull_request.merged == true &&
+      !startsWith(github.event.pull_request.title, 'ci: automated version bump')
     runs-on: ubuntu-latest
 
+    outputs:
+      new_version: ${{ steps.ver.outputs.new_version }}
+      pr_created: ${{ steps.create_pr.outputs.pr_created }}
+
     steps:
-      - name: 📥 Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -27,34 +31,56 @@ jobs:
         with:
           channel: stable
 
-      - name: Install dependencies
-        run: flutter pub get
+      - name: Run version bump script
+        id: ver
+        run: |
+          chmod +x tools/version.sh
+          tools/version.sh
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
+          echo "new_version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Make version script executable
-        run: chmod +x tools/version.sh
-
-      - name: Run version automation
-        run: tools/version.sh
-
-      - name: Commit & create PR for version bump
+      - name: Commit & Create PR
+        id: create_pr
         env:
           GH_TOKEN: ${{ secrets.CI_PAT }}
-          GITHUB_TOKEN: ${{ secrets.CI_PAT }}   # Needed for gh CLI operations
         run: |
           git config user.name "CI Bot"
           git config user.email "ci@saoirse.com"
-
           BRANCH="ci/version-bump-${{ github.run_number }}"
-
           git checkout -b $BRANCH
-
           git add pubspec.yaml CHANGELOG.md
           git commit -m "ci: automated version bump" || exit 0
-
           git push origin $BRANCH
-
           gh pr create \
             --base main \
             --head $BRANCH \
             --title "ci: automated version bump" \
-            --body "Automated version bump after merging PR #${{ github.event.pull_request.number }}"
+            --body "Automated version bump"
+          echo "pr_created=true" >> $GITHUB_OUTPUT
+
+  tag:
+    needs: version
+    if: needs.version.outputs.pr_created != 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version
+        id: getver
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create tag
+        env:
+          GH_TOKEN: ${{ secrets.CI_PAT }}
+        run: |
+          git config user.name "CI Bot"
+          git config user.email "ci@saoirse.com"
+          git tag v${{ steps.getver.outputs.VERSION }}
+          git push origin v${{ steps.getver.outputs.VERSION }}
+
