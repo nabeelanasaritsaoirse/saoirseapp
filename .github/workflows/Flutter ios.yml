@@ -66,15 +66,16 @@ jobs:
           mkdir -p ios
           echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > ios/api_key.json
           chmod 600 ios/api_key.json
-
-      - name: 🔓 Unlock macOS keychain
+          
+      - name: 🔓 Setup Keychain
         run: |
-          security create-keychain -p "" build.keychain
+          KEYCHAIN_PASSWORD="ci_keychain_pass"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security set-keychain-settings build.keychain
-
-      - name: 🔐 Download Certificates (Match)
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -lut 7200 build.keychain
+      # ---------------- Download Certificates via Match ----------------
+      - name: 🔐 Fastlane Match
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
@@ -84,7 +85,7 @@ jobs:
             --api_key_path ./api_key.json \
             --git_branch main \
             --keychain_name build.keychain \
-            --keychain_password ""
+            --keychain_password "ci_keychain_pass"
 
       - name: 💾 Cache Xcode DerivedData
         uses: actions/cache@v3
