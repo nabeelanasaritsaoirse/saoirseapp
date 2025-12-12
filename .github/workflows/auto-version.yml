@@ -27,6 +27,8 @@ jobs:
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2
+        with:
+          channel: stable
 
       - name: Run version bump script
         id: ver
@@ -35,33 +37,24 @@ jobs:
           tools/version.sh
           VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
           echo "new_version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Create Version Bump Branch + Commit
-        env:
-          TOKEN: ${{ secrets.CI_PAT }}
-        run: |
-          git config user.name "CI Bot"
-          git config user.email "ci@saoirse.com"
-
-          BRANCH="ci/version-bump-${{ github.run_number }}"
-          git checkout -b $BRANCH
-
-          git add pubspec.yaml CHANGELOG.md
-          git commit -m "ci: automated version bump" || echo "No changes"
-
-          # Push to new branch
-          git push https://x-access-token:$TOKEN@github.com/${{ github.repository }}.git HEAD:$BRANCH
-
-      - name: Open Pull Request
+      - name: Commit & Create PR
+        id: create_pr
         env:
           GH_TOKEN: ${{ secrets.CI_PAT }}
         run: |
+          git config user.name "CI Bot"
+          git config user.email "ci@saoirse.com"
+          BRANCH="ci/version-bump-${{ github.run_number }}"
+          git checkout -b $BRANCH
+          git add pubspec.yaml CHANGELOG.md
+          git commit -m "ci: automated version bump" || exit 0
+          git push origin $BRANCH
           gh pr create \
             --base main \
             --head $BRANCH \
             --title "ci: automated version bump" \
             --body "Automated version bump"
-
+          echo "pr_created=true" >> $GITHUB_OUTPUT
   tag:
     needs: version
     runs-on: ubuntu-latest
