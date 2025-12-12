@@ -1,10 +1,6 @@
-## Version 1.3.6+81
+## Version 1.3.7+82
 
-- Merge pull request #253 from nabeelanasaritsaoirse/versioning
+- Merge pull request #255 from nabeelanasaritsaoirse/versioning
 - Update auto-version.yml
-- Merge pull request #252 from nabeelanasaritsaoirse/versioning
-- Update auto-version.yml
-- Merge pull request #251 from nabeelanasaritsaoirse/versioning
-- Update auto-version.yml
-- Merge pull request #250 from nabeelanasaritsaoirse/ci/version-bump-27
+- Merge pull request #254 from nabeelanasaritsaoirse/ci/version-bump-31
 - ci: automated version bump
