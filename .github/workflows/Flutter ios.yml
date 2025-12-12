@@ -137,7 +137,7 @@ jobs:
             <key>provisioningProfiles</key>
             <dict>
               <key>${BUNDLE_ID}</key>
-              <string>match AppStore ${BUNDLE_ID}</string>
+              <string>AppStore_${BUNDLE_ID}</string>
             </dict>
           </dict>
           </plist>
@@ -156,13 +156,14 @@ jobs:
             -workspace Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
-            -archivePath ../${ARCHIVE_DIR}/Runner.xcarchive \
-            -destination 'generic/platform=iOS' \
-            DEVELOPMENT_TEAM=${TEAM_ID} \
+            -archivePath ../build/ios/archive/Runner.xcarchive \
+            -destination generic/platform=iOS \
+            DEVELOPMENT_TEAM=BYQUNNQSQH \
             CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE_SPECIFIER="match AppStore ${BUNDLE_ID}" \
+            PROVISIONING_PROFILE_SPECIFIER="AppStore_com.saoirse.epi" \
             OTHER_CODE_SIGN_FLAGS="--keychain build.keychain" \
             CODE_SIGN_IDENTITY="Apple Distribution"
+
 
       # ---------------- Verify Archive ----------------
       - name: ✅ Verify Archive
