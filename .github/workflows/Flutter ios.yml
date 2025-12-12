@@ -17,6 +17,7 @@ permissions:
 env:
   BUNDLE_ID: com.saoirse.epi
   TEAM_ID: BYQUNNQSQH
+  PROFILE_NAME: "match AppStore com.saoirse.epi 1765456537"
   ARCHIVE_DIR: build/ios/archive
   IPA_DIR: build/ios/ipa
 
@@ -66,7 +67,7 @@ jobs:
           mkdir -p ios
           echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > ios/api_key.json
           chmod 600 ios/api_key.json
-          
+
       - name: 🔓 Setup Keychain
         run: |
           KEYCHAIN_PASSWORD="ci_keychain_pass"
@@ -74,7 +75,7 @@ jobs:
           security default-keychain -s build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security set-keychain-settings -lut 7200 build.keychain
-      # ---------------- Download Certificates via Match ----------------
+
       - name: 🔐 Fastlane Match
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
@@ -128,7 +129,7 @@ jobs:
             <key>provisioningProfiles</key>
             <dict>
               <key>${BUNDLE_ID}</key>
-              <string>match AppStore ${BUNDLE_ID}</string>
+              <string>${PROFILE_NAME}</string>
             </dict>
           </dict>
           </plist>
@@ -137,7 +138,7 @@ jobs:
       - name: 🩹 Disable Flutter ThinBinary
         run: sed -i '' 's/Thin Binary/Thin Binary Disabled by CI/g' ios/Runner.xcodeproj/project.pbxproj
 
-      - name: 🏗️ Archive Build (Runner only)
+      - name: 🏗️ Archive Build
         run: |
           cd ios
           mkdir -p ../${ARCHIVE_DIR}
@@ -151,9 +152,9 @@ jobs:
             -destination 'generic/platform=iOS' \
             DEVELOPMENT_TEAM=${TEAM_ID} \
             CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE_SPECIFIER="match AppStore com.saoirse.epi" \
-            OTHER_CODE_SIGN_FLAGS="--keychain build.keychain" \
+            PROVISIONING_PROFILE_SPECIFIER="${PROFILE_NAME}" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
+            OTHER_CODE_SIGN_FLAGS="--keychain build.keychain" \
             | tee ../xcodebuild.log
 
       - name: ✅ Verify Archive
