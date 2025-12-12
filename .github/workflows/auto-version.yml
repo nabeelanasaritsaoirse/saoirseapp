@@ -61,19 +61,19 @@ jobs:
   tag:
     needs: version
     runs-on: ubuntu-latest
-
+  
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
+  
       - name: Get version
         id: getver
         run: |
           VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-
+  
       - name: Create tag
         env:
           GH_TOKEN: ${{ secrets.CI_PAT }}
@@ -82,4 +82,4 @@ jobs:
           git config user.email "ci@saoirse.com"
           git tag v${{ steps.getver.outputs.VERSION }}
           git push origin v${{ steps.getver.outputs.VERSION }}
-
+  
