@@ -1,6 +1,75 @@
-## Version 1.3.7+82
+## Version 1.3.8+83
 
-- Merge pull request #255 from nabeelanasaritsaoirse/versioning
-- Update auto-version.yml
-- Merge pull request #254 from nabeelanasaritsaoirse/ci/version-bump-31
-- ci: automated version bump
+- Merge pull request #257 from nabeelanasaritsaoirse/nabeeela
+- fix:cicd updated
+- Merge remote-tracking branch 'origin' into nabeeela fix:deployment for ios
+- Update Flutter ios.yml
+- Create Fastfile
+- Update Appfile
+- Update Matchfile
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Appfile
+- Update Matchfile
+- Update Appfile
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Podfile
+- Update Podfile
+- Update Flutter ios.yml
+- Update Podfile
+- Update Podfile
+- Update Flutter ios.yml
+- Update Podfile
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Podfile
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Podfile
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Podfile
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Podfile
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Create api_key.json
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Update Appfile
+- Update Flutter ios.yml
+- Update Matchfile
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Change deployment branch from 'developer' to 'nabeeela'
+- Update project.pbxproj
+- Update Flutter ios.yml
+- Update Flutter ios.yml
+- Add Fastlane Appfile configuration
+- Create Matchfile
+- Update Flutter ios.yml
+- Merge pull request #236 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-1
+- Update Podfile
+- Merge pull request #235 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-3
+- Add permissions for iOS build workflow
