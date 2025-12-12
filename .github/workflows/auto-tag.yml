@@ -1,25 +1,21 @@
 name: 🏷 Auto Tag on Version Bump
 
 on:
-  pull_request:
-    branches:
-      - main
-    types:
-      - closed
+  workflow_run:
+    workflows: ["📌 Auto Version & Changelog"]
+    types: [completed]
 
 permissions:
   contents: write
 
 jobs:
   tag:
-    if: "github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, 'ci: automated version bump')"
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Extract version
         id: version
