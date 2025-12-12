@@ -14,7 +14,6 @@ jobs:
     if: >
       github.event.pull_request.merged == true &&
       !startsWith(github.event.pull_request.title, 'ci: automated version bump')
-
     runs-on: ubuntu-latest
 
     outputs:
@@ -28,8 +27,6 @@ jobs:
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2
-        with:
-          channel: stable
 
       - name: Run version bump script
         id: ver
@@ -39,18 +36,31 @@ jobs:
           VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
           echo "new_version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Commit Updated Files
-        run: |
-          git config user.name "CI Bot"
-          git config user.email "ci@saoirse.com"
-          git add pubspec.yaml CHANGELOG.md
-          git commit -m "ci: automated version bump" || echo "No changes"
-
-      - name: Push Version Commit
+      - name: Create Version Bump Branch + Commit
         env:
           TOKEN: ${{ secrets.CI_PAT }}
         run: |
-          git push https://x-access-token:$TOKEN@github.com/${{ github.repository }}.git HEAD:main
+          git config user.name "CI Bot"
+          git config user.email "ci@saoirse.com"
+
+          BRANCH="ci/version-bump-${{ github.run_number }}"
+          git checkout -b $BRANCH
+
+          git add pubspec.yaml CHANGELOG.md
+          git commit -m "ci: automated version bump" || echo "No changes"
+
+          # Push to new branch
+          git push https://x-access-token:$TOKEN@github.com/${{ github.repository }}.git HEAD:$BRANCH
+
+      - name: Open Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.CI_PAT }}
+        run: |
+          gh pr create \
+            --base main \
+            --head $BRANCH \
+            --title "ci: automated version bump" \
+            --body "Automated version bump"
 
   tag:
     needs: version
@@ -59,8 +69,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Get Version
         id: ver
@@ -68,13 +76,14 @@ jobs:
           VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Create & Push Tag (Triggers Deploy Workflow)
+      - name: Create & Push Tag
         env:
           TOKEN: ${{ secrets.CI_PAT }}
         run: |
           git config user.name "CI Bot"
           git config user.email "ci@saoirse.com"
+
           TAG="v${{ steps.ver.outputs.VERSION }}"
           git tag $TAG
-          # 🚨 MUST PUSH USING TOKEN — otherwise the build pipeline WILL NOT TRIGGER
+
           git push https://x-access-token:$TOKEN@github.com/${{ github.repository }}.git $TAG
