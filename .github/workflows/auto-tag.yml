@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   tag:
-    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, 'ci: automated version bump')
+    if: "github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, 'ci: automated version bump')"
     runs-on: ubuntu-latest
 
     steps:
