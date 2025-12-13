@@ -35,33 +35,57 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await AppsFlyerService.instance.init();
-  await dotenv.load(fileName: ".env");
-  Platform.isIOS
-      ? await Firebase.initializeApp(
-          options:  FirebaseOptions(
-          apiKey: dotenv.env['IOS_API_KEY']?? '',
+  
+  // Load .env with error handling
+  try {
+    await dotenv.load(fileName: ".env");
+    log("✅ .env loaded successfully");
+  } catch (e) {
+    log("❌ Failed to load .env: $e");
+    log("⚠️ Make sure .env is added to Xcode project as a Copy Bundle Resource");
+    // You could optionally use fallback values here for testing
+  }
+  
+  // Initialize Firebase with better error handling
+  try {
+    if (Platform.isIOS) {
+      await Firebase.initializeApp(
+        options: FirebaseOptions(
+          apiKey: dotenv.env['IOS_API_KEY'] ?? '',
           appId: dotenv.env['IOS_APP_ID'] ?? '',
           messagingSenderId: dotenv.env['IOS_MESSAGING_SENDER_ID'] ?? '',
           projectId: dotenv.env['IOS_PROJECT_ID'] ?? '',
-        ))
-      : await Firebase.initializeApp(
-          options: FirebaseOptions(
+        ),
+      );
+    } else {
+      await Firebase.initializeApp(
+        options: FirebaseOptions(
           apiKey: dotenv.env['ANDROID_API_KEY'] ?? '',
           appId: dotenv.env['ANDROID_APP_ID'] ?? '',
           messagingSenderId: dotenv.env['ANDROID_MESSAGING_SENDER_ID'] ?? '',
           projectId: dotenv.env['ANDROID_PROJECT_ID'] ?? '',
-        ));
-    
+        ),
+      );
+    }
+    log("✅ Firebase initialized successfully");
+  } catch (e) {
+    log("❌ Firebase initialization failed: $e");
+    // Continue anyway - some features might work without Firebase
+  }
     
   // Background handler registration
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   // Request permission
-  await FirebaseMessaging.instance.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
+  try {
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  } catch (e) {
+    log("⚠️ Failed to request notification permission: $e");
+  }
 
   // 📌 Local Notification Initialization
   await NotificationServiceHelper.initializeLocalNotifications();
@@ -76,8 +100,8 @@ Future<void> main() async {
   final savedToken = storage.read(AppConst.ACCESS_TOKEN);
   if (savedToken != null) {
     notif.updateToken(savedToken);
-     notif.refreshNotifications();
-  notif.fetchUnreadCount();
+    notif.refreshNotifications();
+    notif.fetchUnreadCount();
   }
 
   // 🟢 Foreground message listener
