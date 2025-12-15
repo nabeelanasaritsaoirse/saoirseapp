@@ -29,17 +29,11 @@ class AppStrings {
   static String wallet_title = "My Wallet";
 
   // Home Screen
-  static String card_discription =
-      "Turn your savings into success\ninvest today and secure the future you’ve always wanted!";
-  static String btton_lebel = "Book Now";
   static String poular = "Most Popular";
   static String see_all = "See All";
   static String best_products = 'Best Seller Products';
   static String trending = "Trending Products";
-  static String explore = "Explore\nMore!!";
   static String purchase = "START PURCHASING";
-  static String Adverticement_content =
-      "Just save minimum ₹100 everyday\nto get your desired product";
   static String refer = "Refer EPI";
   static String refer_heding = "Earn Money\nEveryday";
   static String refer_button_lebel = "Refer A Friend Now";
@@ -54,9 +48,7 @@ class AppStrings {
   static String freeShiping = "Free shipping";
   static String ColorAvailable = "Color Available";
   static String description = "Description";
-  static String selectPlan = "Select Plan";
   static String checkout = "Check Out";
-  static String addToCart = "Add to Cart";
 
   // Refferal page
   static String refferalTitle = "Referral Details";
@@ -64,7 +56,6 @@ class AppStrings {
   static String referalBannerContent =
       "Invite Friends\nEarn Money\nStart Referring Today!";
   static String refer_via = "Refer Via";
-  static String apply_refferal = "Apply Refferal";
   static String shareTo = "Share to";
   static String search = "Search";
   static String no = "No";
@@ -78,6 +69,7 @@ class AppStrings {
   static String facebook = 'Facebook';
   static String telegram = 'Telegram';
   static String twitter = 'Twitter';
+  static String instagram = 'Instagram';
   static String gmail = 'Gmail';
   static String more = 'More';
   static String your_refferal = "Your referral";
@@ -87,19 +79,14 @@ class AppStrings {
       "If someone referred you, enter their referral code below. This helps us apply rewards correctly.";
   static String refferal_applied_success =
       "Your referral code has been\nsuccessfully applied.";
-  // Invite friend Details page
-  static String referal_screen_label = "Referal Details";
   static String productId = "Product ID";
   static String amount = "Amount";
   static String pending_status = "Pending Status";
   static String view_details = "View Details";
-  static String user_name = "Rajive Kumar";
-  static String user_email = "rajive.kumar@gmail.com";
   static String total_product = "Total Product";
   static String my_commission = "My commission";
   static String message = "Message Me";
   static String product = "Products";
-  static String no_products = "No products available";
   static String dp = "D.P  ";
   static String date_of_purchase = "Date of Purchase";
   static String total_price = "Total price";
@@ -108,9 +95,6 @@ class AppStrings {
   static String myTotalErnings = "My Total Ernings";
   static String pending_inv = "Pending Investment";
   static String close = 'Close';
-  static String last = "Last ";
-  static String days = "Days";
-  static String day = "/Day";
   static String each = "/Each";
 
   // select planning sheet
@@ -119,23 +103,17 @@ class AppStrings {
   static String enter_days = "days";
   static String enter_amount = "amount";
   static String convert = "Convert";
-  static String auto_generated = "Auto generated";
-  static String recommented = "Recommended";
   static String equivalent_time = "Equivalent Time:";
-  static String start_on = "Start On";
-  static String end_on = "Start On";
   static String selected = "Select";
   static String warning_label = "Please Select Your Plan";
   static String warning_body =
       "You haven’t selected a plan yet. Please choose a plan before proceeding to Add to Cart.";
   static String checkout_warning_body =
       "You haven’t selected a plan yet. Please choose a plan before proceeding to Check out.";
-      
-      // KYC page 
+
+  // KYC page
 
   static String KycTitle = "KYC Status";
-  
-
 
   //Cart page
   static String carttitle = "Cart";

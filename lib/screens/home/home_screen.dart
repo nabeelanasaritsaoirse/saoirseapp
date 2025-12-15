@@ -40,14 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
   InvestmentStatusController investmentController =
       Get.put(InvestmentStatusController());
 
-  // Refactored Icon box
-
-  final List<String> imageList = [
-    AppAssets.success_image_1,
-    AppAssets.success_image_2,
-    AppAssets.success_image_3,
-  ];
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -657,7 +649,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 75.h,
                       ),
                       appButton(
-                          onTap: () {},
+                          onTap: () {
+                            Get.to(() => ProductListing());
+                          },
                           buttonColor: AppColors.white,
                           borderRadius: BorderRadius.circular(5.r),
                           padding: EdgeInsets.all(0),

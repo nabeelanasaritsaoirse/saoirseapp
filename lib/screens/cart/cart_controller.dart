@@ -1,9 +1,9 @@
 // ignore_for_file: avoid_print
 
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/product_details_model.dart';
 
 import '../../models/cart_response_model.dart';
+import '../../models/product_details_model.dart';
 import '../../services/cart_service.dart';
 import '../../widgets/app_toast.dart';
 
@@ -22,9 +22,6 @@ class CartController extends GetxController {
     fetchCartCount();
     super.onInit();
   }
-
-
-  
 
   // Fetch cart from API
   Future<void> fetchCart() async {
@@ -106,43 +103,42 @@ class CartController extends GetxController {
     }
   }
 
- // -------------------- ADD TO CART --------------------
- Future<void> addProductToCart({
-  required String productId,
-  required String? variantId,
-  required int days,
-  required double dailyAmount,
-}) async {
-  try {
-    isLoading(true);
+  // -------------------- ADD TO CART --------------------
+  Future<void> addProductToCart({
+    required String productId,
+    required String? variantId,
+    required int days,
+    required double dailyAmount,
+  }) async {
+    try {
+      isLoading(true);
 
-    final response = await service.addToCart(
-      productId: productId,
-      variantId: variantId,
-      totalDays: days,
-      dailyAmount: dailyAmount,
-      quantity: 1,
-    );
+      final response = await service.addToCart(
+        productId: productId,
+        variantId: variantId,
+        totalDays: days,
+        dailyAmount: dailyAmount,
+        quantity: 1,
+      );
 
-    if (response == null) {
-      appToast(content: "Failed to add to cart", error: true);
-      return;
+      if (response == null) {
+        appToast(content: "Failed to add to cart", error: true);
+        return;
+      }
+
+      if (response.success) {
+        appToaster(content: response.message);
+        fetchCart();
+        fetchCartCount();
+      } else {
+        appToast(content: response.message, error: true);
+      }
+    } catch (e) {
+      appToast(content: "Error: $e", error: true);
+    } finally {
+      isLoading(false);
     }
-
-    if (response.success) {
-      appToast(content: response.message);
-      fetchCart();
-      fetchCartCount();
-    } else {
-      appToast(content: response.message, error: true);
-    }
-  } catch (e) {
-    appToast(content: "Error: $e", error: true);
-  } finally {
-    isLoading(false);
   }
-}
-
 
   // Clear cart
   Future<void> clearCartItems() async {
@@ -230,70 +226,57 @@ class CartController extends GetxController {
     }
   }
 
-
   ProductDetailsData convertCartToProductDetails(CartProduct item) {
-  return ProductDetailsData(
-    id: item.productId,
-    productId: item.productId,
-    variantId: item.variant?.variantId ?? "",
-    name: item.name,
-    brand: item.brand,
-    sku: "",
-
-    description: Description(short: "", long: "", features: []),
-
-    category: Category(
-      mainCategoryId: "",
-      mainCategoryName: "",
-      subCategoryId: "",
-      subCategoryName: "",
-    ),
-
-    availability: Availability(
-      isAvailable: true,
-      stockQuantity: item.stock,
-      lowStockLevel: 0,
-      stockStatus: item.stock > 0 ? "in_stock" : "out_of_stock",
-    ),
-
-    pricing: Pricing(
-      regularPrice: item.price,
-      salePrice: item.finalPrice,
-      finalPrice: item.finalPrice,
-      currency: "INR",
-    ),
-
-    seo: Seo(keywords: []),
-    warranty: Warranty(period: 0),
-
-    images: item.images
-        .map((img) => ImageData(
-              url: img.url,
-              altText: img.altText,
-              isPrimary: img.isPrimary,
-              id: img.id,
-            ))
-        .toList(),
-
-    isPopular: false,
-    isBestSeller: false,
-    isTrending: false,
-    status: "active",
-
-    hasVariants: item.variant != null,
-
-    regionalPricing: [],
-    regionalSeo: [],
-    regionalAvailability: [],
-    relatedProducts: [],
-    variants: [],
-    plans: [],
-
-    createdAt: "",
-    updatedAt: "",
-    v: 0,
-  );
-}
-
-
+    return ProductDetailsData(
+      id: item.productId,
+      productId: item.productId,
+      variantId: item.variant?.variantId ?? "",
+      name: item.name,
+      brand: item.brand,
+      sku: "",
+      description: Description(short: "", long: "", features: []),
+      category: Category(
+        mainCategoryId: "",
+        mainCategoryName: "",
+        subCategoryId: "",
+        subCategoryName: "",
+      ),
+      availability: Availability(
+        isAvailable: true,
+        stockQuantity: item.stock,
+        lowStockLevel: 0,
+        stockStatus: item.stock > 0 ? "in_stock" : "out_of_stock",
+      ),
+      pricing: Pricing(
+        regularPrice: item.price,
+        salePrice: item.finalPrice,
+        finalPrice: item.finalPrice,
+        currency: "INR",
+      ),
+      seo: Seo(keywords: []),
+      warranty: Warranty(period: 0),
+      images: item.images
+          .map((img) => ImageData(
+                url: img.url,
+                altText: img.altText,
+                isPrimary: img.isPrimary,
+                id: img.id,
+              ))
+          .toList(),
+      isPopular: false,
+      isBestSeller: false,
+      isTrending: false,
+      status: "active",
+      hasVariants: item.variant != null,
+      regionalPricing: [],
+      regionalSeo: [],
+      regionalAvailability: [],
+      relatedProducts: [],
+      variants: [],
+      plans: [],
+      createdAt: "",
+      updatedAt: "",
+      v: 0,
+    );
+  }
 }

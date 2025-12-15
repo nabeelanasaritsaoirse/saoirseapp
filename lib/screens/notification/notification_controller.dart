@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 import 'package:get/get.dart';
+
 import '../../models/notification_details_response_model.dart';
 import '../../models/notification_response.dart';
 import '../../services/notification_service.dart';
@@ -36,20 +37,18 @@ class NotificationController extends GetxController {
   // ------------------------------------------------------------
   // 🔑 Update token after login
   // ------------------------------------------------------------
-void updateToken(String newToken) {
-  token = newToken;
-  service.updateToken(newToken); 
-  log("🔑 NotificationController token updated");
+  void updateToken(String newToken) {
+    token = newToken;
+    service.updateToken(newToken);
+    log("🔑 NotificationController token updated");
 
-  page = 1;
-  notifications.clear();
-  hasMore.value = true;
+    page = 1;
+    notifications.clear();
+    hasMore.value = true;
 
-  fetchNotifications();   // <-- ADD THIS
-  fetchUnreadCount();     // <-- ADD THIS
-}
-
-
+    fetchNotifications(); // <-- ADD THIS
+    fetchUnreadCount(); // <-- ADD THIS
+  }
 
   bool get hasToken => token != null && token!.isNotEmpty;
 
@@ -57,11 +56,7 @@ void updateToken(String newToken) {
   // 📩 Fetch Notifications
   // ------------------------------------------------------------
   Future<void> fetchNotifications() async {
-    if (!hasToken) {
-      log("🚫 No token → fetchNotifications skipped");
-      return;
-    }
-    if (!hasMore.value) return;
+    if (!hasMore.value || isLoading.value) return;
 
     try {
       isLoading(true);
@@ -70,8 +65,12 @@ void updateToken(String newToken) {
 
       if (response != null && response.success) {
         notifications.addAll(response.data.notifications);
-        hasMore.value = response.data.pagination.hasMore;
-        page++;
+        // if less than limit returned → no more pages
+        if (response.data.notifications.length < limit) {
+          hasMore.value = false;
+        } else {
+          page++;
+        }
       }
     } catch (e) {
       log("❌ Notification fetch error: $e");
@@ -122,16 +121,15 @@ void updateToken(String newToken) {
 
         // Update details screen
         if (notificationDetails.value != null) {
-          notificationDetails.value =
-              notificationDetails.value!.copyWith(
+          notificationDetails.value = notificationDetails.value!.copyWith(
             isLikedByMe: data["isLiked"],
             likeCount: data["newLikeCount"],
           );
         }
 
         // Update list screen
-        final index = notifications.indexWhere(
-            (n) => n.notificationId == notificationId);
+        final index =
+            notifications.indexWhere((n) => n.notificationId == notificationId);
 
         if (index != -1) {
           notifications[index] = notifications[index].copyWith(
@@ -160,8 +158,8 @@ void updateToken(String newToken) {
           unreadCount.value -= 1;
         }
 
-        int index = notifications.indexWhere(
-            (n) => n.notificationId == notificationId);
+        int index =
+            notifications.indexWhere((n) => n.notificationId == notificationId);
 
         if (index != -1) {
           // If backend returns isRead, update here
@@ -204,14 +202,12 @@ void updateToken(String newToken) {
       );
 
       if (response != null && response["success"] == true) {
-        final newComment =
-            CommentModel.fromJson(response["data"]["comment"]);
+        final newComment = CommentModel.fromJson(response["data"]["comment"]);
 
         comments.insert(0, newComment);
 
         if (notificationDetails.value != null) {
-          notificationDetails.value =
-              notificationDetails.value!.copyWith(
+          notificationDetails.value = notificationDetails.value!.copyWith(
             commentCount: notificationDetails.value!.commentCount + 1,
           );
         }
@@ -260,15 +256,12 @@ void updateToken(String newToken) {
     }
   }
 
-
-
   Future<void> refreshNotifications() async {
-  page = 1;
-  notifications.clear();
-  hasMore.value = true;
-  await fetchNotifications();
-}
-
+    page = 1;
+    notifications.clear();
+    hasMore.value = true;
+    await fetchNotifications();
+  }
 
   // ------------------------------------------------------------
   // 🔢 Unread Count
@@ -283,7 +276,7 @@ void updateToken(String newToken) {
     if (count != null) unreadCount.value = count;
   }
 
-    // ------------------------------------------------------------
+  // ------------------------------------------------------------
   // 🎉 Send In-App Welcome Notification
   // ------------------------------------------------------------
   Future<void> sendWelcomeNotification(String userName) async {
@@ -308,62 +301,51 @@ void updateToken(String newToken) {
 
   // FOR ORDER CONFIRMATION
   Future<void> sendOrderConfirmation(String userName) async {
-  if (!hasToken) {
-    log("🚫 No token → sendOrderConfirmation skipped");
-    return;
+    if (!hasToken) {
+      log("🚫 No token → sendOrderConfirmation skipped");
+      return;
+    }
+
+    log("📦 Sending Order Confirmation Notification → $userName");
+
+    final success = await service.sendCustomNotification(
+      title: "Thank you, $userName!",
+      message: "Your order has been confirmed and will be delivered soon.",
+      sendPush: true,
+      sendInApp: true,
+    );
+
+    if (success) {
+      log("🎉 Order Confirmation Notification Sent Successfully");
+
+      /// refresh notifications
+      refreshNotifications();
+      fetchUnreadCount();
+    } else {
+      log("❌ Failed to send order confirmation notification");
+    }
   }
-  
 
-  log("📦 Sending Order Confirmation Notification → $userName");
+  /// 🚨 Send Only Push Notification (Urgent Alert)
+  Future<void> sendUrgentAlert() async {
+    if (!hasToken) {
+      log("🚫 No token → sendUrgentAlert skipped");
+      return;
+    }
 
-  final success = await service.sendCustomNotification(
-    title: "Thank you, $userName!",
-    message: "Your order has been confirmed and will be delivered soon.",
-    sendPush: true,
-    sendInApp: true,
-  );
+    log("🚨 Sending Urgent Push Notification");
 
-  if (success) {
-    log("🎉 Order Confirmation Notification Sent Successfully");
+    final success = await service.sendCustomNotification(
+      title: "⚡ Flash Sale Alert!",
+      message: "Limited time offer: 50% OFF on all products. Shop now!",
+      sendPush: true, // ✔ Push notification
+      sendInApp: false, // ❌ Don't show in notification feed
+    );
 
-    /// refresh notifications
-    refreshNotifications();
-    fetchUnreadCount();
-  } else {
-    log("❌ Failed to send order confirmation notification");
+    if (success) {
+      log("🎉 Urgent Push Notification Sent Successfully");
+    } else {
+      log("❌ Failed to send urgent push notification");
+    }
   }
 }
-
-
-/// 🚨 Send Only Push Notification (Urgent Alert)
-Future<void> sendUrgentAlert() async {
-  if (!hasToken) {
-    log("🚫 No token → sendUrgentAlert skipped");
-    return;
-  }
-
-  log("🚨 Sending Urgent Push Notification");
-
-  final success = await service.sendCustomNotification(
-    title: "⚡ Flash Sale Alert!",
-    message: "Limited time offer: 50% OFF on all products. Shop now!",
-    sendPush: true,      // ✔ Push notification
-    sendInApp: false,    // ❌ Don't show in notification feed
-  );
-
-  if (success) {
-    log("🎉 Urgent Push Notification Sent Successfully");
-  } else {
-    log("❌ Failed to send urgent push notification");
-  }
-}
-
-
-
-
-  
-}
-
-
-
-

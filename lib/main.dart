@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -11,20 +10,20 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:saoirse_app/constants/app_constant.dart';
-import 'package:saoirse_app/screens/notification/notification_controller.dart';
-import 'package:saoirse_app/services/notification_service_helper.dart';
 
+import 'bindings/allcontroller.dart';
 import 'constants/app_colors.dart';
+import 'constants/app_constant.dart';
 import 'constants/app_strings.dart';
 import 'l10n/app_localizations.dart';
+import 'screens/notification/notification_controller.dart';
 import 'screens/splash/splash_screen.dart';
 import 'services/api_service.dart';
 import 'services/appsflyer_service.dart';
+import 'services/notification_service_helper.dart';
 
 //storage instance
 GetStorage storage = GetStorage();
-
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("🟡 Background Message Received: ${message.notification?.title}");
@@ -38,8 +37,8 @@ Future<void> main() async {
   await dotenv.load(fileName: ".env");
   Platform.isIOS
       ? await Firebase.initializeApp(
-          options:  FirebaseOptions(
-          apiKey: dotenv.env['IOS_API_KEY']?? '',
+          options: FirebaseOptions(
+          apiKey: dotenv.env['IOS_API_KEY'] ?? '',
           appId: dotenv.env['IOS_APP_ID'] ?? '',
           messagingSenderId: dotenv.env['IOS_MESSAGING_SENDER_ID'] ?? '',
           projectId: dotenv.env['IOS_PROJECT_ID'] ?? '',
@@ -51,8 +50,6 @@ Future<void> main() async {
           messagingSenderId: dotenv.env['ANDROID_MESSAGING_SENDER_ID'] ?? '',
           projectId: dotenv.env['ANDROID_PROJECT_ID'] ?? '',
         ));
-    
-    
   // Background handler registration
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
@@ -76,8 +73,8 @@ Future<void> main() async {
   final savedToken = storage.read(AppConst.ACCESS_TOKEN);
   if (savedToken != null) {
     notif.updateToken(savedToken);
-     notif.refreshNotifications();
-  notif.fetchUnreadCount();
+    notif.refreshNotifications();
+    notif.fetchUnreadCount();
   }
 
   // 🟢 Foreground message listener
@@ -127,6 +124,7 @@ class MyApp extends StatelessWidget {
             }
           },
           child: GetMaterialApp(
+            initialBinding: Allcontroller(),
             locale: locale,
             debugShowCheckedModeBanner: false,
             title: AppStrings.app_name,

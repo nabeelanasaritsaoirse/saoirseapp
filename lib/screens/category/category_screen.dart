@@ -8,6 +8,7 @@ import '../../constants/app_strings.dart';
 import '../../models/category_model.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
+import '../../widgets/category_item.dart';
 import '../../widgets/custom_appbar.dart';
 import '../productListing/product_listing.dart';
 import '../profile/profile_controller.dart';
@@ -121,79 +122,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 child: Column(
                   children: [
                     Expanded(
-                      child: ListView.builder(
+                      child: ListView.separated(
                         controller: controller.scrollController.value,
+                        physics: const ClampingScrollPhysics(), // IMPORTANT
+                        padding: EdgeInsets.zero,
                         itemCount: controller.categoryGroups.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 0),
                         itemBuilder: (context, index) {
-                          final isSelected =
-                              controller.selectedIndex.value == index;
-                          final category = controller.categoryGroups[index];
-
-                          return GestureDetector(
-                            onTap: () => controller.selectCategory(index),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.lightGrey
-                                    : AppColors.white,
-                                border: Border(
-                                  left: BorderSide(
-                                    color: isSelected
-                                        ? AppColors.primaryColor
-                                        : AppColors.transparent,
-                                    width: 4.w,
-                                  ),
-                                ),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                vertical: 15.h,
-                                horizontal: 7.w,
-                              ),
-                              child: Column(
-                                children: [
-                                  Builder(
-                                    builder: (_) {
-                                      final imageUrl = category.image?.url;
-
-                                      if (imageUrl == null ||
-                                          imageUrl.isEmpty) {
-                                        return Icon(
-                                          Icons.image_outlined,
-                                          size: 32.sp,
-                                          color: AppColors.grey,
-                                        );
-                                      }
-                                      return Image.network(
-                                        imageUrl,
-                                        width: 70.w,
-                                        height: 70.h,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Icon(
-                                            Icons.image_outlined,
-                                            size: 32.sp,
-                                            color: AppColors.grey,
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
-                                  SizedBox(height: 7.h),
-                                  appText(
-                                    category.name,
-                                    textAlign: TextAlign.center,
-                                    fontSize: 11.sp,
-                                    fontWeight: isSelected
-                                        ? FontWeight.w700
-                                        : FontWeight.w600,
-                                    color: isSelected
-                                        ? AppColors.primaryColor
-                                        : AppColors.textBlack,
-                                  ),
-                                ],
-                              ),
-                            ),
+                          return CategoryItem(
+                            index: index,
+                            controller: controller,
                           );
                         },
                       ),
@@ -332,21 +270,23 @@ class SubCategoryCard extends StatelessWidget {
                     );
                   }
 
-                  // Image available: show network image, fallback to icon on error
-                  return Image.network(
-                    imageUrl,
-                    height: 70.h,
-                    width: 70.w,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Center(
-                        child: Icon(
-                          Icons.image_outlined,
-                          size: 40.sp,
-                          color: AppColors.grey,
-                        ),
-                      );
-                    },
+                  // Image available: show network image, fallback to icon on errorreturn Image.
+                  return Center(
+                    child: Image.network(
+                      imageUrl,
+                      height: 75.h,
+                      width: 80.w,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(
+                          child: Icon(
+                            Icons.image_outlined,
+                            size: 50.sp,
+                            color: AppColors.grey,
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
               ),
