@@ -246,27 +246,18 @@ class MessageController extends GetxController {
     }
   }
 
-  Future<void> shareToInstagram(String code) async {
+ Future<void> shareToInstagram(String code) async {
   final link = _referralLink(code);
   final message = "Hey! Join me on this app using my referral code: $link";
 
-  final url = Uri.parse("instagram://share");
-
-  if (await canLaunchUrl(url)) {
-    // ignore: deprecated_member_use
-    await Share.share(
-      message,
-      subject: "Referral",
-    );
-  } else {
-    // Fallback to normal text sharing options
-    // ignore: deprecated_member_use
-    await Share.share(
-      message,
-      subject: "Referral",
-    );
-  }
+  // Directly open system share → Instagram will appear in list
+  // ignore: deprecated_member_use
+  await Share.share(
+    message,
+    subject: "Referral",
+  );
 }
+
 
 
   

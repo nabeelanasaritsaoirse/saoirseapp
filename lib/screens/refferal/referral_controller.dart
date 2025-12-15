@@ -180,22 +180,22 @@ class ReferralController extends GetxController {
 Future<void> shareToInstagram() async {
   final link = _referralLink();
 
-  final message =
-      "Hey! Join me on this app using my referral code: $link";
+  // Copy link to clipboard so user can paste in Instagram caption
+  await Clipboard.setData(ClipboardData(text: link));
 
-  // Instagram deep link (opens Instagram if installed)
-  final instagramUrl =
-      "instagram://share?text=${Uri.encodeComponent(message)}";
+  // Try to open Instagram app
+  final instagramUri = Uri.parse("instagram://app");
 
-  if (await canLaunchUrl(Uri.parse(instagramUrl))) {
-    await launchUrl(Uri.parse(instagramUrl));
+  if (await canLaunchUrl(instagramUri)) {
+    await launchUrl(instagramUri);
+
+
   } else {
-    // Fallback → Instagram doesn't support web text share,
-    // so we fallback to SharePlus system share
-    final fallbackMessage = message;
-    await Share.share(fallbackMessage);
+    // Instagram is not installed → fallback
+    await Share.share(link);
   }
 }
+
 
 
 
