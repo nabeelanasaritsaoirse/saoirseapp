@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:developer';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -172,6 +174,25 @@ class ReferralController extends GetxController {
           "https://t.me/share/url?text=${Uri.encodeComponent(message)}";
       await launchUrl(Uri.parse(fallback),
           mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> shareToInstagram() async {
+    final link = _referralLink();
+
+    final message = "Hey! Join me on this app using my referral code: $link";
+
+    // Instagram deep link (opens Instagram if installed)
+    final instagramUrl =
+        "instagram://share?text=${Uri.encodeComponent(message)}";
+
+    if (await canLaunchUrl(Uri.parse(instagramUrl))) {
+      await launchUrl(Uri.parse(instagramUrl));
+    } else {
+      // Fallback → Instagram doesn't support web text share,
+      // so we fallback to SharePlus system share
+      final fallbackMessage = message;
+      await Share.share(fallbackMessage);
     }
   }
 
