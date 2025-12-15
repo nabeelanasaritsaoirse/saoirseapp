@@ -3,6 +3,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
@@ -232,8 +233,7 @@ class ProductDetailsController extends GetxController {
     }
 
     final double totalPrice = data.pricing.finalPrice;
-    final double perDayAmount =
-        double.tryParse(amountController.text.trim()) ?? 0;
+    final double perDayAmount = double.tryParse(amountController.text.trim()) ?? 0;
 
     if (perDayAmount <= 0) {
       daysController.text = "";
@@ -357,5 +357,16 @@ class ProductDetailsController extends GetxController {
     }
 
     return "Select Plan";
+  }
+
+  //Product Sharing Option
+  Future<void> productSharing(String productId) async {
+    final link = "https://inviteapp.onelink.me/VDIY?af_dp=epi://product/$productId";
+    await SharePlus.instance.share(
+      ShareParams(
+        text: "Check out this product 👇\n$link",
+        subject: "Product from EPI",
+      ),
+    );
   }
 }

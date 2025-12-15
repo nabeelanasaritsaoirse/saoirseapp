@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import '../../models/product_details_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
@@ -137,8 +136,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       color: AppColors.textBlack,
                     ),
                     SizedBox(width: 8.w),
-                    if (product.pricing.finalPrice !=
-                        product.pricing.regularPrice)
+                    if (product.pricing.finalPrice != product.pricing.regularPrice)
                       appText(
                         "₹${product.pricing.regularPrice}",
                         fontSize: 16.sp,
@@ -189,7 +187,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   // ----------------- IMAGE SECTION -----------------
-  // ----------------- IMAGE SECTION -----------------
   Widget buildImageSection(ProductDetailsData product) {
     return Column(
       children: [
@@ -216,8 +213,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       margin: EdgeInsets.symmetric(horizontal: 2.w),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4.r),
-                        color:
-                            index == i ? AppColors.black : AppColors.textBlack,
+                        color: index == i ? AppColors.black : AppColors.textBlack,
                       ),
                     );
                   }),
@@ -263,18 +259,38 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          controller.isFavorite.value
-                              ? Icons.favorite
-                              : Icons.favorite_border,
+                          controller.isFavorite.value ? Icons.favorite : Icons.favorite_border,
                           size: 22,
-                          color: controller.isFavorite.value
-                              ? AppColors.red
-                              : AppColors.black,
+                          color: controller.isFavorite.value ? AppColors.red : AppColors.black,
                         ),
                       ),
                     );
                   }),
                 ],
+              ),
+            ),
+
+            /// SHARE BUTTON (BOTTOM RIGHT)
+            Positioned(
+              top: 70.h,
+              right: 15.w,
+              child: GestureDetector(
+                onTap: () async {
+                  await controller.productSharing(product.id);
+                },
+                child: Container(
+                  width: 40.w,
+                  height: 40.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.share,
+                    size: 20.sp,
+                    color: AppColors.black,
+                  ),
+                ),
               ),
             ),
           ],
@@ -311,17 +327,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   onTap: () => controller.selectVariantById(variant.variantId),
                   child: Container(
                     margin: EdgeInsets.only(right: 10.w),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.primaryColor.withOpacity(0.15)
-                          : AppColors.white,
+                      color: isSelected ? AppColors.primaryColor.withOpacity(0.15) : AppColors.white,
                       borderRadius: BorderRadius.circular(8.r),
                       border: Border.all(
-                        color: isSelected
-                            ? AppColors.primaryColor
-                            : AppColors.lightGrey,
+                        color: isSelected ? AppColors.primaryColor : AppColors.lightGrey,
                         width: isSelected ? 2 : 1,
                       ),
                     ),
@@ -330,9 +341,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         variant.attributes.color,
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w600,
-                        color: isSelected
-                            ? AppColors.primaryColor
-                            : AppColors.textBlack,
+                        color: isSelected ? AppColors.primaryColor : AppColors.textBlack,
                       ),
                     ),
                   ),
@@ -369,22 +378,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           /// Add to Cart
           appButton(
             onTap: () {
-              bool hasPlan = controller.selectedPlanIndex.value != -1 ||
-                  (controller.customDays.value > 0 &&
-                      controller.customAmount.value > 0);
+              bool hasPlan = controller.selectedPlanIndex.value != -1 || (controller.customDays.value > 0 && controller.customAmount.value > 0);
 
               if (!hasPlan) {
-                WarningDialog.show(
-                    title: AppStrings.warning_label,
-                    message: AppStrings.warning_body);
+                WarningDialog.show(title: AppStrings.warning_label, message: AppStrings.warning_body);
                 return;
               }
 
               final selectedPlan = controller.getSelectedPlan();
-              final selectedVariantId =
-                  controller.selectedVariantId.value.isEmpty
-                      ? null
-                      : controller.selectedVariantId.value;
+              final selectedVariantId = controller.selectedVariantId.value.isEmpty ? null : controller.selectedVariantId.value;
 
               cartController.addProductToCart(
                 productId: controller.product.value!.id,
@@ -452,9 +454,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 padding: EdgeInsets.symmetric(vertical: 10.h),
               ),
               onPressed: () {
-                bool hasPlan = controller.selectedPlanIndex.value != -1 ||
-                    (controller.customDays.value > 0 &&
-                        controller.customAmount.value > 0);
+                bool hasPlan = controller.selectedPlanIndex.value != -1 || (controller.customDays.value > 0 && controller.customAmount.value > 0);
 
                 if (!hasPlan) {
                   WarningDialog.show(
@@ -469,8 +469,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 double selectedAmount;
 
                 if (controller.selectedPlanIndex.value != -1) {
-                  final plan =
-                      controller.plans[controller.selectedPlanIndex.value];
+                  final plan = controller.plans[controller.selectedPlanIndex.value];
                   selectedDays = plan.days;
                   selectedAmount = plan.perDayAmount;
                 } else {
@@ -537,12 +536,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   alignment: Alignment.center,
                   color: AppColors.lightGrey,
                   child: Padding(
-                    padding: EdgeInsets.all(15.w),
-                    child: Image.network(
-                      img.url,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                      padding: EdgeInsets.all(15.w),
+                      child: Image.network(
+                        img.url,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) {
+                          return Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            color: Colors.grey.shade200,
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.broken_image,
+                              size: 32.sp,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
+                      )),
                 );
               },
             ),
@@ -565,8 +576,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       margin: EdgeInsets.symmetric(horizontal: 2.w),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4.r),
-                        color:
-                            index == i ? AppColors.black : AppColors.textBlack,
+                        color: index == i ? AppColors.black : AppColors.textBlack,
                       ),
                     );
                   }),
