@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/notification/notification_controller.dart';
 
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
@@ -15,6 +15,7 @@ import '../../services/auth_service.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../login/login_controller.dart';
+import '../notification/notification_controller.dart';
 import '../refferal/referral_controller.dart';
 
 class VerifyOtpController extends GetxController {
@@ -32,6 +33,34 @@ class VerifyOtpController extends GetxController {
   final String phoneNumber;
   final String username;
   final String referral;
+
+  RxInt secondsRemaining = 60.obs;
+  RxBool canResend = false.obs;
+  Timer? timer;
+  @override
+  void onInit() {
+    super.onInit();
+    startTimer();
+  }
+
+  void startTimer() {
+    canResend(false);
+    secondsRemaining.value = 60;
+
+    timer?.cancel();
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (secondsRemaining.value > 0) {
+        secondsRemaining.value--;
+      } else {
+        canResend(true);
+        timer.cancel();
+      }
+    });
+  }
+
+  void stopTimer() {
+    timer?.cancel();
+  }
 
   /// STEP 1 — Verify OTP (Firebase)
   Future<void> verifyOtp() async {
@@ -209,6 +238,7 @@ class VerifyOtpController extends GetxController {
     for (var controller in otpControllers) {
       controller.dispose();
     }
+    timer?.cancel();
     super.onClose();
   }
 }

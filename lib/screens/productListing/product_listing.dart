@@ -65,10 +65,12 @@ class _ProductListingState extends State<ProductListing> {
               controller: productlistingController.nameContoller,
               hintText: "Search",
               hintColor: AppColors.textBlack,
+              fillColor: AppColors.white,
               contentPadding:
                   EdgeInsets.symmetric(horizontal: 20.w, vertical: 10),
-              fillColor: AppColors.white,
               borderRadius: BorderRadius.circular(15.r),
+              onChanged: productlistingController.performSearch,
+              textColor: AppColors.textBlack,
             ),
           ),
           actions: [

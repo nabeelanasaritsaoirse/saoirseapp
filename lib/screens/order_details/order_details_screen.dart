@@ -1,11 +1,10 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unused_local_variable, deprecated_member_use
 
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/widgets/app_text_field.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -13,7 +12,10 @@ import '../../models/address_response.dart';
 import '../../models/product_details_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
+import '../../widgets/app_text_field.dart';
+import '../../widgets/app_toast.dart';
 import '../../widgets/custom_appbar.dart';
+import '../my_wallet/my_wallet_controller.dart';
 import '../razorpay/razorpay_controller.dart';
 import 'order_details_controller.dart';
 
@@ -31,10 +33,12 @@ class OrderDetailsScreen extends StatelessWidget {
     this.product,
     required this.selectedDays,
     required this.selectedAmount,
-    this.selectVarientId, this.quantity,
+    this.selectVarientId,
+    this.quantity,
   });
   final orderController = Get.find<OrderDetailsController>();
   final razorpayController = Get.put(RazorpayController());
+  final walletController = Get.put(MyWalletController());
 
   @override
   Widget build(BuildContext context) {
@@ -375,6 +379,7 @@ class OrderDetailsScreen extends StatelessWidget {
                     ),
                     child: Row(
                       spacing: 15.w,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // ----------- PRODUCT IMAGE --------------
                         SizedBox(
@@ -422,11 +427,11 @@ class OrderDetailsScreen extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  appText(
-                                    "${AppStrings.qty} $quantity",
-                                    fontSize: 13.sp,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                  // appText(
+                                  //   "${AppStrings.qty} ${quantity ?? 1}",
+                                  //   fontSize: 13.sp,
+                                  //   fontWeight: FontWeight.w700,
+                                  // ),
                                 ],
                               ),
 
@@ -456,6 +461,78 @@ class OrderDetailsScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                 );
                               }),
+                              SizedBox(height: 2.h),
+                              // ----------- QUANTITY SELECTOR ----------
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Obx(() {
+                                    return Row(
+                                      children: [
+                                        // MINUS BUTTON
+                                        GestureDetector(
+                                          onTap: () =>
+                                              orderController.decreaseQty(),
+                                          child: Container(
+                                            width: 22.w,
+                                            height: 22.w,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(6.r),
+                                              border: Border.all(
+                                                  color: AppColors.grey),
+                                            ),
+                                            child: Icon(Icons.remove,
+                                                size: 15.sp,
+                                                color: AppColors.textBlack),
+                                          ),
+                                        ),
+
+                                        SizedBox(width: 10.w),
+
+                                        // QUANTITY TEXT
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 9.w, vertical: 4.h),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(6.r),
+                                            border: Border.all(
+                                                color: AppColors.grey),
+                                          ),
+                                          child: appText(
+                                            "${orderController.quantity.value}",
+                                            fontSize: 10.sp,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+
+                                        SizedBox(width: 10.w),
+
+                                        // PLUS BUTTON
+                                        GestureDetector(
+                                          onTap: () =>
+                                              orderController.increaseQty(),
+                                          child: Container(
+                                            width: 22.w,
+                                            height: 22.w,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(6.r),
+                                              border: Border.all(
+                                                  color: AppColors.grey),
+                                            ),
+                                            child: Icon(Icons.add,
+                                                size: 15.sp,
+                                                color: AppColors.textBlack),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -813,41 +890,413 @@ class OrderDetailsScreen extends StatelessWidget {
           ],
         ),
       )),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.all(12.w),
-        color: AppColors.transparent,
-        child: appButton(
-          onTap: () {
-            orderController.placeOrder(
-              productId: product!.id,
-              variantId: selectVarientId ?? "",
-              paymentOption: "daily",
-              totalDays: orderController.selectedDays.value,
-              couponCode: orderController.appliedCouponCode.value,
-              deliveryAddress: {
-                "name": addresses.name,
-                "phoneNumber": addresses.phoneNumber,
-                "addressLine1": addresses.addressLine1,
-                "city": addresses.city,
-                "state": addresses.state,
-                "pincode": addresses.pincode,
-              },
-            );
-          },
-          width: double.infinity,
-          height: 45.h,
-          buttonColor: AppColors.lightAmber,
-          borderRadius: BorderRadius.circular(20.r),
-          child: Center(
-            child: appText(
-              AppStrings.pay_now,
-              fontSize: 15.sp,
-              color: AppColors.white,
-              fontWeight: FontWeight.w600,
+      // bottomNavigationBar: Container(
+      //   padding: EdgeInsets.all(12.w),
+      //   color: AppColors.transparent,
+      //   child: appButton(
+      //     onTap: () {
+      //       orderController.placeOrder(
+      //         productId: product!.id,
+      //         variantId: selectVarientId ?? "",
+      //         paymentOption: "daily",
+      //         totalDays: orderController.selectedDays.value,
+      //         couponCode: orderController.appliedCouponCode.value,
+      //         deliveryAddress: {
+      //           "name": addresses.name,
+      //           "phoneNumber": addresses.phoneNumber,
+      //           "addressLine1": addresses.addressLine1,
+      //           "city": addresses.city,
+      //           "state": addresses.state,
+      //           "pincode": addresses.pincode,
+      //         },
+      //       );
+      //     },
+      //     width: double.infinity,
+      //     height: 45.h,
+      //     buttonColor: AppColors.lightAmber,
+      //     borderRadius: BorderRadius.circular(20.r),
+      //     child: Center(
+      //       child: appText(
+      //         AppStrings.pay_now,
+      //         fontSize: 15.sp,
+      //         color: AppColors.white,
+      //         fontWeight: FontWeight.w600,
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      bottomNavigationBar: _buildBottomBar(),
+    );
+  }
+
+  Widget _buildBottomBar() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(15.r),
+          topRight: Radius.circular(15.r),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColor,
+            blurRadius: 6.r,
+            offset: Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // ---------------- PAYMENT METHOD BUTTON ----------------
+          Expanded(
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                backgroundColor: AppColors.white,
+                side: BorderSide(color: AppColors.shadowColor),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 10.h),
+              ),
+              onPressed: () => _showPaymentMethodSheet(),
+              child: Obx(() {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    appText(
+                      orderController.selectedPaymentMethod.value == "razorpay"
+                          ? "Razorpay"
+                          : "Wallet",
+                      color: AppColors.textBlack,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    SizedBox(width: 6.w),
+                    Icon(Icons.keyboard_arrow_up,
+                        size: 20.sp, color: AppColors.textBlack),
+                  ],
+                );
+              }),
             ),
           ),
+
+          SizedBox(width: 10.w),
+
+          // ---------------- PAY NOW BUTTON ----------------
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.lightAmber,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 10.h),
+              ),
+              // onPressed: () {
+              //   orderController.placeOrder(
+              //     productId: product!.id,
+              //     variantId: selectVarientId ?? "",
+              //     // paymentOption: orderController.selectedPaymentMethod.value,
+              //         paymentOption: "daily",
+              //     totalDays: orderController.selectedDays.value,
+              //     couponCode: orderController.appliedCouponCode.value,
+              //     deliveryAddress: {
+              //       "name": addresses.name,
+              //       "phoneNumber": addresses.phoneNumber,
+              //       "addressLine1": addresses.addressLine1,
+              //       "city": addresses.city,
+              //       "state": addresses.state,
+              //       "pincode": addresses.pincode,
+              //     },
+              //   );
+              // },
+              onPressed: () {
+                orderController.placeOrder(
+                  productId: product!.id,
+                  variantId: selectVarientId ?? "",
+                  paymentOption: "daily",
+                  totalDays: orderController.selectedDays.value,
+                  couponCode: orderController.appliedCouponCode.value,
+                  deliveryAddress: {
+                    "name": addresses.name,
+                    "phoneNumber": addresses.phoneNumber,
+                    "addressLine1": addresses.addressLine1,
+                    "city": addresses.city,
+                    "state": addresses.state,
+                    "pincode": addresses.pincode,
+                  },
+                );
+              },
+              child: appText(
+                AppStrings.pay_now,
+                color: AppColors.white,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPaymentMethodSheet() {
+    final walletBalance = walletController.wallet.value?.walletBalance ?? 0.0;
+
+    Get.bottomSheet(
+      Container(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 25.h),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24.r),
+            topRight: Radius.circular(24.r),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with close button
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                appText(
+                  "Select Payment Method",
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primaryColor,
+                ),
+                IconButton(
+                  onPressed: () => Get.back(),
+                  icon: Icon(Icons.close, size: 24.sp),
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 15.h),
+
+            // ================= WALLET OPTION =================
+            Obx(() => GestureDetector(
+                  onTap: () {
+                    if (walletBalance < orderController.selectedAmount.value) {
+                      appToaster(
+                        content: "Insufficient wallet balance",
+                        error: true,
+                      );
+                      return; // stop here, do not select wallet
+                    }
+
+                    // If enough balance → allow selection
+                    orderController.selectPaymentMethod("wallet");
+                    Get.back();
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: orderController.selectedPaymentMethod.value ==
+                              "wallet"
+                          ? AppColors.primaryColor
+                          : AppColors.white,
+                      border: Border.all(
+                        color: orderController.selectedPaymentMethod.value ==
+                                "wallet"
+                            ? AppColors.primaryColor
+                            : AppColors.grey,
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Row(
+                      children: [
+                        // Icon Container
+                        Container(
+                          padding: EdgeInsets.all(10.w),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                          child: Icon(
+                            Icons.account_balance_wallet_rounded,
+                            color: AppColors.primaryColor,
+                            size: 24.sp,
+                          ),
+                        ),
+
+                        SizedBox(width: 12.w),
+
+                        // Text Content
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Wallet Payment",
+                                style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                "Balance: ₹${walletBalance.toStringAsFixed(1)}",
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  color: AppColors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Radio Button
+                        Container(
+                          width: 24.w,
+                          height: 24.w,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color:
+                                  orderController.selectedPaymentMethod.value ==
+                                          "wallet"
+                                      ? AppColors.primaryColor
+                                      : AppColors.grey.withOpacity(0.5),
+                              width: 2,
+                            ),
+                            color:
+                                orderController.selectedPaymentMethod.value ==
+                                        "wallet"
+                                    ? AppColors.primaryColor
+                                    : Colors.transparent,
+                          ),
+                          child: orderController.selectedPaymentMethod.value ==
+                                  "wallet"
+                              ? Icon(
+                                  Icons.check,
+                                  size: 16.sp,
+                                  color: Colors.white,
+                                )
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ),
+                )),
+
+            SizedBox(height: 12.h),
+
+            // ================= RAZORPAY OPTION =================
+            Obx(() => GestureDetector(
+                  onTap: () {
+                    orderController.selectPaymentMethod("razorpay");
+                    Get.back();
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: orderController.selectedPaymentMethod.value ==
+                              "razorpay"
+                          ? AppColors.primaryColor.withOpacity(0.08)
+                          : AppColors.white,
+                      border: Border.all(
+                        color: orderController.selectedPaymentMethod.value ==
+                                "razorpay"
+                            ? AppColors.primaryColor
+                            : AppColors.grey.withOpacity(0.3),
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Row(
+                      children: [
+                        // Icon Container
+                        Container(
+                          padding: EdgeInsets.all(10.w),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                          child: Icon(
+                            Icons.payment_rounded,
+                            color: AppColors.primaryColor,
+                            size: 24.sp,
+                          ),
+                        ),
+
+                        SizedBox(width: 12.w),
+
+                        // Text Content
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Razorpay Payment",
+                                style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                "UPI, Card, Net Banking & More",
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  color: AppColors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Radio Button
+                        Container(
+                          width: 24.w,
+                          height: 24.w,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color:
+                                  orderController.selectedPaymentMethod.value ==
+                                          "razorpay"
+                                      ? AppColors.primaryColor
+                                      : AppColors.grey.withOpacity(0.5),
+                              width: 2,
+                            ),
+                            color:
+                                orderController.selectedPaymentMethod.value ==
+                                        "razorpay"
+                                    ? AppColors.primaryColor
+                                    : Colors.transparent,
+                          ),
+                          child: orderController.selectedPaymentMethod.value ==
+                                  "razorpay"
+                              ? Icon(
+                                  Icons.check,
+                                  size: 16.sp,
+                                  color: Colors.white,
+                                )
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ),
+                )),
+
+            SizedBox(height: 20.h),
+          ],
         ),
       ),
+      isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: true,
     );
   }
 

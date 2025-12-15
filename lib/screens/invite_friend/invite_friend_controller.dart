@@ -14,7 +14,7 @@ class InviteFriendController extends GetxController {
   InviteFriendController(this.userId);
 
   final ReferralService _referralService = ReferralService();
-  final ConversationService _chatService = ConversationService();
+  final ConversationService chatService = ConversationService();
 
   final friendDetails = Rxn<FriendDetails>();
   final isProductLoading = false.obs;
@@ -78,7 +78,7 @@ class InviteFriendController extends GetxController {
 
     isLoading.value = true;
 
-    final chat = await _chatService.createIndividualChat(userId);
+    final chat = await chatService.createIndividualChat(userId);
 
     isLoading.value = false;
 
@@ -102,6 +102,7 @@ class InviteFriendController extends GetxController {
         () => PaymentMessageScreen(
               conversationId: chat.conversationId,
               participants: chat.participants,
+              showProfileButton: false,
               name: name,
             ),
         transition: Transition.rightToLeft);

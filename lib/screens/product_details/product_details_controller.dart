@@ -3,6 +3,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
@@ -29,7 +30,8 @@ class ProductDetailsController extends GetxController {
 
   RxBool isLoading = true.obs;
   Rx<ProductDetailsData?> product = Rx<ProductDetailsData?>(null);
-
+  RxList<ImageData> mergedImages = <ImageData>[].obs;
+  final PageController pageController = PageController();
   RxInt currentImageIndex = 0.obs;
   RxBool isFavorite = false.obs;
   RxInt selectedPlanIndex = (-1).obs;
@@ -47,10 +49,29 @@ class ProductDetailsController extends GetxController {
     super.onInit();
     scrollController.addListener(_scrollListener);
     fetchProductDetails();
-    checkIfInWishlist();
+    checkIfInWishlist(productId);
   }
 
   // FETCH PRODUCT DETAILS
+  // Future<void> fetchProductDetails() async {
+  //   try {
+  //     isLoading(true);
+
+  //     final result = await productService.fetchProductDetails(productId);
+  //     product.value = result;
+
+  //     if (result != null && result.hasVariants && result.variants.isNotEmpty) {
+  //       selectedVariantId.value = result.variants.first.variantId;
+  //       log("Default Variant Selected: ${selectedVariantId.value}");
+  //     }
+  //   } catch (e) {
+  //     log("ERROR FETCHING PRODUCT DETAILS: $e");
+  //     appToast(content: "Failed to load product details");
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
+
   Future<void> fetchProductDetails() async {
     try {
       isLoading(true);
@@ -58,53 +79,58 @@ class ProductDetailsController extends GetxController {
       final result = await productService.fetchProductDetails(productId);
       product.value = result;
 
-      if (result != null && result.hasVariants && result.variants.isNotEmpty) {
-        selectedVariantId.value = result.variants.first.variantId;
-        log("Default Variant Selected: ${selectedVariantId.value}");
+      if (result == null) return;
+
+      // Start with base images
+      mergedImages.assignAll(result.images);
+
+      // If it has variants → override only the first image
+      if (result.hasVariants && result.variants.isNotEmpty) {
+        final firstVariant = result.variants.first;
+        selectedVariantId.value = firstVariant.variantId;
+
+        if (firstVariant.images.isNotEmpty) {
+          mergedImages[0] = firstVariant.images.first;
+        }
       }
+
+      // Reset page
+      currentImageIndex.value = 0;
+      pageController.jumpToPage(0);
     } catch (e) {
-      log("ERROR FETCHING PRODUCT DETAILS: $e");
-      appToast(content: "Failed to load product details");
+      log("ERROR: $e");
     } finally {
       isLoading(false);
     }
   }
 
-  Future<void> checkIfInWishlist() async {
-    // ✅ Check if id is null before using it
-    if (id == null) {
-      log("ID is null, skipping wishlist check");
-      return;
-    }
-
+  Future<void> checkIfInWishlist(String id) async {
     try {
-      final exists = await wishlistService.checkWishlist(id!);
+      final exists = await wishlistService.checkWishlist(id);
       isFavorite.value = exists;
     } catch (e) {
       log("ERROR CHECKING WISHLIST: $e");
     }
   }
 
-  Future<void> toggleFavorite() async {
+  Future<void> toggleFavorite(String id) async {
     final productData = product.value;
 
     if (productData == null) {
       appToast(content: "Product not loaded");
       return;
     }
-
-    // Check if id is null
-    if (id == null) {
-      appToast(content: "Product ID not available", error: true);
+    if (id.isEmpty) {
+      appToast(content: "Invalid Product ID", error: true);
       return;
     }
 
     if (isFavorite.value) {
-      final removed = await wishlistService.removeFromWishlist(id!);
+      final removed = await wishlistService.removeFromWishlist(id);
 
       if (removed) {
         isFavorite(false);
-        appToast(content: "Removed from wishlist");
+        appToaster(content: "Removed from wishlist");
       } else {
         appToast(content: "Failed to remove from wishlist", error: true);
       }
@@ -112,11 +138,11 @@ class ProductDetailsController extends GetxController {
       return;
     }
 
-    final added = await wishlistService.addToWishlist(id!);
+    final added = await wishlistService.addToWishlist(id);
 
     if (added) {
       isFavorite(true);
-      appToast(content: "Added to wishlist");
+      appToaster(content: "Added to wishlist");
     } else {
       appToast(content: "Failed to add wishlist", error: true);
     }
@@ -276,7 +302,34 @@ class ProductDetailsController extends GetxController {
   void selectVariantById(String variantId) {
     selectedVariantId.value = variantId;
 
-    log("Selected variantId: $variantId");
+    final data = product.value;
+    if (data == null) return;
+
+    final variant = data.variants.firstWhere(
+      (v) => v.variantId == variantId,
+      orElse: () => data.variants.first,
+    );
+
+    // Always start with base product images
+    mergedImages.assignAll(data.images);
+
+    // Replace only the FIRST image if variant has its own image
+    if (variant.images.isNotEmpty) {
+      mergedImages[0] = variant.images.first;
+    }
+
+    // Reset slider
+    currentImageIndex.value = 0;
+
+    Future.delayed(Duration(milliseconds: 50), () {
+      if (pageController.hasClients) {
+        pageController.animateToPage(
+          0,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   Variant? getSelectedVariant() {
@@ -305,5 +358,17 @@ class ProductDetailsController extends GetxController {
     }
 
     return "Select Plan";
+  }
+
+  //Product Sharing Option
+  Future<void> productSharing(String productId) async {
+    final link =
+        "https://inviteapp.onelink.me/VDIY?af_dp=epi://product/$productId";
+    await SharePlus.instance.share(
+      ShareParams(
+        text: "Check out this product 👇\n$link",
+        subject: "Product from EPI",
+      ),
+    );
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../constants/app_colors.dart';
-import '../dummy/dummy_assets.dart';
 import '../models/order_history_model.dart';
 import 'app_dateformatter.dart';
 import 'app_text.dart';
@@ -53,11 +52,19 @@ class OrderCard extends StatelessWidget {
                   height: 72.h,
                   decoration: BoxDecoration(
                     color: AppColors.lightGrey,
-                    image: DecorationImage(
-                      image: AssetImage(DummyAssets.mobile),
-                      fit: BoxFit.contain,
-                    ),
+                    borderRadius: BorderRadius.circular(5),
                   ),
+                  child: order.image.isNotEmpty
+                      ? Image.network(
+                          order.image,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                              Icons.image_not_supported,
+                              size: 30,
+                              color: Colors.grey),
+                        )
+                      : Icon(Icons.image_not_supported,
+                          size: 30, color: Colors.grey),
                 ),
 
                 SizedBox(width: 12.w),

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
@@ -15,7 +16,11 @@ class VerifyOTPScreen extends StatelessWidget {
   final String phoneNumber;
   final String referral;
   final String username;
-  VerifyOTPScreen({super.key, required this.phoneNumber, required this.referral, required this.username});
+  VerifyOTPScreen(
+      {super.key,
+      required this.phoneNumber,
+      required this.referral,
+      required this.username});
 
   late final VerifyOtpController controller = Get.put(
     VerifyOtpController(
@@ -81,7 +86,6 @@ class VerifyOTPScreen extends StatelessWidget {
 
                 SizedBox(height: 40.h),
 
-
                 /// OTP Boxes
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -98,7 +102,7 @@ class VerifyOTPScreen extends StatelessWidget {
                         keyboardType: TextInputType.number,
                         maxLength: 1,
                         style: TextStyle(
-                          fontSize: 20.sp, 
+                          fontSize: 20.sp,
                           fontWeight: FontWeight.bold,
                           color: AppColors.black,
                           height: 1.2,
@@ -111,7 +115,7 @@ class VerifyOTPScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10.r),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: EdgeInsets.symmetric(vertical: 15.h), 
+                          contentPadding: EdgeInsets.symmetric(vertical: 15.h),
                         ),
                         onChanged: (value) {
                           if (value.isNotEmpty && index < 5) {
@@ -127,16 +131,29 @@ class VerifyOTPScreen extends StatelessWidget {
 
                 SizedBox(height: 20.h),
 
-                GestureDetector(
-                  onTap: () {},
-                  child: appText(
-                    "Resend code",
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.primaryColor,
-                    fontSize: 14.sp,
-                    fontFamily: "Poppins",
-                  ),
-                ),
+                Obx(() {
+                  return GestureDetector(
+                    onTap: controller.canResend.value
+                        ? () async {
+                            bool sent = await AuthService.sendOTP(phoneNumber,
+                                isResend: true);
+                            if (sent) controller.startTimer();
+                          }
+                        : null, // 🔐 disabled until timer ends
+
+                    child: appText(
+                      controller.canResend.value
+                          ? "Resend code" // after timer ends
+                          : "Resend in ${controller.secondsRemaining}s", // countdown
+                      fontWeight: FontWeight.w500,
+                      color: controller.canResend.value
+                          ? AppColors.primaryColor // active color
+                          : AppColors.grey, // disabled color
+                      fontSize: 14.sp,
+                      fontFamily: "Poppins",
+                    ),
+                  );
+                }),
 
                 SizedBox(height: 40.h),
 
