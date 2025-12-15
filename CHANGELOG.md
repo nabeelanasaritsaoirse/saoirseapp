@@ -1,40 +1,4 @@
-## Version 1.4.6+91
+## Version 1.4.7+92
 
-- Merge pull request #266 from nabeelanasaritsaoirse/developer
-- Merge pull request #265 from nabeelanasaritsaoirse/deep
-- Merge branch 'main' of https://github.com/nishantitsaoirse-head/saoirseapp into deep
-- Merge remote-tracking branch 'origin/sahir' into deep
-- Resolved flickering issues on the left sidebar on the category screen
-- fea: added ios notification permission
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- Fully implemented product sharing feature in product details screen
-- Merge remote-tracking branch 'origin/shadin' into deep
-- Merge remote-tracking branch 'origin/sahir' into deep
-- Merge remote-tracking branch 'origin/sahir' into deep
-- Fixed daily payment and amount display in Select Plan section
-- qr scan and image upload and refferal code auto fill on both login page and refferal screen
-- Merge branch 'sahir' of https://github.com/nishantitsaoirse-head/saoirseapp into shadin
-- code  pushed again
-- fea
-- Added referral sharing to instagram and added debouncer to the chat section
-- Merge remote-tracking branch 'origin/sahir' into deep
-- display referred user profile in chat and implement profile detail dialog UI
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- Implemented order history API images with error handling fixes, updated referral screen UI, and added referral QR code functionality
-- fea: resend otp
-- navigation resend otp timer
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- Merge remote-tracking branch 'origin/shadin' into deep
-- app toster , product detail page wishlist adding , favorite adding issue completed
-- Removed unused static data, images, and dummy models, cleaned up UI static data, and updated invite-friend details screen UI
-- fix
-- toast added
-- Merge remote-tracking branch 'origin/shadin' into deep
-- Merge remote-tracking branch 'origin/sahir' into deep
-- phone number limit validation based on country code completed
-- Added Payment method ui and  in Order details screen and
-- Merge remote-tracking branch 'origin/shadin' into deep
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- fix:
-- Updated UI in category and invite-friend details screens, improved search UI, and fixed search functionality issues
-- resend otp and validation for username
+- Merge pull request #268 from nabeelanasaritsaoirse/deep
+- fix: ios camera permission
