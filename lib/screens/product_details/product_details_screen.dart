@@ -189,7 +189,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   // ----------------- IMAGE SECTION -----------------
-  // ----------------- IMAGE SECTION -----------------
   Widget buildImageSection(ProductDetailsData product) {
     return Column(
       children: [
@@ -275,6 +274,30 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     );
                   }),
                 ],
+              ),
+            ),
+
+            /// SHARE BUTTON (BOTTOM RIGHT)
+            Positioned(
+              top: 70.h,
+              right: 15.w,
+              child: GestureDetector(
+                onTap: () async {
+                  await controller.productSharing(product.id);
+                },
+                child: Container(
+                  width: 40.w,
+                  height: 40.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.share,
+                    size: 20.sp,
+                    color: AppColors.black,
+                  ),
+                ),
               ),
             ),
           ],
@@ -537,12 +560,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   alignment: Alignment.center,
                   color: AppColors.lightGrey,
                   child: Padding(
-                    padding: EdgeInsets.all(15.w),
-                    child: Image.network(
-                      img.url,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                      padding: EdgeInsets.all(15.w),
+                      child: Image.network(
+                        img.url,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) {
+                          return Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            color: Colors.grey.shade200,
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.broken_image,
+                              size: 32.sp,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
+                      )),
                 );
               },
             ),
