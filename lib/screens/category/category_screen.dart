@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/category_item.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -121,79 +122,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 child: Column(
                   children: [
                     Expanded(
-                      child: ListView.builder(
+                      child: ListView.separated(
                         controller: controller.scrollController.value,
+                        physics: const ClampingScrollPhysics(), // IMPORTANT
+                        padding: EdgeInsets.zero,
                         itemCount: controller.categoryGroups.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 0),
                         itemBuilder: (context, index) {
-                          final isSelected =
-                              controller.selectedIndex.value == index;
-                          final category = controller.categoryGroups[index];
-
-                          return GestureDetector(
-                            onTap: () => controller.selectCategory(index),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.lightGrey
-                                    : AppColors.white,
-                                border: Border(
-                                  left: BorderSide(
-                                    color: isSelected
-                                        ? AppColors.primaryColor
-                                        : AppColors.transparent,
-                                    width: 4.w,
-                                  ),
-                                ),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                vertical: 15.h,
-                                horizontal: 7.w,
-                              ),
-                              child: Column(
-                                children: [
-                                  Builder(
-                                    builder: (_) {
-                                      final imageUrl = category.image?.url;
-
-                                      if (imageUrl == null ||
-                                          imageUrl.isEmpty) {
-                                        return Icon(
-                                          Icons.image_outlined,
-                                          size: 32.sp,
-                                          color: AppColors.grey,
-                                        );
-                                      }
-                                      return Image.network(
-                                        imageUrl,
-                                        width: 70.w,
-                                        height: 70.h,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Icon(
-                                            Icons.image_outlined,
-                                            size: 32.sp,
-                                            color: AppColors.grey,
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
-                                  SizedBox(height: 7.h),
-                                  appText(
-                                    category.name,
-                                    textAlign: TextAlign.center,
-                                    fontSize: 11.sp,
-                                    fontWeight: isSelected
-                                        ? FontWeight.w700
-                                        : FontWeight.w600,
-                                    color: isSelected
-                                        ? AppColors.primaryColor
-                                        : AppColors.textBlack,
-                                  ),
-                                ],
-                              ),
-                            ),
+                          return CategoryItem(
+                            index: index,
+                            controller: controller,
                           );
                         },
                       ),
