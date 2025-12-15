@@ -290,7 +290,6 @@ class SelectPlanSheet extends StatelessWidget {
                                                 .selectedPlanIndex.value,
                                     activeColor: AppColors.primaryColor,
                                     onChanged: (_) {
-                                  
                                       if (controller.selectedPlanIndex.value ==
                                           index) {
                                         controller.selectedPlanIndex.value = -1;
@@ -367,14 +366,12 @@ class SelectPlanSheet extends StatelessWidget {
 
                                       SizedBox(height: 4.h),
 
-                                      if (plan.description != null &&
-                                          plan.description!.trim().isNotEmpty)
-                                        appText(
-                                          plan.description!,
-                                          fontSize: 11.sp,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.grey,
-                                        ),
+                                      appText(
+                                        "Pay ${plan.perDayAmount.toStringAsFixed(0)} daily for ${plan.days} days",
+                                        fontSize: 11.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.grey,
+                                      ),
 
                                       SizedBox(height: 4.h),
 
