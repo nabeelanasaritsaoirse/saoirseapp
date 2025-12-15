@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../constants/app_strings.dart';
 import '../../models/refferal_info_model.dart';
@@ -17,6 +19,7 @@ import '../../screens/refferal/referral_controller.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../services/converstion_service.dart';
+import '../../services/login_service.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
@@ -29,6 +32,7 @@ import '../message/message_screen.dart';
 import '../my_wallet/my_wallet.dart';
 import '../notification/notification_controller.dart';
 import '../notification/notification_screen.dart';
+import 'qr_scanner.dart';
 
 class ReferralScreen extends StatefulWidget {
   const ReferralScreen({super.key});
@@ -50,8 +54,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
   void initState() {
     super.initState();
 
-    controller = Get.put(ReferralController());
-    loginController = Get.put(LoginController());
+    controller = Get.find<ReferralController>();
+    loginController = Get.find<LoginController>();
     searchController = TextEditingController();
     scrollController = ScrollController();
     searchFocusNode = FocusNode();
@@ -77,6 +81,11 @@ class _ReferralScreenState extends State<ReferralScreen> {
         });
       }
     });
+  }
+
+  String extractReferral(String qrData) {
+    Uri uri = Uri.parse(qrData);
+    return uri.queryParameters["deep_link_value"] ?? qrData;
   }
 
   @override
@@ -794,13 +803,34 @@ class _ReferralScreenState extends State<ReferralScreen> {
               SizedBox(height: 15.h),
 
               // INPUT FIELD
-              appTextField(
-                contentPadding: EdgeInsets.all(10.r),
-                controller: referralCtrl,
-                textColor: AppColors.black,
-                hintText: "Enter the referral code",
-                hintSize: 14.sp,
-                hintColor: AppColors.grey,
+              Row(
+                children: [
+                  Expanded(
+                    child: appTextField(
+                      contentPadding: EdgeInsets.all(10.r),
+                      controller: referralCtrl,
+                      textColor: AppColors.black,
+                      hintText: "Enter the referral code",
+                      hintSize: 14.sp,
+                      hintColor: AppColors.grey,
+                      validator: (value) {
+                        // Keep using LoginService.referralValidation (returns null if valid)
+                        return LoginService.referralValidation(
+                            referral: value ?? "");
+                      },
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.qr_code_scanner,
+                        size: 32, color: AppColors.primaryColor),
+                    onPressed: () {
+                      showQRPicker((code) {
+                        referralCtrl.text = code;
+                        log("🟢 Referral code updated in popup: $code"); // ← fill input
+                      });
+                    },
+                  ),
+                ],
               ),
 
               SizedBox(height: 15.h),
@@ -825,12 +855,18 @@ class _ReferralScreenState extends State<ReferralScreen> {
                   Expanded(
                     child: appButton(
                       onTap: () async {
-                        Get.back(); // close input popup
                         await Future.delayed(Duration(milliseconds: 100));
-                        bool success = await Get.put(LoginController())
+                        bool success = await Get.find<LoginController>()
                             .applyReferral(referralCtrl.text.trim());
 
                         if (success) {
+                          log("✅ Referral Applied — Closing Input Popup...");
+
+                          // CLOSE ONLY THE INPUT POPUP
+                          Get.back();
+
+                          // Small delay for smooth transition
+                          await Future.delayed(Duration(milliseconds: 150));
                           showReferralSuccessPopup();
                         }
                       },
@@ -920,6 +956,187 @@ class _ReferralScreenState extends State<ReferralScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void scanQRWithCamera(Function(String) onCodeSelected) {
+    Get.to(() => QRScannerScreen(
+          onReferralDetected: (value) {
+            final code = extractReferral(value);
+            log("📸 Camera scanned QR: $code");
+
+            onCodeSelected(code);
+            Get.back();
+          },
+        ));
+  }
+
+  Future<void> pickQRFromGallery(Function(String) onCodeSelected) async {
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image == null) return;
+
+    try {
+      final MobileScannerController scanner = MobileScannerController();
+
+      final BarcodeCapture? result = await scanner.analyzeImage(image.path);
+
+      if (result != null && result.barcodes.isNotEmpty) {
+        final value = result.barcodes.first.rawValue ?? "";
+        final code = extractReferral(value);
+
+        log("🖼 QR from image: $code");
+
+        onCodeSelected(code);
+      } else {
+        log("No QR found in image");
+      }
+    } catch (e) {
+      log("Failed to read QR: $e");
+    }
+  }
+
+  void showQRPicker(Function(String) onCodeSelected) {
+    Get.bottomSheet(
+      TweenAnimationBuilder(
+        duration: Duration(milliseconds: 300),
+        tween: Tween<double>(begin: 0.0, end: 1.0),
+        builder: (context, value, child) {
+          return Transform.translate(
+            offset: Offset(0, 50 * (1 - value)),
+            child: Opacity(opacity: value, child: child),
+          );
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 25, horizontal: 20),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withOpacity(0.2),
+                blurRadius: 20.r,
+                offset: Offset(0, -5),
+              )
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Grab indicator
+              Container(
+                width: 50.w,
+                height: 5.h,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+              ),
+              SizedBox(height: 20.h),
+
+              // Title
+              Text(
+                "Choose QR Method",
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.black87,
+                ),
+              ),
+              SizedBox(height: 20.h),
+
+              // Option 1 — Scan QR
+              GestureDetector(
+                onTap: () {
+                  // Get.back(); // close only bottomsheet
+                  Future.delayed(Duration(milliseconds: 150), () {
+                    scanQRWithCamera(onCodeSelected);
+                  });
+                },
+                child: Container(
+                  padding: EdgeInsets.all(14),
+                  margin: EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.lightGrey,
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.blueshade.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.qr_code_scanner,
+                            size: 28, color: AppColors.primaryColor),
+                      ),
+                      SizedBox(width: 14.w),
+                      Expanded(
+                        child: Text(
+                          "Scan using Camera",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Icon(Icons.arrow_forward_ios,
+                          size: 18.sp, color: AppColors.lightGrey),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Option 2 — Upload QR
+              GestureDetector(
+                onTap: () {
+                  // Get.back(); // close only bottomsheet
+                  Future.delayed(Duration(milliseconds: 150), () {
+                    pickQRFromGallery(onCodeSelected);
+                  });
+                },
+                child: Container(
+                  padding: EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.lightGrey,
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.blueshade.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.image,
+                            size: 28.sp, color: AppColors.primaryColor),
+                      ),
+                      SizedBox(width: 14),
+                      Expanded(
+                        child: Text(
+                          "Upload QR from Gallery",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Icon(Icons.arrow_forward_ios,
+                          size: 18.sp, color: AppColors.lightGrey),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 10.h),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
     );
   }
 }

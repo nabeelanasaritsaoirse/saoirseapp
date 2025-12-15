@@ -10,6 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:saoirse_app/bindings/allcontroller.dart';
 
 import 'constants/app_colors.dart';
 import 'constants/app_constant.dart';
@@ -49,7 +50,6 @@ Future<void> main() async {
           messagingSenderId: dotenv.env['ANDROID_MESSAGING_SENDER_ID'] ?? '',
           projectId: dotenv.env['ANDROID_PROJECT_ID'] ?? '',
         ));
-
   // Background handler registration
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
@@ -124,6 +124,7 @@ class MyApp extends StatelessWidget {
             }
           },
           child: GetMaterialApp(
+            initialBinding: Allcontroller(),
             locale: locale,
             debugShowCheckedModeBanner: false,
             title: AppStrings.app_name,
