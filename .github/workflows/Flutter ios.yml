@@ -216,13 +216,22 @@ jobs:
           path: |
             xcodebuild.log
             export.log
+            
+      - name: 🧾 Build Summary
+        run: |
+          echo "## 🍎 iOS Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.version.outputs.VERSION_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Number:** ${{ steps.version.outputs.BUILD_NUMBER }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Bundle ID:** ${BUNDLE_ID}" >> $GITHUB_STEP_SUMMARY
 
   ios-deploy:
     name: "🚀 Deploy to TestFlight"
     needs: ios-ci
     runs-on: macos-latest
     environment:
-      name: ios-deploy
+      name: ios-deploy   # Optional: add manual approval like Android
 
     steps:
       - name: 📥 Checkout Repository
@@ -246,3 +255,14 @@ jobs:
             --api_key_path api_key.json \
             --ipa build/ios/ipa/*.ipa \
             --skip_waiting_for_build_processing
+
+      - name: 🧾 Deploy Summary
+        run: |
+          echo "## 🚀 TestFlight Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ needs.ios-ci.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Number:** ${{ needs.ios-ci.outputs.build_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ✅ Uploaded to TestFlight" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The build will be available for testing once Apple completes processing." >> $GITHUB_STEP_SUMMARY
