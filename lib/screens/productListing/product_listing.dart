@@ -31,9 +31,14 @@ class _ProductListingState extends State<ProductListing> {
     }
 
     scrollController.addListener(() {
-      if (scrollController.position.pixels ==
-          scrollController.position.maxScrollExtent) {
-        Get.find<ProductlistingController>().fetchProducts();
+      final controller = Get.find<ProductlistingController>();
+
+      if (!controller.hasNextPage.value) return; // no more pages
+      if (controller.isMoreLoading.value) return; // already loading more
+
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 200) {
+        controller.fetchProducts();
       }
     });
   }
