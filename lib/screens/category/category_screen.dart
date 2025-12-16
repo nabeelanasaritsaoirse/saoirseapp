@@ -230,7 +230,7 @@ class SubCategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => const ProductListing(), arguments: {'categoryId': id.id});
+        Get.to(() => const ProductListing(), arguments: {'categoryId': subCategory.id});
       },
       child: Container(
         decoration: BoxDecoration(
