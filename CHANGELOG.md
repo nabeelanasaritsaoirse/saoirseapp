@@ -1,4 +1,4 @@
-## Version 1.4.12+97
+## Version 1.4.13+98
 
-- Merge pull request #278 from nabeelanasaritsaoirse/deepitsaoirse-hue-patch-1
-- Remove UIMainStoryboardFile from Info.plist
+- Merge pull request #280 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-2
+- Update release.yml
