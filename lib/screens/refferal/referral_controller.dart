@@ -117,6 +117,21 @@ class ReferralController extends GetxController {
     }
   }
 
+    Future<File> _copyInstagramStoryImageToTemp() async {
+    final byteData = await rootBundle.load(
+      'assets/images/referral_story_image.png',
+    );
+
+    final tempDir = await getTemporaryDirectory();
+    final file = File('${tempDir.path}/instagram_referral_story.png');
+
+    await file.writeAsBytes(
+      byteData.buffer.asUint8List(),
+    );
+
+    return file;
+  }
+
   // ---------------------------------------------------------------------------
   // Fetch Product Details List (Referral Details screen)
   // ---------------------------------------------------------------------------
@@ -177,20 +192,57 @@ class ReferralController extends GetxController {
     }
   }
 
+ 
+   Future<Uri> _getInstagramContentUri(File file) async {
+    final uri = await MethodChannel(
+      'com.saoirse.epi/fileprovider',
+    ).invokeMethod<String>(
+      'getUri',
+      file.path,
+    );
+
+    return Uri.parse(uri!);
+  }
+
   Future<void> shareToInstagram() async {
     final link = _referralLink();
 
-    // Copy link to clipboard so user can paste in Instagram caption
-    await Clipboard.setData(ClipboardData(text: link));
+    try {
+      // 1️⃣ Copy referral link
+      await Clipboard.setData(ClipboardData(text: link));
 
-    // Try to open Instagram app
-    final instagramUri = Uri.parse("instagram://app");
+      // 2️⃣ Copy image to cache
+      final imageFile = await _copyInstagramStoryImageToTemp();
 
-    if (await canLaunchUrl(instagramUri)) {
-      await launchUrl(instagramUri);
-    } else {
-      // Instagram is not installed → fallback
-      await Share.share(link);
+      // 3️⃣ Get content:// URI
+      final contentUri = await _getInstagramContentUri(imageFile);
+
+      // 4️⃣ Launch Instagram Story
+      final intent = AndroidIntent(
+        action: 'com.instagram.share.ADD_TO_STORY',
+        data: contentUri.toString(),
+        type: 'image/*',
+        flags: <int>[
+          1, // FLAG_GRANT_READ_URI_PERMISSION
+        ],
+        arguments: {
+          'source_application': 'com.saoirse.epi',
+        },
+      );
+
+      await intent.launch();
+
+      appToaster(
+        error: false,
+        content: "Referral link copied. Paste it or add Link sticker.",
+      );
+    } catch (e, st) {
+      log("Instagram Story Error: $e\n$st");
+
+      appToast(
+        error: true,
+        content: "Failed to open Instagram Story",
+      );
     }
   }
 

@@ -11,7 +11,7 @@ class AddressService {
     // Read userId properly
     String? userId = storage.read(AppConst.USER_ID);
 
-    if (userId == null || userId.isEmpty) {
+    if (userId!.isEmpty) {
       log("❌ ERROR: User ID not found in storage");
       return null;
     }
@@ -30,7 +30,7 @@ class AddressService {
     log("body ===> $body");
     log("Userid : $userId");
 
-    if (userId == null || userId.isEmpty) {
+    if (userId!.isEmpty) {
       log("❌ USER ID NOT FOUND");
       return false;
     }
