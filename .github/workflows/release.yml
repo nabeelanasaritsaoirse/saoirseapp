@@ -1,4 +1,5 @@
 name: Automated Release Publishing
+run-name: "🚀 Relaese note"
 
 on:
   push:
