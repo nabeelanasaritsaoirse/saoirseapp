@@ -1,5 +1,9 @@
 # saoirse_app
-A new Flutter project.
+A Flutter e-commerce application.
+
+## Branch: Nishant
+
+This branch contains development changes by Nishant.
 
 ## Getting Started
 
