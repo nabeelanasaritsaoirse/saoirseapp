@@ -3,10 +3,10 @@ name: Automated Release Publishing
 on:
   push:
     tags:
-      - 'v*'   # Runs when versioning workflow creates v1.2.3 tags
+      - 'v*'
 
 permissions:
-  contents: write     # required to publish GitHub Release
+  contents: write
 
 jobs:
   release:
@@ -14,44 +14,61 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Extract version from tag
-        id: vars
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           VERSION="${TAG#v}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
-      - name: Generate Auto Release Notes Template
-        id: notes
+      - name: Generate Auto Release Notes
         run: |
+          set -e
+
+          PREV_TAG=$(git tag --sort=-creatordate | grep -v "^${TAG}$" | head -n 1 || true)
+
+          if [ -n "$PREV_TAG" ]; then
+            RANGE="${PREV_TAG}..HEAD"
+            COMPARE="${PREV_TAG} → ${TAG}"
+          else
+            RANGE="HEAD"
+            COMPARE="Initial release"
+          fi
+
           echo "# 🚀 Release v${VERSION}" > RELEASE_NOTES.md
           echo "" >> RELEASE_NOTES.md
-          echo "## ✨ New Features" >> RELEASE_NOTES.md
-          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 --exclude="$TAG")..HEAD | grep "^feat:" >> RELEASE_NOTES.md || echo "- None" >> RELEASE_NOTES.md
-          
+
+          echo "## 📌 Summary" >> RELEASE_NOTES.md
+          echo "This release includes bug fixes, stability improvements, and CI enhancements." >> RELEASE_NOTES.md
           echo "" >> RELEASE_NOTES.md
-          echo "## 🐞 Fixes" >> RELEASE_NOTES.md
-          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 --exclude="$TAG")..HEAD | grep "^fix:" >> RELEASE_NOTES.md || echo "- None" >> RELEASE_NOTES.md
-          
+
+          echo "## 🔧 Changes & Reasons" >> RELEASE_NOTES.md
+          git log $RANGE --pretty=format:"- %s (%an)" >> RELEASE_NOTES.md || echo "- None" >> RELEASE_NOTES.md
           echo "" >> RELEASE_NOTES.md
-          echo "## 🔥 Breaking Changes" >> RELEASE_NOTES.md
-          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 --exclude="$TAG")..HEAD | grep "BREAKING CHANGE" >> RELEASE_NOTES.md || echo "- None" >> RELEASE_NOTES.md
-          
+
+          echo "## 🐞 Bug Fixes" >> RELEASE_NOTES.md
+          git log $RANGE --pretty=format:"%s" | grep -i fix | sed 's/^/- /' >> RELEASE_NOTES.md || echo "- None" >> RELEASE_NOTES.md
           echo "" >> RELEASE_NOTES.md
+
           echo "## 🛠 Internal Improvements" >> RELEASE_NOTES.md
-          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 --exclude="$TAG")..HEAD | grep -E "chore:|refactor:" >> RELEASE_NOTES.md || echo "- None" >> RELEASE_NOTES.md
-          
+          git log $RANGE --pretty=format:"%s" | grep -Ei "ci|chore|refactor|build" | sed 's/^/- /' >> RELEASE_NOTES.md || echo "- None" >> RELEASE_NOTES.md
           echo "" >> RELEASE_NOTES.md
+
+          echo "## 🔍 Commits" >> RELEASE_NOTES.md
+          git log $RANGE --pretty=format:"- %s" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+
           echo "## 📦 Build" >> RELEASE_NOTES.md
           echo "Version: ${VERSION}" >> RELEASE_NOTES.md
+          echo "Compare: ${COMPARE}" >> RELEASE_NOTES.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ env.VERSION }}
+          tag_name: ${{ env.TAG }}
           name: "Release v${{ env.VERSION }}"
           body_path: RELEASE_NOTES.md
