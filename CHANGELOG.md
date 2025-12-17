@@ -1,4 +1,4 @@
-## Version 1.4.11+96
+## Version 1.4.12+97
 
-- Merge pull request #276 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-1
-- Update Flutter ios.yml
+- Merge pull request #278 from nabeelanasaritsaoirse/deepitsaoirse-hue-patch-1
+- Remove UIMainStoryboardFile from Info.plist
