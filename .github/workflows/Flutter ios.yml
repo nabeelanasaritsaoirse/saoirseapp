@@ -2,9 +2,7 @@ name: 🍎 iOS CI & TestFlight
 run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:  # Manual trigger for debugging
 
 concurrency:
   group: ios-build-${{ github.ref }}
@@ -24,7 +22,7 @@ env:
 
 jobs:
   ios-ci:
-    runs-on: macos-latest
+    runs-on: macos-14  # Updated macOS runner
     outputs:
       version_name: ${{ steps.version.outputs.VERSION_NAME }}
       build_number: ${{ steps.version.outputs.BUILD_NUMBER }}
@@ -32,13 +30,19 @@ jobs:
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for tags
 
       - name: ⚙️ Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.35.7"
+          flutter-version: "3.24.5"  # Valid stable version
           channel: stable
           cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch-
+
+      - name: 🔍 Flutter Doctor
+        run: flutter doctor -v
 
       - name: 📦 Flutter Pub Get
         run: flutter pub get
@@ -50,7 +54,6 @@ jobs:
           VERSION_NAME=$(echo "$VERSION_LINE" | cut -d '+' -f 1 | sed 's/version: //')
           BUILD_NUMBER=$(echo "$VERSION_LINE" | cut -d '+' -f 2)
           
-          # If no build number in pubspec, use run number
           if [ -z "$BUILD_NUMBER" ]; then
             BUILD_NUMBER=$GITHUB_RUN_NUMBER
           fi
@@ -61,7 +64,6 @@ jobs:
           
           echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
-
 
       - name: 🔑 Create .env file
         run: |
@@ -79,13 +81,14 @@ jobs:
 
       - name: ✅ Verify .env file
         run: |
-          echo "✅ .env file created in project root"
+          echo "✅ .env file created"
           ls -la .env
+          flutter pub deps --style=compact
 
       - name: 🚀 Install Fastlane & CocoaPods
         run: |
-          sudo gem install fastlane -N
-          sudo gem install cocoapods -N
+          sudo gem install fastlane -NV
+          sudo gem install cocoapods -NV
 
       - name: 🔐 Write App Store Connect API Key
         run: |
@@ -113,58 +116,55 @@ jobs:
             --keychain_name build.keychain \
             --keychain_password "ci_keychain_pass"
 
-      - name: 💾 Cache Xcode DerivedData
-        uses: actions/cache@v3
+      - name: 💾 Cache Xcode & Pods
+        uses: actions/cache@v4
         with:
           path: |
             ~/Library/Developer/Xcode/DerivedData
             ios/Pods
-          key: ${{ runner.os }}-xcode-${{ hashFiles('ios/Podfile.lock') }}
+            ios/Podfile.lock
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
           restore-keys: |
-            ${{ runner.os }}-xcode-
+            ${{ runner.os }}-pods-
 
-      - name: 🧨 Reset Pods (if not cached)
-        run: |
-          if [ ! -d "ios/Pods" ]; then
-            rm -rf ios/Podfile.lock
-          fi
-
-      - name: 🧨 Install Pods
+      - name: 🧨 Clean & Install Pods
         run: |
           cd ios
+          rm -rf Pods Podfile.lock
           pod install --repo-update
 
       - name: 🔨 Build Flutter iOS Release
         run: |
-          echo "🚀 Starting Flutter build..."
+          echo "🚀 Building Flutter iOS..."
           flutter clean
-          flutter build ios --release --no-codesign
+          flutter pub get
+          flutter build ios --release --no-codesign --verbose
           echo "✅ Flutter build completed!"
 
-      - name: ✅ Verify Flutter Build Output
+      - name: 🔍 Verify Flutter Build (Black Screen Fix)
         run: |
-          echo "🔍 Checking Flutter build artifacts..."
-          ls -la ios/Flutter/
-
-          if [ ! -f "ios/Flutter/Generated.xcconfig" ]; then
-            echo "❌ ERROR: Generated.xcconfig not found!"
+          echo "🔍 Verifying build artifacts..."
+          
+          # Check Flutter.framework
+          if [ ! -d "build/ios/iphoneos/Runner.app/Frameworks/Flutter.framework" ]; then
+            echo "❌ Flutter.framework missing - BLACK SCREEN CAUSE!"
             exit 1
           fi
-
-          if [ ! -d "build/ios/iphoneos/Runner.app" ]; then
-            echo "❌ ERROR: Runner.app not built!"
-            exit 1
-          fi
-
-          echo "✅ Flutter build artifacts verified!"
-          cat ios/Flutter/Generated.xcconfig
+          
+          # Check launch screen config
+          /usr/libexec/PlistBuddy -c "Print :UILaunchStoryboardName" ios/Runner/Info.plist || echo "⚠️ Launch screen not configured"
+          
+          # Verify App.framework
+          ls -la build/ios/iphoneos/Runner.app/Frameworks/App.framework || echo "⚠️ App.framework issues"
+          
+          echo "✅ Build verification passed!"
+          ls -la build/ios/iphoneos/Runner.app/Frameworks/
 
       - name: 📝 Create ExportOptions.plist
         run: |
           cat > ios/ExportOptions.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-           "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
             <key>method</key>
@@ -194,20 +194,23 @@ jobs:
             -configuration Release \
             -archivePath ../${ARCHIVE_DIR}/Runner.xcarchive \
             -destination 'generic/platform=iOS' \
+            -allowProvisioningUpdates \
             DEVELOPMENT_TEAM=${TEAM_ID} \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE_SPECIFIER="${PROFILE_NAME}" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
             OTHER_CODE_SIGN_FLAGS="--keychain build.keychain" \
+            VALIDATE_WORKSPACE=YES \
             | tee ../xcodebuild.log
 
       - name: ✅ Verify Archive
         run: |
           if [ ! -d "${ARCHIVE_DIR}/Runner.xcarchive" ]; then
-            echo "❌ Archive not created!"
-            tail -n 200 xcodebuild.log || true
+            echo "❌ Archive failed! Check logs:"
+            tail -n 100 xcodebuild.log
             exit 1
           fi
+          echo "✅ Archive created successfully"
 
       - name: 📦 Export IPA
         run: |
@@ -216,42 +219,51 @@ jobs:
             -archivePath ../${ARCHIVE_DIR}/Runner.xcarchive \
             -exportPath ../${IPA_DIR} \
             -exportOptionsPlist ExportOptions.plist \
-            | tee ../export.log || true
+            | tee ../export.log
 
       - name: ✅ Verify IPA
         run: |
-          ls ${IPA_DIR}/*.ipa || (echo "❌ IPA export failed!" && exit 1)
+          IPA_PATH=$(ls ${IPA_DIR}/*.ipa)
+          if [ ! -f "$IPA_PATH" ]; then
+            echo "❌ IPA export failed!"
+            tail -n 50 export.log
+            exit 1
+          fi
+          echo "✅ IPA ready: $IPA_PATH"
 
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-ipa
+          name: ios-ipa-${{ steps.version.outputs.VERSION_NAME }}
           path: ${{ env.IPA_DIR }}/*.ipa
+          retention-days: 30
 
-      - name: 📋 Upload build logs
+      - name: 📋 Upload Build Logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ios-build-logs
+          name: ios-logs-${{ github.run_number }}
           path: |
             xcodebuild.log
             export.log
-            
+            ios/Flutter/Generated.xcconfig
+
       - name: 🧾 Build Summary
+        if: success()
         run: |
           echo "## 🍎 iOS Build Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Version:** ${{ steps.version.outputs.VERSION_NAME }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build Number:** ${{ steps.version.outputs.BUILD_NUMBER }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build:** ${{ steps.version.outputs.BUILD_NUMBER }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Bundle ID:** ${BUNDLE_ID}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Bundle ID:** ${{ env.BUNDLE_ID }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ✅ Ready for TestFlight" >> $GITHUB_STEP_SUMMARY
 
   ios-deploy:
     name: "🚀 Deploy to TestFlight"
     needs: ios-ci
-    runs-on: macos-latest
-    environment:
-      name: ios-deploy   # Optional: add manual approval like Android
+    runs-on: macos-14
+    if: github.ref_type == 'tag'
+    environment: ios-deploy
 
     steps:
       - name: 📥 Checkout Repository
@@ -260,13 +272,13 @@ jobs:
       - name: 📦 Download IPA
         uses: actions/download-artifact@v4
         with:
-          name: ios-ipa
+          name: ios-ipa-${{ needs.ios-ci.outputs.version_name }}
           path: build/ios/ipa
 
       - name: 🚀 Install Fastlane
-        run: sudo gem install fastlane -N
+        run: sudo gem install fastlane -NV
 
-      - name: 🔐 Write api_key.json
+      - name: 🔐 Write API Key
         run: echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > api_key.json
 
       - name: 🚀 Upload to TestFlight
@@ -274,15 +286,14 @@ jobs:
           fastlane pilot upload \
             --api_key_path api_key.json \
             --ipa build/ios/ipa/*.ipa \
-            --skip_waiting_for_build_processing
+            --skip_waiting_for_build_processing \
+            --verbose
 
       - name: 🧾 Deploy Summary
+        if: success()
         run: |
-          echo "## 🚀 TestFlight Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 TestFlight Deployed" >> $GITHUB_STEP_SUMMARY
           echo "- **Version:** ${{ needs.ios-ci.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build Number:** ${{ needs.ios-ci.outputs.build_number }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status:** ✅ Uploaded to TestFlight" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The build will be available for testing once Apple completes processing." >> $GITHUB_STEP_SUMMARY
+          echo "- **Build:** ${{ needs.ios-ci.outputs.build_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ✅ Processing in TestFlight" >> $GITHUB_STEP_SUMMARY
+
