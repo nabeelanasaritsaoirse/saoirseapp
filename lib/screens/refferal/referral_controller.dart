@@ -208,22 +208,22 @@ class ReferralController extends GetxController {
     final link = _referralLink();
 
     try {
-      // 1️⃣ Copy referral link
+      
       await Clipboard.setData(ClipboardData(text: link));
 
-      // 2️⃣ Copy image to cache
+    
       final imageFile = await _copyInstagramStoryImageToTemp();
 
-      // 3️⃣ Get content:// URI
+     
       final contentUri = await _getInstagramContentUri(imageFile);
 
-      // 4️⃣ Launch Instagram Story
+      
       final intent = AndroidIntent(
         action: 'com.instagram.share.ADD_TO_STORY',
         data: contentUri.toString(),
         type: 'image/*',
         flags: <int>[
-          1, // FLAG_GRANT_READ_URI_PERMISSION
+          1, 
         ],
         arguments: {
           'source_application': 'com.saoirse.epi',
