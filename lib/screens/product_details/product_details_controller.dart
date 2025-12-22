@@ -280,7 +280,7 @@ class ProductDetailsController extends GetxController {
       final plan = plans[selectedPlanIndex.value];
       return {
         "days": plan.days,
-        "amount": plan.totalAmount,
+        "amount": plan.perDayAmount,
       };
     }
 
