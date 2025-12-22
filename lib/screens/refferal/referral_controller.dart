@@ -32,9 +32,14 @@ class ReferralController extends GetxController {
   Rxn<ReferrerInfoModel> referrer = Rxn<ReferrerInfoModel>();
   String get referralLink => _referralLink();
 
+  /// Stats
+  final totalReferrals = 0.obs;
+  final referralLimit = 0.obs;
+
   @override
   void onInit() {
     super.onInit();
+    fetchReferralStats();
     loadReferralFromStorage();
     fetchReferralData();
     fetchReferrerInfo();
@@ -121,6 +126,23 @@ class ReferralController extends GetxController {
   // Fetch Product Details List (Referral Details screen)
   // ---------------------------------------------------------------------------
 
+  Future<void> fetchReferralStats() async {
+    try {
+      isLoading(true);
+
+      final response = await _referralService.fetchReferralStats();
+
+      if (response != null && response.success) {
+        final data = response.data;
+        totalReferrals.value = data.totalReferrals;
+        referralLimit.value = data.referralLimit;
+      }
+    } catch (e) {
+      print("Controller Error: $e");
+    } finally {
+      isLoading(false);
+    }
+  }
   // ---------------------------------------------------------------------------
   // SHARE OPTIONS
   // ---------------------------------------------------------------------------
