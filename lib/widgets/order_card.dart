@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -58,13 +59,32 @@ class OrderCard extends StatelessWidget {
                       ? Image.network(
                           order.image,
                           fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => Icon(
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) {
+                              return child;
+                            }
+                            return Center(
+                              child: CupertinoActivityIndicator(
+                                radius: 10.0,
+                                color: AppColors.textGray,
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) => Center(
+                            child: Icon(
                               Icons.image_not_supported,
                               size: 30,
-                              color: Colors.grey),
+                              color: Colors.grey,
+                            ),
+                          ),
                         )
-                      : Icon(Icons.image_not_supported,
-                          size: 30, color: Colors.grey),
+                      : Center(
+                          child: Icon(
+                            Icons.image_not_supported,
+                            size: 30,
+                            color: Colors.grey,
+                          ),
+                        ),
                 ),
 
                 SizedBox(width: 12.w),

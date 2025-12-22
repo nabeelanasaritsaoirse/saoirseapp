@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -399,6 +400,18 @@ class OrderDetailsScreen extends StatelessWidget {
                               width: 55.w,
                               height: 55.h,
                               fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) {
+                                  return child;
+                                }
+                                return Center(
+                                  child: CupertinoActivityIndicator(
+                                    radius: 10.0,
+                                    color: AppColors.textGray,
+                                  ),
+                                );
+                              },
                               errorBuilder: (_, __, ___) => Container(
                                 color: Colors.grey.shade200,
                                 child: Icon(Icons.broken_image, size: 28.sp),

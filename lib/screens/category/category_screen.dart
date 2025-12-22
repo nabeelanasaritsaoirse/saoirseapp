@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -271,13 +272,24 @@ class SubCategoryCard extends StatelessWidget {
                     );
                   }
 
-                  // Image available: show network image, fallback to icon on errorreturn Image.
+                  // Image available: show network image, fallback to icon on error
                   return Center(
                     child: Image.network(
                       imageUrl,
                       height: 75.h,
                       width: 80.w,
                       fit: BoxFit.contain,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        }
+                        return Center(
+                          child: CupertinoActivityIndicator(
+                            radius: 10.0,
+                            color: AppColors.textGray,
+                          ),
+                        );
+                      },
                       errorBuilder: (context, error, stackTrace) {
                         return Center(
                           child: Icon(

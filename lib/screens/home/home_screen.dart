@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -153,10 +154,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   margin: EdgeInsets.symmetric(horizontal: 8.w),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12.r),
-                                    image: DecorationImage(
-                                      image: NetworkImage(imagePath),
-                                      fit: BoxFit.cover,
-                                    ),
                                     boxShadow: [
                                       BoxShadow(
                                         color: AppColors.lightBlack,
@@ -164,6 +161,34 @@ class _HomeScreenState extends State<HomeScreen> {
                                         offset: const Offset(0, 4),
                                       ),
                                     ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    child: Image.network(
+                                      imagePath,
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Center(
+                                          child: CupertinoActivityIndicator(
+                                            radius: 10.0,
+                                            color: AppColors.textGray,
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (_, __, ___) => Container(
+                                        color: Colors.grey.shade300,
+                                        child: Icon(
+                                          Icons.broken_image,
+                                          size: 40.sp,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 );
                               },
@@ -501,13 +526,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                           }
 
                                           return Center(
-                                            child: SizedBox(
-                                              width: 24.w,
-                                              height: 24.w,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                                color: Colors.grey,
-                                              ),
+                                            child: CupertinoActivityIndicator(
+                                              radius: 10.0,
+                                              color: AppColors.textGray,
                                             ),
                                           );
                                         },
@@ -712,6 +733,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                               .size
                                               .width
                                               .w,
+
+                                          // 👇 Loading indicator
+                                          loadingBuilder: (context, child,
+                                              loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return Center(
+                                              child: CupertinoActivityIndicator(
+                                                radius: 10.0,
+                                                color: AppColors.textGray,
+                                              ),
+                                            );
+                                          },
 
                                           // 👇 If image not found → show simple grey container with icon
                                           errorBuilder: (_, __, ___) =>
