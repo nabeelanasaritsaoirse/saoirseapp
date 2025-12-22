@@ -117,7 +117,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           return Row(
             children: [
               Container(
-                width: 80.h,
+                width: 85.h,
                 color: AppColors.white,
                 child: Column(
                   children: [

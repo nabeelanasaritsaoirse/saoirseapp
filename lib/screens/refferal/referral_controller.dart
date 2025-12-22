@@ -32,9 +32,14 @@ class ReferralController extends GetxController {
   Rxn<ReferrerInfoModel> referrer = Rxn<ReferrerInfoModel>();
   String get referralLink => _referralLink();
 
+  /// Stats
+  final totalReferrals = 0.obs;
+  final referralLimit = 0.obs;
+
   @override
   void onInit() {
     super.onInit();
+    fetchReferralStats();
     loadReferralFromStorage();
     fetchReferralData();
     fetchReferrerInfo();
@@ -117,10 +122,42 @@ class ReferralController extends GetxController {
     }
   }
 
+    Future<File> _copyInstagramStoryImageToTemp() async {
+    final byteData = await rootBundle.load(
+      'assets/images/referral_story_image.png',
+    );
+
+    final tempDir = await getTemporaryDirectory();
+    final file = File('${tempDir.path}/instagram_referral_story.png');
+
+    await file.writeAsBytes(
+      byteData.buffer.asUint8List(),
+    );
+
+    return file;
+  }
+
   // ---------------------------------------------------------------------------
   // Fetch Product Details List (Referral Details screen)
   // ---------------------------------------------------------------------------
 
+  Future<void> fetchReferralStats() async {
+    try {
+      isLoading(true);
+
+      final response = await _referralService.fetchReferralStats();
+
+      if (response != null && response.success) {
+        final data = response.data;
+        totalReferrals.value = data.totalReferrals;
+        referralLimit.value = data.referralLimit;
+      }
+    } catch (e) {
+      print("Controller Error: $e");
+    } finally {
+      isLoading(false);
+    }
+  }
   // ---------------------------------------------------------------------------
   // SHARE OPTIONS
   // ---------------------------------------------------------------------------
@@ -177,20 +214,57 @@ class ReferralController extends GetxController {
     }
   }
 
+ 
+   Future<Uri> _getInstagramContentUri(File file) async {
+    final uri = await MethodChannel(
+      'com.saoirse.epi/fileprovider',
+    ).invokeMethod<String>(
+      'getUri',
+      file.path,
+    );
+
+    return Uri.parse(uri!);
+  }
+
   Future<void> shareToInstagram() async {
     final link = _referralLink();
 
-    // Copy link to clipboard so user can paste in Instagram caption
-    await Clipboard.setData(ClipboardData(text: link));
+    try {
+      
+      await Clipboard.setData(ClipboardData(text: link));
 
-    // Try to open Instagram app
-    final instagramUri = Uri.parse("instagram://app");
+    
+      final imageFile = await _copyInstagramStoryImageToTemp();
 
-    if (await canLaunchUrl(instagramUri)) {
-      await launchUrl(instagramUri);
-    } else {
-      // Instagram is not installed → fallback
-      await Share.share(link);
+     
+      final contentUri = await _getInstagramContentUri(imageFile);
+
+      
+      final intent = AndroidIntent(
+        action: 'com.instagram.share.ADD_TO_STORY',
+        data: contentUri.toString(),
+        type: 'image/*',
+        flags: <int>[
+          1, 
+        ],
+        arguments: {
+          'source_application': 'com.saoirse.epi',
+        },
+      );
+
+      await intent.launch();
+
+      appToaster(
+        error: false,
+        content: "Referral link copied. Paste it or add Link sticker.",
+      );
+    } catch (e, st) {
+      log("Instagram Story Error: $e\n$st");
+
+      appToast(
+        error: true,
+        content: "Failed to open Instagram Story",
+      );
     }
   }
 

@@ -132,6 +132,8 @@ class MyApp extends StatelessWidget {
               scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
               textTheme: GoogleFonts.poppinsTextTheme(),
               highlightColor: AppColors.transparent,
+
+              
               splashColor: AppColors.transparent,
               useMaterial3: true,
             ),

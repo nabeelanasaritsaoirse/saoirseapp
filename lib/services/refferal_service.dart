@@ -11,6 +11,7 @@ import '../models/friend_details_response.dart';
 import '../models/product_detiails_response.dart';
 import '../models/referral_response_model.dart';
 import '../models/refferal_info_model.dart';
+import '../models/refferal_limit.dart';
 import '../services/api_service.dart';
 
 class ReferralService {
@@ -123,6 +124,32 @@ class ReferralService {
       return ReferrerInfoModel.fromJson(response["referredBy"]);
     } else {
       log("Referrer Info Error: ${response["message"]}");
+      return null;
+    }
+  }
+
+  Future<ReferralStatsResponse?> fetchReferralStats() async {
+    try {
+      final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+      final response = await APIService.getRequest(
+        url: AppURLs.REFERRAL_STATS,
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+        onSuccess: (json) => json,
+      );
+
+      if (response == null) return null;
+
+      if (response["success"] == true && response["data"] != null) {
+        return ReferralStatsResponse.fromJson(response);
+      } else {
+        log("Referral Stats Error: ${response["message"]}");
+        return null;
+      }
+    } catch (e) {
+      log("Referral Stats Exception: $e");
       return null;
     }
   }

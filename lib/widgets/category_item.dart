@@ -24,47 +24,51 @@ class CategoryItem extends StatelessWidget {
       final category = controller.categoryGroups[index];
 
       return InkWell(
-        onTap: () => controller.selectCategory(index),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          height: 110.h, // FIXED HEIGHT = no flicker
-          padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 7.w),
-          decoration: BoxDecoration(
-            color: isSelected ? AppColors.lightGrey : AppColors.white,
-            border: Border(
-              left: BorderSide(
-                color: isSelected ? AppColors.primaryColor : Colors.transparent,
-                width: 4.w,
-              ),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // 🔥 KEY
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _CategoryImage(category: category),
-
-              // Reduce spacing slightly
-              SizedBox(height: 4.h),
-
-              Flexible(
-                // 🔥 KEY
-                child: appText(
-                  category.name,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  fontSize: 11.sp,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+          onTap: () => controller.selectCategory(index),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 7.w),
+            decoration: BoxDecoration(
+              color: isSelected ? AppColors.lightGrey : AppColors.white,
+              border: Border(
+                left: BorderSide(
                   color:
-                      isSelected ? AppColors.primaryColor : AppColors.textBlack,
+                      isSelected ? AppColors.primaryColor : Colors.transparent,
+                  width: 4.w,
                 ),
               ),
-            ],
-          ),
-        ),
-      );
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // FIXED image size = no relayout
+                SizedBox(
+                  width: 50.w,
+                  height: 50.h,
+                  child: _CategoryImage(category: category),
+                ),
+
+                SizedBox(height: 6.h),
+
+                // FIXED text behavior = no relayout
+                Text(
+                  category.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 10.sp,
+                    height: 1.2, // 🔥 IMPORTANT
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                    color: isSelected
+                        ? AppColors.primaryColor
+                        : AppColors.textBlack,
+                  ),
+                ),
+              ],
+            ),
+          ));
     });
   }
 }

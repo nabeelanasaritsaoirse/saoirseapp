@@ -31,6 +31,7 @@ class AppURLs {
   static String FETCH_REFERRAL = BASE_API + "api/referral/list/";
   static String APPLY_REFERRAL = BASE_API + "api/auth/applyReferralCode";
   static String REFERRAL_INFO = BASE_API + "api/referral/referrer-info";
+  static String REFERRAL_STATS = BASE_API + "api/referral/stats/";
 
   // Wishlist api
   static String GET_WISHLIST = BASE_API + "api/wishlist";
