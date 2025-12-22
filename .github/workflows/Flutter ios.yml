@@ -3,8 +3,8 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - DEPLOY
 
 concurrency:
   group: ios-build-${{ github.ref }}
@@ -40,11 +40,18 @@ jobs:
           channel: stable
           cache: true
 
-      - name: 🧰 Select Xcode 16.1
+      # - name: 🧰 Select Xcode 16.1
+      #   run: |
+      #     sudo xcode-select -s /Applications/Xcode_16.1.app
+      #     xcodebuild -version
+      #     xcodebuild -showsdks
+
+      - name: Install Xcode components
         run: |
-          sudo xcode-select -s /Applications/Xcode_16.1.app
-          xcodebuild -version
-          xcodebuild -showsdks
+          sudo xcode-select -s /Applications/Xcode.app
+          xcodebuild -runFirstLaunch
+          xcodebuild -downloadPlatform iOS
+
 
       - name: 📦 Flutter Pub Get
         run: flutter pub get
