@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/payment_methods.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -1024,23 +1025,40 @@ class OrderDetailsScreen extends StatelessWidget {
               //     },
               //   );
               // },
+              // onPressed: () {
+              //   orderController.placeOrder(
+              //     productId: product!.id,
+              //     variantId: selectVarientId ?? "",
+                  
+              //     totalDays: orderController.selectedDays.value,
+              //     couponCode: orderController.appliedCouponCode.value,
+              //     deliveryAddress: {
+              //       "name": addresses.name,
+              //       "phoneNumber": addresses.phoneNumber,
+              //       "addressLine1": addresses.addressLine1,
+              //       "city": addresses.city,
+              //       "state": addresses.state,
+              //       "pincode": addresses.pincode,
+              //     },
+              //   );
+              // },
               onPressed: () {
-                orderController.placeOrder(
-                  productId: product!.id,
-                  variantId: selectVarientId ?? "",
-                  paymentOption: "daily",
-                  totalDays: orderController.selectedDays.value,
-                  couponCode: orderController.appliedCouponCode.value,
-                  deliveryAddress: {
-                    "name": addresses.name,
-                    "phoneNumber": addresses.phoneNumber,
-                    "addressLine1": addresses.addressLine1,
-                    "city": addresses.city,
-                    "state": addresses.state,
-                    "pincode": addresses.pincode,
-                  },
-                );
-              },
+  orderController.placeOrder(
+    productId: product!.id,
+    variantId: selectVarientId ?? "",
+    totalDays: orderController.selectedDays.value,
+    couponCode: orderController.appliedCouponCode.value,
+    deliveryAddress: {
+      "name": addresses.name,
+      "phoneNumber": addresses.phoneNumber,
+      "addressLine1": addresses.addressLine1,
+      "city": addresses.city,
+      "state": addresses.state,
+      "pincode": addresses.pincode,
+    },
+  );
+},
+
               child: appText(
                 AppStrings.pay_now,
                 color: AppColors.white,
@@ -1104,7 +1122,7 @@ class OrderDetailsScreen extends StatelessWidget {
                     }
 
                     // If enough balance → allow selection
-                    orderController.selectPaymentMethod("wallet");
+                    orderController.selectPaymentMethod(PaymentMethod.wallet);
                     Get.back();
                   },
                   child: Container(
@@ -1206,7 +1224,7 @@ class OrderDetailsScreen extends StatelessWidget {
             // ================= RAZORPAY OPTION =================
             Obx(() => GestureDetector(
                   onTap: () {
-                    orderController.selectPaymentMethod("razorpay");
+                    orderController.selectPaymentMethod(PaymentMethod.razorpay);
                     Get.back();
                   },
                   child: Container(

@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/payment_methods.dart';
 
 import '../../models/coupon_model.dart';
 import '../../models/coupon_validation_model.dart';
@@ -16,7 +17,7 @@ import '../razorpay/razorpay_controller.dart';
 class OrderDetailsController extends GetxController {
   RxInt selectedDays = 0.obs;
   RxDouble selectedAmount = 0.0.obs;
-  var selectedPaymentMethod = "razorpay".obs;
+
   var quantity = 1.obs;
   String orderid = "";
 
@@ -29,6 +30,8 @@ class OrderDetailsController extends GetxController {
 
   // store last applied coupon code (string) for display
   RxString appliedCouponCode = "".obs;
+
+  RxString selectedPaymentMethod = PaymentMethod.razorpay.obs;
 
   // storing first values for remove coupon
   double originalAmount = 0.0;
@@ -125,7 +128,7 @@ class OrderDetailsController extends GetxController {
   Future<void> placeOrder({
     required String productId,
     String variantId = "",
-    required String paymentOption,
+    // required String paymentOption,
     required int totalDays,
     String couponCode = "",
     required Map<String, dynamic> deliveryAddress,
@@ -140,75 +143,84 @@ class OrderDetailsController extends GetxController {
       "pincode": (deliveryAddress["pincode"] ?? "").toString().trim(),
     };
 
-    // Final body
-    final body = {
+    final Map<String, dynamic> body = {
       "productId": productId,
-      "variantId": variantId,
-      "paymentOption": paymentOption,
-      "paymentDetails": {
-        "totalDays": totalDays,
-      },
-      "couponCode": couponCode,
+      "quantity": quantity.value,
+      "totalDays": totalDays,
+      "paymentMethod": selectedPaymentMethod.value,
       "deliveryAddress": delivery,
     };
+
+// add only if variantId is not empty
+    if (variantId.trim().isNotEmpty) {
+      body["variantId"] = variantId.trim();
+    }
+
+// // add only if couponCode is not empty
+    if (couponCode.trim().isNotEmpty) {
+      body["couponCode"] = couponCode.trim();
+    }
 
     log("📦 FINAL JSON = ${jsonEncode(body)}");
 
     appLoader();
 
-    final response = await OrderService.createOrder(body);
+    try {
+      final response = await OrderService.createOrder(body);
 
-    if (Get.isDialogOpen ?? false) Get.back();
+      if (response == null) {
+        appToast(
+          error: true,
+          content: "Failed to place order. Please try again!",
+        );
+        return;
+      }
 
-    if (response == null) {
+      // ✅ WALLET FLOW
+      if (selectedPaymentMethod.value == PaymentMethod.wallet) {
+        appToast(content: "Order placed using Wallet");
+        return;
+      }
+
+    
+      // ✅ RAZORPAY FLOW
+      final data = response['data'];
+
+      if (data == null || data is! Map<String, dynamic>) {
+        appToast(
+          error: true,
+          content: "Invalid payment response from server",
+        );
+        return;
+      }
+
+      final payment = OrderResponseModel.fromJson(data);
+
+      if (payment.payment.razorpayOrderId.isEmpty) {
+        appToast(
+          error: true,
+          content: "Invalid Razorpay Order ID!",
+        );
+        return;
+      }
+
+      log("🚀 Opening Razorpay with orderId = ${payment.payment.razorpayOrderId}");
+
+      Get.find<RazorpayController>().openCheckout(
+        razorpayOrderId: payment.payment.razorpayOrderId,
+        orderId: payment.order.id,
+        amount: payment.payment.amount,
+      );
+    } catch (e, s) {
+      log("❌ placeOrder error", error: e, stackTrace: s);
       appToast(
         error: true,
-        title: "Error",
-        content: "Failed to place order. Please try again!",
+        content: "Payment initialization failed",
       );
-      return;
+    } finally {
+      // 🔥 CLOSE LOADER LAST
+      if (Get.isDialogOpen ?? false) Get.back();
     }
-
-    log("ORDER API SUCCESS: $response");
-
-    // final paymentJson = response["payment"];
-    final paymentOrder = response["order"];
-
-    if (paymentOrder == null) {
-      appToast(
-        error: true,
-        content: "Payment info missing from server!",
-      );
-      return;
-    }
-
-    final payment = OrderResponseModel.fromJson(response);
-
-    // Validate
-    if (payment.order.id.isEmpty) {
-      appToast(
-        error: true,
-        content: "Invalid payment details!",
-      );
-      return;
-    }
-    if (payment.payment.orderId.isEmpty) {
-      appToast(
-        error: true,
-        content: "Invalid Razorpay Order ID!",
-      );
-      return;
-    }
-
-    orderid = payment.order.id;
-    log("orderid is : $orderid");
-
-    // Open Razorpay
-    Get.find<RazorpayController>().openCheckout(
-      razorpayOrderId: payment.payment.orderId,
-      orderId: payment.order.id,
-      amount: payment.payment.amount,
-    );
   }
 
   void setCustomPlan(int days, double amount) {
@@ -222,10 +234,10 @@ class OrderDetailsController extends GetxController {
   }
 
   void increaseQty() {
-    if (quantity.value >= 10) {
-      appToaster(content: "Maximum quantity is 10", error: true);
-      return;
-    }
+    // if (quantity.value >= 10) {
+    //   appToaster(content: "Maximum quantity is 10", error: true);
+    //   return;
+    // }
     quantity.value++;
   }
 
