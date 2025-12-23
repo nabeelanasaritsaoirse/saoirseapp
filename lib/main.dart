@@ -33,7 +33,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await AppsFlyerService.instance.init();
-  await dotenv.load(fileName: ".env");
+  
+  // ✅ Make dotenv loading optional (in case .env is missing in CI build)
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    log("⚠️ .env file not found, using default config: $e");
+  }
   
   // ✅ Use default Firebase initialization
   // This automatically reads from GoogleService-Info.plist (iOS) or google-services.json (Android)
