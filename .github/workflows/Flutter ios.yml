@@ -44,7 +44,6 @@ jobs:
         run: |
           sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -runFirstLaunch || true
-
       # --------------------------------------------------
       # Flutter
       # --------------------------------------------------
@@ -61,7 +60,6 @@ jobs:
         run: |
           sudo gem install fastlane -N
           sudo gem install cocoapods -N
-
       # --------------------------------------------------
       # Clean
       # --------------------------------------------------
@@ -83,16 +81,13 @@ jobs:
           VERSION_LINE=$(grep "^version:" pubspec.yaml)
           VERSION_NAME=$(echo "$VERSION_LINE" | cut -d '+' -f 1 | sed 's/version: //')
           BUILD_NUMBER=$(echo "$VERSION_LINE" | cut -d '+' -f 2)
-
           if [ -z "$BUILD_NUMBER" ]; then
             BUILD_NUMBER=$GITHUB_RUN_NUMBER
           fi
-
           echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
           
           echo "Building version: $VERSION_NAME ($BUILD_NUMBER)"
-
       # --------------------------------------------------
       # ENV
       # --------------------------------------------------
@@ -109,7 +104,63 @@ jobs:
           ANDROID_MESSAGING_SENDER_ID=${{ secrets.ANDROID_MESSAGING_SENDER_ID }}
           ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
           EOF
-
+      
+      # --------------------------------------------------
+      # Fix Launch Screen Assets - THIS IS THE KEY FIX
+      # --------------------------------------------------
+      - name: 🖼️ Verify Launch Screen Assets
+        run: |
+          echo "Checking LaunchImage.imageset configuration..."
+          
+          # Check if LaunchImage.imageset exists
+          if [ ! -d "ios/Runner/Assets.xcassets/LaunchImage.imageset" ]; then
+            echo "⚠️ LaunchImage.imageset not found! Creating it..."
+            mkdir -p ios/Runner/Assets.xcassets/LaunchImage.imageset
+          fi
+          
+          # Ensure Contents.json exists with proper configuration
+          cat > ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json <<'JSON'
+          {
+            "images" : [
+              {
+                "idiom" : "universal",
+                "filename" : "LaunchImage.png",
+                "scale" : "1x"
+              },
+              {
+                "idiom" : "universal",
+                "filename" : "LaunchImage@2x.png",
+                "scale" : "2x"
+              },
+              {
+                "idiom" : "universal",
+                "filename" : "LaunchImage@3x.png",
+                "scale" : "3x"
+              }
+            ],
+            "info" : {
+              "version" : 1,
+              "author" : "xcode"
+            }
+          }
+          JSON
+          
+          echo "✅ LaunchImage.imageset configuration verified"
+          
+      # --------------------------------------------------
+      # Update Info.plist with required keys
+      # --------------------------------------------------
+      - name: 📝 Update Info.plist
+        run: |
+          # Add required Flutter keys to Info.plist
+          /usr/libexec/PlistBuddy -c "Add :io.flutter.embedded_views_preview bool true" ios/Runner/Info.plist 2>/dev/null || \
+          /usr/libexec/PlistBuddy -c "Set :io.flutter.embedded_views_preview true" ios/Runner/Info.plist
+          
+          /usr/libexec/PlistBuddy -c "Add :CADisableMinimumFrameDurationOnPhone bool true" ios/Runner/Info.plist 2>/dev/null || \
+          /usr/libexec/PlistBuddy -c "Set :CADisableMinimumFrameDurationOnPhone true" ios/Runner/Info.plist
+          
+          echo "✅ Info.plist updated with required keys"
+          
       # --------------------------------------------------
       # App Store Connect API key
       # --------------------------------------------------
@@ -118,7 +169,6 @@ jobs:
           mkdir -p ios
           echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > ios/api_key.json
           chmod 600 ios/api_key.json
-
       # --------------------------------------------------
       # Keychain
       # --------------------------------------------------
@@ -147,7 +197,6 @@ jobs:
           
           echo "✅ Keychain setup complete"
           security list-keychains
-
       # --------------------------------------------------
       # Certificates
       # --------------------------------------------------
@@ -168,7 +217,6 @@ jobs:
           # Verify certificates
           echo "Checking for Apple Distribution certificate..."
           security find-identity -v -p codesigning build.keychain-db | grep "Apple Distribution" || echo "⚠️ No distribution cert found!"
-
       # --------------------------------------------------
       # Firebase Config
       # --------------------------------------------------
@@ -212,7 +260,6 @@ jobs:
           </dict>
           </plist>
           EOF
-
       # --------------------------------------------------
       # Pods
       # --------------------------------------------------
@@ -220,7 +267,6 @@ jobs:
         run: |
           cd ios
           pod install --repo-update
-
       # --------------------------------------------------
       # Configure Xcode project for manual signing
       # --------------------------------------------------
@@ -245,6 +291,8 @@ jobs:
                   config.build_settings['CODE_SIGN_IDENTITY'] = 'Apple Distribution'
                   config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ENV['PROFILE_NAME']
                   config.build_settings['CODE_SIGN_IDENTITY[sdk=iphoneos*]'] = 'Apple Distribution'
+                  config.build_settings['ENABLE_BITCODE'] = 'NO'
+                  config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
                 end
               end
             end
@@ -255,7 +303,6 @@ jobs:
           RUBY
           
           ruby update_signing.rb
-
       # --------------------------------------------------
       # Build Flutter (without codesigning)
       # --------------------------------------------------
@@ -266,7 +313,6 @@ jobs:
             --no-codesign \
             --build-name ${{ steps.version.outputs.VERSION_NAME }} \
             --build-number ${{ steps.version.outputs.BUILD_NUMBER }}
-
       # --------------------------------------------------
       # ExportOptions
       # --------------------------------------------------
@@ -296,7 +342,6 @@ jobs:
           </dict>
           </plist>
           EOF
-
       # --------------------------------------------------
       # Archive with Xcode
       # --------------------------------------------------
@@ -320,7 +365,6 @@ jobs:
             | tee ../archive.log
           
           echo "✅ Archive created"
-
       # --------------------------------------------------
       # Verify Archive
       # --------------------------------------------------
@@ -334,7 +378,6 @@ jobs:
           
           echo "=== Flutter Frameworks ==="
           ls -la ${{ env.ARCHIVE_DIR }}/Runner.xcarchive/Products/Applications/Runner.app/Frameworks/ | grep -E "(App.framework|Flutter.framework)" || echo "⚠️ Flutter frameworks missing!"
-
       # --------------------------------------------------
       # Export IPA
       # --------------------------------------------------
@@ -350,7 +393,6 @@ jobs:
           
           echo "✅ IPA exported"
           ls -lh ../${{ env.IPA_DIR }}/
-
       # --------------------------------------------------
       # Verify IPA
       # --------------------------------------------------
@@ -360,13 +402,19 @@ jobs:
           ls -lh ${{ env.IPA_DIR }}/*.ipa
           
           echo "=== Checking IPA Contents ==="
-          unzip -l ${{ env.IPA_DIR }}/*.ipa | grep -E "(App.framework|Flutter.framework)" || echo "⚠️ Flutter frameworks not in IPA!"
-
+          unzip -l ${{ env.IPA_DIR }}/*.ipa | grep -E "(App.framework|Flutter.framework|GoogleService-Info.plist)" || echo "⚠️ Missing critical files!"
+          
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
           path: ${{ env.IPA_DIR }}/*.ipa
+          
+      - name: 📤 Upload dSYM for Crash Analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-dsym
+          path: ${{ env.ARCHIVE_DIR }}/Runner.xcarchive/dSYMs/
           
       - name: 📤 Upload Logs (if failed)
         if: failure()
@@ -376,6 +424,7 @@ jobs:
           path: |
             archive.log
             export.log
+            
   ios-deploy:
     name: 🚀 Deploy to TestFlight
     needs: ios-ci
