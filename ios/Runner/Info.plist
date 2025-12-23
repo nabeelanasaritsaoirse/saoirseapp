@@ -45,8 +45,13 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	
+	<!-- Flutter Performance & Rendering Settings -->
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	
