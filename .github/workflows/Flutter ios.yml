@@ -125,12 +125,27 @@ jobs:
       - name: 🔓 Setup Keychain
         run: |
           KEYCHAIN_PASSWORD="ci_keychain_pass"
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security set-keychain-settings -lut 7200 build.keychain
+          KEYCHAIN_PATH="$HOME/Library/Keychains/build.keychain-db"
           
-          # List keychains to verify
+          # Delete if exists
+          security delete-keychain build.keychain-db 2>/dev/null || true
+          
+          # Create new keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain-db
+          
+          # Set as default
+          security default-keychain -s build.keychain-db
+          
+          # Unlock
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain-db
+          
+          # Set timeout to 2 hours
+          security set-keychain-settings -lut 7200 build.keychain-db
+          
+          # Add to search list
+          security list-keychains -d user -s build.keychain-db $(security list-keychains -d user | sed s/\"//g)
+          
+          echo "✅ Keychain setup complete"
           security list-keychains
 
       # --------------------------------------------------
@@ -139,14 +154,23 @@ jobs:
       - name: 🔐 Fastlane Match
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
         run: |
           cd ios
           fastlane match appstore \
             --readonly \
             --api_key_path ./api_key.json \
+            --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git \
             --git_branch main \
-            --keychain_name build.keychain \
-            --keychain_password "ci_keychain_pass"
+            --keychain_name build.keychain-db \
+            --keychain_password "ci_keychain_pass" \
+            --verbose
+          
+          echo "✅ Certificates installed"
+          
+          # Verify certificates
+          echo "Checking for Apple Distribution certificate..."
+          security find-identity -v -p codesigning build.keychain-db | grep "Apple Distribution" || echo "⚠️ No distribution cert found!"
 
       # --------------------------------------------------
       # Firebase Config
@@ -201,7 +225,53 @@ jobs:
           pod install --repo-update
 
       # --------------------------------------------------
-      # ExportOptions (BEFORE build)
+      # Configure Xcode project for manual signing
+      # --------------------------------------------------
+      - name: ⚙️ Configure Xcode Project Signing
+        run: |
+          # Install xcodeproj gem to modify project settings
+          sudo gem install xcodeproj -N
+          
+          # Create Ruby script to update project settings
+          cat > update_signing.rb <<'RUBY'
+          require 'xcodeproj'
+          
+          project_path = 'ios/Runner.xcodeproj'
+          project = Xcodeproj::Project.open(project_path)
+          
+          project.targets.each do |target|
+            if target.name == 'Runner'
+              target.build_configurations.each do |config|
+                if config.name == 'Release'
+                  config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
+                  config.build_settings['DEVELOPMENT_TEAM'] = ENV['TEAM_ID']
+                  config.build_settings['CODE_SIGN_IDENTITY'] = 'Apple Distribution'
+                  config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ENV['PROFILE_NAME']
+                  config.build_settings['CODE_SIGN_IDENTITY[sdk=iphoneos*]'] = 'Apple Distribution'
+                end
+              end
+            end
+          end
+          
+          project.save
+          puts "✅ Xcode project configured for manual signing"
+          RUBY
+          
+          ruby update_signing.rb
+
+      # --------------------------------------------------
+      # Build Flutter (without codesigning)
+      # --------------------------------------------------
+      - name: 🔨 Build Flutter Framework
+        run: |
+          flutter build ios \
+            --release \
+            --no-codesign \
+            --build-name ${{ steps.version.outputs.VERSION_NAME }} \
+            --build-number ${{ steps.version.outputs.BUILD_NUMBER }}
+
+      # --------------------------------------------------
+      # ExportOptions
       # --------------------------------------------------
       - name: 📝 Create ExportOptions.plist
         run: |
@@ -231,32 +301,84 @@ jobs:
           EOF
 
       # --------------------------------------------------
-      # Build IPA (Flutter handles everything)
+      # Archive with Xcode
       # --------------------------------------------------
-      - name: 🔨 Build Flutter IPA
+      - name: 🏗️ Archive with Xcode
         run: |
-          flutter build ipa \
-            --release \
-            --export-options-plist=ios/ExportOptions.plist
-        env:
-          DEVELOPMENT_TEAM: ${{ env.TEAM_ID }}
+          cd ios
+          mkdir -p ../${{ env.ARCHIVE_DIR }}
+          mkdir -p ../${{ env.IPA_DIR }}
+          
+          xcodebuild archive \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath ../${{ env.ARCHIVE_DIR }}/Runner.xcarchive \
+            -destination 'generic/platform=iOS' \
+            DEVELOPMENT_TEAM=${{ env.TEAM_ID }} \
+            CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE_SPECIFIER="${{ env.PROFILE_NAME }}" \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            OTHER_CODE_SIGN_FLAGS="--keychain $HOME/Library/Keychains/build.keychain-db" \
+            | tee ../archive.log
+          
+          echo "✅ Archive created"
 
       # --------------------------------------------------
-      # Verify Build
+      # Verify Archive
+      # --------------------------------------------------
+      - name: 🔍 Verify Archive
+        run: |
+          echo "=== Archive Structure ==="
+          ls -la ${{ env.ARCHIVE_DIR }}/Runner.xcarchive/Products/Applications/
+          
+          echo "=== App Contents ==="
+          ls -la ${{ env.ARCHIVE_DIR }}/Runner.xcarchive/Products/Applications/Runner.app/
+          
+          echo "=== Flutter Frameworks ==="
+          ls -la ${{ env.ARCHIVE_DIR }}/Runner.xcarchive/Products/Applications/Runner.app/Frameworks/ | grep -E "(App.framework|Flutter.framework)" || echo "⚠️ Flutter frameworks missing!"
+
+      # --------------------------------------------------
+      # Export IPA
+      # --------------------------------------------------
+      - name: 📦 Export IPA
+        run: |
+          cd ios
+          xcodebuild -exportArchive \
+            -archivePath ../${{ env.ARCHIVE_DIR }}/Runner.xcarchive \
+            -exportPath ../${{ env.IPA_DIR }} \
+            -exportOptionsPlist ExportOptions.plist \
+            -allowProvisioningUpdates \
+            | tee ../export.log
+          
+          echo "✅ IPA exported"
+          ls -lh ../${{ env.IPA_DIR }}/
+
+      # --------------------------------------------------
+      # Verify IPA
       # --------------------------------------------------
       - name: 🔍 Verify IPA Contents
         run: |
-          echo "=== IPA Files ==="
-          ls -lh build/ios/ipa/
+          echo "=== IPA File ==="
+          ls -lh ${{ env.IPA_DIR }}/*.ipa
           
-          echo "=== Checking Flutter Frameworks ==="
-          unzip -l build/ios/ipa/*.ipa | grep -E "(App.framework|Flutter.framework)" || echo "⚠️ WARNING: Flutter frameworks not found!"
+          echo "=== Checking IPA Contents ==="
+          unzip -l ${{ env.IPA_DIR }}/*.ipa | grep -E "(App.framework|Flutter.framework)" || echo "⚠️ Flutter frameworks not in IPA!"
 
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
-          path: build/ios/ipa/*.ipa
+          path: ${{ env.IPA_DIR }}/*.ipa
+          
+      - name: 📤 Upload Logs (if failed)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: |
+            archive.log
+            export.log
   ios-deploy:
     name: 🚀 Deploy to TestFlight
     needs: ios-ci
