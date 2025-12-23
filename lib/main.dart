@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -26,74 +27,198 @@ GetStorage storage = GetStorage();
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("🟡 Background Message Received: ${message.notification?.title}");
-  NotificationServiceHelper.showFlutterNotification(message);
+  try {
+    NotificationServiceHelper.showFlutterNotification(message);
+  } catch (e) {
+    log("❌ Error showing background notification: $e");
+  }
 }
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await GetStorage.init();
-  await AppsFlyerService.instance.init();
-  
-  // ✅ Make dotenv loading optional (in case .env is missing in CI build)
-  try {
-    await dotenv.load(fileName: ".env");
-  } catch (e) {
-    log("⚠️ .env file not found, using default config: $e");
-  }
-  
-  // ✅ Use default Firebase initialization (with safety check to prevent double init)
-  // This automatically reads from GoogleService-Info.plist (iOS) or google-services.json (Android)
-  if (Firebase.apps.isEmpty) {
-    await Firebase.initializeApp();
-  }
-  
-  // Background handler registration
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-
-  // Request permission
-  await FirebaseMessaging.instance.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-
-  // 📌 Local Notification Initialization
-  await NotificationServiceHelper.initializeLocalNotifications();
-
-  String? lang = storage.read('language') ?? 'en';
-  Locale locale = Locale(lang);
-
-  // 🔥 REGISTER CONTROLLERS FIRST
-  final notif = Get.put(NotificationController(), permanent: true);
-
-  // Restore token if already logged in
-  final savedToken = storage.read(AppConst.ACCESS_TOKEN);
-  if (savedToken != null) {
-    notif.updateToken(savedToken);
-    notif.refreshNotifications();
-    notif.fetchUnreadCount();
-  }
-
-  // 🟢 Foreground message listener
-  FirebaseMessaging.onMessage.listen((message) {
-    log("🟢 Foreground Msg Received: ${message.notification?.title}");
-    NotificationServiceHelper.showFlutterNotification(message);
+  // Wrap everything in error handling
+  runZonedGuarded(() async {
+    try {
+      log("🚀 App initialization starting...");
+      
+      // Initialize Flutter binding
+      WidgetsFlutterBinding.ensureInitialized();
+      log("✅ Flutter binding initialized");
+      
+      // Initialize GetStorage
+      await GetStorage.init();
+      log("✅ GetStorage initialized");
+      
+      // Initialize AppsFlyer
+      try {
+        await AppsFlyerService.instance.init();
+        log("✅ AppsFlyer initialized");
+      } catch (e) {
+        log("⚠️ AppsFlyer initialization failed (non-critical): $e");
+      }
+      
+      // Load .env file (optional in CI/CD builds)
+      try {
+        await dotenv.load(fileName: ".env");
+        log("✅ .env file loaded successfully");
+      } catch (e) {
+        log("⚠️ .env file not found, using default configuration: $e");
+      }
+      
+      // Initialize Firebase (with safety check)
+      try {
+        if (Firebase.apps.isEmpty) {
+          await Firebase.initializeApp();
+          log("✅ Firebase initialized successfully");
+        } else {
+          log("✅ Firebase already initialized");
+        }
+      } catch (e) {
+        log("❌ CRITICAL: Firebase initialization failed: $e");
+        // Continue anyway - some features might still work
+      }
+      
+      // Register background message handler
+      try {
+        FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+        log("✅ Background message handler registered");
+      } catch (e) {
+        log("⚠️ Could not register background handler: $e");
+      }
+      
+      // Request notification permissions
+      try {
+        final settings = await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+        log("✅ Notification permission status: ${settings.authorizationStatus}");
+      } catch (e) {
+        log("⚠️ Could not request notification permissions: $e");
+      }
+      
+      // Initialize local notifications
+      try {
+        await NotificationServiceHelper.initializeLocalNotifications();
+        log("✅ Local notifications initialized");
+      } catch (e) {
+        log("⚠️ Local notification initialization failed: $e");
+      }
+      
+      // Load language preference
+      String? lang = storage.read('language') ?? 'en';
+      Locale locale = Locale(lang);
+      log("✅ Language set to: $lang");
+      
+      // Register NotificationController
+      try {
+        final notif = Get.put(NotificationController(), permanent: true);
+        log("✅ NotificationController registered");
+        
+        // Restore token if already logged in
+        final savedToken = storage.read(AppConst.ACCESS_TOKEN);
+        if (savedToken != null && savedToken.isNotEmpty) {
+          notif.updateToken(savedToken);
+          notif.refreshNotifications();
+          notif.fetchUnreadCount();
+          log("✅ User session restored");
+        } else {
+          log("ℹ️ No saved session found");
+        }
+      } catch (e) {
+        log("⚠️ NotificationController setup failed: $e");
+      }
+      
+      // Setup foreground message listener
+      try {
+        FirebaseMessaging.onMessage.listen((message) {
+          log("🟢 Foreground message received: ${message.notification?.title}");
+          try {
+            NotificationServiceHelper.showFlutterNotification(message);
+          } catch (e) {
+            log("❌ Error showing foreground notification: $e");
+          }
+        });
+        log("✅ Foreground message listener setup");
+      } catch (e) {
+        log("⚠️ Could not setup foreground listener: $e");
+      }
+      
+      // Setup notification tap handlers
+      try {
+        // User taps notification when app is in background
+        FirebaseMessaging.onMessageOpenedApp.listen((message) {
+          log("🔵 Notification clicked (background): ${message.data}");
+          try {
+            NotificationServiceHelper.handleNotificationTap(message.data);
+          } catch (e) {
+            log("❌ Error handling notification tap: $e");
+          }
+        });
+        
+        // User taps notification when app was terminated
+        final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+        if (initialMessage != null) {
+          log("🟥 App opened from terminated state via notification");
+          try {
+            NotificationServiceHelper.handleNotificationTap(initialMessage.data);
+          } catch (e) {
+            log("❌ Error handling initial notification: $e");
+          }
+        }
+        log("✅ Notification tap handlers setup");
+      } catch (e) {
+        log("⚠️ Could not setup notification tap handlers: $e");
+      }
+      
+      log("🎯 Starting app UI...");
+      runApp(MyApp(locale: locale));
+      log("✅ App UI launched successfully");
+      
+    } catch (e, stackTrace) {
+      log("💥 FATAL ERROR during initialization: $e");
+      log("Stack trace: $stackTrace");
+      
+      // Even if initialization fails, try to run app with defaults
+      try {
+        runApp(MyApp(locale: const Locale('en')));
+      } catch (e2) {
+        log("💥 Could not recover from fatal error: $e2");
+        // Show error screen as last resort
+        runApp(MaterialApp(
+          home: Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Failed to start app',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'Error: $e',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ));
+      }
+    }
+  }, (error, stackTrace) {
+    // Catch any uncaught errors during app runtime
+    log("💥 UNCAUGHT ERROR: $error");
+    log("Stack trace: $stackTrace");
   });
-
-  // 🔵 User taps notification (when app is in background)
-  FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    log("🔵 Notification clicked: ${message.data}");
-    NotificationServiceHelper.handleNotificationTap(message.data);
-  });
-
-  // 🔴 Terminated → user taps notification
-  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-  if (initialMessage != null) {
-    log("🟥 Terminated state → Notification tapped");
-    NotificationServiceHelper.handleNotificationTap(initialMessage.data);
-  }
-
-  runApp(MyApp(locale: locale));
 }
 
 class MyApp extends StatelessWidget {
@@ -102,14 +227,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // optional: if APIService needs context later, move it to HomeScreen
-    APIService.checkConnection(context);
+    // Check connection (non-blocking)
+    try {
+      APIService.checkConnection(context);
+    } catch (e) {
+      log("⚠️ Connection check failed: $e");
+    }
 
     return ScreenUtilInit(
-      designSize: const Size(360, 690), //required for ScreenUtil
-      minTextAdapt: true, // prevents text overflow
-      splitScreenMode: true, //fixes _splitScreenMode not initialized
-      useInheritedMediaQuery: true, //keeps correct context in GetX
+      designSize: const Size(360, 690),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      useInheritedMediaQuery: true,
       builder: (context, child) {
         return GestureDetector(
           onTap: () {
@@ -145,9 +274,6 @@ class MyApp extends StatelessWidget {
               Locale('hi'), // Hindi
               Locale('ml'), // Malayalam
             ],
-
-            // optional - default locale
-
             fallbackLocale: const Locale('en'),
           ),
         );
@@ -159,11 +285,9 @@ class MyApp extends StatelessWidget {
 class CustomScrollBehavior extends ScrollBehavior {
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) {
-    // Use BouncingScrollPhysics everywhere
     return const BouncingScrollPhysics();
   }
 
-  // Optional: remove overscroll glow on Android
   @override
   Widget buildOverscrollIndicator(
     BuildContext context,
