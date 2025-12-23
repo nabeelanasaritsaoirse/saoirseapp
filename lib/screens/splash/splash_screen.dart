@@ -1,7 +1,6 @@
-// ignore_for_file: deprecated_member_use
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_assets.dart';
@@ -19,37 +18,49 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  //navigation
-  void _splashScreen() {
-    bool isLogin = !(storage.read(AppConst.USER_ID) == null);
-
-    Future.delayed(const Duration(seconds: 2), () async {
-      if (isLogin) {
-        Get.offAll(() => DashboardScreen());
-      } else {
-        Get.offAll(() => const OnBoardScreen());
-      }
-    });
-  }
-
   @override
   void initState() {
     super.initState();
+    log("🟢 SplashScreen init");
 
-    _splashScreen();
+    _navigate();
+  }
+
+  Future<void> _navigate() async {
+    bool isLogin = false;
+
+    try {
+      final userId = storage.read(AppConst.USER_ID);
+      isLogin = userId != null;
+      log("🟢 User login state: $isLogin");
+    } catch (e) {
+      log("⚠️ Storage read failed: $e");
+    }
+
+    // HARD safety timeout (never hang)
+    await Future.delayed(const Duration(seconds: 3));
+
+    if (!mounted) return;
+
+    if (isLogin) {
+      Get.offAll(() => DashboardScreen());
+    } else {
+      Get.offAll(() => const OnBoardScreen());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColors.primaryColor,
-        body: Center(
+    return Scaffold(
+      backgroundColor: AppColors.primaryColor,
+      body: SafeArea(
+        child: Center(
           child: Image.asset(
             AppAssets.app_logo,
-            height: 250.h,
-            width: Get.width,
+            width: 200, // ❌ no ScreenUtil here
             fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) =>
+                const CircularProgressIndicator(color: Colors.white),
           ),
         ),
       ),
