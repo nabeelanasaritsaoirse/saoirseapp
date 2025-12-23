@@ -41,9 +41,11 @@ Future<void> main() async {
     log("⚠️ .env file not found, using default config: $e");
   }
   
-  // ✅ Use default Firebase initialization
+  // ✅ Use default Firebase initialization (with safety check to prevent double init)
   // This automatically reads from GoogleService-Info.plist (iOS) or google-services.json (Android)
-  await Firebase.initializeApp();
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp();
+  }
   
   // Background handler registration
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
