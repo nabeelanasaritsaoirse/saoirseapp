@@ -45,12 +45,11 @@ jobs:
           xcodebuild -runFirstLaunch || true
 
       # --------------------------------------------------
-      # Flutter
+      # Flutter - Use same version as Android or latest stable
       # --------------------------------------------------
       - name: ⚙️ Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.35.7"
           channel: stable
           cache: true
 
@@ -143,6 +142,9 @@ jobs:
             --keychain_name build.keychain \
             --keychain_password "ci_keychain_pass"
 
+      # --------------------------------------------------
+      # Firebase Config (BEFORE Pods)
+      # --------------------------------------------------
       - name: 🔥 Add GoogleService-Info.plist
         run: |
           cat > ios/Runner/GoogleService-Info.plist <<EOF
@@ -183,14 +185,14 @@ jobs:
           </dict>
           </plist>
           EOF
+
       # --------------------------------------------------
-      # Pods
+      # Pods (AFTER Firebase config)
       # --------------------------------------------------
       - name: 📦 Install Pods
         run: |
           cd ios
           pod install --repo-update
-
 
       # --------------------------------------------------
       # Flutter build (NO signing)
@@ -245,7 +247,6 @@ jobs:
             CODE_SIGN_IDENTITY="Apple Distribution" \
             OTHER_CODE_SIGN_FLAGS="--keychain build.keychain" \
             | tee ../xcodebuild.log
-
 
       # --------------------------------------------------
       # Export IPA
