@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -35,21 +34,11 @@ Future<void> main() async {
   await GetStorage.init();
   await AppsFlyerService.instance.init();
   await dotenv.load(fileName: ".env");
-  Platform.isIOS
-      ? await Firebase.initializeApp(
-          options: FirebaseOptions(
-          apiKey: dotenv.env['IOS_API_KEY'] ?? '',
-          appId: dotenv.env['IOS_APP_ID'] ?? '',
-          messagingSenderId: dotenv.env['IOS_MESSAGING_SENDER_ID'] ?? '',
-          projectId: dotenv.env['IOS_PROJECT_ID'] ?? '',
-        ))
-      : await Firebase.initializeApp(
-          options: FirebaseOptions(
-          apiKey: dotenv.env['ANDROID_API_KEY'] ?? '',
-          appId: dotenv.env['ANDROID_APP_ID'] ?? '',
-          messagingSenderId: dotenv.env['ANDROID_MESSAGING_SENDER_ID'] ?? '',
-          projectId: dotenv.env['ANDROID_PROJECT_ID'] ?? '',
-        ));
+  
+  // ✅ Use default Firebase initialization
+  // This automatically reads from GoogleService-Info.plist (iOS) or google-services.json (Android)
+  await Firebase.initializeApp();
+  
   // Background handler registration
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
