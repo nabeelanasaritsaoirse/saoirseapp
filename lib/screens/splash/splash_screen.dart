@@ -1,8 +1,8 @@
+// ignore_for_file: deprecated_member_use
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_constant.dart';
@@ -18,49 +18,52 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  
+  // Navigation with proper controller initialization
+  void _splashScreen() {
+    bool isLogin = !(storage.read(AppConst.USER_ID) == null);
+    
+    Future.delayed(const Duration(seconds: 2), () async {
+      try {
+        if (isLogin) {
+          log("➡️ User logged in - Navigating to Dashboard");
+          
+          // CRITICAL: Ensure controllers are ready before navigation
+          // This prevents the black screen issue
+          await Future.delayed(const Duration(milliseconds: 100));
+          
+          Get.offAll(() => DashboardScreen());
+          log("✅ Dashboard navigation completed");
+        } else {
+          log("➡️ User not logged in - Navigating to OnBoard");
+          Get.offAll(() => const OnBoardScreen());
+          log("✅ OnBoard navigation completed");
+        }
+      } catch (e) {
+        log("❌ Navigation error: $e");
+        // Fallback to OnBoard if something goes wrong
+        Get.offAll(() => const OnBoardScreen());
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    log("🟢 SplashScreen init");
-
-    _navigate();
-  }
-
-  Future<void> _navigate() async {
-    bool isLogin = false;
-
-    try {
-      final userId = storage.read(AppConst.USER_ID);
-      isLogin = userId != null;
-      log("🟢 User login state: $isLogin");
-    } catch (e) {
-      log("⚠️ Storage read failed: $e");
-    }
-
-    // HARD safety timeout (never hang)
-    await Future.delayed(const Duration(seconds: 3));
-
-    if (!mounted) return;
-
-    if (isLogin) {
-      Get.offAll(() => DashboardScreen());
-    } else {
-      Get.offAll(() => const OnBoardScreen());
-    }
+    _splashScreen();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.primaryColor,
-      body: SafeArea(
-        child: Center(
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: AppColors.primaryColor,
+        body: Center(
           child: Image.asset(
             AppAssets.app_logo,
-            width: 200, // ❌ no ScreenUtil here
+            height: 250.h,
+            width: Get.width,
             fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) =>
-                const CircularProgressIndicator(color: Colors.white),
           ),
         ),
       ),
