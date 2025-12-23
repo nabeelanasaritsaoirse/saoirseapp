@@ -154,7 +154,6 @@ jobs:
       - name: 🔐 Fastlane Match
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
         run: |
           cd ios
           fastlane match appstore \
@@ -163,11 +162,9 @@ jobs:
             --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git \
             --git_branch main \
             --keychain_name build.keychain-db \
-            --keychain_password "ci_keychain_pass" \
-            --verbose
-          
-          echo "✅ Certificates installed"
-          
+            --keychain_password "ci_keychain_pass"
+                echo "✅ Certificates installed"
+                
           # Verify certificates
           echo "Checking for Apple Distribution certificate..."
           security find-identity -v -p codesigning build.keychain-db | grep "Apple Distribution" || echo "⚠️ No distribution cert found!"
