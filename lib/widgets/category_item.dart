@@ -53,19 +53,16 @@ class CategoryItem extends StatelessWidget {
                 SizedBox(height: 6.h),
 
                 // FIXED text behavior = no relayout
-                Text(
+                appText(
                   category.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 10.sp,
-                    height: 1.2, // 🔥 IMPORTANT
-                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                    color: isSelected
-                        ? AppColors.primaryColor
-                        : AppColors.textBlack,
-                  ),
+                  fontSize: 10.sp,
+                  height: 1.2, // 🔥 IMPORTANT
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                  color:
+                      isSelected ? AppColors.primaryColor : AppColors.textBlack,
                 ),
               ],
             ),

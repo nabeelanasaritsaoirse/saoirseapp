@@ -38,8 +38,6 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  bool _isImageLoading = true;
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
