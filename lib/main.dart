@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -13,280 +12,148 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'bindings/allcontroller.dart';
 import 'constants/app_colors.dart';
-import 'constants/app_constant.dart';
 import 'constants/app_strings.dart';
 import 'l10n/app_localizations.dart';
-import 'screens/notification/notification_controller.dart';
 import 'screens/splash/splash_screen.dart';
-import 'services/api_service.dart';
-import 'services/appsflyer_service.dart';
 import 'services/notification_service_helper.dart';
 
-//storage instance
-GetStorage storage = GetStorage();
+/// Global storage
+final GetStorage storage = GetStorage();
 
+/// Background notifications (iOS requirement)
+@pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  log("🟡 Background Message Received: ${message.notification?.title}");
   try {
+    await Firebase.initializeApp();
     NotificationServiceHelper.showFlutterNotification(message);
-  } catch (e) {
-    log("❌ Error showing background notification: $e");
+  } catch (e, st) {
+    log("❌ Background message error", error: e, stackTrace: st);
   }
 }
 
 Future<void> main() async {
-  // Wrap everything in error handling
-  runZonedGuarded(() async {
-    try {
-      log("🚀 App initialization starting...");
-      
-      // Initialize Flutter binding
-      WidgetsFlutterBinding.ensureInitialized();
-      log("✅ Flutter binding initialized");
-      
-      // Initialize GetStorage
-      await GetStorage.init();
-      log("✅ GetStorage initialized");
-      
-      // Initialize AppsFlyer
-      try {
-        await AppsFlyerService.instance.init();
-        log("✅ AppsFlyer initialized");
-      } catch (e) {
-        log("⚠️ AppsFlyer initialization failed (non-critical): $e");
-      }
-      
-      // Load .env file (optional in CI/CD builds)
-      try {
-        await dotenv.load(fileName: ".env");
-        log("✅ .env file loaded successfully");
-      } catch (e) {
-        log("⚠️ .env file not found, using default configuration: $e");
-      }
-      
-      // Initialize Firebase (with safety check)
-      try {
-        if (Firebase.apps.isEmpty) {
-          await Firebase.initializeApp();
-          log("✅ Firebase initialized successfully");
-        } else {
-          log("✅ Firebase already initialized");
-        }
-      } catch (e) {
-        log("❌ CRITICAL: Firebase initialization failed: $e");
-        // Continue anyway - some features might still work
-      }
-      
-      // Register background message handler
-      try {
-        FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-        log("✅ Background message handler registered");
-      } catch (e) {
-        log("⚠️ Could not register background handler: $e");
-      }
-      
-      // Request notification permissions
-      try {
-        final settings = await FirebaseMessaging.instance.requestPermission(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
-        log("✅ Notification permission status: ${settings.authorizationStatus}");
-      } catch (e) {
-        log("⚠️ Could not request notification permissions: $e");
-      }
-      
-      // Initialize local notifications
-      try {
-        await NotificationServiceHelper.initializeLocalNotifications();
-        log("✅ Local notifications initialized");
-      } catch (e) {
-        log("⚠️ Local notification initialization failed: $e");
-      }
-      
-      // Load language preference
-      String? lang = storage.read('language') ?? 'en';
-      Locale locale = Locale(lang);
-      log("✅ Language set to: $lang");
-      
-      // Register NotificationController
-      try {
-        final notif = Get.put(NotificationController(), permanent: true);
-        log("✅ NotificationController registered");
-        
-        // Restore token if already logged in
-        final savedToken = storage.read(AppConst.ACCESS_TOKEN);
-        if (savedToken != null && savedToken.isNotEmpty) {
-          notif.updateToken(savedToken);
-          notif.refreshNotifications();
-          notif.fetchUnreadCount();
-          log("✅ User session restored");
-        } else {
-          log("ℹ️ No saved session found");
-        }
-      } catch (e) {
-        log("⚠️ NotificationController setup failed: $e");
-      }
-      
-      // Setup foreground message listener
-      try {
-        FirebaseMessaging.onMessage.listen((message) {
-          log("🟢 Foreground message received: ${message.notification?.title}");
-          try {
-            NotificationServiceHelper.showFlutterNotification(message);
-          } catch (e) {
-            log("❌ Error showing foreground notification: $e");
-          }
-        });
-        log("✅ Foreground message listener setup");
-      } catch (e) {
-        log("⚠️ Could not setup foreground listener: $e");
-      }
-      
-      // Setup notification tap handlers
-      try {
-        // User taps notification when app is in background
-        FirebaseMessaging.onMessageOpenedApp.listen((message) {
-          log("🔵 Notification clicked (background): ${message.data}");
-          try {
-            NotificationServiceHelper.handleNotificationTap(message.data);
-          } catch (e) {
-            log("❌ Error handling notification tap: $e");
-          }
-        });
-        
-        // User taps notification when app was terminated
-        final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-        if (initialMessage != null) {
-          log("🟥 App opened from terminated state via notification");
-          try {
-            NotificationServiceHelper.handleNotificationTap(initialMessage.data);
-          } catch (e) {
-            log("❌ Error handling initial notification: $e");
-          }
-        }
-        log("✅ Notification tap handlers setup");
-      } catch (e) {
-        log("⚠️ Could not setup notification tap handlers: $e");
-      }
-      
-      log("🎯 Starting app UI...");
-      runApp(MyApp(locale: locale));
-      log("✅ App UI launched successfully");
-      
-    } catch (e, stackTrace) {
-      log("💥 FATAL ERROR during initialization: $e");
-      log("Stack trace: $stackTrace");
-      
-      // Even if initialization fails, try to run app with defaults
-      try {
-        runApp(MyApp(locale: const Locale('en')));
-      } catch (e2) {
-        log("💥 Could not recover from fatal error: $e2");
-        // Show error screen as last resort
-        runApp(MaterialApp(
-          home: Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Failed to start app',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Error: $e',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ));
-      }
-    }
-  }, (error, stackTrace) {
-    // Catch any uncaught errors during app runtime
-    log("💥 UNCAUGHT ERROR: $error");
-    log("Stack trace: $stackTrace");
-  });
+  WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterError.onError = (details) {
+    log("❌ Flutter error", error: details.exception, stackTrace: details.stack);
+  };
+
+  runApp(const BootstrapApp());
 }
 
+/// ---------------------------------------------------------------------------
+/// BOOTSTRAP APP (minimal, non-blocking startup)
+/// ---------------------------------------------------------------------------
+class BootstrapApp extends StatefulWidget {
+  const BootstrapApp({super.key});
+
+  @override
+  State<BootstrapApp> createState() => _BootstrapAppState();
+}
+
+class _BootstrapAppState extends State<BootstrapApp> {
+  Locale _locale = const Locale('en');
+
+  @override
+  void initState() {
+    super.initState();
+    _bootstrap();
+  }
+
+  Future<void> _bootstrap() async {
+    try {
+      log("🚀 Bootstrap start");
+
+      // Storage
+      await GetStorage.init();
+
+      // Env (optional)
+      try {
+        await dotenv.load(fileName: ".env");
+      } catch (_) {}
+
+      // Firebase (safe init)
+      try {
+        await Firebase.initializeApp();
+        FirebaseMessaging.onBackgroundMessage(
+          firebaseMessagingBackgroundHandler,
+        );
+      } catch (_) {}
+
+      // Restore language
+      final lang = storage.read('language') ?? 'en';
+      _locale = Locale(lang);
+
+      log("✅ Bootstrap complete");
+      setState(() {});
+    } catch (e, st) {
+      log("❌ Bootstrap failed", error: e, stackTrace: st);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MyApp(locale: _locale);
+  }
+}
+
+/// ---------------------------------------------------------------------------
+/// MAIN APP
+/// ---------------------------------------------------------------------------
 class MyApp extends StatelessWidget {
   final Locale locale;
   const MyApp({super.key, required this.locale});
 
   @override
   Widget build(BuildContext context) {
-    // Check connection (non-blocking)
-    try {
-      APIService.checkConnection(context);
-    } catch (e) {
-      log("⚠️ Connection check failed: $e");
-    }
-
     return ScreenUtilInit(
       designSize: const Size(360, 690),
       minTextAdapt: true,
       splitScreenMode: true,
       useInheritedMediaQuery: true,
       builder: (context, child) {
-        return GestureDetector(
-          onTap: () {
-            // Dismiss keyboard on tap outside
-            FocusScopeNode currentFocus = FocusScope.of(context);
-            if (!currentFocus.hasPrimaryFocus &&
-                currentFocus.focusedChild != null) {
-              FocusManager.instance.primaryFocus?.unfocus();
-            }
-          },
-          child: GetMaterialApp(
-            initialBinding: Allcontroller(),
-            locale: locale,
-            debugShowCheckedModeBanner: false,
-            title: AppStrings.app_name,
-            theme: ThemeData(
-              scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
-              textTheme: GoogleFonts.poppinsTextTheme(),
-              highlightColor: AppColors.transparent,
-              splashColor: AppColors.transparent,
-              useMaterial3: true,
-            ),
-            scrollBehavior: CustomScrollBehavior(),
-            home: SplashScreen(),
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('en'), // English
-              Locale('hi'), // Hindi
-              Locale('ml'), // Malayalam
-            ],
-            fallbackLocale: const Locale('en'),
+        return GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: AppStrings.app_name,
+          locale: locale,
+          fallbackLocale: const Locale('en'),
+
+          /// ✅ ONLY ONE binding (no duplicates)
+          initialBinding: Allcontroller(),
+
+          theme: ThemeData(
+            scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
+            textTheme: GoogleFonts.poppinsTextTheme(),
+            splashColor: AppColors.transparent,
+            highlightColor: AppColors.transparent,
+            useMaterial3: true,
           ),
+
+          scrollBehavior: const _NoGlowScrollBehavior(),
+          home: const SplashScreen(),
+
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            Locale('hi'),
+            Locale('ml'),
+          ],
         );
       },
     );
   }
 }
 
-class CustomScrollBehavior extends ScrollBehavior {
-  @override
-  ScrollPhysics getScrollPhysics(BuildContext context) {
-    return const BouncingScrollPhysics();
-  }
+/// ---------------------------------------------------------------------------
+/// SCROLL BEHAVIOR
+/// ---------------------------------------------------------------------------
+class _NoGlowScrollBehavior extends ScrollBehavior {
+  const _NoGlowScrollBehavior();
 
   @override
   Widget buildOverscrollIndicator(
