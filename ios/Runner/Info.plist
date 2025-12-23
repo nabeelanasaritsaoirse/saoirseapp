@@ -85,12 +85,12 @@
 	<key>NSUserNotificationUsageDescription</key>
 	<string>EPI use notifications to keep you updated.</string>
 	
-	<!-- Uncomment if you need tracking for ads
+	
 	<key>NSUserTrackingUsageDescription</key>
 	<string>This identifier will be used to deliver personalized ads.</string>
 	
 	
-	<!-- Uncomment if you need deep linking
+	
 	<key>CFBundleURLTypes</key>
 	<array>
 	  <dict>
