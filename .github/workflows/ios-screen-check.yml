@@ -7,18 +7,12 @@ on:
 
 jobs:
   ios-native-debug:
-    runs-on: macos-15  # ✅ Changed from macos-14
+    runs-on: macos-15
 
     steps:
-      # --------------------------------------------------
-      # Checkout
-      # --------------------------------------------------
       - name: 📥 Checkout repo
         uses: actions/checkout@v4
 
-      # --------------------------------------------------
-      # Flutter
-      # --------------------------------------------------
       - name: ⚙️ Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -26,21 +20,27 @@ jobs:
           channel: stable
           cache: true
 
-      # --------------------------------------------------
-      # Flutter clean
-      # --------------------------------------------------
       - name: 🧹 Flutter clean
         run: flutter clean
 
-      # --------------------------------------------------
-      # Pub get (Creates Generated.xcconfig)
-      # --------------------------------------------------
       - name: 📦 Flutter pub get
         run: flutter pub get
 
-      # --------------------------------------------------
-      # CocoaPods (Install BEFORE building)
-      # --------------------------------------------------
+      # ✅ ADD THIS STEP
+      - name: 📥 Download Poppins Fonts
+        run: |
+          echo "Downloading Poppins fonts..."
+          mkdir -p assets/fonts
+          cd assets/fonts
+          
+          curl -L -o Poppins-Regular.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf"
+          curl -L -o Poppins-Medium.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Medium.ttf"
+          curl -L -o Poppins-SemiBold.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf"
+          curl -L -o Poppins-Bold.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf"
+          
+          echo "✅ Fonts downloaded"
+          ls -lh
+
       - name: 📦 Install CocoaPods
         run: |
           cd ios
@@ -48,15 +48,9 @@ jobs:
           pod install --repo-update
           cd ..
 
-      # --------------------------------------------------
-      # Generate iOS config files (AFTER pods are installed)
-      # --------------------------------------------------
       - name: 🛠️ Build iOS Debug
         run: flutter build ios --debug --simulator --no-codesign
 
-      # --------------------------------------------------
-      # Native Xcode build (to verify everything works)
-      # --------------------------------------------------
       - name: 🔍 Native Xcode build (verbose)
         run: |
           set -o pipefail
@@ -70,9 +64,6 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             | tee xcodebuild.log
 
-      # --------------------------------------------------
-      # Upload logs
-      # --------------------------------------------------
       - name: 📄 Upload native logs
         if: always()
         uses: actions/upload-artifact@v4
