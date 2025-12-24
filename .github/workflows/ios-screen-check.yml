@@ -1,4 +1,4 @@
-name: 🍎 iOS Native Debug (Black Screen)
+name: 🍎 iOS Native Debug
 
 on:
   push:
@@ -10,9 +10,15 @@ jobs:
     runs-on: macos-15
 
     steps:
+      # --------------------------------------------------
+      # Checkout
+      # --------------------------------------------------
       - name: 📥 Checkout repo
         uses: actions/checkout@v4
 
+      # --------------------------------------------------
+      # Flutter
+      # --------------------------------------------------
       - name: ⚙️ Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -20,13 +26,31 @@ jobs:
           channel: stable
           cache: true
 
+      # --------------------------------------------------
+      # Flutter clean
+      # --------------------------------------------------
       - name: 🧹 Flutter clean
         run: flutter clean
 
+      # --------------------------------------------------
+      # Pub get (Creates Generated.xcconfig)
+      # --------------------------------------------------
       - name: 📦 Flutter pub get
         run: flutter pub get
 
-      # ✅ ADD THIS STEP
+      # --------------------------------------------------
+      # Create .env file (Required by pubspec.yaml)
+      # --------------------------------------------------
+      - name: 📝 Create .env file
+        run: |
+          echo "Creating .env file..."
+          touch .env
+          echo "# Environment variables" > .env
+          echo "✅ .env file created"
+
+      # --------------------------------------------------
+      # Download Poppins Fonts (Required)
+      # --------------------------------------------------
       - name: 📥 Download Poppins Fonts
         run: |
           echo "Downloading Poppins fonts..."
@@ -38,9 +62,14 @@ jobs:
           curl -L -o Poppins-SemiBold.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf"
           curl -L -o Poppins-Bold.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf"
           
-          echo "✅ Fonts downloaded"
+          echo "✅ Fonts downloaded:"
           ls -lh
+          cd ../..
 
+      # --------------------------------------------------
+      # CocoaPods (Install BEFORE building)
+      # Podfile already has Swift 5.0 configured
+      # --------------------------------------------------
       - name: 📦 Install CocoaPods
         run: |
           cd ios
@@ -48,9 +77,15 @@ jobs:
           pod install --repo-update
           cd ..
 
+      # --------------------------------------------------
+      # Build iOS Debug (After pods are installed)
+      # --------------------------------------------------
       - name: 🛠️ Build iOS Debug
         run: flutter build ios --debug --simulator --no-codesign
 
+      # --------------------------------------------------
+      # Native Xcode build (Verification)
+      # --------------------------------------------------
       - name: 🔍 Native Xcode build (verbose)
         run: |
           set -o pipefail
@@ -64,6 +99,9 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             | tee xcodebuild.log
 
+      # --------------------------------------------------
+      # Upload logs
+      # --------------------------------------------------
       - name: 📄 Upload native logs
         if: always()
         uses: actions/upload-artifact@v4
