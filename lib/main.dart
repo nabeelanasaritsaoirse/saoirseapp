@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io' show Platform;
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -24,7 +25,10 @@ final GetStorage storage = GetStorage();
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
-    await Firebase.initializeApp();
+    // ✅ Check if already initialized
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp();
+    }
     NotificationServiceHelper.showFlutterNotification(message);
   } catch (e, st) {
     log("❌ Background message error", error: e, stackTrace: st);
@@ -32,11 +36,21 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 Future<void> main() async {
+  // ✅ Ensure binding is initialized FIRST
   WidgetsFlutterBinding.ensureInitialized();
 
+  // ✅ Global error handler
   FlutterError.onError = (details) {
     log("❌ Flutter error", error: details.exception, stackTrace: details.stack);
   };
+
+  // ✅ Initialize critical services synchronously before runApp
+  try {
+    await GetStorage.init();
+    log("✅ GetStorage initialized");
+  } catch (e) {
+    log("❌ GetStorage failed: $e");
+  }
 
   runApp(const BootstrapApp());
 }
@@ -53,6 +67,8 @@ class BootstrapApp extends StatefulWidget {
 
 class _BootstrapAppState extends State<BootstrapApp> {
   Locale _locale = const Locale('en');
+  bool _isReady = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -64,35 +80,90 @@ class _BootstrapAppState extends State<BootstrapApp> {
     try {
       log("🚀 Bootstrap start");
 
-      // Storage
-      await GetStorage.init();
-
-      // Env (optional)
+      // ✅ Env (optional, non-blocking)
       try {
         await dotenv.load(fileName: ".env");
-      } catch (_) {}
+        log("✅ .env loaded");
+      } catch (e) {
+        log("⚠️ .env not found, using defaults: $e");
+      }
 
-      // Firebase (safe init)
+      // ✅ Firebase (safe init with platform check)
       try {
-        await Firebase.initializeApp();
-        FirebaseMessaging.onBackgroundMessage(
-          firebaseMessagingBackgroundHandler,
-        );
-      } catch (_) {}
+        if (Firebase.apps.isEmpty) {
+          await Firebase.initializeApp();
+          log("✅ Firebase initialized");
+          
+          // ✅ Only set background handler AFTER successful init
+          FirebaseMessaging.onBackgroundMessage(
+            firebaseMessagingBackgroundHandler,
+          );
+        }
+      } catch (e) {
+        log("⚠️ Firebase init skipped: $e");
+        // Continue without Firebase - don't block app launch
+      }
 
-      // Restore language
-      final lang = storage.read('language') ?? 'en';
-      _locale = Locale(lang);
+      // ✅ Restore language (already initialized GetStorage in main)
+      try {
+        final lang = storage.read('language') ?? 'en';
+        _locale = Locale(lang);
+        log("✅ Language: $lang");
+      } catch (e) {
+        log("⚠️ Language default to 'en': $e");
+        _locale = const Locale('en');
+      }
 
       log("✅ Bootstrap complete");
-      setState(() {});
+      
+      // ✅ Update UI state
+      if (mounted) {
+        setState(() {
+          _isReady = true;
+        });
+      }
     } catch (e, st) {
       log("❌ Bootstrap failed", error: e, stackTrace: st);
+      if (mounted) {
+        setState(() {
+          _isReady = true; // ✅ Still proceed to show app (with error handling)
+          _errorMessage = "Startup warning: $e";
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // ✅ Show loading state while bootstrapping
+    if (!_isReady) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          backgroundColor: Colors.white, // Or your splash color
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Your app logo here
+                const CircularProgressIndicator(),
+                const SizedBox(height: 20),
+                Text(
+                  'Loading...',
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // ✅ Show error if bootstrap had issues (optional)
+    if (_errorMessage != null) {
+      log("⚠️ App starting with warning: $_errorMessage");
+    }
+
     return MyApp(locale: _locale);
   }
 }
