@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/my_wallet/my_wallet_controller.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
+import '../my_wallet/my_wallet_controller.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
@@ -17,7 +17,8 @@ class PendingTransaction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PendingTransactionController controller = Get.put(PendingTransactionController());
+    final PendingTransactionController controller =
+        Get.put(PendingTransactionController());
 
     Get.put(MyWalletController(), permanent: true);
 
@@ -90,7 +91,8 @@ class PendingTransaction extends StatelessWidget {
                             //-------------------------------- TEXT CONTENT -------------------------------
                             Expanded(
                               child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w, vertical: 10.h),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -123,8 +125,12 @@ class PendingTransaction extends StatelessWidget {
                             Padding(
                               padding: EdgeInsets.only(right: 12.w),
                               child: Icon(
-                                isSelected.value ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                                color: isSelected.value ? AppColors.primaryColor : AppColors.grey,
+                                isSelected.value
+                                    ? Icons.radio_button_checked
+                                    : Icons.radio_button_unchecked,
+                                color: isSelected.value
+                                    ? AppColors.primaryColor
+                                    : AppColors.grey,
                               ),
                             )
                           ],
@@ -139,7 +145,6 @@ class PendingTransaction extends StatelessWidget {
 
 //-------------------------------- BOTTOM TOTAL AMOUNT SECTION -------------------------------
           Obx(() {
-            
             if (controller.transactions.isEmpty) {
               return const SizedBox.shrink();
             }

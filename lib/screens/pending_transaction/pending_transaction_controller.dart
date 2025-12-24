@@ -3,17 +3,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_colors.dart';
-// import 'package:saoirse_app/screens/booking_confirmation/booking_confirmation_screen.dart';
-import 'package:saoirse_app/screens/my_wallet/my_wallet_controller.dart';
-import 'package:saoirse_app/screens/razorpay/pending_transaction_razorpay_controller.dart';
-import 'package:saoirse_app/widgets/app_button.dart';
-import 'package:saoirse_app/widgets/app_loader.dart';
-import 'package:saoirse_app/widgets/app_text.dart';
-import 'package:saoirse_app/widgets/app_toast.dart';
 
+import '../../constants/app_colors.dart';
 import '../../models/pending_transaction_model.dart';
 import '../../services/pending_transaction_service.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_loader.dart';
+import '../../widgets/app_text.dart';
+import '../../widgets/app_toast.dart';
+import '../my_wallet/my_wallet_controller.dart';
+import '../razorpay/pending_transaction_razorpay_controller.dart';
 
 class PendingTransactionController extends GetxController {
   final PendingTransactionService service = PendingTransactionService();
@@ -50,7 +49,8 @@ class PendingTransactionController extends GetxController {
       transactions.value = response.data.payments;
 
       // default: all selected (static data)
-      selectedList.value = List<RxBool>.generate(transactions.length, (_) => true.obs);
+      selectedList.value =
+          List<RxBool>.generate(transactions.length, (_) => true.obs);
 
       //adding all ids to order id list
       selectedOrderIds.value = transactions.map((t) => t.orderId).toList();
@@ -136,13 +136,15 @@ class PendingTransactionController extends GetxController {
 
   Future<void> payNow() async {
     if (selectedOrderIds.isEmpty) {
-      appToast(error: true, content: "Please select at least one order to pay.");
+      appToast(
+          error: true, content: "Please select at least one order to pay.");
       return;
     }
 
     // ================= WALLET FLOW =================
     if (selectedPaymentMethod.value == "WALLET") {
-      final walletBalance = Get.find<MyWalletController>().wallet.value?.walletBalance ?? 0;
+      final walletBalance =
+          Get.find<MyWalletController>().wallet.value?.walletBalance ?? 0;
 
       if (walletBalance < totalAmount.value) {
         appToast(error: true, content: "Insufficient wallet balance");
@@ -189,14 +191,10 @@ class PendingTransactionController extends GetxController {
     );
   }
 
-
-
-
-
-
   ///------------------------DROP DOWN------------------
   void showPaymentMethodSheet() {
-    final walletBalance = Get.find<MyWalletController>().wallet.value?.walletBalance ?? 0.0;
+    final walletBalance =
+        Get.find<MyWalletController>().wallet.value?.walletBalance ?? 0.0;
     final bool isWalletEnabled = walletBalance > 0;
 
     Get.bottomSheet(
@@ -235,85 +233,85 @@ class PendingTransactionController extends GetxController {
             SizedBox(height: 15.h),
 
             // ================= WALLET OPTION =================
-           Obx(() => GestureDetector(
-      onTap: isWalletEnabled
-          ? () {
-              selectedPaymentMethod.value = "WALLET";
-            }
-          : null,
-      child: Opacity(
-        opacity: isWalletEnabled ? 1.0 : 0.5, 
-        child: Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: selectedPaymentMethod.value == "WALLET"
-                ? AppColors.primaryColor.withOpacity(0.08)
-                : AppColors.white,
-            border: Border.all(
-              color: isWalletEnabled
-                  ? (selectedPaymentMethod.value == "WALLET"
-                      ? AppColors.primaryColor
-                      : AppColors.grey.withOpacity(0.5))
-                  : AppColors.grey.withOpacity(0.3),
-              width: 1.5,
-            ),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Row(
-            children: [
-              // Icon container
-              Container(
-                padding: EdgeInsets.all(10.w),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child: Icon(
-                  Icons.account_balance_wallet_rounded,
-                  color: AppColors.primaryColor,
-                  size: 24.sp,
-                ),
-              ),
+            Obx(() => GestureDetector(
+                  onTap: isWalletEnabled
+                      ? () {
+                          selectedPaymentMethod.value = "WALLET";
+                        }
+                      : null,
+                  child: Opacity(
+                    opacity: isWalletEnabled ? 1.0 : 0.5,
+                    child: Container(
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: selectedPaymentMethod.value == "WALLET"
+                            ? AppColors.primaryColor.withOpacity(0.08)
+                            : AppColors.white,
+                        border: Border.all(
+                          color: isWalletEnabled
+                              ? (selectedPaymentMethod.value == "WALLET"
+                                  ? AppColors.primaryColor
+                                  : AppColors.grey.withOpacity(0.5))
+                              : AppColors.grey.withOpacity(0.3),
+                          width: 1.5,
+                        ),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Row(
+                        children: [
+                          // Icon container
+                          Container(
+                            padding: EdgeInsets.all(10.w),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            child: Icon(
+                              Icons.account_balance_wallet_rounded,
+                              color: AppColors.primaryColor,
+                              size: 24.sp,
+                            ),
+                          ),
 
-              SizedBox(width: 12.w),
+                          SizedBox(width: 12.w),
 
-              // Text
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Wallet Payment",
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                          // Text
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Wallet Payment",
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  isWalletEnabled
+                                      ? "Balance: ₹${walletBalance.toStringAsFixed(1)}"
+                                      : "Wallet balance is 0",
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    color: AppColors.grey,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // this Show check only if wallet is enabled
+                          if (isWalletEnabled)
+                            _buildCheckIndicator(
+                                selectedPaymentMethod.value == "WALLET"),
+                        ],
                       ),
                     ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      isWalletEnabled
-                          ? "Balance: ₹${walletBalance.toStringAsFixed(1)}"
-                          : "Wallet balance is 0",
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        color: AppColors.grey,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // this Show check only if wallet is enabled
-              if (isWalletEnabled)
-                _buildCheckIndicator(
-                    selectedPaymentMethod.value == "WALLET"),
-            ],
-          ),
-        ),
-      ),
-    )),
+                  ),
+                )),
 
             SizedBox(height: 12.h),
 
@@ -325,9 +323,13 @@ class PendingTransactionController extends GetxController {
                   child: Container(
                     padding: EdgeInsets.all(16.w),
                     decoration: BoxDecoration(
-                      color: selectedPaymentMethod.value == "RAZORPAY" ? AppColors.primaryColor.withOpacity(0.08) : AppColors.white,
+                      color: selectedPaymentMethod.value == "RAZORPAY"
+                          ? AppColors.primaryColor.withOpacity(0.08)
+                          : AppColors.white,
                       border: Border.all(
-                        color: selectedPaymentMethod.value == "RAZORPAY" ? AppColors.primaryColor : AppColors.grey.withOpacity(0.5),
+                        color: selectedPaymentMethod.value == "RAZORPAY"
+                            ? AppColors.primaryColor
+                            : AppColors.grey.withOpacity(0.5),
                         width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(12.r),
@@ -377,7 +379,8 @@ class PendingTransactionController extends GetxController {
                         ),
 
                         // Check indicator
-                        _buildCheckIndicator(selectedPaymentMethod.value == "RAZORPAY"),
+                        _buildCheckIndicator(
+                            selectedPaymentMethod.value == "RAZORPAY"),
                       ],
                     ),
                   ),
@@ -389,7 +392,7 @@ class PendingTransactionController extends GetxController {
             appButton(
               onTap: () {
                 Get.back();
-                payNow(); 
+                payNow();
               },
               width: double.infinity,
               height: 45.h,
@@ -412,29 +415,27 @@ class PendingTransactionController extends GetxController {
     );
   }
 
-
   Widget _buildCheckIndicator(bool selected) {
-  return Container(
-    width: 24.w,
-    height: 24.w,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      border: Border.all(
-        color: selected
-            ? AppColors.primaryColor
-            : AppColors.grey.withOpacity(0.5),
-        width: 2,
+    return Container(
+      width: 24.w,
+      height: 24.w,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: selected
+              ? AppColors.primaryColor
+              : AppColors.grey.withOpacity(0.5),
+          width: 2,
+        ),
+        color: selected ? AppColors.primaryColor : Colors.transparent,
       ),
-      color: selected ? AppColors.primaryColor : Colors.transparent,
-    ),
-    child: selected
-        ? Icon(
-            Icons.check,
-            size: 16.sp,
-            color: Colors.white,
-          )
-        : null,
-  );
-}
-
+      child: selected
+          ? Icon(
+              Icons.check,
+              size: 16.sp,
+              color: Colors.white,
+            )
+          : null,
+    );
+  }
 }
