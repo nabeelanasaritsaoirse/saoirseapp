@@ -10,9 +10,15 @@ jobs:
     runs-on: macos-14
 
     steps:
+      # --------------------------------------------------
+      # Checkout
+      # --------------------------------------------------
       - name: 📥 Checkout repo
         uses: actions/checkout@v4
 
+      # --------------------------------------------------
+      # Flutter
+      # --------------------------------------------------
       - name: ⚙️ Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -20,23 +26,39 @@ jobs:
           channel: stable
           cache: true
 
+      # --------------------------------------------------
+      # Flutter clean
+      # --------------------------------------------------
+      - name: 🧹 Flutter clean
+        run: flutter clean
+
+      # --------------------------------------------------
+      # Pub get (MUST be before pod install)
+      # --------------------------------------------------
       - name: 📦 Flutter pub get
         run: flutter pub get
 
-      - name: 🧹 Clean iOS
+      # --------------------------------------------------
+      # Generate iOS config files (CRITICAL STEP)
+      # This creates ios/Flutter/Generated.xcconfig
+      # --------------------------------------------------
+      - name: 🛠️ Generate iOS build files
+        run: flutter build ios --debug --simulator --no-codesign
+
+      # --------------------------------------------------
+      # CocoaPods (NOW it will work)
+      # --------------------------------------------------
+      - name: 📦 Install CocoaPods
         run: |
-          flutter clean
           cd ios
           rm -rf Pods Podfile.lock
           pod install --repo-update
           cd ..
 
-      - name: 🛠️ Build iOS Debug (Simulator, No Codesign)
-        run: |
-          set -o pipefail
-          flutter build ios --debug --simulator --no-codesign
-
-      - name: 🔍 Native Xcode Build (Verbose)
+      # --------------------------------------------------
+      # Native Xcode build (to expose crash)
+      # --------------------------------------------------
+      - name: 🔍 Native Xcode build (verbose)
         run: |
           set -o pipefail
           cd ios
@@ -49,6 +71,9 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             | tee xcodebuild.log
 
+      # --------------------------------------------------
+      # Upload logs
+      # --------------------------------------------------
       - name: 📄 Upload native logs
         if: always()
         uses: actions/upload-artifact@v4
