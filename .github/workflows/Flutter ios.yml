@@ -562,3 +562,26 @@ jobs:
             --api_key_path api_key.json \
             --ipa build/ios/ipa/*.ipa \
             --skip_waiting_for_build_processing
+
+      - name: 📋 Generate Crash Report Instructions
+        run: |
+          cat > TestFlightDebugInstructions.md <<'INSTRUCTIONS'
+          # How to Get iOS Crash Logs from TestFlight
+          
+          ## On the Test Device:
+          1. Install app from TestFlight
+          2. Launch the app (if it shows black screen and crashes)
+          3. Go to Settings → Privacy & Security → Analytics & Improvements → Analytics Data
+          4. Look for crash logs starting with "saoirse_app-" or "Runner-"
+          5. Tap the log → Share button → Send to yourself
+          
+          ## Alternative - Using Xcode:
+          1. Connect device to Mac via USB
+          2. Open Xcode → Window → Devices and Simulators
+          3. Select your device
+          4. Click "View Device Logs"
+          5. Filter for "saoirse" or look for recent crashes
+          INSTRUCTIONS
+          
+          echo "✅ Debug instructions created"
+
