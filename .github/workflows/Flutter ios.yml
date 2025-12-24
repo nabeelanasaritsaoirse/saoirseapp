@@ -1,4 +1,5 @@
-name: 🍎 iOS Native Debug (Black Screen)
+name: 🍎 iOS Native Debug 
+
 on:
   push:
     branches:
