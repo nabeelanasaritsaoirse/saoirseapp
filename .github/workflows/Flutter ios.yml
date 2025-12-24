@@ -75,6 +75,33 @@ jobs:
         run: flutter pub get
 
       # --------------------------------------------------
+      # Download Poppins Fonts (iOS Fix)
+      # --------------------------------------------------
+      - name: 📥 Download Poppins Fonts for iOS
+        run: |
+          echo "Downloading Poppins fonts..."
+          mkdir -p assets/fonts
+          cd assets/fonts
+          
+          # Download Poppins fonts from Google Fonts GitHub
+          curl -L -o Poppins-Regular.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf"
+          curl -L -o Poppins-Medium.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Medium.ttf"
+          curl -L -o Poppins-SemiBold.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf"
+          curl -L -o Poppins-Bold.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf"
+          
+          echo "✅ Fonts downloaded successfully"
+          ls -lh
+          
+          # Verify fonts were downloaded
+          if [ ! -f "Poppins-Regular.ttf" ]; then
+            echo "❌ Font download failed"
+            exit 1
+          fi
+          
+          echo "✅ All Poppins fonts ready"
+
+
+      # --------------------------------------------------
       # Version
       # --------------------------------------------------
       - name: 🔢 Read Version from pubspec.yaml
