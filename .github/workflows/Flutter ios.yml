@@ -303,6 +303,16 @@ jobs:
           RUBY
           
           ruby update_signing.rb
+
+      - name: 🔧 Configure iOS Build Settings
+        run: |
+          echo "STRIP_STYLE = non-global" >> ios/Flutter/Release.xcconfig
+          echo "DEAD_CODE_STRIPPING = YES" >> ios/Flutter/Release.xcconfig
+          echo "✅ Build settings configured to prevent black screen"
+
+
+      - name : verify flutter env
+        run: flutter doctor -v
       # --------------------------------------------------
       # Build Flutter (without codesigning)
       # --------------------------------------------------
@@ -361,8 +371,11 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE_SPECIFIER="${{ env.PROFILE_NAME }}" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
+            STRIP_STYLE=non-global \
+            DEAD_CODE_STRIPPING=YES \
             OTHER_CODE_SIGN_FLAGS="--keychain $HOME/Library/Keychains/build.keychain-db" \
             | tee ../archive.log
+
           
           echo "✅ Archive created"
       # --------------------------------------------------
