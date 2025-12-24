@@ -151,7 +151,10 @@ class MyApp extends StatelessWidget {
           title: AppStrings.app_name,
           locale: locale,
           fallbackLocale: const Locale('en'),
-          initialBinding: Allcontroller(),
+          
+          // ❌ REMOVED: initialBinding: Allcontroller(),
+          // Controllers now initialized in SplashScreen after first frame
+          
           theme: ThemeData(
             scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
             textTheme: GoogleFonts.poppinsTextTheme(),
