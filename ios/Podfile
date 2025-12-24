@@ -58,11 +58,15 @@ post_install do |installer|
       # iOS Deployment Target Fix
       current = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
       begin
-        needs_update = current.nil? || current.to_f < 12.0
+        needs_update = current.nil? || current.to_f < 13.0
       rescue
         needs_update = true
       end
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0' if needs_update
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0' if needs_update
+      
+      # 🔥 Swift 6 Configuration (Required for Firebase)
+      config.build_settings['SWIFT_VERSION'] = '6.0'
+      config.build_settings['SWIFT_EMIT_ASYNC_WHEN_SUPPORTED'] = 'YES'
     end
   end
 end
