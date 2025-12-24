@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/booking_confirmation/booking_confirmation_screen.dart';
 
 import '../../constants/payment_methods.dart';
 import '../../models/coupon_model.dart';
@@ -21,14 +22,20 @@ class OrderDetailsController extends GetxController {
   var quantity = 1.obs;
   String orderid = "";
 
+  // ------------------------- BASE PRICING (per 1 qty) -------------------------
+  double baseFinalPrice = 0.0;
+  double baseDailyAmount = 0.0;
+  int baseDays = 0;
+  RxDouble totalAmount = 0.0.obs;
+
+
   // ------------------------- COUPONS -----------------------------------------
   RxList<Coupon> coupons = <Coupon>[].obs;
   Rx<Coupon?> selectedCoupon = Rx<Coupon?>(null);
-  // store the last validation response (null if none)
+
   Rx<CouponValidationResponse?> couponValidation =
       Rx<CouponValidationResponse?>(null);
 
-  // store last applied coupon code (string) for display
   RxString appliedCouponCode = "".obs;
 
   RxString selectedPaymentMethod = PaymentMethod.razorpay.obs;
@@ -43,23 +50,78 @@ class OrderDetailsController extends GetxController {
     fetchCoupons();
   }
 
+  // ------------------------- INITIAL PRODUCT PRICING -------------------------
+  void initProductPricing({
+    required double finalPrice,
+    required double dailyAmount,
+    required int days,
+  }) {
+    baseFinalPrice = finalPrice;
+    baseDailyAmount = dailyAmount;
+    baseDays = days;
+
+    originalAmount = dailyAmount;
+    originalDays = days;
+
+    selectedAmount.value = dailyAmount;
+    selectedDays.value = days;
+
+    totalAmount.value = finalPrice;
+  }
+
+  // ------------------------- CENTRAL RECALCULATION ---------------------------
+  void recalculatePricing() {
+  final qty = quantity.value;
+
+  if (baseDailyAmount == 0 || baseDays == 0) return;
+
+  // ✅ COUPON APPLIED
+  if (couponValidation.value != null) {
+    final v = couponValidation.value!;
+    final inst = v.installment;
+    final pricing = v.pricing;
+
+    selectedAmount.value = roundToInt(inst.dailyAmount * qty);
+    selectedDays.value = inst.totalDays;
+
+    // 🔥 TOTAL AMOUNT FROM SERVER × QTY
+    totalAmount.value =
+        roundToInt(pricing.finalPrice * qty);
+
+    return;
+  }
+
+  // ✅ NO COUPON
+  selectedAmount.value =
+      roundToInt(baseDailyAmount * qty);
+  selectedDays.value = baseDays;
+
+  // 🔥 TOTAL AMOUNT = PRODUCT PRICE × QTY
+  totalAmount.value =
+      roundToInt(baseFinalPrice * qty);
+}
+
+  double roundToInt(double value) {
+  return value.roundToDouble(); // 193.2 → 193
+}
+
+
+  // ------------------------- FETCH COUPONS -----------------------------------
   Future<void> fetchCoupons() async {
     final all = await CouponService.fetchCoupons();
 
-    // filter only INSTANT & REDUCE_DAYS
     coupons.value = all
         .where(
             (c) => c.couponType == "INSTANT" || c.couponType == "REDUCE_DAYS")
         .toList();
   }
 
-  //selected coupon show text field
   void selectCoupon(Coupon coupon, TextEditingController controller) {
     selectedCoupon.value = coupon;
     controller.text = coupon.couponCode;
   }
 
-  //-- Apply button tapped
+  // ------------------------- APPLY COUPON ------------------------------------
   Future<void> applyCouponApi({
     required String couponCode,
     required String productId,
@@ -86,7 +148,6 @@ class OrderDetailsController extends GetxController {
 
     final response = await CouponService.validateCoupon(body);
 
-    // hide loader
     if (Get.isDialogOpen ?? false) Get.back();
 
     if (response == null) {
@@ -94,18 +155,20 @@ class OrderDetailsController extends GetxController {
       return;
     }
 
-    // Save the validation response for UI to display
     couponValidation.value = response;
     appliedCouponCode.value = couponCode.trim();
 
-    // Update order amounts/days based on server response so UI displays live changes:
-    // - For INSTANT: pricing.finalPrice may change and installment.dailyAmount stays as provided by server
-    // - For REDUCE_DAYS: installment.reducedDays may be provided; we still use installment.dailyAmount & totalDays from response
     final inst = response.installment;
-    selectedAmount.value = inst.dailyAmount;
+    final pricing = response.pricing;
+
+    selectedAmount.value =
+    roundToInt(inst.dailyAmount * this.quantity.value);
+
     selectedDays.value = inst.totalDays;
 
-    // Optional message
+    totalAmount.value =
+    roundToInt(pricing.finalPrice * this.quantity.value);
+
     if (response.benefits.savingsMessage.isNotEmpty) {
       appToast(
           title: "Coupon Applied", content: response.benefits.savingsMessage);
@@ -115,25 +178,23 @@ class OrderDetailsController extends GetxController {
   }
 
   void removeCoupon(TextEditingController controller) {
-    couponValidation.value = null; // remove server response
-    appliedCouponCode.value = ""; // clear coupon code text
+    couponValidation.value = null;
+    appliedCouponCode.value = "";
     selectedCoupon.value = null;
-    selectedAmount.value = originalAmount; // restore original daily amount
-    selectedDays.value = originalDays; // restore original days
-    controller.clear(); // clear text field
+
+    recalculatePricing();
+   recalculatePricing(); 
+    controller.clear();
   }
 
-  //----------------------------COUPONS END-------------------------------------
-
+  // ------------------------- PLACE ORDER -------------------------------------
   Future<void> placeOrder({
     required String productId,
     String variantId = "",
-    // required String paymentOption,
     required int totalDays,
     String couponCode = "",
     required Map<String, dynamic> deliveryAddress,
   }) async {
-    // Clean delivery address
     final delivery = {
       "name": (deliveryAddress["name"] ?? "").toString().trim(),
       "phoneNumber": (deliveryAddress["phoneNumber"] ?? "").toString().trim(),
@@ -151,12 +212,10 @@ class OrderDetailsController extends GetxController {
       "deliveryAddress": delivery,
     };
 
-// add only if variantId is not empty
     if (variantId.trim().isNotEmpty) {
       body["variantId"] = variantId.trim();
     }
 
-// // add only if couponCode is not empty
     if (couponCode.trim().isNotEmpty) {
       body["couponCode"] = couponCode.trim();
     }
@@ -176,13 +235,17 @@ class OrderDetailsController extends GetxController {
         return;
       }
 
-      // ✅ WALLET FLOW
       if (selectedPaymentMethod.value == PaymentMethod.wallet) {
-        appToast(content: "Order placed using Wallet");
+        appLoader();
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (Get.isDialogOpen ?? false) Get.back();
+
+        Get.off(() => BookingConfirmationScreen());
+      
         return;
       }
 
-      // ✅ RAZORPAY FLOW
       final data = response['data'];
 
       if (data == null || data is! Map<String, dynamic>) {
@@ -217,11 +280,11 @@ class OrderDetailsController extends GetxController {
         content: "Payment initialization failed",
       );
     } finally {
-      // 🔥 CLOSE LOADER LAST
       if (Get.isDialogOpen ?? false) Get.back();
     }
   }
 
+  // ------------------------- PAYMENT -----------------------------------------
   void setCustomPlan(int days, double amount) {
     selectedDays.value = days;
     selectedAmount.value = amount;
@@ -232,12 +295,10 @@ class OrderDetailsController extends GetxController {
     selectedPaymentMethod.value = method;
   }
 
+  // ------------------------- QUANTITY ----------------------------------------
   void increaseQty() {
-    // if (quantity.value >= 10) {
-    //   appToaster(content: "Maximum quantity is 10", error: true);
-    //   return;
-    // }
     quantity.value++;
+    recalculatePricing();
   }
 
   void decreaseQty() {
@@ -246,5 +307,10 @@ class OrderDetailsController extends GetxController {
       return;
     }
     quantity.value--;
+    recalculatePricing();
   }
 }
+
+
+
+

@@ -88,7 +88,7 @@ class AppURLs {
   static String CREATE_ORDER_API = BASE_API + "api/installments/orders";
 
   // Payment Api
-  static String PAYMENT_PROCESS_API = BASE_API + "api/payments/process";
+  static String PAYMENT_PROCESS_API = BASE_API + "api/installments/payments/process";
 
   // Notifications
   static String NOTIFICATIONS = BASE_API + "api/notifications";
