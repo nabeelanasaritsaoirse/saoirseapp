@@ -33,20 +33,13 @@ jobs:
         run: flutter clean
 
       # --------------------------------------------------
-      # Pub get (MUST be before pod install)
+      # Pub get (Creates Generated.xcconfig)
       # --------------------------------------------------
       - name: 📦 Flutter pub get
         run: flutter pub get
 
       # --------------------------------------------------
-      # Generate iOS config files (CRITICAL STEP)
-      # This creates ios/Flutter/Generated.xcconfig
-      # --------------------------------------------------
-      - name: 🛠️ Generate iOS build files
-        run: flutter build ios --debug --simulator --no-codesign
-
-      # --------------------------------------------------
-      # CocoaPods (NOW it will work)
+      # CocoaPods (Install BEFORE building)
       # --------------------------------------------------
       - name: 📦 Install CocoaPods
         run: |
@@ -56,7 +49,13 @@ jobs:
           cd ..
 
       # --------------------------------------------------
-      # Native Xcode build (to expose crash)
+      # Generate iOS config files (AFTER pods are installed)
+      # --------------------------------------------------
+      - name: 🛠️ Build iOS Debug
+        run: flutter build ios --debug --simulator --no-codesign
+
+      # --------------------------------------------------
+      # Native Xcode build (to verify everything works)
       # --------------------------------------------------
       - name: 🔍 Native Xcode build (verbose)
         run: |
@@ -81,4 +80,3 @@ jobs:
           name: ios-native-debug-logs
           path: |
             ios/xcodebuild.log
-            ~/Library/Logs/DiagnosticReports
