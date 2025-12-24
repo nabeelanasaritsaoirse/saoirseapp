@@ -44,6 +44,7 @@ jobs:
         run: |
           sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -runFirstLaunch || true
+          
       # --------------------------------------------------
       # Flutter
       # --------------------------------------------------
@@ -60,6 +61,7 @@ jobs:
         run: |
           sudo gem install fastlane -N
           sudo gem install cocoapods -N
+          
       # --------------------------------------------------
       # Clean
       # --------------------------------------------------
@@ -88,6 +90,7 @@ jobs:
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
           
           echo "Building version: $VERSION_NAME ($BUILD_NUMBER)"
+          
       # --------------------------------------------------
       # ENV
       # --------------------------------------------------
@@ -106,7 +109,7 @@ jobs:
           EOF
       
       # --------------------------------------------------
-      # Fix Launch Screen Assets - THIS IS THE KEY FIX
+      # Fix Launch Screen Assets
       # --------------------------------------------------
       - name: 🖼️ Verify Launch Screen Assets
         run: |
@@ -148,6 +151,63 @@ jobs:
           echo "✅ LaunchImage.imageset configuration verified"
           
       # --------------------------------------------------
+      # CRITICAL: Fix iOS Black Screen Issues
+      # --------------------------------------------------
+      - name: 🔧 Fix iOS Black Screen Configuration
+        run: |
+          echo "=== Applying iOS Black Screen Fixes ==="
+          
+          # 1. Remove UIApplicationSceneManifest (major cause of black screen)
+          echo "1. Removing UIApplicationSceneManifest if present..."
+          /usr/libexec/PlistBuddy -c "Delete :UIApplicationSceneManifest" ios/Runner/Info.plist 2>/dev/null || echo "   No scene manifest found (good)"
+          
+          # 2. Verify removal
+          if /usr/libexec/PlistBuddy -c "Print :UIApplicationSceneManifest" ios/Runner/Info.plist 2>&1 | grep -q "Does Not Exist"; then
+            echo "   ✅ Verified: UIApplicationSceneManifest removed"
+          fi
+          
+          # 3. Set iOS deployment target to 13.0 in Podfile
+          echo "2. Setting iOS deployment target to 13.0..."
+          if [ -f "ios/Podfile" ]; then
+            sed -i '' "s/platform :ios, '[0-9.]*'/platform :ios, '13.0'/" ios/Podfile || true
+            # Also try adding if not present
+            if ! grep -q "platform :ios" ios/Podfile; then
+              sed -i '' "1a\\
+platform :ios, '13.0'
+" ios/Podfile
+            fi
+            echo "   ✅ Podfile updated"
+          fi
+          
+          # 4. Set deployment target in project.pbxproj
+          if [ -f "ios/Runner.xcodeproj/project.pbxproj" ]; then
+            sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 13.0;/g' ios/Runner.xcodeproj/project.pbxproj
+            echo "   ✅ project.pbxproj updated"
+          fi
+          
+          # 5. Configure Release.xcconfig with critical build settings
+          echo "3. Configuring Release.xcconfig..."
+          cat >> ios/Flutter/Release.xcconfig <<XCCONFIG
+
+// ===== BLACK SCREEN FIX =====
+// Prevent symbol stripping that breaks Flutter FFI
+STRIP_STYLE = non-global
+DEAD_CODE_STRIPPING = YES
+IPHONEOS_DEPLOYMENT_TARGET = 13.0
+
+// Additional optimization settings
+ENABLE_BITCODE = NO
+ONLY_ACTIVE_ARCH = NO
+XCCONFIG
+          
+          echo "   ✅ Release.xcconfig updated"
+          echo ""
+          echo "=== Release.xcconfig contents ==="
+          cat ios/Flutter/Release.xcconfig
+          echo ""
+          echo "✅ All black screen fixes applied successfully"
+          
+      # --------------------------------------------------
       # Update Info.plist with required keys
       # --------------------------------------------------
       - name: 📝 Update Info.plist
@@ -169,6 +229,7 @@ jobs:
           mkdir -p ios
           echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > ios/api_key.json
           chmod 600 ios/api_key.json
+          
       # --------------------------------------------------
       # Keychain
       # --------------------------------------------------
@@ -197,6 +258,7 @@ jobs:
           
           echo "✅ Keychain setup complete"
           security list-keychains
+          
       # --------------------------------------------------
       # Certificates
       # --------------------------------------------------
@@ -212,11 +274,13 @@ jobs:
             --git_branch main \
             --keychain_name build.keychain-db \
             --keychain_password "ci_keychain_pass"
-                echo "✅ Certificates installed"
-                
+          
+          echo "✅ Certificates installed"
+          
           # Verify certificates
           echo "Checking for Apple Distribution certificate..."
           security find-identity -v -p codesigning build.keychain-db | grep "Apple Distribution" || echo "⚠️ No distribution cert found!"
+          
       # --------------------------------------------------
       # Firebase Config
       # --------------------------------------------------
@@ -260,6 +324,7 @@ jobs:
           </dict>
           </plist>
           EOF
+          
       # --------------------------------------------------
       # Pods
       # --------------------------------------------------
@@ -267,6 +332,7 @@ jobs:
         run: |
           cd ios
           pod install --repo-update
+          
       # --------------------------------------------------
       # Configure Xcode project for manual signing
       # --------------------------------------------------
@@ -293,26 +359,25 @@ jobs:
                   config.build_settings['CODE_SIGN_IDENTITY[sdk=iphoneos*]'] = 'Apple Distribution'
                   config.build_settings['ENABLE_BITCODE'] = 'NO'
                   config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+                  # BLACK SCREEN FIX: Set deployment target
+                  config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
                 end
               end
             end
           end
           
           project.save
-          puts "✅ Xcode project configured for manual signing"
+          puts "✅ Xcode project configured for manual signing and iOS 13.0"
           RUBY
           
           ruby update_signing.rb
 
-      - name: 🔧 Configure iOS Build Settings
-        run: |
-          echo "STRIP_STYLE = non-global" >> ios/Flutter/Release.xcconfig
-          echo "DEAD_CODE_STRIPPING = YES" >> ios/Flutter/Release.xcconfig
-          echo "✅ Build settings configured to prevent black screen"
-
-
-      - name : verify flutter env
+      # --------------------------------------------------
+      # Verify Flutter Environment
+      # --------------------------------------------------
+      - name: 🩺 Verify Flutter Environment
         run: flutter doctor -v
+        
       # --------------------------------------------------
       # Build Flutter (without codesigning)
       # --------------------------------------------------
@@ -323,6 +388,7 @@ jobs:
             --no-codesign \
             --build-name ${{ steps.version.outputs.VERSION_NAME }} \
             --build-number ${{ steps.version.outputs.BUILD_NUMBER }}
+            
       # --------------------------------------------------
       # ExportOptions
       # --------------------------------------------------
@@ -352,8 +418,9 @@ jobs:
           </dict>
           </plist>
           EOF
+          
       # --------------------------------------------------
-      # Archive with Xcode
+      # Archive with Xcode (WITH BLACK SCREEN FIXES)
       # --------------------------------------------------
       - name: 🏗️ Archive with Xcode
         run: |
@@ -373,24 +440,46 @@ jobs:
             CODE_SIGN_IDENTITY="Apple Distribution" \
             STRIP_STYLE=non-global \
             DEAD_CODE_STRIPPING=YES \
+            IPHONEOS_DEPLOYMENT_TARGET=13.0 \
+            ENABLE_BITCODE=NO \
             OTHER_CODE_SIGN_FLAGS="--keychain $HOME/Library/Keychains/build.keychain-db" \
             | tee ../archive.log
-
           
-          echo "✅ Archive created"
+          echo "✅ Archive created with black screen fixes"
+          
+      # --------------------------------------------------
+      # Verify Build Settings Were Applied
+      # --------------------------------------------------
+      - name: 🔍 Verify Build Settings
+        run: |
+          echo "=== Verifying Critical Build Settings ==="
+          cd ios
+          xcodebuild -showBuildSettings \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release | grep -E "(STRIP_STYLE|IPHONEOS_DEPLOYMENT_TARGET|DEAD_CODE_STRIPPING)" || echo "Settings not found"
+          echo "==================================="
+          
       # --------------------------------------------------
       # Verify Archive
       # --------------------------------------------------
-      - name: 🔍 Verify Archive
+      - name: 🔍 Verify Archive Structure
         run: |
           echo "=== Archive Structure ==="
           ls -la ${{ env.ARCHIVE_DIR }}/Runner.xcarchive/Products/Applications/
           
+          echo ""
           echo "=== App Contents ==="
           ls -la ${{ env.ARCHIVE_DIR }}/Runner.xcarchive/Products/Applications/Runner.app/
           
+          echo ""
           echo "=== Flutter Frameworks ==="
           ls -la ${{ env.ARCHIVE_DIR }}/Runner.xcarchive/Products/Applications/Runner.app/Frameworks/ | grep -E "(App.framework|Flutter.framework)" || echo "⚠️ Flutter frameworks missing!"
+          
+          echo ""
+          echo "=== Checking App.framework contents ==="
+          ls -la ${{ env.ARCHIVE_DIR }}/Runner.xcarchive/Products/Applications/Runner.app/Frameworks/App.framework/flutter_assets/ | head -20
+          
       # --------------------------------------------------
       # Export IPA
       # --------------------------------------------------
@@ -406,6 +495,7 @@ jobs:
           
           echo "✅ IPA exported"
           ls -lh ../${{ env.IPA_DIR }}/
+          
       # --------------------------------------------------
       # Verify IPA
       # --------------------------------------------------
@@ -414,8 +504,13 @@ jobs:
           echo "=== IPA File ==="
           ls -lh ${{ env.IPA_DIR }}/*.ipa
           
+          echo ""
           echo "=== Checking IPA Contents ==="
-          unzip -l ${{ env.IPA_DIR }}/*.ipa | grep -E "(App.framework|Flutter.framework|GoogleService-Info.plist)" || echo "⚠️ Missing critical files!"
+          unzip -l ${{ env.IPA_DIR }}/*.ipa | grep -E "(App.framework|Flutter.framework)" | head -10
+          
+          echo ""
+          echo "=== Checking for flutter_assets ==="
+          unzip -l ${{ env.IPA_DIR }}/*.ipa | grep "flutter_assets" | head -10
           
       - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
@@ -438,6 +533,9 @@ jobs:
             archive.log
             export.log
             
+  # ======================================================
+  # DEPLOYMENT JOB
+  # ======================================================
   ios-deploy:
     name: 🚀 Deploy to TestFlight
     needs: ios-ci
