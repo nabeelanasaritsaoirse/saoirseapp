@@ -1,0 +1,59 @@
+name: 🍎 iOS Native Debug (Black Screen)
+
+on:
+  push:
+    branches:
+      - DEPLOY
+
+jobs:
+  ios-native-debug:
+    runs-on: macos-14
+
+    steps:
+      - name: 📥 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.7"
+          channel: stable
+          cache: true
+
+      - name: 📦 Flutter pub get
+        run: flutter pub get
+
+      - name: 🧹 Clean iOS
+        run: |
+          flutter clean
+          cd ios
+          rm -rf Pods Podfile.lock
+          pod install --repo-update
+          cd ..
+
+      - name: 🛠️ Build iOS Debug (Simulator, No Codesign)
+        run: |
+          set -o pipefail
+          flutter build ios --debug --simulator --no-codesign
+
+      - name: 🔍 Native Xcode Build (Verbose)
+        run: |
+          set -o pipefail
+          cd ios
+          xcodebuild \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee xcodebuild.log
+
+      - name: 📄 Upload native logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-native-debug-logs
+          path: |
+            ios/xcodebuild.log
+            ~/Library/Logs/DiagnosticReports
