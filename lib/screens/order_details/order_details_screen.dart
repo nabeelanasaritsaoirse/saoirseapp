@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable, deprecated_member_use
+// ignore_for_file: unused_local_variable, deprecated_member_use, prefer_const_constructors_in_immutables
 
 import 'dart:developer';
 
