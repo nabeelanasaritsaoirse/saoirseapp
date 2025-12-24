@@ -64,9 +64,12 @@ post_install do |installer|
       end
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0' if needs_update
       
-      # 🔥 Swift 6 Configuration (Required for Firebase)
+      # 🔥 Swift 6 Configuration with relaxed concurrency checking
       config.build_settings['SWIFT_VERSION'] = '6.0'
-      config.build_settings['SWIFT_EMIT_ASYNC_WHEN_SUPPORTED'] = 'YES'
+      
+      # ✅ Disable strict concurrency checking for compatibility
+      config.build_settings['SWIFT_STRICT_CONCURRENCY'] = 'minimal'
+      config.build_settings['SWIFT_UPCOMING_FEATURE_CONCURRENCY_CHECKING'] = 'NO'
     end
   end
 end
