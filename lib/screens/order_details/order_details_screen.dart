@@ -1,13 +1,15 @@
-// ignore_for_file: unused_local_variable, deprecated_member_use
+// ignore_for_file: unused_local_variable, deprecated_member_use, prefer_const_constructors_in_immutables
 
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../../constants/payment_methods.dart';
 import '../../models/address_response.dart';
 import '../../models/product_details_model.dart';
 import '../../widgets/app_button.dart';
@@ -19,7 +21,7 @@ import '../my_wallet/my_wallet_controller.dart';
 import '../razorpay/razorpay_controller.dart';
 import 'order_details_controller.dart';
 
-class OrderDetailsScreen extends StatelessWidget {
+class OrderDetailsScreen extends StatefulWidget {
   final Address addresses;
   final ProductDetailsData? product;
   final String? selectVarientId;
@@ -36,28 +38,55 @@ class OrderDetailsScreen extends StatelessWidget {
     this.selectVarientId,
     this.quantity,
   });
+
+  @override
+  State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
+}
+
+class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   final orderController = Get.find<OrderDetailsController>();
+
   final razorpayController = Get.put(RazorpayController());
+
   final walletController = Get.put(MyWalletController());
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 🔥 THIS IS MANDATORY
+      orderController.initProductPricing(
+        finalPrice: widget.product!.pricing.finalPrice,
+        dailyAmount: widget.selectedAmount,
+        days: widget.selectedDays,
+      );
+
+      // also sync initial quantity if passed
+      if (widget.quantity != null && widget.quantity! > 1) {
+        orderController.quantity.value = widget.quantity!;
+        orderController.recalculatePricing();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    log("DEBUG → incoming selectVarientId: $selectVarientId");
+    log("DEBUG → incoming selectVarientId: ${widget.selectVarientId}");
 
     if (orderController.originalAmount == 0.0) {
-      orderController.originalAmount = selectedAmount;
-      orderController.originalDays = selectedDays;
+      orderController.originalAmount = widget.selectedAmount;
+      orderController.originalDays = widget.selectedDays;
     }
 
     final couponController = TextEditingController();
-    final pricing = product!.pricing;
+    final pricing = widget.product!.pricing;
 
     final String? productImageUrl =
-        product != null && product!.images.isNotEmpty
-            ? product!.images
+        widget.product != null && widget.product!.images.isNotEmpty
+            ? widget.product!.images
                 .firstWhere(
                   (img) => img.isPrimary,
-                  orElse: () => product!.images.first,
+                  orElse: () => widget.product!.images.first,
                 )
                 .url
             : null;
@@ -104,7 +133,7 @@ class OrderDetailsScreen extends StatelessWidget {
                             fontSize: 11.sp, fontWeight: FontWeight.w600),
                       ),
                       appText(
-                        addresses.name,
+                        widget.addresses.name,
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w700,
                       )
@@ -118,7 +147,7 @@ class OrderDetailsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 2.h,
                         children: [
-                          appText(addresses.addressLine1,
+                          appText(widget.addresses.addressLine1,
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w600,
                               height: 1.3.h,
@@ -126,19 +155,19 @@ class OrderDetailsScreen extends StatelessWidget {
                           Row(
                             spacing: 5.w,
                             children: [
-                              appText("${addresses.city},",
+                              appText("${widget.addresses.city},",
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w600,
                                   height: 1.3.h,
                                   textAlign: TextAlign.left),
-                              appText(addresses.pincode,
+                              appText(widget.addresses.pincode,
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w600,
                                   height: 1.3.h,
                                   textAlign: TextAlign.left),
                             ],
                           ),
-                          appText(addresses.country,
+                          appText(widget.addresses.country,
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w600,
                               height: 1.3.h,
@@ -150,7 +179,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.grey),
                               appText(
-                                addresses.phoneNumber,
+                                widget.addresses.phoneNumber,
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -183,161 +212,6 @@ class OrderDetailsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            // -------------------- PRODUCT DETAILS -----------------------
-            // Container(
-            //   width: double.infinity,
-            //   padding: EdgeInsets.all(15.w),
-            //   constraints: BoxConstraints(
-            //     minHeight: 130.h, // ⬅️ instead of fixed height
-            //   ),
-            //   decoration: BoxDecoration(
-            //     color: AppColors.white,
-            //     boxShadow: [
-            //       BoxShadow(
-            //         color: AppColors.shadowColor,
-            //         blurRadius: 6.r,
-            //         offset: Offset(0, 2),
-            //       )
-            //     ],
-            //     borderRadius: BorderRadius.circular(8.r),
-            //   ),
-            //   child: Column(
-            //     spacing: 6.h,
-            //     crossAxisAlignment: CrossAxisAlignment.start,
-            //     children: [
-            //       appText(
-            //         AppStrings.item,
-            //         fontSize: 13.sp,
-            //         fontWeight: FontWeight.w700,
-            //       ),
-            //       Container(
-            //         width: double.infinity,
-            //         padding:
-            //             EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
-            //         constraints: BoxConstraints(
-            //           minHeight: 80.h, // ⬅️ instead of fixed height
-            //         ),
-            //         decoration: BoxDecoration(
-            //           borderRadius: BorderRadius.circular(8.r),
-            //           border: Border.all(color: AppColors.grey),
-            //         ),
-            //         child: Row(
-            //           spacing: 15.w,
-            //           children: [
-            //             SizedBox(
-            //                 width: 55.w,
-            //                 height: 55.h,
-            //                 child: ClipRRect(
-            //                   borderRadius: BorderRadius.circular(8.r),
-            //                   child: Image.network(
-            //                     product!.images.isNotEmpty
-            //                         ? product!.images
-            //                             .firstWhere(
-            //                               (img) => img.isPrimary,
-            //                               orElse: () => product!.images.first,
-            //                             )
-            //                             .url
-            //                         : "", // empty triggers errorBuilder
-            //                     width: 70.w,
-            //                     height: 70.w,
-            //                     fit: BoxFit.cover,
-            //                     errorBuilder: (_, __, ___) {
-            //                       return Container(
-            //                         width: 70.w,
-            //                         height: 70.w,
-            //                         color: Colors.grey.shade200,
-            //                         child: Icon(
-            //                           Icons.broken_image,
-            //                           size: 28.sp,
-            //                           color: Colors.grey,
-            //                         ),
-            //                       );
-            //                     },
-            //                     loadingBuilder:
-            //                         (context, child, loadingProgress) {
-            //                       if (loadingProgress == null) return child;
-
-            //                       return Center(
-            //                         child: SizedBox(
-            //                           width: 24.w,
-            //                           height: 24.w,
-            //                           child: CircularProgressIndicator(
-            //                             strokeWidth: 2,
-            //                             color: Colors.grey,
-            //                           ),
-            //                         ),
-            //                       );
-            //                     },
-            //                   ),
-            //                 )),
-            //             Expanded(
-            //               child: Column(
-            //                 crossAxisAlignment: CrossAxisAlignment.start,
-            //                 mainAxisAlignment: MainAxisAlignment.center,
-            //                 children: [
-            //                   Row(
-            //                     mainAxisAlignment:
-            //                         MainAxisAlignment.spaceBetween,
-            //                     children: [
-            //                       Expanded(
-            //                         child: appText(
-            //                           product!.name,
-            //                           fontSize: 12.sp,
-            //                           textAlign: TextAlign.left,
-            //                           fontWeight: FontWeight.w600,
-            //                           maxLines: 2,
-            //                           overflow: TextOverflow.ellipsis,
-            //                         ),
-            //                       ),
-            //                       appText(
-            //                         "${AppStrings.qty} 1",
-            //                         fontSize: 13.sp,
-            //                         fontWeight: FontWeight.w700,
-            //                       ),
-            //                     ],
-            //                   ),
-            //                   // if (product!.hasVariants)
-            //                   //   Obx(() {
-            //                   //     final productCtrl = Get.find<ProductDetailsController>();
-            //                   //     final selectedVariant = productCtrl.getSelectedVariant();
-
-            //                   //     if (selectedVariant == null) {
-            //                   //       return SizedBox.shrink();
-            //                   //     }
-
-            //                   //     return appText(
-            //                   //       selectedVariant.attributes.color,
-            //                   //       fontSize: 12.sp,
-            //                   //       fontWeight: FontWeight.w600,
-            //                   //     );
-            //                   //   }),
-            //                   if (product!.hasVariants)
-            //                     appText(
-            //                       product!.variantId.isNotEmpty
-            //                           ? "Variant: $selectVarientId"
-            //                           : "",
-            //                       fontSize: 12.sp,
-            //                       fontWeight: FontWeight.w600,
-            //                     ),
-
-            //                   appText("₹ ${product!.pricing.finalPrice}",
-            //                       fontSize: 12.sp, fontWeight: FontWeight.w600),
-            //                   Obx(() {
-            //                     return appText(
-            //                       "Plan - ₹${orderController.selectedAmount.value} / ${orderController.selectedDays.value} Days",
-            //                       fontSize: 12.sp,
-            //                       fontWeight: FontWeight.w600,
-            //                     );
-            //                   }),
-            //                 ],
-            //               ),
-            //             ),
-            //           ],
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
 
             // -------------------- PRODUCT DETAILS -----------------------
             Container(
@@ -388,17 +262,30 @@ class OrderDetailsScreen extends StatelessWidget {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8.r),
                             child: Image.network(
-                              product!.images.isNotEmpty
-                                  ? product!.images
+                              widget.product!.images.isNotEmpty
+                                  ? widget.product!.images
                                       .firstWhere(
                                         (img) => img.isPrimary,
-                                        orElse: () => product!.images.first,
+                                        orElse: () =>
+                                            widget.product!.images.first,
                                       )
                                       .url
                                   : "",
                               width: 55.w,
                               height: 55.h,
                               fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) {
+                                  return child;
+                                }
+                                return Center(
+                                  child: CupertinoActivityIndicator(
+                                    radius: 10.0,
+                                    color: AppColors.textGray,
+                                  ),
+                                );
+                              },
                               errorBuilder: (_, __, ___) => Container(
                                 color: Colors.grey.shade200,
                                 child: Icon(Icons.broken_image, size: 28.sp),
@@ -419,7 +306,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: appText(
-                                      product!.name,
+                                      widget.product!.name,
                                       fontSize: 12.sp,
                                       fontWeight: FontWeight.w600,
                                       textAlign: TextAlign.left,
@@ -436,11 +323,11 @@ class OrderDetailsScreen extends StatelessWidget {
                               ),
 
                               // ----------- VARIANT (COLOR / SIZE) --------------
-                              if (product!.hasVariants)
+                              if (widget.product!.hasVariants)
                                 appText(
-                                  selectVarientId != null &&
-                                          selectVarientId!.isNotEmpty
-                                      ? "Variant: $selectVarientId"
+                                  widget.selectVarientId != null &&
+                                          widget.selectVarientId!.isNotEmpty
+                                      ? "Variant: ${widget.selectVarientId}"
                                       : "",
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w600,
@@ -448,7 +335,7 @@ class OrderDetailsScreen extends StatelessWidget {
 
                               // ----------- PRICE --------------
                               appText(
-                                "₹ ${product!.pricing.finalPrice}",
+                                "₹ ${widget.product!.pricing.finalPrice}",
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -461,6 +348,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                 );
                               }),
+
                               SizedBox(height: 2.h),
                               // ----------- QUANTITY SELECTOR ----------
                               Row(
@@ -597,11 +485,11 @@ class OrderDetailsScreen extends StatelessWidget {
                                 //added coupon edit
                                 orderController.applyCouponApi(
                                   couponCode: couponController.text.trim(),
-                                  productId: product!.id,
+                                  productId: widget.product!.id,
                                   totalDays: orderController.selectedDays.value,
                                   dailyAmount:
                                       orderController.selectedAmount.value,
-                                  variantId: selectVarientId ?? "",
+                                  variantId: widget.selectVarientId ?? "",
                                   quantity: 1,
                                 );
                               },
@@ -832,7 +720,7 @@ class OrderDetailsScreen extends StatelessWidget {
                         spacing: 5.h,
                         children: [
                           buildPriceInfo(
-                              label: product!.name,
+                              label: widget.product!.name,
                               content:
                                   "₹ ${p.originalPrice.toStringAsFixed(0)}"),
                           buildPriceInfo(
@@ -857,14 +745,17 @@ class OrderDetailsScreen extends StatelessWidget {
                       spacing: 5.h,
                       children: [
                         buildPriceInfo(
-                            label: product!.name,
+                            label: widget.product!.name,
                             content: "₹ ${pricing.finalPrice}"),
                         buildPriceInfo(
                             label: AppStrings.shipping_charge, content: "Free"),
                         Divider(color: AppColors.grey),
-                        buildPriceInfo(
+                        Obx(() {
+                          return buildPriceInfo(
                             label: AppStrings.total_amount,
-                            content: "₹ ${pricing.finalPrice}"),
+                            content: "₹ ${orderController.totalAmount.value}",
+                          );
+                        }),
                       ],
                     );
                   }),
@@ -878,9 +769,10 @@ class OrderDetailsScreen extends StatelessWidget {
                   }),
                   Obx(() {
                     return buildPriceInfo(
-                        label: AppStrings.pay_now,
-                        content: "₹${orderController.selectedAmount.value}");
-                  }),
+                      label: AppStrings.pay_now,
+                      content: "₹${orderController.selectedAmount.value}",
+                    );
+                  })
                 ],
               ),
             ),
@@ -890,41 +782,6 @@ class OrderDetailsScreen extends StatelessWidget {
           ],
         ),
       )),
-      // bottomNavigationBar: Container(
-      //   padding: EdgeInsets.all(12.w),
-      //   color: AppColors.transparent,
-      //   child: appButton(
-      //     onTap: () {
-      //       orderController.placeOrder(
-      //         productId: product!.id,
-      //         variantId: selectVarientId ?? "",
-      //         paymentOption: "daily",
-      //         totalDays: orderController.selectedDays.value,
-      //         couponCode: orderController.appliedCouponCode.value,
-      //         deliveryAddress: {
-      //           "name": addresses.name,
-      //           "phoneNumber": addresses.phoneNumber,
-      //           "addressLine1": addresses.addressLine1,
-      //           "city": addresses.city,
-      //           "state": addresses.state,
-      //           "pincode": addresses.pincode,
-      //         },
-      //       );
-      //     },
-      //     width: double.infinity,
-      //     height: 45.h,
-      //     buttonColor: AppColors.lightAmber,
-      //     borderRadius: BorderRadius.circular(20.r),
-      //     child: Center(
-      //       child: appText(
-      //         AppStrings.pay_now,
-      //         fontSize: 15.sp,
-      //         color: AppColors.white,
-      //         fontWeight: FontWeight.w600,
-      //       ),
-      //     ),
-      //   ),
-      // ),
       bottomNavigationBar: _buildBottomBar(),
     );
   }
@@ -965,7 +822,8 @@ class OrderDetailsScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     appText(
-                      orderController.selectedPaymentMethod.value == "razorpay"
+                      orderController.selectedPaymentMethod.value ==
+                              PaymentMethod.razorpay
                           ? "Razorpay"
                           : "Wallet",
                       color: AppColors.textBlack,
@@ -993,38 +851,19 @@ class OrderDetailsScreen extends StatelessWidget {
                 ),
                 padding: EdgeInsets.symmetric(vertical: 10.h),
               ),
-              // onPressed: () {
-              //   orderController.placeOrder(
-              //     productId: product!.id,
-              //     variantId: selectVarientId ?? "",
-              //     // paymentOption: orderController.selectedPaymentMethod.value,
-              //         paymentOption: "daily",
-              //     totalDays: orderController.selectedDays.value,
-              //     couponCode: orderController.appliedCouponCode.value,
-              //     deliveryAddress: {
-              //       "name": addresses.name,
-              //       "phoneNumber": addresses.phoneNumber,
-              //       "addressLine1": addresses.addressLine1,
-              //       "city": addresses.city,
-              //       "state": addresses.state,
-              //       "pincode": addresses.pincode,
-              //     },
-              //   );
-              // },
               onPressed: () {
                 orderController.placeOrder(
-                  productId: product!.id,
-                  variantId: selectVarientId ?? "",
-                  paymentOption: "daily",
+                  productId: widget.product!.id,
+                  variantId: widget.selectVarientId ?? "",
                   totalDays: orderController.selectedDays.value,
                   couponCode: orderController.appliedCouponCode.value,
                   deliveryAddress: {
-                    "name": addresses.name,
-                    "phoneNumber": addresses.phoneNumber,
-                    "addressLine1": addresses.addressLine1,
-                    "city": addresses.city,
-                    "state": addresses.state,
-                    "pincode": addresses.pincode,
+                    "name": widget.addresses.name,
+                    "phoneNumber": widget.addresses.phoneNumber,
+                    "addressLine1": widget.addresses.addressLine1,
+                    "city": widget.addresses.city,
+                    "state": widget.addresses.state,
+                    "pincode": widget.addresses.pincode,
                   },
                 );
               },
@@ -1091,7 +930,7 @@ class OrderDetailsScreen extends StatelessWidget {
                     }
 
                     // If enough balance → allow selection
-                    orderController.selectPaymentMethod("wallet");
+                    orderController.selectPaymentMethod(PaymentMethod.wallet);
                     Get.back();
                   },
                   child: Container(
@@ -1193,7 +1032,7 @@ class OrderDetailsScreen extends StatelessWidget {
             // ================= RAZORPAY OPTION =================
             Obx(() => GestureDetector(
                   onTap: () {
-                    orderController.selectPaymentMethod("razorpay");
+                    orderController.selectPaymentMethod(PaymentMethod.razorpay);
                     Get.back();
                   },
                   child: Container(

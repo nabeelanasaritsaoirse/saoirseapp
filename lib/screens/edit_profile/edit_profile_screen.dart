@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -63,15 +64,44 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: AppColors.grey,
-                          image: DecorationImage(
-                            image: localImage != null
-                                ? FileImage(localImage) as ImageProvider
-                                : (user!.profilePicture.isNotEmpty
-                                    ? NetworkImage(user.profilePicture)
-                                    : AssetImage(AppAssets.user_img)
-                                        as ImageProvider),
-                            fit: BoxFit.cover,
-                          ),
+                        ),
+                        child: ClipOval(
+                          child: localImage != null
+                              ? Image.file(
+                                  localImage,
+                                  fit: BoxFit.cover,
+                                  width: 120.w,
+                                  height: 120.w,
+                                )
+                              : (user!.profilePicture.isNotEmpty
+                                  ? Image.network(
+                                      user.profilePicture,
+                                      fit: BoxFit.cover,
+                                      width: 120.w,
+                                      height: 120.w,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Center(
+                                          child: CupertinoActivityIndicator(
+                                            radius: 10.0,
+                                            color: AppColors.textGray,
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (_, __, ___) => Image.asset(
+                                        AppAssets.user_img,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Image.asset(
+                                      AppAssets.user_img,
+                                      fit: BoxFit.cover,
+                                      width: 120.w,
+                                      height: 120.w,
+                                    )),
                         ),
                       );
                     }),

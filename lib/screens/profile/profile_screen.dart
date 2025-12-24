@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -99,10 +100,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             CircleAvatar(
                               radius: 42,
                               backgroundColor: Colors.grey.shade300,
-                              backgroundImage: user.profilePicture.isNotEmpty
-                                  ? NetworkImage(user.profilePicture)
-                                  : AssetImage(AppAssets.user_img)
-                                      as ImageProvider,
+                              child: user.profilePicture.isNotEmpty
+                                  ? ClipOval(
+                                      child: Image.network(
+                                        user.profilePicture,
+                                        fit: BoxFit.cover,
+                                        width: 84,
+                                        height: 84,
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
+                                          return Center(
+                                            child: CupertinoActivityIndicator(
+                                              radius: 10.0,
+                                              color: AppColors.textGray,
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (_, __, ___) =>
+                                            Image.asset(
+                                          AppAssets.user_img,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    )
+                                  : Image.asset(
+                                      AppAssets.user_img,
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
 
                             Positioned(

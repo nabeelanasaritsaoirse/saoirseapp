@@ -27,9 +27,10 @@ class HomeController extends GetxController {
   final SuccessStoryService successService = SuccessStoryService();
   final HomeBannerService bannerService = HomeBannerService();
 
-  final RxList<Product> mostPopularProducts = <Product>[].obs;
-  final RxList<Product> bestSellerProducts = <Product>[].obs;
-  final RxList<Product> trendingProducts = <Product>[].obs;
+  final Rxn<FeaturedList> popularList = Rxn<FeaturedList>();
+  final Rxn<FeaturedList> bestSellerList = Rxn<FeaturedList>();
+  final Rxn<FeaturedList> trendingList = Rxn<FeaturedList>();
+
   RxList<SuccessStoryItem> successStories = <SuccessStoryItem>[].obs;
   RxList<CategoryGroup> parentCategories = <CategoryGroup>[].obs;
 
@@ -42,9 +43,9 @@ class HomeController extends GetxController {
   // Fetch all products
   Future<void> fetchAllProducts() async {
     await Future.wait([
-      fetchPopularProducts(),
-      fetchBestSellerProducts(),
-      fetchTrendingProducts(),
+      fetchPopularList(),
+      fetchBestSellerList(),
+      fetchTrendingList(),
       fetchSuccessStories(),
       fetchHomeBanners(),
       fetchParentCategories(),
@@ -52,14 +53,14 @@ class HomeController extends GetxController {
   }
 
   // Fetch Popular Products
-  Future<void> fetchPopularProducts() async {
+  Future<void> fetchPopularList() async {
     try {
       popularLoading.value = true;
-      final products =
-          await HomeService.fetchPopularProducts(page: 1, limit: 10);
+      popularLoading.value = true;
+      final list = await HomeService.fetchPopularList(limit: 10);
 
-      if (products != null && products.isNotEmpty) {
-        mostPopularProducts.value = products;
+      if (list != null) {
+        popularList.value = list;
       }
     } catch (e) {
       log('Error fetching popular products: $e');
@@ -69,14 +70,13 @@ class HomeController extends GetxController {
   }
 
   // // Fetch Best Seller Products
-  Future<void> fetchBestSellerProducts() async {
+  Future<void> fetchBestSellerList() async {
     try {
       bestSellerLoading.value = true;
-      final products =
-          await HomeService.fetchBestSellerProducts(page: 1, limit: 10);
+      final list = await HomeService.fetchBestSellerList(limit: 10);
 
-      if (products != null && products.isNotEmpty) {
-        bestSellerProducts.value = products;
+      if (list != null) {
+        bestSellerList.value = list;
       }
     } catch (e) {
       log('Error fetching best seller products: $e');
@@ -86,14 +86,13 @@ class HomeController extends GetxController {
   }
 
   // Fetch Trending Products
-  Future<void> fetchTrendingProducts() async {
+  Future<void> fetchTrendingList() async {
     try {
       trendingLoading.value = true;
-      final products =
-          await HomeService.fetchTrendingProducts(page: 1, limit: 10);
+      final list = await HomeService.fetchTrendingList(limit: 10);
 
-      if (products != null && products.isNotEmpty) {
-        trendingProducts.value = products;
+      if (list != null) {
+        trendingList.value = list;
       }
     } catch (e) {
       log('Error fetching trending products: $e');

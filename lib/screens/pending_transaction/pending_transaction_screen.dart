@@ -6,6 +6,7 @@ import '../../constants/app_assets.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
+import '../my_wallet/my_wallet_controller.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
@@ -18,6 +19,8 @@ class PendingTransaction extends StatelessWidget {
   Widget build(BuildContext context) {
     final PendingTransactionController controller =
         Get.put(PendingTransactionController());
+
+    Get.put(MyWalletController(), permanent: true);
 
     return Scaffold(
       backgroundColor: AppColors.paperColor,
@@ -140,9 +143,13 @@ class PendingTransaction extends StatelessWidget {
             }),
           ),
 
-          //-------------------------------- BOTTOM TOTAL AMOUNT SECTION -------------------------------
-          Obx(
-            () => Container(
+//-------------------------------- BOTTOM TOTAL AMOUNT SECTION -------------------------------
+          Obx(() {
+            if (controller.transactions.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            return Container(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
               decoration: BoxDecoration(
                 color: AppColors.white,
@@ -178,7 +185,7 @@ class PendingTransaction extends StatelessWidget {
                   // Pay now button
                   appButton(
                     onTap: () {
-                      controller.payNow();
+                      controller.showPaymentMethodSheet();
                     },
                     child: Center(
                       child: appText(
@@ -197,8 +204,8 @@ class PendingTransaction extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );

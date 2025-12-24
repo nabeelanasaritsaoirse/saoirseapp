@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -153,10 +154,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   margin: EdgeInsets.symmetric(horizontal: 8.w),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12.r),
-                                    image: DecorationImage(
-                                      image: NetworkImage(imagePath),
-                                      fit: BoxFit.cover,
-                                    ),
                                     boxShadow: [
                                       BoxShadow(
                                         color: AppColors.lightBlack,
@@ -164,6 +161,34 @@ class _HomeScreenState extends State<HomeScreen> {
                                         offset: const Offset(0, 4),
                                       ),
                                     ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    child: Image.network(
+                                      imagePath,
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Center(
+                                          child: CupertinoActivityIndicator(
+                                            radius: 10.0,
+                                            color: AppColors.textGray,
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (_, __, ___) => Container(
+                                        color: Colors.grey.shade300,
+                                        child: Icon(
+                                          Icons.broken_image,
+                                          size: 40.sp,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 );
                               },
@@ -355,12 +380,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 205.h,
                   child: Obx(() {
+                    final list = homeController.popularList.value;
                     if (homeController.loading.value &&
-                        homeController.mostPopularProducts.isEmpty) {
+                        homeController.popularLoading.value) {
                       return Center(child: appLoader());
                     }
 
-                    if (homeController.mostPopularProducts.isEmpty) {
+                    if (list == null || list.products.isEmpty) {
                       return Center(
                         child: appText(
                           AppStrings.no_popular_products,
@@ -374,20 +400,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       scrollDirection: Axis.horizontal,
                       padding:
                           EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
-                      itemCount: homeController.mostPopularProducts.length,
+                      itemCount: list.products.length,
                       itemBuilder: (context, index) {
-                        final product =
-                            homeController.mostPopularProducts[index];
+                        final product = list.products[index];
                         return ProductCard(
                           productId: product.productId,
                           showFavorite: false,
-                          id: product.id,
+                          id: product.productMongoId,
                           name: product.name,
-                          image: product.images.isNotEmpty
-                              ? product.images[1].url
-                              : '',
+                          image: product.image,
                           brand: product.brand,
-                          price: product.price.toStringAsFixed(0),
+                          price: product.finalPrice.toStringAsFixed(0),
                           isFavorite: product.isFavorite,
                           margin: EdgeInsets.only(right: 12.w),
                         );
@@ -430,13 +453,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 85.h,
                   child: Obx(
                     () {
+                      final list = homeController.bestSellerList.value;
                       if (homeController.bestSellerLoading.value) {
                         return Center(
                           child: appLoader(),
                         );
                       }
 
-                      if (homeController.bestSellerProducts.isEmpty) {
+                      if (list == null || list.products.isEmpty) {
                         return Center(
                             child: appText(AppStrings.no_best_seller_products));
                       }
@@ -444,10 +468,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       return ListView.builder(
                         scrollDirection: Axis.horizontal,
                         padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        itemCount: homeController.bestSellerProducts.length,
+                        itemCount: list.products.length,
                         itemBuilder: (context, index) {
-                          final product =
-                              homeController.bestSellerProducts[index];
+                          final product = list.products[index];
 
                           return Padding(
                             padding: EdgeInsets.all(8.0.w),
@@ -455,7 +478,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               onTap: () => Get.to(
                                 ProductDetailsScreen(
                                   productId: product.productId,
-                                  id: product.id,
+                                  id: product.productMongoId,
                                 ),
                               ),
                               child: Container(
@@ -501,13 +524,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                           }
 
                                           return Center(
-                                            child: SizedBox(
-                                              width: 24.w,
-                                              height: 24.w,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                                color: Colors.grey,
-                                              ),
+                                            child: CupertinoActivityIndicator(
+                                              radius: 10.0,
+                                              color: AppColors.textGray,
                                             ),
                                           );
                                         },
@@ -528,7 +547,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                           appText(
                                             product.name,
                                             fontFamily: 'inter',
-                                            fontSize: 14.sp,
+                                            fontSize: 13.sp,
+                                            maxLines: 2,
+                                            textAlign: TextAlign.start,
                                             fontWeight: FontWeight.w600,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -586,12 +607,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 205.h,
                   child: Obx(() {
-                    if (homeController.loading.value &&
-                        homeController.trendingProducts.isEmpty) {
+                    final list = homeController.trendingList.value;
+                    if (homeController.trendingLoading.value) {
                       return Center(child: appLoader());
                     }
 
-                    if (homeController.trendingProducts.isEmpty) {
+                    if (list == null || list.products.isEmpty) {
                       return Center(
                         child: appText(
                           AppStrings.no_trending_products,
@@ -605,19 +626,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       scrollDirection: Axis.horizontal,
                       padding:
                           EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
-                      itemCount: homeController.trendingProducts.length,
+                      itemCount: list.products.length,
                       itemBuilder: (context, index) {
-                        final product = homeController.trendingProducts[index];
+                        final product = list.products[index];
                         return ProductCard(
                           productId: product.productId,
                           showFavorite: false,
-                          id: product.id,
+                          id: product.productMongoId,
                           name: product.name,
-                          image: product.images.isNotEmpty
-                              ? product.images[1].url
-                              : '',
+                          image: product.image,
                           brand: product.brand,
-                          price: product.price.toStringAsFixed(0),
+                          price: product.finalPrice.toStringAsFixed(0),
                           isFavorite: product.isFavorite,
                           margin: EdgeInsets.only(right: 12.w),
                         );
@@ -712,6 +731,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                               .size
                                               .width
                                               .w,
+
+                                          // 👇 Loading indicator
+                                          loadingBuilder: (context, child,
+                                              loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return Center(
+                                              child: CupertinoActivityIndicator(
+                                                radius: 10.0,
+                                                color: AppColors.textGray,
+                                              ),
+                                            );
+                                          },
 
                                           // 👇 If image not found → show simple grey container with icon
                                           errorBuilder: (_, __, ___) =>

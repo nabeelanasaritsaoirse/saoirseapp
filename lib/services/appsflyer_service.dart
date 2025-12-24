@@ -2,7 +2,7 @@ import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 
-import 'deep_link_navigation_service.dart';
+// import 'deep_link_navigation_service.dart';
 
 class AppsFlyerService {
   AppsFlyerService._internal();
@@ -68,7 +68,7 @@ class AppsFlyerService {
         final productId = uri.pathSegments.last;
 
         storage.write("pending_product_id", productId);
-        DeepLinkNavigationService.handleProductNavigation();
+        // DeepLinkNavigationService.handleProductNavigation();
       }
     });
 
@@ -84,7 +84,7 @@ class AppsFlyerService {
         final productId = uri.pathSegments.last;
 
         storage.write("pending_product_id", productId);
-        DeepLinkNavigationService.handleProductNavigation();
+        // DeepLinkNavigationService.handleProductNavigation();
 
         debugPrint("📦 Product deep link received (background): $productId");
       }

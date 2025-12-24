@@ -486,15 +486,11 @@ class _ReferralScreenState extends State<ReferralScreen> {
               color: AppColors.textBlack,
             ),
             Obx(() {
-              final count = controller.filteredReferrals.length;
-              return Align(
-                alignment: AlignmentGeometry.centerRight,
-                child: appText(
-                  "$count / 50",
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textGray,
-                ),
+              return appText(
+                "${controller.totalReferrals.value} / ${controller.referralLimit.value}",
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textGray,
               );
             }),
           ],
