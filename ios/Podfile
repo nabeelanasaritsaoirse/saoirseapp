@@ -64,12 +64,8 @@ post_install do |installer|
       end
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0' if needs_update
       
-      # 🔥 Swift 6 Configuration with relaxed concurrency checking
-      config.build_settings['SWIFT_VERSION'] = '6.0'
-      
-      # ✅ Disable strict concurrency checking for compatibility
-      config.build_settings['SWIFT_STRICT_CONCURRENCY'] = 'minimal'
-      config.build_settings['SWIFT_UPCOMING_FEATURE_CONCURRENCY_CHECKING'] = 'NO'
+      # ✅ Swift 5.0 - Works with all plugins
+      config.build_settings['SWIFT_VERSION'] = '5.0'
     end
   end
 end
