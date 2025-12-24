@@ -1,9 +1,9 @@
 name: 🍎 iOS Native Debug 
 
-on:
-  push:
-    branches:
-      - DEPLOY
+# on:
+#   push:
+#     branches:
+#       - DEPLOY
 jobs:
   ios-native-debug:
     runs-on: macos-15
