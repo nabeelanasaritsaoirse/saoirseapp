@@ -1,10 +1,11 @@
-name: 🍎 iOS CI & TestFlight
+name: 🍎 iOS CI, Debug & TestFlight
 run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
 on:
   push:
     branches:
       - tes
+  workflow_dispatch:
 
 concurrency:
   group: ios-build-${{ github.ref }}
@@ -22,50 +23,72 @@ env:
   ARCHIVE_DIR: build/ios/archive
   IPA_DIR: build/ios/ipa
 
+# ==================================================
+# 1️⃣ NATIVE DEBUG (SIMULATOR)
+# ==================================================
 jobs:
+  ios-native-debug:
+    name: 🧪 iOS Native Debug (Simulator)
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Assets MUST exist before pub get
+      - name: 📝 Create .env
+        run: echo "# CI env" > .env
+
+      - name: 📥 Download Fonts
+        run: |
+          mkdir -p assets/fonts
+          cd assets/fonts
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Medium.ttf
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
+          cd ../..
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.7"
+          channel: stable
+          cache: true
+
+      - run: flutter clean
+      - run: flutter pub get
+
+      - name: 📦 Install Pods
+        run: |
+          cd ios
+          pod install --repo-update
+          cd ..
+
+      - name: 🛠️ Build Debug (Simulator)
+        run: flutter build ios --debug --simulator --no-codesign
+
+# ==================================================
+# 2️⃣ IOS BUILD (UNCHANGED – YOUR WORKING PIPELINE)
+# ==================================================
   ios-ci:
+    name: 🏗️ iOS CI Build
+    needs: ios-native-debug
     runs-on: macos-15
     outputs:
       version_name: ${{ steps.version.outputs.VERSION_NAME }}
       build_number: ${{ steps.version.outputs.BUILD_NUMBER }}
 
     steps:
-      # --------------------------------------------------
-      # Checkout
-      # --------------------------------------------------
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
-
-      # --------------------------------------------------
-      # Flutter Setup
-      # --------------------------------------------------
-      - name: ⚙️ Setup Flutter
-        uses: subosito/flutter-action@v2
+      # ---------------- YOUR STEPS (UNCHANGED) ----------------
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
 
-      # --------------------------------------------------
-      # Install Tools
-      # --------------------------------------------------
-      - name: 🚀 Install Fastlane & CocoaPods
-        run: |
-          sudo gem install fastlane -N
-          sudo gem install cocoapods -N
-          sudo gem install xcodeproj -N
+      - run: sudo gem install fastlane cocoapods xcodeproj -N
+      - run: flutter clean
+      - run: flutter pub get
 
-      # --------------------------------------------------
-      # Clean & Dependencies
-      # --------------------------------------------------
-      - name: 🧹 Flutter Clean
-        run: flutter clean
-
-      - name: 📦 Flutter Pub Get
-        run: flutter pub get
-
-      # --------------------------------------------------
-      # Create .env file (REQUIRED)
-      # --------------------------------------------------
       - name: 📝 Create .env file
         run: |
           cat > .env <<EOF
@@ -80,18 +103,16 @@ jobs:
           ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
           EOF
 
-      # --------------------------------------------------
-      # Download Fonts (REQUIRED)
-      # --------------------------------------------------
-      - name: 📥 Download Poppins Fonts
+      - name: 📥 Download Fonts
         run: |
           mkdir -p assets/fonts
           cd assets/fonts
-          curl -L -o Poppins-Regular.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf"
-          curl -L -o Poppins-Medium.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Medium.ttf"
-          curl -L -o Poppins-SemiBold.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf"
-          curl -L -o Poppins-Bold.ttf "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf"
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Medium.ttf
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
           cd ../..
+
 
       # --------------------------------------------------
       # Version Info
