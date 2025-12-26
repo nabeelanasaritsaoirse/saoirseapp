@@ -155,8 +155,7 @@ class OrderCard extends StatelessWidget {
                       SizedBox(height: 8.h),
                       _textSpan('Order ID : ', order.id),
                       SizedBox(height: 8.h),
-                      _textSpan(
-                          'Invested : ', '${order.currency} ${order.invested}'),
+                      _textSpan('Invested : ', '₹${order.invested}'),
                     ],
                   ),
                 ),
