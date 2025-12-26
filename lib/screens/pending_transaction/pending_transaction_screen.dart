@@ -98,6 +98,8 @@ class PendingTransaction extends StatelessWidget {
                                   children: [
                                     appText(
                                       item.productName,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                       fontSize: 16.sp,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.textBlack,
