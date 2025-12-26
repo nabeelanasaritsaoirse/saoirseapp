@@ -9,7 +9,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 import 'package:http/http.dart' as http;
 
 class APIService {
@@ -26,82 +25,92 @@ class APIService {
     Map<String, String>? headers,
     int timeoutSeconds = 15,
   }) async {
-    try {
-      log("POST: $url");
-      debugPrint("BODY: $body", wrapWidth: 1024);
+    const int maxRetries = 5;
 
-      final response = await http
-          .post(
-            Uri.parse(url),
-            body: jsonEncode(body),
-            headers: headers ?? {"Content-Type": "application/json"},
-          )
-          .timeout(Duration(seconds: timeoutSeconds));
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        log("POST Attempt $attempt/$maxRetries: $url");
+        debugPrint("BODY: $body", wrapWidth: 1024);
 
-      log("Response [${response.statusCode}]: ${response.body}");
+        final response = await http
+            .post(
+              Uri.parse(url),
+              body: jsonEncode(body),
+              headers: headers ?? {"Content-Type": "application/json"},
+            )
+            .timeout(Duration(seconds: timeoutSeconds));
 
-      switch (response.statusCode) {
-        case 200:
-        case 201:
-          final data = jsonDecode(response.body);
-          if (data is! Map<String, dynamic>) {
-            log("Invalid response format received from server.");
+        log("Response [${response.statusCode}]: ${response.body}");
+
+        switch (response.statusCode) {
+          case 200:
+          case 201:
+            final data = jsonDecode(response.body);
+            if (data is! Map<String, dynamic>) {
+              log("Invalid response format received from server.");
+              return null;
+            }
+            return onSuccess(data); // ✅ stop retry on success
+
+          case 204:
+            log("No data available (204).");
             return null;
-          }
-          return onSuccess(data);
 
-        case 204:
-          log("No data available (204).");
-          return null;
+          case 400:
+            log("Bad Request (400): ${response.body}");
+            return jsonDecode(response.body);
 
-        case 400:
-          log("Bad Request (400): ${response.body}");
-          return jsonDecode(response.body);
+          case 401:
+            log("Unauthorized (401).");
+            return null;
 
-        case 401:
-          log("Unauthorized (401).");
-          return null;
+          case 403:
+            log("Forbidden (403).");
+            return null;
 
-        case 403:
-          log("Forbidden (403).");
-          return null;
+          case 404:
+            log("Route / Resource not found (404).");
+            return null;
 
-        case 404:
-          log("Route / Resource not found (404).");
-          return null;
+          case 408:
+            log("Request Timeout (408). Retrying...");
+            break;
 
-        case 408:
-          log("Request Timeout (408).");
-          return null;
+          case 429:
+            log("Too Many Requests (429). Retrying...");
+            break;
 
-        case 429:
-          log("Too Many Requests (429).");
-          return null;
-
-        default:
-          if (response.statusCode >= 500) {
-            log("Server Error (${response.statusCode}).");
-          } else {
-            log("Unexpected Error (${response.statusCode}).");
-          }
-          return null;
+          default:
+            if (response.statusCode >= 500) {
+              log("Server Error (${response.statusCode}). Retrying...");
+              break;
+            } else {
+              log("Unexpected Error (${response.statusCode}).");
+              return null;
+            }
+        }
+      } on SocketException {
+        log("No internet connection. Retrying...");
+      } on TimeoutException {
+        log("POST request timed out. Retrying...");
+      } on FormatException {
+        log("Invalid response format.");
+        return null;
+      } on http.ClientException catch (e) {
+        log("Network error: $e. Retrying...");
+      } catch (e) {
+        log("Unexpected error: ${e.toString()}");
+        return null;
       }
-    } on SocketException {
-      log("No internet connection.");
-      return null;
-    } on FormatException {
-      log("Invalid response format.");
-      return null;
-    } on TimeoutException {
-      log("POST request timed out.");
-      return null;
-    } on http.ClientException catch (e) {
-      log("Network error: $e");
-      return null;
-    } catch (e) {
-      log("Unexpected error: ${e.toString()}");
-      return null;
+
+      // ⏳ delay before next retry
+      if (attempt < maxRetries) {
+        await Future.delayed(const Duration(seconds: 1));
+      }
     }
+
+    log("POST request failed after $maxRetries attempts.");
+    return null;
   }
 
   // ---------------------------------------------------------------------------
@@ -114,79 +123,90 @@ class APIService {
     Map<String, String>? headers,
     int timeoutSeconds = 15,
   }) async {
-    try {
-      log("GET: $url");
+    const int maxRetries = 5;
 
-      final response = await http
-          .get(
-            Uri.parse(url),
-            headers: headers ?? {"Content-Type": "application/json"},
-          )
-          .timeout(Duration(seconds: timeoutSeconds));
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        log("GET Attempt $attempt/$maxRetries: $url");
 
-      log("Response [${response.statusCode}]: ${response.body}");
+        final response = await http
+            .get(
+              Uri.parse(url),
+              headers: headers ?? {"Content-Type": "application/json"},
+            )
+            .timeout(Duration(seconds: timeoutSeconds));
 
-      switch (response.statusCode) {
-        case 200:
-        case 201:
-          final data = jsonDecode(response.body);
-          if (data is Map<String, dynamic>) return onSuccess(data);
+        log("Response [${response.statusCode}]: ${response.body}");
 
-          log("Invalid JSON response format.");
-          return null;
+        switch (response.statusCode) {
+          case 200:
+          case 201:
+            final data = jsonDecode(response.body);
+            if (data is Map<String, dynamic>) {
+              return onSuccess(data); // ✅ stop retry on success
+            }
+            log("Invalid JSON response format.");
+            return null;
 
-        case 204:
-          log("No data available (204).");
-          return null;
+          case 204:
+            log("No data available (204).");
+            return null;
 
-        case 400:
-          log("Bad Request (400).");
-          return null;
+          case 400:
+            log("Bad Request (400).");
+            return null;
 
-        case 401:
-          log("Unauthorized (401).");
-          return null;
+          case 401:
+            log("Unauthorized (401).");
+            return null;
 
-        case 403:
-          log("Forbidden (403).");
-          return null;
+          case 403:
+            log("Forbidden (403).");
+            return null;
 
-        case 404:
-          log("Resource not found (404).");
-          return null;
+          case 404:
+            log("Resource not found (404).");
+            return null;
 
-        case 408:
-          log("Request Timeout (408).");
-          return null;
+          case 408:
+            log("Request Timeout (408). Retrying...");
+            break;
 
-        case 429:
-          log("Too Many Requests (429).");
-          return null;
+          case 429:
+            log("Too Many Requests (429). Retrying...");
+            break;
 
-        default:
-          if (response.statusCode >= 500) {
-            log("Server Error (${response.statusCode}).");
-          } else {
-            log("Unexpected Error (${response.statusCode}).");
-          }
-          return null;
+          default:
+            if (response.statusCode >= 500) {
+              log("Server Error (${response.statusCode}). Retrying...");
+              break;
+            } else {
+              log("Unexpected Error (${response.statusCode}).");
+              return null;
+            }
+        }
+      } on SocketException {
+        log("No internet connection. Retrying...");
+      } on TimeoutException {
+        log("GET request timed out. Retrying...");
+      } on FormatException {
+        log("Invalid response format.");
+        return null;
+      } on http.ClientException catch (e) {
+        log("Network error: $e. Retrying...");
+      } catch (e) {
+        log("Unexpected error: ${e.toString()}");
+        return null;
       }
-    } on SocketException {
-      log("No internet connection.");
-      return null;
-    } on FormatException {
-      log("Invalid response format.");
-      return null;
-    } on TimeoutException {
-      log("GET request timed out.");
-      return null;
-    } on http.ClientException catch (e) {
-      log("Network error: $e");
-      return null;
-    } catch (e) {
-      log("Unexpected error: ${e.toString()}");
-      return null;
+
+      // ⏳ delay before next retry
+      if (attempt < maxRetries) {
+        await Future.delayed(const Duration(seconds: 1));
+      }
     }
+
+    log("GET request failed after $maxRetries attempts.");
+    return null;
   }
 
   // ---------------------------------------------------------------------------
@@ -200,82 +220,92 @@ class APIService {
     Map<String, String>? headers,
     int timeoutSeconds = 15,
   }) async {
-    try {
-      log("PUT: $url");
-      log("BODY: $body");
+    const int maxRetries = 5;
 
-      final response = await http
-          .put(
-            Uri.parse(url),
-            body: jsonEncode(body),
-            headers: headers ?? {"Content-Type": "application/json"},
-          )
-          .timeout(Duration(seconds: timeoutSeconds));
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        log("PUT Attempt $attempt/$maxRetries: $url");
+        log("BODY: $body");
 
-      log("Response [${response.statusCode}]: ${response.body}");
+        final response = await http
+            .put(
+              Uri.parse(url),
+              body: jsonEncode(body),
+              headers: headers ?? {"Content-Type": "application/json"},
+            )
+            .timeout(Duration(seconds: timeoutSeconds));
 
-      switch (response.statusCode) {
-        case 200:
-        case 201:
-          final data = jsonDecode(response.body);
-          if (data is! Map<String, dynamic>) {
-            log("Invalid response format from server.");
+        log("Response [${response.statusCode}]: ${response.body}");
+
+        switch (response.statusCode) {
+          case 200:
+          case 201:
+            final data = jsonDecode(response.body);
+            if (data is! Map<String, dynamic>) {
+              log("Invalid response format from server.");
+              return null;
+            }
+            return onSuccess(data); // ✅ stop retry on success
+
+          case 204:
+            log("No content (204).");
             return null;
-          }
-          return onSuccess(data);
 
-        case 204:
-          log("No content (204).");
-          return null;
+          case 400:
+            log("Bad Request (400).");
+            return null;
 
-        case 400:
-          log("Bad Request (400).");
-          return null;
+          case 401:
+            log("Unauthorized (401).");
+            return null;
 
-        case 401:
-          log("Unauthorized (401).");
-          return null;
+          case 403:
+            log("Forbidden (403).");
+            return null;
 
-        case 403:
-          log("Forbidden (403).");
-          return null;
+          case 404:
+            log("Resource not found (404).");
+            return null;
 
-        case 404:
-          log("Resource not found (404).");
-          return null;
+          case 408:
+            log("Request Timeout (408). Retrying...");
+            break;
 
-        case 408:
-          log("Request Timeout (408).");
-          return null;
+          case 429:
+            log("Too Many Requests (429). Retrying...");
+            break;
 
-        case 429:
-          log("Too Many Requests (429).");
-          return null;
-
-        default:
-          if (response.statusCode >= 500) {
-            log("Server Error (${response.statusCode}).");
-          } else {
-            log("Unexpected Error (${response.statusCode}).");
-          }
-          return null;
+          default:
+            if (response.statusCode >= 500) {
+              log("Server Error (${response.statusCode}). Retrying...");
+              break;
+            } else {
+              log("Unexpected Error (${response.statusCode}).");
+              return null;
+            }
+        }
+      } on SocketException {
+        log("No internet connection. Retrying...");
+      } on TimeoutException {
+        log("PUT request timed out. Retrying...");
+      } on FormatException {
+        log("Invalid response format.");
+        return null;
+      } on http.ClientException catch (e) {
+        log("Network error: $e. Retrying...");
+      } catch (e) {
+        log("Unexpected error: ${e.toString()}");
+        return null;
       }
-    } on SocketException {
-      log("No internet connection.");
-      return null;
-    } on FormatException {
-      log("Invalid response format.");
-      return null;
-    } on TimeoutException {
-      log("PUT request timed out.");
-      return null;
-    } on http.ClientException catch (e) {
-      log("Network error: $e");
-      return null;
-    } catch (e) {
-      log("Unexpected error: ${e.toString()}");
-      return null;
+
+      // ⏳ delay before next retry
+      if (attempt < maxRetries) {
+        await Future.delayed(const Duration(seconds: 1));
+      }
     }
+
+    log("PUT request failed after $maxRetries attempts.");
+    return null;
   }
 
   // ---------------------------------------------------------------------------
@@ -289,83 +319,95 @@ class APIService {
     Map<String, String>? headers,
     int timeoutSeconds = 15,
   }) async {
-    try {
-      log("DELETE: $url");
-      if (body != null) debugPrint("BODY: $body", wrapWidth: 1024);
+    const int maxRetries = 5;
 
-      final request = http.Request('DELETE', Uri.parse(url));
-      request.headers.addAll(headers ?? {"Content-Type": "application/json"});
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        log("DELETE Attempt $attempt/$maxRetries: $url");
+        if (body != null) debugPrint("BODY: $body", wrapWidth: 1024);
 
-      if (body != null) request.body = jsonEncode(body);
+        final request = http.Request('DELETE', Uri.parse(url));
+        request.headers.addAll(headers ?? {"Content-Type": "application/json"});
 
-      final response = await http.Response.fromStream(
-        await request.send().timeout(Duration(seconds: timeoutSeconds)),
-      );
+        if (body != null) request.body = jsonEncode(body);
 
-      log("Response [${response.statusCode}]: ${response.body}");
+        final response = await http.Response.fromStream(
+          await request.send().timeout(Duration(seconds: timeoutSeconds)),
+        );
 
-      switch (response.statusCode) {
-        case 200:
-        case 201:
-        case 202:
-        case 204:
-          if (response.body.isEmpty) return onSuccess({});
-          final data = jsonDecode(response.body);
+        log("Response [${response.statusCode}]: ${response.body}");
 
-          if (data is! Map<String, dynamic>) {
-            log("Invalid server response format.");
+        switch (response.statusCode) {
+          case 200:
+          case 201:
+          case 202:
+          case 204:
+            if (response.body.isEmpty) {
+              return onSuccess({}); // ✅ stop retry on success
+            }
+
+            final data = jsonDecode(response.body);
+            if (data is! Map<String, dynamic>) {
+              log("Invalid server response format.");
+              return null;
+            }
+            return onSuccess(data); // ✅ stop retry on success
+
+          case 400:
+            log("Bad Request (400).");
             return null;
-          }
-          return onSuccess(data);
 
-        case 400:
-          log("Bad Request (400).");
-          return null;
+          case 401:
+            log("Unauthorized (401).");
+            return null;
 
-        case 401:
-          log("Unauthorized (401).");
-          return null;
+          case 403:
+            log("Forbidden (403).");
+            return null;
 
-        case 403:
-          log("Forbidden (403).");
-          return null;
+          case 404:
+            log("Resource not found (404).");
+            return null;
 
-        case 404:
-          log("Resource not found (404).");
-          return null;
+          case 408:
+            log("Timeout (408). Retrying...");
+            break;
 
-        case 408:
-          log("Timeout (408).");
-          return null;
+          case 429:
+            log("Too Many Requests (429). Retrying...");
+            break;
 
-        case 429:
-          log("Too Many Requests (429).");
-          return null;
-
-        default:
-          if (response.statusCode >= 500) {
-            log("Server Error (${response.statusCode}).");
-          } else {
-            log("Unexpected Error (${response.statusCode}).");
-          }
-          return null;
+          default:
+            if (response.statusCode >= 500) {
+              log("Server Error (${response.statusCode}). Retrying...");
+              break;
+            } else {
+              log("Unexpected Error (${response.statusCode}).");
+              return null;
+            }
+        }
+      } on SocketException {
+        log("No internet connection. Retrying...");
+      } on TimeoutException {
+        log("DELETE request timed out. Retrying...");
+      } on FormatException {
+        log("Invalid response format.");
+        return null;
+      } on http.ClientException catch (e) {
+        log("Network error: $e. Retrying...");
+      } catch (e) {
+        log("Unexpected error: ${e.toString()}");
+        return null;
       }
-    } on SocketException {
-      log("No internet connection.");
-      return null;
-    } on FormatException {
-      log("Invalid response format.");
-      return null;
-    } on TimeoutException {
-      log("DELETE request timed out.");
-      return null;
-    } on http.ClientException catch (e) {
-      log("Network error: $e");
-      return null;
-    } catch (e) {
-      log("Unexpected error: ${e.toString()}");
-      return null;
+
+      // ⏳ delay before next retry
+      if (attempt < maxRetries) {
+        await Future.delayed(const Duration(seconds: 1));
+      }
     }
+
+    log("DELETE request failed after $maxRetries attempts.");
+    return null;
   }
 
   // ---------------------------------------------------------------------------
@@ -397,54 +439,43 @@ class APIService {
   // Handles image file uploads using POST/PUT.
   // ---------------------------------------------------------------------------
   static Future<http.Response?> uploadImageRequest({
-  required String url,
-  required String method,
-  required http.MultipartFile file,
-  Map<String, String>? headers,
-  Map<String, String>? body,
-  int timeoutSeconds = 20,
-}) async {
-  try {
-    // 🔥 ACTUALLY USE THE PUT METHOD
-    var request = http.MultipartRequest(method, Uri.parse(url));
+    required String url,
+    required String method,
+    required http.MultipartFile file,
+    Map<String, String>? headers,
+    Map<String, String>? body,
+    int timeoutSeconds = 20,
+  }) async {
+    try {
+      // 🔥 ACTUALLY USE THE PUT METHOD
+      var request = http.MultipartRequest(method, Uri.parse(url));
 
-    request.files.add(file);
+      request.files.add(file);
 
-    if (headers != null) {
-      request.headers.addAll({
-        ...headers,
-        "Accept": "application/json",
-      });
+      if (headers != null) {
+        request.headers.addAll({
+          ...headers,
+          "Accept": "application/json",
+        });
+      }
+
+      if (body != null) request.fields.addAll(body);
+
+      var streamedResponse =
+          await request.send().timeout(Duration(seconds: timeoutSeconds));
+
+      var response = await http.Response.fromStream(streamedResponse);
+
+      log("Image Upload Response: ${response.statusCode}");
+      log("BODY: ${response.body}");
+
+      return response;
+    } catch (e) {
+      log("UPLOAD ERROR => $e");
+      return null;
     }
-
-    if (body != null) request.fields.addAll(body);
-
-    var streamedResponse =
-        await request.send().timeout(Duration(seconds: timeoutSeconds));
-
-    var response = await http.Response.fromStream(streamedResponse);
-
-    log("Image Upload Response: ${response.statusCode}");
-    log("BODY: ${response.body}");
-
-    return response;
-  } catch (e) {
-    log("UPLOAD ERROR => $e");
-    return null;
   }
 }
-
-}
-
-
-
-
-
-
-
-
-
-
 
 // // ignore_for_file: unrelated_type_equality_checks
 

@@ -39,45 +39,44 @@ class CartService {
 
   // Add item to cart
   Future<AddToCartResponse?> addToCart({
-  required String productId,
-  required String? variantId,
-  required int totalDays,
-  required double dailyAmount,
-  int quantity = 1,
-}) async {
-  try {
-    final url = "${AppURLs.ADD_TO_CART}$productId";
+    required String productId,
+    required String? variantId,
+    required int totalDays,
+    required double dailyAmount,
+    int quantity = 1,
+  }) async {
+    try {
+      final url = "${AppURLs.ADD_TO_CART}$productId";
 
-  final body = {
-  "quantity": quantity,
-  "variantId": variantId,
-  "installmentPlan": {
-    "totalDays": totalDays,
-    "dailyAmount": dailyAmount,
+      final body = {
+        "quantity": quantity,
+        "variantId": variantId,
+        "installmentPlan": {
+          "totalDays": totalDays,
+          "dailyAmount": dailyAmount,
+        }
+      };
+
+      log("Cart passing body ===. $body");
+
+      final response = await APIService.postRequest(
+        url: url,
+        body: body,
+        onSuccess: (json) => json,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response == null) return null;
+
+      return AddToCartResponse.fromJson(response);
+    } catch (e) {
+      print("Add to cart error: $e");
+      return null;
+    }
   }
-};
-    
-    log("Cart passing body ===. $body");
-
-    final response = await APIService.postRequest(
-      url: url,
-      body: body,
-      onSuccess: (json) => json,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-    );
-
-    if (response == null) return null;
-
-    return AddToCartResponse.fromJson(response);
-  } catch (e) {
-    print("Add to cart error: $e");
-    return null;
-  }
-}
-
 
   // Clear cart
   Future<bool> clearCart() async {
