@@ -32,6 +32,7 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+      
       - name: 📝 Create .env (Debug Safe)
         run: |
           cat > .env <<EOF
@@ -44,6 +45,7 @@ jobs:
           ANDROID_MESSAGING_SENDER_ID=dummy
           ANDROID_PROJECT_ID=dummy
           EOF
+          
       - name: 📥 Download Fonts
         run: |
           mkdir -p assets/fonts
@@ -53,25 +55,30 @@ jobs:
           curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf
           curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
           cd ../..
+          
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
+          
       - run: flutter clean
+      
       - run: flutter pub get
+      
       - name: 📦 Install Pods
         run: |
           cd ios
           pod install --repo-update
           cd ..
+          
       - name: 🛠️ Build Debug (Simulator)
         run: flutter build ios --simulator --no-codesign
+        
       - name: 🤖 Run on Simulator
         run: |
           xcrun simctl list
-          xcrun simctl boot "iPhone 15"
-          flutter run -d "iPhone 15" --debug
-
+          xcrun simctl boot "iPhone 11"
+          flutter run -d "iPhone 11" --debug
 # ==================================================
 # 2️⃣ IOS BUILD (UNCHANGED – YOUR WORKING PIPELINE)
 # ==================================================
