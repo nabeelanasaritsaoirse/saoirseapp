@@ -65,6 +65,32 @@ jobs:
   
       - run: flutter clean
       - run: flutter pub get
+
+      - name: 🔧 Configure iOS 16 for Debug
+        run: |
+          # Update project settings
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 16.0;/g' ios/Runner.xcodeproj/project.pbxproj
+          
+          # Update Podfile platform
+          sed -i '' "s/platform :ios, '[0-9.]\+'/platform :ios, '16.0'/g" ios/Podfile
+          
+          # Force Debug.xcconfig to 16.0
+          echo "IPHONEOS_DEPLOYMENT_TARGET = 16.0" >> ios/Flutter/Debug.xcconfig
+          
+          # Ensure Podfile has the post_install hook to force pods to 16.0
+          if ! grep -q "config.build_settings\['IPHONEOS_DEPLOYMENT_TARGET'\] = '16.0'" ios/Podfile; then
+            cat >> ios/Podfile <<'RUBY'
+          
+          post_install do |installer|
+            installer.pods_project.targets.each do |target|
+              flutter_additional_ios_build_settings(target)
+              target.build_configurations.each do |config|
+                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+              end
+            end
+          end
+          RUBY
+          fi
   
       - name: 🔥 Create GoogleService-Info.plist
         run: |
