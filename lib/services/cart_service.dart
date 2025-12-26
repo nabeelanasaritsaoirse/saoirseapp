@@ -17,6 +17,7 @@ class CartService {
   final token = storage.read(AppConst.ACCESS_TOKEN);
 
   Future<CartResponse?> fetchCart() async {
+    
     final url = AppURLs.GET_FULL_CART;
     try {
       final response = await APIService.getRequest(

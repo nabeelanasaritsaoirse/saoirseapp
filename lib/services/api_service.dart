@@ -20,14 +20,17 @@ class APIService {
   // Sends a POST request with JSON body and handles all common status codes.
   // ---------------------------------------------------------------------------
   static Future<T?> postRequest<T>({
-    required String url,
-    Map<String, dynamic>? body,
-    required T Function(Map<String, dynamic>) onSuccess,
-    Map<String, String>? headers,
-    int timeoutSeconds = 15,
-  }) async {
+  required String url,
+  Map<String, dynamic>? body,
+  required T Function(Map<String, dynamic>) onSuccess,
+  Map<String, String>? headers,
+  int timeoutSeconds = 15,
+}) async {
+  const int maxRetries = 5;
+
+  for (int attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      log("POST: $url");
+      log("POST Attempt $attempt/$maxRetries: $url");
       debugPrint("BODY: $body", wrapWidth: 1024);
 
       final response = await http
@@ -48,7 +51,7 @@ class APIService {
             log("Invalid response format received from server.");
             return null;
           }
-          return onSuccess(data);
+          return onSuccess(data); // ✅ stop retry on success
 
         case 204:
           log("No data available (204).");
@@ -71,51 +74,62 @@ class APIService {
           return null;
 
         case 408:
-          log("Request Timeout (408).");
-          return null;
+          log("Request Timeout (408). Retrying...");
+          break;
 
         case 429:
-          log("Too Many Requests (429).");
-          return null;
+          log("Too Many Requests (429). Retrying...");
+          break;
 
         default:
           if (response.statusCode >= 500) {
-            log("Server Error (${response.statusCode}).");
+            log("Server Error (${response.statusCode}). Retrying...");
+            break;
           } else {
             log("Unexpected Error (${response.statusCode}).");
+            return null;
           }
-          return null;
       }
     } on SocketException {
-      log("No internet connection.");
-      return null;
+      log("No internet connection. Retrying...");
+    } on TimeoutException {
+      log("POST request timed out. Retrying...");
     } on FormatException {
       log("Invalid response format.");
       return null;
-    } on TimeoutException {
-      log("POST request timed out.");
-      return null;
     } on http.ClientException catch (e) {
-      log("Network error: $e");
-      return null;
+      log("Network error: $e. Retrying...");
     } catch (e) {
       log("Unexpected error: ${e.toString()}");
       return null;
     }
+
+    // ⏳ delay before next retry
+    if (attempt < maxRetries) {
+      await Future.delayed(const Duration(seconds: 1));
+    }
   }
+
+  log("POST request failed after $maxRetries attempts.");
+  return null;
+}
+
 
   // ---------------------------------------------------------------------------
   // GET REQUEST
   // Sends a GET request and processes JSON response with status code handling.
   // ---------------------------------------------------------------------------
   static Future<T?> getRequest<T>({
-    required String url,
-    required T Function(Map<String, dynamic>) onSuccess,
-    Map<String, String>? headers,
-    int timeoutSeconds = 15,
-  }) async {
+  required String url,
+  required T Function(Map<String, dynamic>) onSuccess,
+  Map<String, String>? headers,
+  int timeoutSeconds = 15,
+}) async {
+  const int maxRetries = 5;
+
+  for (int attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      log("GET: $url");
+      log("GET Attempt $attempt/$maxRetries: $url");
 
       final response = await http
           .get(
@@ -130,8 +144,9 @@ class APIService {
         case 200:
         case 201:
           final data = jsonDecode(response.body);
-          if (data is Map<String, dynamic>) return onSuccess(data);
-
+          if (data is Map<String, dynamic>) {
+            return onSuccess(data); // ✅ stop retry on success
+          }
           log("Invalid JSON response format.");
           return null;
 
@@ -156,52 +171,63 @@ class APIService {
           return null;
 
         case 408:
-          log("Request Timeout (408).");
-          return null;
+          log("Request Timeout (408). Retrying...");
+          break;
 
         case 429:
-          log("Too Many Requests (429).");
-          return null;
+          log("Too Many Requests (429). Retrying...");
+          break;
 
         default:
           if (response.statusCode >= 500) {
-            log("Server Error (${response.statusCode}).");
+            log("Server Error (${response.statusCode}). Retrying...");
+            break;
           } else {
             log("Unexpected Error (${response.statusCode}).");
+            return null;
           }
-          return null;
       }
     } on SocketException {
-      log("No internet connection.");
-      return null;
+      log("No internet connection. Retrying...");
+    } on TimeoutException {
+      log("GET request timed out. Retrying...");
     } on FormatException {
       log("Invalid response format.");
       return null;
-    } on TimeoutException {
-      log("GET request timed out.");
-      return null;
     } on http.ClientException catch (e) {
-      log("Network error: $e");
-      return null;
+      log("Network error: $e. Retrying...");
     } catch (e) {
       log("Unexpected error: ${e.toString()}");
       return null;
     }
+
+    // ⏳ delay before next retry
+    if (attempt < maxRetries) {
+      await Future.delayed(const Duration(seconds: 1));
+    }
   }
+
+  log("GET request failed after $maxRetries attempts.");
+  return null;
+}
+
 
   // ---------------------------------------------------------------------------
   // PUT REQUEST
   // Updates data on server using PUT and handles all major response codes.
   // ---------------------------------------------------------------------------
-  static Future<T?> putRequest<T>({
-    required String url,
-    required Map<String, dynamic> body,
-    required T Function(Map<String, dynamic>) onSuccess,
-    Map<String, String>? headers,
-    int timeoutSeconds = 15,
-  }) async {
+ static Future<T?> putRequest<T>({
+  required String url,
+  required Map<String, dynamic> body,
+  required T Function(Map<String, dynamic>) onSuccess,
+  Map<String, String>? headers,
+  int timeoutSeconds = 15,
+}) async {
+  const int maxRetries = 5;
+
+  for (int attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      log("PUT: $url");
+      log("PUT Attempt $attempt/$maxRetries: $url");
       log("BODY: $body");
 
       final response = await http
@@ -222,7 +248,7 @@ class APIService {
             log("Invalid response format from server.");
             return null;
           }
-          return onSuccess(data);
+          return onSuccess(data); // ✅ stop retry on success
 
         case 204:
           log("No content (204).");
@@ -245,52 +271,63 @@ class APIService {
           return null;
 
         case 408:
-          log("Request Timeout (408).");
-          return null;
+          log("Request Timeout (408). Retrying...");
+          break;
 
         case 429:
-          log("Too Many Requests (429).");
-          return null;
+          log("Too Many Requests (429). Retrying...");
+          break;
 
         default:
           if (response.statusCode >= 500) {
-            log("Server Error (${response.statusCode}).");
+            log("Server Error (${response.statusCode}). Retrying...");
+            break;
           } else {
             log("Unexpected Error (${response.statusCode}).");
+            return null;
           }
-          return null;
       }
     } on SocketException {
-      log("No internet connection.");
-      return null;
+      log("No internet connection. Retrying...");
+    } on TimeoutException {
+      log("PUT request timed out. Retrying...");
     } on FormatException {
       log("Invalid response format.");
       return null;
-    } on TimeoutException {
-      log("PUT request timed out.");
-      return null;
     } on http.ClientException catch (e) {
-      log("Network error: $e");
-      return null;
+      log("Network error: $e. Retrying...");
     } catch (e) {
       log("Unexpected error: ${e.toString()}");
       return null;
     }
+
+    // ⏳ delay before next retry
+    if (attempt < maxRetries) {
+      await Future.delayed(const Duration(seconds: 1));
+    }
   }
+
+  log("PUT request failed after $maxRetries attempts.");
+  return null;
+}
+
 
   // ---------------------------------------------------------------------------
   // DELETE REQUEST
   // Sends a DELETE request, allows optional body, and handles responses.
   // ---------------------------------------------------------------------------
   static Future<T?> deleteRequest<T>({
-    required String url,
-    Map<String, dynamic>? body,
-    required T Function(Map<String, dynamic>) onSuccess,
-    Map<String, String>? headers,
-    int timeoutSeconds = 15,
-  }) async {
+  required String url,
+  Map<String, dynamic>? body,
+  required T Function(Map<String, dynamic>) onSuccess,
+  Map<String, String>? headers,
+  int timeoutSeconds = 15,
+}) async {
+  const int maxRetries = 5;
+
+  for (int attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      log("DELETE: $url");
+      log("DELETE Attempt $attempt/$maxRetries: $url");
       if (body != null) debugPrint("BODY: $body", wrapWidth: 1024);
 
       final request = http.Request('DELETE', Uri.parse(url));
@@ -309,14 +346,16 @@ class APIService {
         case 201:
         case 202:
         case 204:
-          if (response.body.isEmpty) return onSuccess({});
-          final data = jsonDecode(response.body);
+          if (response.body.isEmpty) {
+            return onSuccess({}); // ✅ stop retry on success
+          }
 
+          final data = jsonDecode(response.body);
           if (data is! Map<String, dynamic>) {
             log("Invalid server response format.");
             return null;
           }
-          return onSuccess(data);
+          return onSuccess(data); // ✅ stop retry on success
 
         case 400:
           log("Bad Request (400).");
@@ -335,38 +374,46 @@ class APIService {
           return null;
 
         case 408:
-          log("Timeout (408).");
-          return null;
+          log("Timeout (408). Retrying...");
+          break;
 
         case 429:
-          log("Too Many Requests (429).");
-          return null;
+          log("Too Many Requests (429). Retrying...");
+          break;
 
         default:
           if (response.statusCode >= 500) {
-            log("Server Error (${response.statusCode}).");
+            log("Server Error (${response.statusCode}). Retrying...");
+            break;
           } else {
             log("Unexpected Error (${response.statusCode}).");
+            return null;
           }
-          return null;
       }
     } on SocketException {
-      log("No internet connection.");
-      return null;
+      log("No internet connection. Retrying...");
+    } on TimeoutException {
+      log("DELETE request timed out. Retrying...");
     } on FormatException {
       log("Invalid response format.");
       return null;
-    } on TimeoutException {
-      log("DELETE request timed out.");
-      return null;
     } on http.ClientException catch (e) {
-      log("Network error: $e");
-      return null;
+      log("Network error: $e. Retrying...");
     } catch (e) {
       log("Unexpected error: ${e.toString()}");
       return null;
     }
+
+    // ⏳ delay before next retry
+    if (attempt < maxRetries) {
+      await Future.delayed(const Duration(seconds: 1));
+    }
   }
+
+  log("DELETE request failed after $maxRetries attempts.");
+  return null;
+}
+
 
   // ---------------------------------------------------------------------------
   // INTERNET CONNECTIVITY CHECK

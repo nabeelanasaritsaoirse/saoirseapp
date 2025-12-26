@@ -15,9 +15,11 @@ class HomeService {
   /// slug: most-popular
   /// ===============================
   static Future<FeaturedList?> fetchPopularList({
+    
     int page = 1,
     int limit = 10,
   }) async {
+   
     final token = storage.read(AppConst.ACCESS_TOKEN);
     final url = '${AppURLs.POPULAR_PRODUCT_API}page=$page&limit=$limit';
 

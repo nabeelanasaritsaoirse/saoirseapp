@@ -97,7 +97,7 @@ class AppURLs {
       BASE_API + "api/notifications/unread-count";
 
   // Orders History
-  static String ORDER_HISTORY_API = BASE_API + "api/installments/orders";
+  static String ORDER_HISTORY_API = BASE_API + "api/orders/user/history";
   static String ORDER_DELIVERED_HISTORY_API =
       BASE_API + "api/orders/user/delivered";
 
