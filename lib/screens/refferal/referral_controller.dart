@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, avoid_print
 
 import 'dart:developer';
 import 'dart:io';
@@ -122,7 +122,7 @@ class ReferralController extends GetxController {
     }
   }
 
-    Future<File> _copyInstagramStoryImageToTemp() async {
+  Future<File> _copyInstagramStoryImageToTemp() async {
     final byteData = await rootBundle.load(
       'assets/images/referral_story_image.png',
     );
@@ -214,8 +214,7 @@ class ReferralController extends GetxController {
     }
   }
 
- 
-   Future<Uri> _getInstagramContentUri(File file) async {
+  Future<Uri> _getInstagramContentUri(File file) async {
     final uri = await MethodChannel(
       'com.saoirse.epi/fileprovider',
     ).invokeMethod<String>(
@@ -230,22 +229,18 @@ class ReferralController extends GetxController {
     final link = _referralLink();
 
     try {
-      
       await Clipboard.setData(ClipboardData(text: link));
 
-    
       final imageFile = await _copyInstagramStoryImageToTemp();
 
-     
       final contentUri = await _getInstagramContentUri(imageFile);
 
-      
       final intent = AndroidIntent(
         action: 'com.instagram.share.ADD_TO_STORY',
         data: contentUri.toString(),
         type: 'image/*',
         flags: <int>[
-          1, 
+          1,
         ],
         arguments: {
           'source_application': 'com.saoirse.epi',

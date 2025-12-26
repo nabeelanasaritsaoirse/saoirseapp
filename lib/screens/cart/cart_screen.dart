@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -92,33 +93,54 @@ class CartScreen extends StatelessWidget {
                             /// IMAGE
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10.r),
-                              child: item.images.isNotEmpty
-                                  ? item.images.first.url.startsWith('http')
-                                      ? Image.network(
-                                          item.images.first.url,
-                                          width: 80.w,
-                                          height: 80.h,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Icon(
-                                              Icons.broken_image,
-                                              size: 80.sp,
-                                              color: AppColors.grey,
-                                            );
-                                          },
-                                        )
-                                      : Image.asset(
-                                          item.images.first.url,
-                                          width: 80.w,
-                                          height: 80.h,
-                                          fit: BoxFit.cover,
-                                        )
-                                  : Icon(
-                                      Icons.broken_image,
-                                      size: 80.sp,
-                                      color: AppColors.grey,
-                                    ),
+                              child: SizedBox(
+                                width: 80.w,
+                                height: 80.h,
+                                child: item.images.isNotEmpty
+                                    ? item.images.first.url.startsWith('http')
+                                        ? Image.network(
+                                            item.images.first.url,
+                                            width: 80.w,
+                                            height: 80.h,
+                                            fit: BoxFit.cover,
+                                            loadingBuilder: (context, child,
+                                                loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return Center(
+                                                child:
+                                                    CupertinoActivityIndicator(
+                                                  radius: 10.0,
+                                                  color: AppColors.textGray,
+                                                ),
+                                              );
+                                            },
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Center(
+                                                child: Icon(
+                                                  Icons.broken_image,
+                                                  size: 80.sp,
+                                                  color: AppColors.grey,
+                                                ),
+                                              );
+                                            },
+                                          )
+                                        : Image.asset(
+                                            item.images.first.url,
+                                            width: 80.w,
+                                            height: 80.h,
+                                            fit: BoxFit.cover,
+                                          )
+                                    : Center(
+                                        child: Icon(
+                                          Icons.broken_image,
+                                          size: 80.sp,
+                                          color: AppColors.grey,
+                                        ),
+                                      ),
+                              ),
                             ),
 
                             SizedBox(width: 12.w),

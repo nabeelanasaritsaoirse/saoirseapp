@@ -33,21 +33,26 @@ class SelectPlanSheet extends StatelessWidget {
       controller.updateDaysFromAmount(dayController, amountController);
     });
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.85,
-      maxChildSize: 0.95,
-      minChildSize: 0.50,
-      expand: false,
-      builder: (context, sheetController) {
-        return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
+        child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
           decoration: BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
           ),
           child: SingleChildScrollView(
-            controller: sheetController,
+            physics: const BouncingScrollPhysics(),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 /// --- Header ---
@@ -55,7 +60,6 @@ class SelectPlanSheet extends StatelessWidget {
                   height: 30.h,
                   child: Stack(
                     children: [
-                      /// CENTER TITLE
                       Center(
                         child: appText(
                           AppStrings.select_plan,
@@ -63,8 +67,6 @@ class SelectPlanSheet extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
-                      /// CLOSE BUTTON (top-right)
                       Positioned(
                         bottom: -6.h,
                         right: 0,
@@ -81,7 +83,7 @@ class SelectPlanSheet extends StatelessWidget {
 
                 /// --- Customize My Plan ----
                 Align(
-                  alignment: AlignmentGeometry.centerLeft,
+                  alignment: Alignment.centerLeft,
                   child: appText(
                     AppStrings.costomize_plan,
                     fontSize: 15.sp,
@@ -95,7 +97,6 @@ class SelectPlanSheet extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    /// Days Column
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,7 +129,6 @@ class SelectPlanSheet extends StatelessWidget {
 
                     SizedBox(width: 10.w),
 
-                    /// Amount Column
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,41 +172,40 @@ class SelectPlanSheet extends StatelessWidget {
 
                         if (days <= 0 || amount <= 0) {
                           appToast(
-                              error: true,
-                              title: "Invalid Input",
-                              content: "Please enter valid days and amount");
+                            error: true,
+                            title: "Invalid Input",
+                            content: "Please enter valid days and amount",
+                          );
                           return;
                         }
 
                         if (days < 5) {
                           appToast(
-                              error: true,
-                              title: "Invalid Days",
-                              content: "Days cannot be less than 5");
+                            error: true,
+                            title: "Invalid Days",
+                            content: "Days cannot be less than 5",
+                          );
                           return;
                         }
 
                         if (amount < 50) {
                           appToast(
-                              error: true,
-                              title: "Invalid Amount",
-                              content: "Amount cannot be more less 50");
+                            error: true,
+                            title: "Invalid Amount",
+                            content: "Amount cannot be more less 50",
+                          );
                           return;
                         }
 
-                        // SAVE PLAN IN PRODUCT CONTROLLER
-                        final productCtrl =
-                            Get.find<ProductDetailsController>();
-                        productCtrl.customDays.value = days;
-                        productCtrl.customAmount.value = amount;
-
-                        // Get.to(() =>
-                        //     SelectAddress(product: productCtrl.product.value));
+                        controller.customDays.value = days;
+                        controller.customAmount.value = amount;
                         Get.back();
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 18.w, vertical: 12.h),
+                          horizontal: 18.w,
+                          vertical: 12.h,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.gradientDarkBlue,
                           borderRadius: BorderRadius.circular(10.r),
@@ -232,18 +231,11 @@ class SelectPlanSheet extends StatelessWidget {
                   if (controller.plans.isEmpty) {
                     return Padding(
                       padding: EdgeInsets.symmetric(vertical: 30.h),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 70.h,
-                          ),
-                          appText(
-                            "No plans available",
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.grey,
-                          ),
-                        ],
+                      child: appText(
+                        "No plans available",
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.grey,
                       ),
                     );
                   }
@@ -256,59 +248,29 @@ class SelectPlanSheet extends StatelessWidget {
                         children: [
                           InkWell(
                             onTap: () {
-                              if (controller.selectedPlanIndex.value == index) {
-                                // 🔹 Tapped the same plan → unselect
-                                controller.selectedPlanIndex.value = -1;
-                                controller.customDays.value = 0;
-                                controller.customAmount.value = 0;
-                              } else {
-                                // 🔹 Selected a new plan
-                                controller.selectApiPlan(index);
-                              }
+                              controller.selectedPlanIndex.value == index
+                                  ? controller.selectedPlanIndex.value = -1
+                                  : controller.selectApiPlan(index);
                             },
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                /// Radio Button (visual only)
-                                GestureDetector(
-                                  onTap: () {
-                                    if (controller.selectedPlanIndex.value ==
-                                        index) {
-                                      controller.selectedPlanIndex.value = -1;
-                                      controller.customDays.value = 0;
-                                      controller.customAmount.value = 0;
-                                    } else {
-                                      controller.selectApiPlan(index);
-                                    }
+                                Radio<int>(
+                                  value: index,
+                                  groupValue:
+                                      controller.selectedPlanIndex.value == -1
+                                          ? null
+                                          : controller.selectedPlanIndex.value,
+                                  activeColor: AppColors.primaryColor,
+                                  onChanged: (_) {
+                                    controller.selectApiPlan(index);
                                   },
-                                  child: Radio<int>(
-                                    value: index,
-                                    groupValue:
-                                        controller.selectedPlanIndex.value == -1
-                                            ? null
-                                            : controller
-                                                .selectedPlanIndex.value,
-                                    activeColor: AppColors.primaryColor,
-                                    onChanged: (_) {
-                                      if (controller.selectedPlanIndex.value ==
-                                          index) {
-                                        controller.selectedPlanIndex.value = -1;
-                                        controller.customDays.value = 0;
-                                        controller.customAmount.value = 0;
-                                      } else {
-                                        controller.selectApiPlan(index);
-                                      }
-                                    },
-                                  ),
                                 ),
-
-                                /// Plan Content
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      /// Title Row
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
@@ -342,46 +304,19 @@ class SelectPlanSheet extends StatelessWidget {
                                             ),
                                         ],
                                       ),
-
                                       SizedBox(height: 4.h),
-
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          appText(
-                                            AppStrings.equivalent_time,
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.grey,
-                                          ),
-                                          appText(
-                                            "${plan.days} Days",
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.grey,
-                                          ),
-                                        ],
-                                      ),
-
-                                      SizedBox(height: 4.h),
-
                                       appText(
                                         "Pay ${plan.perDayAmount.toStringAsFixed(0)} daily for ${plan.days} days",
                                         fontSize: 11.sp,
-                                        fontWeight: FontWeight.w400,
                                         color: AppColors.grey,
                                       ),
-
                                       SizedBox(height: 4.h),
-
                                       appText(
                                         "Total Amount : INR ${plan.totalAmount.toStringAsFixed(2)}",
                                         fontSize: 12.sp,
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.primaryColor,
                                       ),
-
                                       SizedBox(height: 10.h),
                                     ],
                                   ),
@@ -405,20 +340,12 @@ class SelectPlanSheet extends StatelessWidget {
                           (controller.customDays.value > 0 &&
                               controller.customAmount.value > 0);
 
-                  if (!hasSelectedPlan) {
-                    return SizedBox.shrink(); // hide button
-                  }
+                  if (!hasSelectedPlan) return SizedBox.shrink();
 
                   return appButton(
                     onTap: () {
                       final selected = controller.getSelectedPlan();
 
-                      if (selected["days"] == 0 || selected["amount"] == 0) {
-                        appToast(error: true, content: "Please select a plan!");
-                        return;
-                      }
-
-                      /// Ensure controller exists
                       final orderCtrl =
                           Get.isRegistered<OrderDetailsController>()
                               ? Get.find<OrderDetailsController>()
@@ -445,11 +372,12 @@ class SelectPlanSheet extends StatelessWidget {
                     ),
                   );
                 }),
+                SizedBox(height: 13.h),
               ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

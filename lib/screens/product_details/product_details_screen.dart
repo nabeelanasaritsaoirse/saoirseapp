@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable, body_might_complete_normally_nullable, deprecated_member_use
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -550,37 +551,49 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         child: Stack(
           children: [
             /// PAGEVIEW USING mergedImages
-            PageView.builder(
-              controller: controller.pageController,
-              itemCount: images.length,
-              onPageChanged: (i) => controller.currentImageIndex.value = i,
-              itemBuilder: (_, i) {
-                final img = images[i];
-                return Container(
-                  alignment: Alignment.center,
-                  color: AppColors.lightGrey,
-                  child: Padding(
-                      padding: EdgeInsets.all(15.w),
-                      child: Image.network(
-                        img.url,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) {
-                          return Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            color: Colors.grey.shade200,
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.broken_image,
-                              size: 32.sp,
-                              color: Colors.grey,
-                            ),
-                          );
-                        },
-                      )),
-                );
-              },
-            ),
+           PageView.builder(
+  controller: controller.pageController,
+  itemCount: images.length,
+  onPageChanged: (i) => controller.currentImageIndex.value = i,
+  itemBuilder: (_, i) {
+    final img = images[i];
+    return Container(
+      alignment: Alignment.center,
+      color: AppColors.lightGrey,
+      child: Padding(
+        padding: EdgeInsets.all(15.w),
+        child: Image.network(
+          img.url,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              return child;
+            }
+            return Center(
+              child: CupertinoActivityIndicator(
+                radius: 10.0,
+                color: AppColors.textGray,
+              ),
+            );
+          },
+          errorBuilder: (_, __, ___) {
+            return Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: Colors.grey.shade200,
+              alignment: Alignment.center,
+              child: Icon(
+                Icons.broken_image,
+                size: 32.sp,
+                color: Colors.grey,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  },
+),
 
             /// DOT INDICATOR USING mergedImages
             Positioned(

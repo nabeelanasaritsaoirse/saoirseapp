@@ -15,13 +15,21 @@ class AppURLs {
   static String USER_UPDATE_API = BASE_API + "api/auth/profiles/";
   static String PROFILE_UPDATE_API = BASE_API + "api/users/";
 
+  // // home screen api
+  // static String POPULAR_PRODUCT_API =
+  //     BASE_API + "api/products/featured/popular?";
+  // static String BEST_SELLER_PRODUCT_API =
+  //     BASE_API + "api/products/featured/best-sellers?";
+  // static String TRENDING_PRODUCT_API =
+  //     BASE_API + "api/products/featured/trending?";
+
   // home screen api
   static String POPULAR_PRODUCT_API =
-      BASE_API + "api/products/featured/popular?";
+      BASE_API + "api/featured-lists/most-popular?";
   static String BEST_SELLER_PRODUCT_API =
-      BASE_API + "api/products/featured/best-sellers?";
+      BASE_API + "api/featured-lists/best-selling?";
   static String TRENDING_PRODUCT_API =
-      BASE_API + "api/products/featured/trending?";
+      BASE_API + "api/featured-lists/trending-products?";
 
   //refferal api
   static String getRefferal_API = BASE_API + "api/referrals/generate-code";
@@ -77,10 +85,11 @@ class AppURLs {
   static String KYC_UPLOAD_API = BASE_API + "api/kyc/upload";
 
   // Order api
-  static String CREATE_ORDER_API = BASE_API + "api/orders";
+  static String CREATE_ORDER_API = BASE_API + "api/installments/orders";
 
   // Payment Api
-  static String PAYMENT_PROCESS_API = BASE_API + "api/payments/process";
+  static String PAYMENT_PROCESS_API =
+      BASE_API + "api/installments/payments/process";
 
   // Notifications
   static String NOTIFICATIONS = BASE_API + "api/notifications";

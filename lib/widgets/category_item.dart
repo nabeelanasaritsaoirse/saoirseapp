@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
@@ -52,19 +53,16 @@ class CategoryItem extends StatelessWidget {
                 SizedBox(height: 6.h),
 
                 // FIXED text behavior = no relayout
-                Text(
+                appText(
                   category.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 10.sp,
-                    height: 1.2, // 🔥 IMPORTANT
-                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                    color: isSelected
-                        ? AppColors.primaryColor
-                        : AppColors.textBlack,
-                  ),
+                  fontSize: 10.sp,
+                  height: 1.2, // 🔥 IMPORTANT
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                  color:
+                      isSelected ? AppColors.primaryColor : AppColors.textBlack,
                 ),
               ],
             ),
@@ -96,6 +94,17 @@ class _CategoryImage extends StatelessWidget {
       height: 50.h,
       fit: BoxFit.cover,
       gaplessPlayback: true,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) {
+          return child;
+        }
+        return Center(
+          child: CupertinoActivityIndicator(
+            radius: 10.0,
+            color: AppColors.textGray,
+          ),
+        );
+      },
       errorBuilder: (_, __, ___) => Icon(
         Icons.image_outlined,
         size: 32.sp,

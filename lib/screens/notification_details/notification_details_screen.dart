@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -61,18 +62,39 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (item.imageUrl != null && item.imageUrl!.isNotEmpty)
-                    ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20.r),
-                        bottomRight: Radius.circular(20.r),
-                      ),
-                      child: Image.network(
-                        item.imageUrl!,
-                        width: double.infinity,
-                        height: 220.h,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                   ClipRRect(
+  borderRadius: BorderRadius.only(
+    bottomLeft: Radius.circular(20.r),
+    bottomRight: Radius.circular(20.r),
+  ),
+  child: Image.network(
+    item.imageUrl!,
+    width: double.infinity,
+    height: 220.h,
+    fit: BoxFit.cover,
+    loadingBuilder: (context, child, loadingProgress) {
+      if (loadingProgress == null) {
+        return child;
+      }
+      return Center(
+        child: CupertinoActivityIndicator(
+          radius: 10.0,
+          color: AppColors.textGray,
+        ),
+      );
+    },
+    errorBuilder: (context, error, stackTrace) => Container(
+      color: Colors.grey.shade300,
+      child: Center(
+        child: Icon(
+          Icons.broken_image,
+          size: 40.sp,
+          color: Colors.grey.shade600,
+        ),
+      ),
+    ),
+  ),
+),
 
                   SizedBox(height: 20.h),
 

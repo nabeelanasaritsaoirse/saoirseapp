@@ -1,62 +1,76 @@
 // models/product_model.dart
-class Product {
-  final String id;
-  final String productId;
-  final String name;
-  final String brand;
-  final String sku;
-  final List<ProductImage> images;
-  final Description description;
-  final Category category;
-  final Pricing pricing;
-  final Availability availability;
-  final bool isPopular;
-  final bool isBestSeller;
-  final bool isTrending;
-  final String status;
+class FeaturedList {
+  final String listId;
+  final String listName;
+  final String slug;
+  final String description;
+  final List<FeaturedProduct> products;
 
-  Product({
-    required this.id,
-    required this.productId,
-    required this.name,
-    required this.brand,
-    required this.sku,
-    required this.images,
+  FeaturedList({
+    required this.listId,
+    required this.listName,
+    required this.slug,
     required this.description,
-    required this.category,
-    required this.pricing,
-    required this.availability,
-    required this.isPopular,
-    required this.isBestSeller,
-    required this.isTrending,
-    required this.status,
+    required this.products,
   });
 
-  // For backward compatibility with your existing UI
-  String get image => images.isNotEmpty ? images.first.url : '';
-  double get price => pricing.finalPrice;
-  bool get hasDiscount => pricing.regularPrice > pricing.salePrice;
-  bool isFavorite = false; // You can manage this separately
+  factory FeaturedList.fromJson(Map<String, dynamic> json) {
+    return FeaturedList(
+      listId: json['listId'] ?? '',
+      listName: json['listName'] ?? '',
+      slug: json['slug'] ?? '',
+      description: json['description'] ?? '',
+      products: (json['products'] as List? ?? [])
+          .map((p) => FeaturedProduct.fromJson(p))
+          .toList(),
+    );
+  }
+}
 
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['_id'] ?? '',
+class FeaturedProduct {
+  final String productId;
+  final String productMongoId;
+  final String name;
+  final String brand;
+  final String image;
+  final double price;
+  final double finalPrice;
+  final int order;
+
+  FeaturedProduct({
+    required this.productId,
+    required this.productMongoId,
+    required this.name,
+    required this.brand,
+    required this.image,
+    required this.price,
+    required this.finalPrice,
+    required this.order,
+  });
+
+  bool get hasDiscount => price > finalPrice;
+  bool isFavorite = false;
+
+  static const String placeholderImage =
+      'https://via.placeholder.com/300x300.png?text=No+Image';
+
+  factory FeaturedProduct.fromJson(Map<String, dynamic> json) {
+    final rawImage = json['productImage'];
+
+    return FeaturedProduct(
       productId: json['productId'] ?? '',
-      name: json['name'] ?? '',
+      productMongoId: json['productMongoId'] ?? '',
+      name: json['productName'] ?? '',
       brand: json['brand'] ?? '',
-      sku: json['sku'] ?? '',
-      images: (json['images'] as List?)
-              ?.map((img) => ProductImage.fromJson(img))
-              .toList() ??
-          [],
-      description: Description.fromJson(json['description'] ?? {}),
-      category: Category.fromJson(json['category'] ?? {}),
-      pricing: Pricing.fromJson(json['pricing'] ?? {}),
-      availability: Availability.fromJson(json['availability'] ?? {}),
-      isPopular: json['isPopular'] ?? false,
-      isBestSeller: json['isBestSeller'] ?? false,
-      isTrending: json['isTrending'] ?? false,
-      status: json['status'] ?? '',
+      image: (rawImage != null && rawImage.toString().isNotEmpty)
+          ? rawImage
+          : placeholderImage,
+
+      // NO /100 — backend already sends rupees
+      price: (json['price'] ?? 0).toDouble(),
+      finalPrice: (json['finalPrice'] ?? 0).toDouble(),
+
+      order: json['order'] ?? 0,
     );
   }
 }
