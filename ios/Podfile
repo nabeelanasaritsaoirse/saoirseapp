@@ -34,35 +34,29 @@ end
 
 post_install do |installer|
   team_id = ENV['TEAM_ID'] || 'BYQUNNQSQH'
-  
+
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
-    
+
     target.build_configurations.each do |config|
-      # Explicitly disable signing for ALL pod targets
+      # Disable signing for pods
       config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
       config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
       config.build_settings['CODE_SIGN_IDENTITY'] = ''
       config.build_settings['CODE_SIGN_ENTITLEMENTS'] = ''
       config.build_settings['DEVELOPMENT_TEAM'] = ''
       config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ''
-      
-      # Only enable signing for the main Runner target
+
+      # Enable signing ONLY for Runner
       if target.name == 'Runner'
         config.build_settings['CODE_SIGNING_REQUIRED'] = 'YES'
         config.build_settings['CODE_SIGNING_ALLOWED'] = 'YES'
         config.build_settings['DEVELOPMENT_TEAM'] = team_id
         config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
       end
-      
-      # iOS Deployment Target Fix
-      current = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
-      begin
-        needs_update = current.nil? || current.to_f < 12.0
-      rescue
-        needs_update = true
-      end
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0' if needs_update
+
+      # ✅ REQUIRED for FirebaseAuth
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
     end
   end
 end
