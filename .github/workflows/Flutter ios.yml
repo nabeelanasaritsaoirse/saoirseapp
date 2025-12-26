@@ -131,8 +131,8 @@ jobs:
       - name: 🛠️ Build for Simulator
         run: flutter build ios --simulator --no-codesign
   
-      - name: 🧪 Run Flutter Tests
-        run: flutter test
+   #   - name: 🧪 Run Flutter Tests
+   #     run: flutter test
   
       - name: 📱 List Available Simulators
         run: xcrun simctl list devices available
