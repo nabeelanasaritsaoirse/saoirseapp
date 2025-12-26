@@ -46,6 +46,7 @@ class PendingPayment {
   final int installmentNumber;
   final int amount;
   final String dueDate;
+  final String productImage;
 
   PendingPayment({
     required this.orderId,
@@ -53,6 +54,7 @@ class PendingPayment {
     required this.installmentNumber,
     required this.amount,
     required this.dueDate,
+     required this.productImage,
   });
 
   factory PendingPayment.fromJson(Map<String, dynamic> json) {
@@ -62,6 +64,10 @@ class PendingPayment {
       installmentNumber: json["installmentNumber"] ?? 0,
       amount: json["amount"] ?? 0,
       dueDate: json["dueDate"] ?? "",
+      productImage: (json["productImage"] != null &&
+        json["productImage"]["url"] != null)
+    ? json["productImage"]["url"].toString()
+    : "",
     );
   }
 }
