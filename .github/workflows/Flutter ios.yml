@@ -34,9 +34,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Assets MUST exist before pub get
-      - name: 📝 Create .env
-        run: echo "# CI env" > .env
+      - name: 📝 Create .env (Debug Safe)
+        run: |
+          cat > .env <<EOF
+          IOS_API_KEY=dummy
+          IOS_APP_ID=dummy
+          IOS_MESSAGING_SENDER_ID=dummy
+          IOS_PROJECT_ID=dummy
+          ANDROID_API_KEY=dummy
+          ANDROID_APP_ID=dummy
+          ANDROID_MESSAGING_SENDER_ID=dummy
+          ANDROID_PROJECT_ID=dummy
+          EOF
+          
+      - name: 🔥 Add GoogleService-Info.plist (Debug)
+        run: |
+          cp ios/Runner/GoogleService-Info.plist.example \
+             ios/Runner/GoogleService-Info.plist
 
       - name: 📥 Download Fonts
         run: |
