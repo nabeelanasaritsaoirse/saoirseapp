@@ -130,7 +130,11 @@ jobs:
   
       - name: 🛠️ Build for Simulator
         run: |
-          flutter build ios --simulator --debug --no-codesign --target-platform=ios-x64
+          flutter build ios --simulator --debug --no-codesign 
+          
+
+
+          
 
   
    #   - name: 🧪 Run Flutter Tests
