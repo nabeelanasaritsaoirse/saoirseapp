@@ -138,7 +138,7 @@ jobs:
       - name: 🔧 Configure iOS Settings
         run: |
           # Remove Scene Manifest (prevents black screen)
-          /usr/libexec/PlistBuddy -c "Delete :UIApplicationSceneManifest" ios/Runner/Info.plist 2>/dev/null || true
+          # /usr/libexec/PlistBuddy -c "Delete :UIApplicationSceneManifest" ios/Runner/Info.plist 2>/dev/null || true
           
           # Set deployment target
           sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 13.0;/g' ios/Runner.xcodeproj/project.pbxproj
