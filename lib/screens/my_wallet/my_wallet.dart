@@ -11,10 +11,17 @@ import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
 import 'my_wallet_controller.dart';
 
-class WalletScreen extends StatelessWidget {
+class WalletScreen extends StatefulWidget {
   WalletScreen({super.key});
 
+  @override
+  State<WalletScreen> createState() => _WalletScreenState();
+}
+
+class _WalletScreenState extends State<WalletScreen> {
   final controller = Get.put(MyWalletController());
+
+  
 
   @override
   Widget build(BuildContext context) {
