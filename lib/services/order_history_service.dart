@@ -9,9 +9,13 @@ class OrderHistoryService {
 
   //----------FETCH ALL ORDERS----------------//
 
-  Future<OrderHistoryResponse?> fetchOrders() async {
+  Future<OrderHistoryResponse?> fetchOrders({
+    required int page,
+    required int limit,
+  }) async {
     final token = await _token();
-    final url = AppURLs.ORDER_HISTORY_API;
+
+    final url = "${AppURLs.ORDER_HISTORY_API}?status=ACTIVE&limit=$limit&page=$page";
 
     return APIService.getRequest<OrderHistoryResponse>(
       url: url,
