@@ -228,6 +228,9 @@ jobs:
           </plist>
           EOF
 
+      
+      - name: ✅ Validate GoogleService-Info.plist
+        run: plutil -lint ios/Runner/GoogleService-Info.plist
 
       # --------------------------------------------------
       # Install Pods
