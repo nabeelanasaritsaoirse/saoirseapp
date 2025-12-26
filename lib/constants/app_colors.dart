@@ -30,6 +30,7 @@ class AppColors {
   static const Color green = Colors.green;
   static const Color red = Colors.red;
   static const Color orange = Colors.orange;
+  static const Color yellow = Colors.yellow;
   static const Color blueshade = Color.fromARGB(255, 175, 214, 246);
   static const Color mediumBlue = Color.fromARGB(255, 29, 16, 211);
   static const Color skyBlue = Color(0xFF9BBBFC);
