@@ -30,23 +30,20 @@ jobs:
   ios-native-debug:
     name: 🧪 iOS Native Debug (Simulator)
     runs-on: macos-15
-
     steps:
       - uses: actions/checkout@v4
-
       - name: 📝 Create .env (Debug Safe)
         run: |
           cat > .env <<EOF
-          IOS_API_KEY=dummy
-          IOS_APP_ID=dummy
-          IOS_MESSAGING_SENDER_ID=dummy
-          IOS_PROJECT_ID=dummy
+          IOS_API_KEY=${{ secrets.IOS_API_KEY }}
+          IOS_APP_ID=${{ secrets.IOS_APP_ID }}
+          IOS_MESSAGING_SENDER_ID=${{ secrets.IOS_MESSAGING_SENDER_ID }}
+          IOS_PROJECT_ID=${{ secrets.IOS_PROJECT_ID }}
           ANDROID_API_KEY=dummy
           ANDROID_APP_ID=dummy
           ANDROID_MESSAGING_SENDER_ID=dummy
           ANDROID_PROJECT_ID=dummy
           EOF
-
       - name: 📥 Download Fonts
         run: |
           mkdir -p assets/fonts
@@ -56,24 +53,24 @@ jobs:
           curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf
           curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
           cd ../..
-
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-
-
       - run: flutter clean
       - run: flutter pub get
-
       - name: 📦 Install Pods
         run: |
           cd ios
           pod install --repo-update
           cd ..
-
       - name: 🛠️ Build Debug (Simulator)
         run: flutter build ios --simulator --no-codesign
+      - name: 🤖 Run on Simulator
+        run: |
+          xcrun simctl list
+          xcrun simctl boot "iPhone 15"
+          flutter run -d "iPhone 15" --debug
 
 # ==================================================
 # 2️⃣ IOS BUILD (UNCHANGED – YOUR WORKING PIPELINE)
