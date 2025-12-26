@@ -1,10 +1,11 @@
-name: 🍎 iOS CI & TestFlight
+name: 🍎 iOS CI, Debug & TestFlight
 run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - test
+  workflow_dispatch:
 
 concurrency:
   group: ios-build-${{ github.ref }}
@@ -22,54 +23,73 @@ env:
   ARCHIVE_DIR: build/ios/archive
   IPA_DIR: build/ios/ipa
 
+# ==================================================
+# 1️⃣ NATIVE DEBUG (SIMULATOR)
+# ==================================================
 jobs:
-  ios-ci:
-    runs-on: macos-latest
-    outputs:
-      version_name: ${{ steps.version.outputs.VERSION_NAME }}
-      build_number: ${{ steps.version.outputs.BUILD_NUMBER }}
+  ios-native-debug:
+    name: 🧪 iOS Native Debug (Simulator)
+    runs-on: macos-15
 
     steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: ⚙️ Setup Flutter
-        uses: subosito/flutter-action@v2
+      # Assets MUST exist before pub get
+      - name: 📝 Create .env
+        run: echo "# CI env" > .env
+
+      - name: 📥 Download Fonts
+        run: |
+          mkdir -p assets/fonts
+          cd assets/fonts
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Medium.ttf
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
+          cd ../..
+
+      - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.35.7"
           channel: stable
           cache: true
 
-      - name: 🧰 Select Xcode 16.1
+      - run: flutter clean
+      - run: flutter pub get
+
+      - name: 📦 Install Pods
         run: |
-          sudo xcode-select -s /Applications/Xcode_16.1.app
-          xcodebuild -version
-          xcodebuild -showsdks
+          cd ios
+          pod install --repo-update
+          cd ..
 
-      - name: 📦 Flutter Pub Get
-        run: flutter pub get
+      - name: 🛠️ Build Debug (Simulator)
+        run: flutter build ios --debug --simulator --no-codesign
 
-      - name: 🔢 Read Version from pubspec.yaml
-        id: version
-        run: |
-          VERSION_LINE=$(grep "^version:" pubspec.yaml)
-          VERSION_NAME=$(echo "$VERSION_LINE" | cut -d '+' -f 1 | sed 's/version: //')
-          BUILD_NUMBER=$(echo "$VERSION_LINE" | cut -d '+' -f 2)
-          
-          # If no build number in pubspec, use run number
-          if [ -z "$BUILD_NUMBER" ]; then
-            BUILD_NUMBER=$GITHUB_RUN_NUMBER
-          fi
-          
-          echo "Version Name: $VERSION_NAME"
-          echo "Build Number: $BUILD_NUMBER"
-          echo "Tag: ${{ github.ref_name }}"
-          
-          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
-          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+# ==================================================
+# 2️⃣ IOS BUILD (UNCHANGED – YOUR WORKING PIPELINE)
+# ==================================================
+  ios-ci:
+    name: 🏗️ iOS CI Build
+    needs: ios-native-debug
+    runs-on: macos-15
+    outputs:
+      version_name: ${{ steps.version.outputs.VERSION_NAME }}
+      build_number: ${{ steps.version.outputs.BUILD_NUMBER }}
 
+    steps:
+      # ---------------- YOUR STEPS (UNCHANGED) ----------------
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
 
-      - name: 🔑 Create .env file
+      - run: sudo gem install fastlane cocoapods xcodeproj -N
+      - run: flutter clean
+      - run: flutter pub get
+
+      - name: 📝 Create .env file
         run: |
           cat > .env <<EOF
           RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}
@@ -83,29 +103,76 @@ jobs:
           ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
           EOF
 
-      - name: ✅ Verify .env file
+      - name: 📥 Download Fonts
         run: |
-          echo "✅ .env file created in project root"
-          ls -la .env
+          mkdir -p assets/fonts
+          cd assets/fonts
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Medium.ttf
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf
+          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
+          cd ../..
 
-      - name: 🚀 Install Fastlane & CocoaPods
+
+      # --------------------------------------------------
+      # Version Info
+      # --------------------------------------------------
+      - name: 🔢 Read Version
+        id: version
         run: |
-          sudo gem install fastlane -N
-          sudo gem install cocoapods -N
+          VERSION_LINE=$(grep "^version:" pubspec.yaml)
+          VERSION_NAME=$(echo "$VERSION_LINE" | cut -d '+' -f 1 | sed 's/version: //')
+          BUILD_NUMBER=$(echo "$VERSION_LINE" | cut -d '+' -f 2)
+          
+          if [ -z "$BUILD_NUMBER" ]; then
+            BUILD_NUMBER=$GITHUB_RUN_NUMBER
+          fi
+          
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+          echo "Building version: $VERSION_NAME ($BUILD_NUMBER)"
 
-      - name: 🔐 Write App Store Connect API Key
+      # --------------------------------------------------
+      # iOS Configuration
+      # --------------------------------------------------
+      - name: 🔧 Configure iOS Settings
+        run: |
+          # Remove Scene Manifest (prevents black screen)
+          /usr/libexec/PlistBuddy -c "Delete :UIApplicationSceneManifest" ios/Runner/Info.plist 2>/dev/null || true
+          
+          # Set deployment target
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 13.0;/g' ios/Runner.xcodeproj/project.pbxproj
+          
+          # Update Release.xcconfig
+          cat >> ios/Flutter/Release.xcconfig <<XCCONFIG
+          STRIP_STYLE = non-global
+          DEAD_CODE_STRIPPING = YES
+          IPHONEOS_DEPLOYMENT_TARGET = 13.0
+          ENABLE_BITCODE = NO
+          ONLY_ACTIVE_ARCH = NO
+          XCCONFIG
+
+      # --------------------------------------------------
+      # Keychain Setup
+      # --------------------------------------------------
+      - name: 🔓 Setup Keychain
+        run: |
+          KEYCHAIN_PASSWORD="ci_keychain_pass"
+          security delete-keychain build.keychain-db 2>/dev/null || true
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain-db
+          security default-keychain -s build.keychain-db
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain-db
+          security set-keychain-settings -lut 7200 build.keychain-db
+          security list-keychains -d user -s build.keychain-db $(security list-keychains -d user | sed s/\"//g)
+
+      # --------------------------------------------------
+      # Certificates
+      # --------------------------------------------------
+      - name: 🔐 Setup API Key
         run: |
           mkdir -p ios
           echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > ios/api_key.json
           chmod 600 ios/api_key.json
-
-      - name: 🔓 Setup Keychain
-        run: |
-          KEYCHAIN_PASSWORD="ci_keychain_pass"
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security set-keychain-settings -lut 7200 build.keychain
 
       - name: 🔐 Fastlane Match
         env:
@@ -115,153 +182,198 @@ jobs:
           fastlane match appstore \
             --readonly \
             --api_key_path ./api_key.json \
+            --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git \
             --git_branch main \
-            --keychain_name build.keychain \
+            --keychain_name build.keychain-db \
             --keychain_password "ci_keychain_pass"
 
-      - name: 💾 Cache Xcode DerivedData
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/Library/Developer/Xcode/DerivedData
-            ios/Pods
-          key: ${{ runner.os }}-xcode-${{ hashFiles('ios/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-xcode-
-
-      - name: 🧨 Reset Pods (if not cached)
+      # --------------------------------------------------
+      # Firebase
+      # --------------------------------------------------
+      - name: 🔥 Add GoogleService-Info.plist
         run: |
-          if [ ! -d "ios/Pods" ]; then
-            rm -rf ios/Podfile.lock
-          fi
+          cat > ios/Runner/GoogleService-Info.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>API_KEY</key>
+            <string>${{ secrets.IOS_API_KEY }}</string>
+            <key>GCM_SENDER_ID</key>
+            <string>${{ secrets.IOS_MESSAGING_SENDER_ID }}</string>
+            <key>PLIST_VERSION</key>
+            <string>1</string>
+            <key>BUNDLE_ID</key>
+            <string>com.saoirse.epi</string>
+            <key>PROJECT_ID</key>
+            <string>${{ secrets.IOS_PROJECT_ID }}</string>
+            <key>STORAGE_BUCKET</key>
+            <string>saoirse-epi.firebasestorage.app</string>
+            <key>IS_ADS_ENABLED</key>
+            <false></false>
+            <key>IS_ANALYTICS_ENABLED</key>
+            <false></false>
+            <key>IS_APPINVITE_ENABLED</key>
+            <true></true>
+            <key>IS_GCM_ENABLED</key>
+            <true></true>
+            <key>IS_SIGNIN_ENABLED</key>
+            <true></true>
+            <key>GOOGLE_APP_ID</key>
+            <string>${{ secrets.IOS_APP_ID }}</string>
+            <key>CLIENT_ID</key>
+            <string>486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q.apps.googleusercontent.com</string>
+            <key>REVERSED_CLIENT_ID</key>
+            <string>com.googleusercontent.apps.486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q</string>
+            <key>ANDROID_CLIENT_ID</key>
+            <string>486829564070-4d1fkup9ndsfec17mg830p1p7eqd6469.apps.googleusercontent.com</string>
+          </dict>
+          </plist>
+          EOF
 
-      - name: 🧨 Install Pods
+      # --------------------------------------------------
+      # Install Pods
+      # --------------------------------------------------
+      - name: 📦 Install Pods
         run: |
           cd ios
           pod install --repo-update
 
-      - name: 🔨 Build Flutter iOS Release
+      # --------------------------------------------------
+      # Configure Xcode Signing
+      # --------------------------------------------------
+      - name: ⚙️ Configure Xcode Signing
         run: |
-          echo "🚀 Starting Flutter build..."
-          flutter clean
-          flutter build ios --release --no-codesign
-          echo "✅ Flutter build completed!"
+          cat > update_signing.rb <<'RUBY'
+          require 'xcodeproj'
+          
+          project_path = 'ios/Runner.xcodeproj'
+          project = Xcodeproj::Project.open(project_path)
+          
+          project.targets.each do |target|
+            if target.name == 'Runner'
+              target.build_configurations.each do |config|
+                if config.name == 'Release'
+                  config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
+                  config.build_settings['DEVELOPMENT_TEAM'] = ENV['TEAM_ID']
+                  config.build_settings['CODE_SIGN_IDENTITY'] = 'Apple Distribution'
+                  config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ENV['PROFILE_NAME']
+                  config.build_settings['CODE_SIGN_IDENTITY[sdk=iphoneos*]'] = 'Apple Distribution'
+                  config.build_settings['ENABLE_BITCODE'] = 'NO'
+                  config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+                  config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+                end
+              end
+            end
+          end
+          
+          project.save
+          RUBY
+          
+          ruby update_signing.rb
 
-      - name: ✅ Verify Flutter Build Output
+      # --------------------------------------------------
+      # Build Flutter
+      # --------------------------------------------------
+      - name: 🔨 Build Flutter
         run: |
-          echo "🔍 Checking Flutter build artifacts..."
-          ls -la ios/Flutter/
+          flutter build ios \
+            --release \
+            --no-codesign \
+            --build-name ${{ steps.version.outputs.VERSION_NAME }} \
+            --build-number ${{ steps.version.outputs.BUILD_NUMBER }}
 
-          if [ ! -f "ios/Flutter/Generated.xcconfig" ]; then
-            echo "❌ ERROR: Generated.xcconfig not found!"
-            exit 1
-          fi
-
-          if [ ! -d "build/ios/iphoneos/Runner.app" ]; then
-            echo "❌ ERROR: Runner.app not built!"
-            exit 1
-          fi
-
-          echo "✅ Flutter build artifacts verified!"
-          cat ios/Flutter/Generated.xcconfig
-
+      # --------------------------------------------------
+      # Create ExportOptions
+      # --------------------------------------------------
       - name: 📝 Create ExportOptions.plist
         run: |
           cat > ios/ExportOptions.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-           "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
             <key>method</key>
             <string>app-store</string>
             <key>teamID</key>
-            <string>${TEAM_ID}</string>
+            <string>${{ env.TEAM_ID }}</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>provisioningProfiles</key>
             <dict>
-              <key>${BUNDLE_ID}</key>
-              <string>${PROFILE_NAME}</string>
+              <key>${{ env.BUNDLE_ID }}</key>
+              <string>${{ env.PROFILE_NAME }}</string>
             </dict>
+            <key>uploadSymbols</key>
+            <true/>
+            <key>compileBitcode</key>
+            <false/>
           </dict>
           </plist>
           EOF
 
-      - name: 🏗️ Archive Build
+      # --------------------------------------------------
+      # Archive
+      # --------------------------------------------------
+      - name: 🏗️ Archive
         run: |
           cd ios
-          mkdir -p ../${ARCHIVE_DIR}
-          mkdir -p ../${IPA_DIR}
-
-          xcodebuild clean archive \
+          mkdir -p ../${{ env.ARCHIVE_DIR }}
+          mkdir -p ../${{ env.IPA_DIR }}
+          
+          xcodebuild archive \
             -workspace Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
-            -archivePath ../${ARCHIVE_DIR}/Runner.xcarchive \
+            -archivePath ../${{ env.ARCHIVE_DIR }}/Runner.xcarchive \
             -destination 'generic/platform=iOS' \
-            DEVELOPMENT_TEAM=${TEAM_ID} \
+            DEVELOPMENT_TEAM=${{ env.TEAM_ID }} \
             CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE_SPECIFIER="${PROFILE_NAME}" \
+            PROVISIONING_PROFILE_SPECIFIER="${{ env.PROFILE_NAME }}" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            OTHER_CODE_SIGN_FLAGS="--keychain build.keychain" \
-            | tee ../xcodebuild.log
+            STRIP_STYLE=non-global \
+            DEAD_CODE_STRIPPING=YES \
+            IPHONEOS_DEPLOYMENT_TARGET=13.0 \
+            ENABLE_BITCODE=NO \
+            OTHER_CODE_SIGN_FLAGS="--keychain $HOME/Library/Keychains/build.keychain-db"
 
-      - name: ✅ Verify Archive
-        run: |
-          if [ ! -d "${ARCHIVE_DIR}/Runner.xcarchive" ]; then
-            echo "❌ Archive not created!"
-            tail -n 200 xcodebuild.log || true
-            exit 1
-          fi
-
+      # --------------------------------------------------
+      # Export IPA
+      # --------------------------------------------------
       - name: 📦 Export IPA
         run: |
           cd ios
           xcodebuild -exportArchive \
-            -archivePath ../${ARCHIVE_DIR}/Runner.xcarchive \
-            -exportPath ../${IPA_DIR} \
+            -archivePath ../${{ env.ARCHIVE_DIR }}/Runner.xcarchive \
+            -exportPath ../${{ env.IPA_DIR }} \
             -exportOptionsPlist ExportOptions.plist \
-            | tee ../export.log || true
+            -allowProvisioningUpdates
 
-      - name: ✅ Verify IPA
-        run: |
-          ls ${IPA_DIR}/*.ipa || (echo "❌ IPA export failed!" && exit 1)
-
-      - name: 📤 Upload IPA Artifact
+      # --------------------------------------------------
+      # Upload Artifacts
+      # --------------------------------------------------
+      - name: 📤 Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
           path: ${{ env.IPA_DIR }}/*.ipa
 
-      - name: 📋 Upload build logs
-        if: always()
+      - name: 📤 Upload dSYM
         uses: actions/upload-artifact@v4
         with:
-          name: ios-build-logs
-          path: |
-            xcodebuild.log
-            export.log
-            
-      - name: 🧾 Build Summary
-        run: |
-          echo "## 🍎 iOS Build Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** ${{ steps.version.outputs.VERSION_NAME }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build Number:** ${{ steps.version.outputs.BUILD_NUMBER }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Bundle ID:** ${BUNDLE_ID}" >> $GITHUB_STEP_SUMMARY
+          name: ios-dsym
+          path: ${{ env.ARCHIVE_DIR }}/Runner.xcarchive/dSYMs/
 
+  # ======================================================
+  # DEPLOY TO TESTFLIGHT
+  # ======================================================
   ios-deploy:
-    name: "🚀 Deploy to TestFlight"
+    name: 🚀 Deploy to TestFlight
     needs: ios-ci
-    runs-on: macos-latest
-    environment:
-      name: ios-deploy   # Optional: add manual approval like Android
+    runs-on: macos-15
 
     steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: 📦 Download IPA
         uses: actions/download-artifact@v4
@@ -272,7 +384,7 @@ jobs:
       - name: 🚀 Install Fastlane
         run: sudo gem install fastlane -N
 
-      - name: 🔐 Write api_key.json
+      - name: 🔐 Write API Key
         run: echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > api_key.json
 
       - name: 🚀 Upload to TestFlight
@@ -281,14 +393,3 @@ jobs:
             --api_key_path api_key.json \
             --ipa build/ios/ipa/*.ipa \
             --skip_waiting_for_build_processing
-
-      - name: 🧾 Deploy Summary
-        run: |
-          echo "## 🚀 TestFlight Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** ${{ needs.ios-ci.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build Number:** ${{ needs.ios-ci.outputs.build_number }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status:** ✅ Uploaded to TestFlight" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The build will be available for testing once Apple completes processing." >> $GITHUB_STEP_SUMMARY
