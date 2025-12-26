@@ -129,7 +129,9 @@ jobs:
         run: cd ios && pod install --repo-update
   
       - name: 🛠️ Build for Simulator
-        run: flutter build ios --simulator --no-codesign
+        run: |
+          flutter build ios --simulator --debug --no-codesign --target-platform=ios-x64
+
   
    #   - name: 🧪 Run Flutter Tests
    #     run: flutter test
