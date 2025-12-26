@@ -3,7 +3,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/my_wallet/my_wallet_controller.dart';
 
 import '../../constants/payment_methods.dart';
 import '../../models/coupon_model.dart';
@@ -14,10 +13,11 @@ import '../../services/order_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_toast.dart';
 import '../booking_confirmation/booking_confirmation_screen.dart';
+import '../my_wallet/my_wallet_controller.dart';
 import '../razorpay/razorpay_controller.dart';
 
 class OrderDetailsController extends GetxController {
-   final walletController = Get.put(MyWalletController());
+  final walletController = Get.put(MyWalletController());
   RxInt selectedDays = 0.obs;
   RxDouble selectedAmount = 0.0.obs;
 

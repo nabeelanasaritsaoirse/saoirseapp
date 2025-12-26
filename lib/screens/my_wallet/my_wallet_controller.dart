@@ -23,43 +23,40 @@ class MyWalletController extends GetxController {
     super.onInit();
   }
 
-
-
   Future<void> fetchWallet({bool forceRefresh = false}) async {
-  try {
-    //  Avoid unnecessary API calls
-    if (!forceRefresh && wallet.value != null) {
-      log("Wallet data already available. Skipping API call.");
-      return;
+    try {
+      //  Avoid unnecessary API calls
+      if (!forceRefresh && wallet.value != null) {
+        log("Wallet data already available. Skipping API call.");
+        return;
+      }
+      log("Calling wallet api");
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      final data = await serviceData.fetchWallet();
+
+      if (data == null) {
+        errorMessage.value = 'Unable to load wallet data';
+        log("Wallet API returned null response");
+        return;
+      }
+
+      wallet.value = data;
+
+      // 🔍 Debug logs
+      log("Wallet API Parsed Response: $data");
+      log("Wallet Balance: ${data.walletBalance}");
+      log("Total Earnings: ${data.totalEarnings}");
+      log("Transactions Count: ${data.transactions.length}");
+    } catch (e, s) {
+      errorMessage.value = 'Something went wrong while fetching wallet';
+      log("Wallet API Exception: $e");
+      log("StackTrace: $s");
+    } finally {
+      isLoading.value = false;
     }
-  log("Calling wallet api");
-    isLoading.value = true;
-    errorMessage.value = '';
-
-    final data = await serviceData.fetchWallet();
-
-    if (data == null) {
-      errorMessage.value = 'Unable to load wallet data';
-      log("Wallet API returned null response");
-      return;
-    }
-
-    wallet.value = data;
-
-    // 🔍 Debug logs
-    log("Wallet API Parsed Response: $data");
-    log("Wallet Balance: ${data.walletBalance}");
-    log("Total Earnings: ${data.totalEarnings}");
-    log("Transactions Count: ${data.transactions?.length ?? 0}");
-  } catch (e, s) {
-    errorMessage.value = 'Something went wrong while fetching wallet';
-    log("Wallet API Exception: $e");
-    log("StackTrace: $s");
-  } finally {
-    isLoading.value = false;
   }
-}
-
 
   Future<void> fetchWalletTransactions() async {
     try {
