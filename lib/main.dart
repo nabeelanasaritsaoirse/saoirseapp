@@ -1,41 +1,44 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
-void main() {
-  runApp(const DiagnosticApp());
+import 'app.dart'; // your main app widget
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  try {
+    await Firebase.initializeApp();
+  } catch (e, s) {
+    log('❌ BG Firebase error', error: e, stackTrace: s);
+  }
 }
 
-class DiagnosticApp extends StatelessWidget {
-  const DiagnosticApp({super.key});
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.red, // Red so you know it's the diagnostic app
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '🔴 DIAGNOSTIC MODE',
-                style: TextStyle(
-                  fontSize: 24,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'If you see this, Flutter works.',
-                style: TextStyle(fontSize: 18, color: Colors.white),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 40),
-              CircularProgressIndicator(color: Colors.white),
-            ],
-          ),
-        ),
-      ),
+  // 🔒 Never allow startup crash
+  try {
+    // Load env (DO NOT FAIL APP)
+    try {
+      await dotenv.load(fileName: ".env");
+    } catch (e) {
+      log("⚠️ .env not loaded: $e");
+    }
+
+    // Firebase init
+    await Firebase.initializeApp();
+
+    FirebaseMessaging.onBackgroundMessage(
+      firebaseMessagingBackgroundHandler,
     );
+
+  } catch (e, s) {
+    log('❌ App init failed', error: e, stackTrace: s);
   }
+
+  // 🔥 ALWAYS RUN APP
+  runApp(const MyApp());
 }
