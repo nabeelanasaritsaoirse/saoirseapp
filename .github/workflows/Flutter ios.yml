@@ -47,10 +47,6 @@ jobs:
           ANDROID_PROJECT_ID=dummy
           EOF
           
-      - name: 🔥 Add GoogleService-Info.plist (Debug)
-        run: |
-          cp ios/Runner/GoogleService-Info.plist.example \
-             ios/Runner/GoogleService-Info.plist
 
       - name: 📥 Download Fonts
         run: |
