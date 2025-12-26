@@ -18,79 +18,79 @@ class AppsFlyerService {
   Future<void> init() async {
     if (_initialized) return;
 
-    //--------Checking Local Storage----------------------
-    final savedReferral = storage.read('pending_referral_code');
-    if (savedReferral != null && savedReferral.isNotEmpty) {
-      referralFromDeepLink = savedReferral;
-      debugPrint("✅ Restored referral from storage: $savedReferral");
+    try {
+      // 🔹 Restore referral if exists
+      final savedReferral = storage.read('pending_referral_code');
+      if (savedReferral != null && savedReferral.isNotEmpty) {
+        referralFromDeepLink = savedReferral;
+        debugPrint("✅ Restored referral: $savedReferral");
+      }
+
+      // 🔹 SAFE AppsFlyer options for iOS
+      final options = AppsFlyerOptions(
+        afDevKey: '42ygpJ8vjAxWw4dg5YZoSZ',
+        appId: '1765456537', // ✅ Apple App Store NUMERIC ID
+        showDebug: true,
+        timeToWaitForATTUserAuthorization: 60, // ✅ REQUIRED for iOS
+        manualStart: true, // ✅ REQUIRED for iOS
+      );
+
+      _sdk = AppsflyerSdk(options);
+
+      // 🔹 Init SDK (do NOT await)
+      _sdk.initSdk(
+        registerConversionDataCallback: true,
+        registerOnDeepLinkingCallback: true,
+        registerOnAppOpenAttributionCallback: true,
+      );
+
+      // 🔹 Start SDK AFTER UI is ready (prevents black screen)
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _sdk.startSDK();
+      });
+
+      // 🔹 Deep linking (foreground)
+      _sdk.onDeepLinking((deepLinkResult) async {
+        if (deepLinkResult.status != Status.FOUND ||
+            deepLinkResult.deepLink == null) {
+          return;
+        }
+
+        final dl = deepLinkResult.deepLink!;
+        final deepLinkValue = dl.deepLinkValue;
+
+        if (deepLinkValue != null && deepLinkValue.isNotEmpty) {
+          referralFromDeepLink = deepLinkValue;
+          storage.write('pending_referral_code', deepLinkValue);
+        }
+
+        final afDp = dl.clickEvent["af_dp"];
+        if (afDp != null && afDp.toString().startsWith("epi://product/")) {
+          final uri = Uri.parse(afDp);
+          final productId = uri.pathSegments.last;
+
+          storage.write("pending_product_id", productId);
+          DeepLinkNavigationService.handleProductNavigation();
+        }
+      });
+
+      // 🔹 App open attribution (background)
+      _sdk.onAppOpenAttribution((data) {
+        final afDp = data["af_dp"];
+        if (afDp != null && afDp.toString().startsWith("epi://product/")) {
+          final uri = Uri.parse(afDp);
+          final productId = uri.pathSegments.last;
+
+          storage.write("pending_product_id", productId);
+          DeepLinkNavigationService.handleProductNavigation();
+        }
+      });
+
+      _initialized = true;
+    } catch (e) {
+      // 🔥 NEVER crash the app
+      debugPrint("❌ AppsFlyer init failed: $e");
     }
-    //----------------------------------------------------
-
-    final options = AppsFlyerOptions(
-      afDevKey: '42ygpJ8vjAxWw4dg5YZoSZ',
-      appId: 'com.saoirse.epi',
-      showDebug: true,
-      timeToWaitForATTUserAuthorization: 0,
-      manualStart: false,
-    );
-
-    _sdk = AppsflyerSdk(options);
-
-    await _sdk.initSdk(
-      registerConversionDataCallback: true,
-      registerOnDeepLinkingCallback: true,
-      registerOnAppOpenAttributionCallback: true,
-    );
-
-    _sdk.onDeepLinking((deepLinkResult) async {
-      if (deepLinkResult.status != Status.FOUND ||
-          deepLinkResult.deepLink == null) {
-        return;
-      }
-
-      final dl = deepLinkResult.deepLink!;
-      final deepLinkValue = dl.deepLinkValue;
-
-      // -------------------------------
-      //  REFERRAL
-      // -------------------------------
-      if (deepLinkValue != null && deepLinkValue.isNotEmpty) {
-        referralFromDeepLink = deepLinkValue;
-        storage.write('pending_referral_code', deepLinkValue);
-      }
-
-      // -------------------------------
-      // PRODUCT DEEP LINK/
-      // -------------------------------
-      final afDp = dl.clickEvent["af_dp"];
-      if (afDp != null && afDp.toString().startsWith("epi://product/")) {
-        final uri = Uri.parse(afDp);
-        final productId = uri.pathSegments.last;
-
-        storage.write("pending_product_id", productId);
-        DeepLinkNavigationService.handleProductNavigation();
-      }
-    });
-
-    _sdk.onAppOpenAttribution((data) {
-      debugPrint("🔵 App Open Attribution: $data");
-
-      // -------------------------------
-      // PRODUCT DEEP LINK (BACKGROUND)
-      // -------------------------------
-      final afDp = data["af_dp"];
-      if (afDp != null && afDp.toString().startsWith("epi://product/")) {
-        final uri = Uri.parse(afDp);
-        final productId = uri.pathSegments.last;
-
-        storage.write("pending_product_id", productId);
-        DeepLinkNavigationService.handleProductNavigation();
-
-        debugPrint("📦 Product deep link received (background): $productId");
-      }
-    });
-
-    _initialized = true;
   }
 
   String? consumePendingProduct() {
