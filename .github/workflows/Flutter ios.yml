@@ -29,7 +29,7 @@ env:
 jobs:
   ios-native-debug:
     name: 🧪 iOS Native Debug (Simulator)
-    runs-on: macos-16
+    runs-on: macos-latest
   
     steps:
       - uses: actions/checkout@v4
