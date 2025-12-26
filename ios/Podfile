@@ -1,5 +1,5 @@
 # Top of the file
-platform :ios, '15.0'
+platform :ios, '16.0'
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
 project 'Runner', {
@@ -56,7 +56,7 @@ post_install do |installer|
         config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
       end
 
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
       config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
       config.build_settings['ENABLE_BITCODE'] = 'NO'
     end
