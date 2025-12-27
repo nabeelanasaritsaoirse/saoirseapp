@@ -216,13 +216,13 @@ jobs:
       # Debug on Failure
       # --------------------------------------------------
       - name: 📸 Screenshot on Failure
-        if: failure()
+        if: always()
         run: |
           UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
           xcrun simctl io "$UDID" screenshot simulator_error.png || true
 
       - name: 📤 Upload Screenshot
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: simulator-screenshot-${{ github.run_number }}
@@ -235,7 +235,7 @@ jobs:
   ios-ci:
     name: 🏗️ iOS CI Build
     needs: ios-native-debug
-    runs-on: macos-16
+    runs-on: macos-latest
     outputs:
       version_name: ${{ steps.version.outputs.VERSION_NAME }}
       build_number: ${{ steps.version.outputs.BUILD_NUMBER }}
@@ -525,7 +525,7 @@ jobs:
   ios-deploy:
     name: 🚀 Deploy to TestFlight
     needs: ios-ci
-    runs-on: macos-16
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v4
