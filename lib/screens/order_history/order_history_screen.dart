@@ -43,9 +43,18 @@ class OrderHistoryScreen extends StatelessWidget {
         }
 
         return ListView.builder(
+          controller: controller.scrollController,
           padding: EdgeInsets.only(top: 7.h),
-          itemCount: controller.orders.length,
+          itemCount: controller.orders.length + 1,
           itemBuilder: (context, index) {
+            if (index == controller.orders.length) {
+              return controller.isPageLoading.value
+                  ? Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Center(child: appLoader()),
+                    )
+                  : const SizedBox.shrink();
+            }
             final order = controller.orders[index];
             return OrderCard(order: order);
           },

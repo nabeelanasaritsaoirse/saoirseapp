@@ -154,7 +154,7 @@ class AppStrings {
   static String StreetName = 'Street Name';
   static String City = 'City';
   static String State = 'State / Province';
-  static String Country = 'country';
+  static String Country = 'Country';
   static String ZipCode = 'Zip Code';
   static String PhoneNumber = 'Phone Number';
   static String Save = 'Save';

@@ -52,9 +52,21 @@ class _TransactionHistoryState extends State<TransactionHistory> {
   }
 
   Widget _transactionCard(WalletTransaction item) {
-    final String productName = item.product?.name ?? "Unknown Product";
+    final String productName = item.product?.name ??
+        (item.description.isNotEmpty ? item.description : "Unknown Product");
     final String status = item.status;
-    final bool isFailed = status.toLowerCase() == "failed";
+    // Status color
+    Color statusColor;
+    if (status.toLowerCase() == "pending") {
+      statusColor = AppColors.orange;
+    } else if (status.toLowerCase() == "completed") {
+      statusColor = AppColors.green;
+    } else if (status.toLowerCase() == "failed") {
+      statusColor = AppColors.red;
+    } else {
+      statusColor = AppColors.yellow;
+    }
+
     final String amount = "₹${item.amount.toStringAsFixed(2)}";
 
     final String date =
@@ -86,7 +98,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 child: appText(
                   productName,
                   textAlign: TextAlign.start,
-                  maxLines: 2,
+                  maxLines: 3,
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w600,
                 ),
@@ -107,7 +119,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               Row(
                 children: [
                   appText(
-                    "Status ",
+                    "Status : ",
                     color: AppColors.mediumGray,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
@@ -117,7 +129,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                   ),
                   appText(
                     status.capitalizeFirst!,
-                    color: isFailed ? AppColors.red : AppColors.green,
+                    color: statusColor,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
                   ),
@@ -128,7 +140,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               Row(
                 children: [
                   appText(
-                    "Amount ",
+                    "Amount : ",
                     color: AppColors.black54,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
