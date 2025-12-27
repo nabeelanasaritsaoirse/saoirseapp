@@ -45,6 +45,25 @@ class ReferralController extends GetxController {
     fetchReferrerInfo();
   }
 
+  Future<void> refreshAll() async {
+    log("🔄 REFRESH STARTED");
+    if (isLoading.value) return;
+
+    try {
+      isLoading.value = true;
+
+      await Future.wait([
+        fetchReferralStats(),
+        fetchReferralData(),
+        fetchReferrerInfo(),
+      ]);
+    } catch (e) {
+      log("🔴 Refresh failed: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> fetchReferrerInfo() async {
     log("\n================ FETCH REFERRER INFO ================");
     log("📡 Calling API: /api/referral/referrer-info");

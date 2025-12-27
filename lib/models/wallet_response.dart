@@ -1,4 +1,4 @@
-class WalletmModels {
+class WalletModels {
   bool success;
   String message;
   int walletBalance;
@@ -11,7 +11,7 @@ class WalletmModels {
   int totalEarnings;
   List<WalletTransaction> transactions;
 
-  WalletmModels({
+  WalletModels({
     required this.success,
     required this.message,
     required this.walletBalance,
@@ -25,19 +25,19 @@ class WalletmModels {
     required this.transactions,
   });
 
-  factory WalletmModels.fromJson(Map<String, dynamic> json) {
-    return WalletmModels(
-      success: json["success"],
-      message: json["message"],
-      walletBalance: json["walletBalance"],
-      totalBalance: json["totalBalance"],
-      holdBalance: json["holdBalance"],
-      referralBonus: json["referralBonus"],
-      investedAmount: json["investedAmount"],
-      requiredInvestment: json["requiredInvestment"],
-      availableBalance: json["availableBalance"],
-      totalEarnings: json["totalEarnings"],
-      transactions: (json["transactions"] as List)
+  factory WalletModels.fromJson(Map<String, dynamic> json) {
+    return WalletModels(
+      success: json["success"] ?? false,
+      message: json["message"] ?? "",
+      walletBalance: json["walletBalance"] ?? 0,
+      totalBalance: json["totalBalance"] ?? 0,
+      holdBalance: json["holdBalance"] ?? 0,
+      referralBonus: json["referralBonus"] ?? 0,
+      investedAmount: json["investedAmount"] ?? 0,
+      requiredInvestment: json["requiredInvestment"] ?? 0,
+      availableBalance: json["availableBalance"] ?? 0,
+      totalEarnings: json["totalEarnings"] ?? 0,
+      transactions: (json["transactions"] as List? ?? [])
           .map((e) => WalletTransaction.fromJson(e))
           .toList(),
     );
@@ -53,11 +53,12 @@ class WalletTransaction {
   final String description;
   final DateTime createdAt;
 
-  final PaymentDetails paymentDetails;
+  /// ✅ paymentDetails can be null (many APIs don’t send it)
+  final PaymentDetails? paymentDetails;
 
-  /// 🔥 THESE ARE JUST ID STRINGS IN API
-  final String product;
-  final String order;
+  /// ✅ product & order may be object OR string OR null
+  final String? product;
+  final String? order;
 
   WalletTransaction({
     required this.id,
@@ -67,9 +68,9 @@ class WalletTransaction {
     required this.paymentMethod,
     required this.description,
     required this.createdAt,
-    required this.paymentDetails,
-    required this.product,
-    required this.order,
+    this.paymentDetails,
+    this.product,
+    this.order,
   });
 
   factory WalletTransaction.fromJson(Map<String, dynamic> json) {
@@ -82,11 +83,16 @@ class WalletTransaction {
       description: json["description"] ?? "",
       createdAt: DateTime.parse(json["createdAt"]),
 
-      paymentDetails: PaymentDetails.fromJson(json["paymentDetails"]),
+      /// ✅ SAFE NULL CHECK
+      paymentDetails: json["paymentDetails"] != null
+          ? PaymentDetails.fromJson(json["paymentDetails"])
+          : null,
 
-      /// ✔ product and order IDs only
-      product: json["product"] ?? "",
-      order: json["order"] ?? "",
+      /// ✅ Extract only IDs safely
+      product:
+          json["product"] is Map ? json["product"]["_id"] : json["product"],
+
+      order: json["order"] is Map ? json["order"]["_id"] : json["order"],
     );
   }
 }
@@ -96,7 +102,7 @@ class PaymentDetails {
   final int emiNumber;
   final bool isCommissionProcessed;
 
-  /// 🆕 New optional fields from API
+  /// Optional fields
   final String? paymentId;
   final String? signature;
 
@@ -113,8 +119,6 @@ class PaymentDetails {
       orderId: json["orderId"] ?? "",
       emiNumber: json["emiNumber"] ?? 0,
       isCommissionProcessed: json["isCommissionProcessed"] ?? false,
-
-      /// 🆕 Safely parse new fields if present
       paymentId: json["paymentId"],
       signature: json["signature"],
     );
