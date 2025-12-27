@@ -22,6 +22,7 @@ env:
   PROFILE_NAME: "match AppStore com.saoirse.epi 1765456537"
   ARCHIVE_DIR: build/ios/archive
   IPA_DIR: build/ios/ipa
+  IOS_MIN_VERSION: "16.0"
 
 jobs:
   ios-native-debug:
@@ -30,6 +31,16 @@ jobs:
   
     steps:
       - uses: actions/checkout@v4
+  
+      # 🚨 Fail-fast guards
+      - name: 🚨 Guard - Enforce iOS 16+ Minimum
+        run: |
+          if grep -R "IPHONEOS_DEPLOYMENT_TARGET = 1[0-5]\." ios/Runner.xcodeproj/project.pbxproj; then
+            echo "❌ ERROR: iOS deployment target < 16 detected"
+            echo "Firebase iOS SDK requires iOS 16.0+"
+            exit 1
+          fi
+          echo "✅ iOS deployment target guard passed"
   
       - name: 📝 Create .env
         run: |
@@ -96,17 +107,41 @@ jobs:
           </plist>
           EOF
 
-      - name: 🔧 Force iOS 16 Everywhere
+      # 🔧 CRITICAL: Force iOS 16 everywhere + remove legacy framework
+      - name: 🔧 Force iOS ${{ env.IOS_MIN_VERSION }} & Clean Legacy
         run: |
-          # Update ALL deployment targets to 16.0 (covers iOS 11-15)
-          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 16.0;/g' ios/Runner.xcodeproj/project.pbxproj
+          # Update ALL deployment targets (project + all configs)
+          sed -i '' "s/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = ${{ env.IOS_MIN_VERSION }};/g" ios/Runner.xcodeproj/project.pbxproj
           
           # Update Podfile platform
-          sed -i '' "s/platform :ios, '[0-9.]\+'/platform :ios, '16.0'/g" ios/Podfile
+          sed -i '' "s/platform :ios, '[0-9.]\+'/platform :ios, '${{ env.IOS_MIN_VERSION }}'/g" ios/Podfile
           
-          # Verify (debug output)
-          echo "=== Deployment targets ==="
+          # Remove legacy Pods_Runner.framework references (CI-safe)
+          sed -i '' '/Pods_Runner\.framework/d' ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' '/Embed Pods Frameworks/d' ios/Runner.xcodeproj/project.pbxproj
+          
+          # Verify
+          echo "=== Deployment targets after fix ==="
           grep IPHONEOS_DEPLOYMENT_TARGET ios/Runner.xcodeproj/project.pbxproj | head -3
+          
+          echo "=== Pods_Runner.framework check ==="
+          if grep -q "Pods_Runner.framework" ios/Runner.xcodeproj/project.pbxproj; then
+            echo "⚠️ Still present (will be ignored by CocoaPods)"
+          else
+            echo "✅ Removed successfully"
+          fi
+
+      # ♻️ Cache CocoaPods (4 min → 30 sec)
+      - name: ♻️ Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cocoapods
+            ios/Pods
+            ios/Podfile.lock
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
 
       - name: 🧹 Clean & Install Pods
         run: |
@@ -115,8 +150,23 @@ jobs:
           pod install --repo-update
           cd ..
 
-      - name: 🛠️ Build for Simulator
-        run: flutter build ios --simulator --debug --no-codesign
+      # 🔍 Verify Firebase iOS requirement
+      - name: 🔍 Guard - Firebase iOS SDK Requirement
+        run: |
+          if grep -R "IPHONEOS_DEPLOYMENT_TARGET = 1[0-5]\." ios/Pods/Pods.xcodeproj/project.pbxproj 2>/dev/null; then
+            echo "⚠️ WARNING: Firebase Pod requires iOS 16+, but found lower target"
+          else
+            echo "✅ Firebase iOS SDK requirements met"
+          fi
+
+      # 🎯 CRITICAL: --ios-min-version flag forces Flutter to use iOS 16
+      - name: 🛠️ Build for Simulator (iOS ${{ env.IOS_MIN_VERSION }})
+        run: |
+          flutter build ios \
+            --simulator \
+            --debug \
+            --no-codesign \
+            --ios-min-version=${{ env.IOS_MIN_VERSION }}
 
       - name: 🚀 Boot Simulator
         run: |
@@ -155,6 +205,7 @@ jobs:
         with:
           name: simulator-screenshot
           path: simulator_error.png
+
 
 
 
