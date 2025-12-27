@@ -107,8 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         fit: BoxFit.cover,
                                         width: 84,
                                         height: 84,
-                                        loadingBuilder:
-                                            (context, child, loadingProgress) {
+                                        loadingBuilder: (context, child, loadingProgress) {
                                           if (loadingProgress == null) {
                                             return child;
                                           }
@@ -119,16 +118,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             ),
                                           );
                                         },
-                                        errorBuilder: (_, __, ___) =>
-                                            Image.asset(
-                                          AppAssets.user_img,
-                                          fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => ClipOval(
+                                          child: Image.asset(
+                                            AppAssets.user_img,
+                                            fit: BoxFit.cover,
+                                            width: 84,
+                                            height: 84,
+                                          ),
                                         ),
                                       ),
                                     )
-                                  : Image.asset(
-                                      AppAssets.user_img,
-                                      fit: BoxFit.cover,
+                                  : ClipOval(
+                                      child: Image.asset(
+                                        AppAssets.user_img,
+                                        fit: BoxFit.cover,
+                                        width: 84,
+                                        height: 84,
+                                      ),
                                     ),
                             ),
 
@@ -213,8 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       return Obx(() => ProfileMenuCard(
                             icon: controller.myOrders[index]["icon"]!,
                             title: controller.myOrders[index]["title"]!,
-                            count:
-                                controller.wishlistCount.value, // 🔥 reactive
+                            count: controller.wishlistCount.value, // 🔥 reactive
                             onTap: () {
                               Get.to(WishlistScreen())?.then((_) {
                                 controller.fetchWishlistCount();
