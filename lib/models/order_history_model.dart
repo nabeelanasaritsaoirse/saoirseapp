@@ -56,11 +56,21 @@ class OrderHistoryItem {
     final product = json["product"] ?? {};
     final pricing = product["pricing"] ?? {};
     final images = (product["images"] as List?) ?? [];
+    final schedule = (json["paymentSchedule"] as List?) ?? [];
+
 
     String imageUrl = "";
     if (images.isNotEmpty && images[0]["url"] != null) {
       imageUrl = images[0]["url"];
     }
+
+    final String openDateValue = schedule.isNotEmpty
+      ? (schedule.first["dueDate"] ?? "")
+      : "";
+
+  final String closeDateValue = schedule.isNotEmpty
+      ? (schedule.last["dueDate"] ?? "")
+      : "";
 
     return OrderHistoryItem(
       id: json["orderId"] ?? "", // user-friendly ID
@@ -73,8 +83,8 @@ class OrderHistoryItem {
       dailyPlan:
           "₹${json["dailyPaymentAmount"] ?? 0}/${json["totalDays"] ?? 0} Days",
       status: json["status"] ?? "",
-      openDate: json["createdAt"] ?? "",
-      closeDate: json["lastPaymentDate"] ?? "",
+      openDate: openDateValue,
+      closeDate: closeDateValue,
       invested: json["totalPaidAmount"] ?? 0,
       currency: pricing["currency"] ?? "INR",
     );
