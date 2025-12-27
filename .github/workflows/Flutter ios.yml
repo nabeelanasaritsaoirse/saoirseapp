@@ -160,26 +160,30 @@ jobs:
       # --------------------------------------------------
       # Simulator Testing (ARM64, Runtime-Based Selection)
       # --------------------------------------------------
-      - name: 🚀 Boot ARM64 Simulator
+      - name: 🚀 Boot iOS Simulator (ARM64, Auto-detect)
         run: |
-          # Select iPhone 15 with iOS 17+ (guaranteed ARM64 on GitHub runners)
-          UDID=$(xcrun simctl list devices available | 
-            awk '/iPhone 15/ && /iOS 1[7-9]/ {print $NF}' | 
-            tr -d '()' | 
-            head -1)
-          
+          # Pick the first available iPhone simulator with iOS >= 16
+          UDID=$(xcrun simctl list devices available | \
+            awk '
+              /iOS/ { os=$0 }
+              /iPhone/ && os ~ /iOS (1[6-9]|[2-9][0-9])\./ {
+                match($0, /\(([A-F0-9-]+)\)/, m)
+                print m[1]
+                exit
+              }'
+          )
+      
           if [ -z "$UDID" ]; then
-            echo "❌ No suitable ARM64 simulator found"
-            echo "Available simulators:"
+            echo "❌ No suitable iPhone simulator found"
+            echo "Available devices:"
             xcrun simctl list devices available
             exit 1
           fi
-          
-          echo "✅ Selected ARM64 simulator: $UDID"
-          xcrun simctl boot "$UDID" || echo "Already booted"
-          
-          # Wait for boot
+      
+          echo "✅ Booting simulator: $UDID"
+          xcrun simctl boot "$UDID" || echo "Simulator already booted"
           sleep 5
+
 
       - name: 📲 Install App
         run: |
