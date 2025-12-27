@@ -368,7 +368,7 @@ jobs:
       - name: ✅ Validate GoogleService-Info.plist
         run: plutil -lint ios/Runner/GoogleService-Info.plist
 
-      - name: 🔍 Debug: Check Firebase Files Before Build
+      - name: 🔍 Debug Check Firebase Files Before Build
         run: |
           echo "=== Checking Firebase configuration ==="
           
