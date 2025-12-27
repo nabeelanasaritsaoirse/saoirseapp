@@ -71,33 +71,38 @@ jobs:
           # Update project deployment target
           sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 16.0;/g' ios/Runner.xcodeproj/project.pbxproj
           
+          # REMOVE any EXCLUDED_ARCHS settings that block arm64
+          sed -i '' '/EXCLUDED_ARCHS.*arm64/d' ios/Runner.xcodeproj/project.pbxproj
+          
           # Update Podfile
           sed -i '' "s/platform :ios, '[0-9.]\+'/platform :ios, '16.0'/g" ios/Podfile
           
-          # Force arm64 architecture for Apple Silicon simulator
+          # Configure for arm64 simulator ONLY
           cat > ios/Flutter/Debug.xcconfig <<XCCONFIG
           IPHONEOS_DEPLOYMENT_TARGET = 16.0
-          ARCHS = arm64
+          ARCHS[sdk=iphonesimulator*] = arm64
           VALID_ARCHS = arm64
+          EXCLUDED_ARCHS[sdk=iphonesimulator*] = 
           ONLY_ACTIVE_ARCH = YES
           XCCONFIG
           
-          # Update Podfile post_install (WITHOUT EXCLUDED_ARCHS)
+          # Update Podfile post_install
           if ! grep -q "config.build_settings\['IPHONEOS_DEPLOYMENT_TARGET'\] = '16.0'" ios/Podfile; then
             cat >> ios/Podfile <<'RUBY'
-    
+      
           post_install do |installer|
             installer.pods_project.targets.each do |target|
               flutter_additional_ios_build_settings(target)
               target.build_configurations.each do |config|
                 config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
-                config.build_settings['ARCHS'] = 'arm64'
-                config.build_settings['VALID_ARCHS'] = 'arm64'
+                config.build_settings['ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+                config.build_settings.delete('EXCLUDED_ARCHS[sdk=iphonesimulator*]')
               end
             end
           end
           RUBY
           fi
+
 
       - name: 🔥 Create GoogleService-Info.plist
         run: |
