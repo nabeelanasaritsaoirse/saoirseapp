@@ -254,16 +254,36 @@ class InviteFriendDetailsScreen extends StatelessWidget {
               SizedBox(height: 10.h),
 
               // ---------------- PRODUCT LIST ----------------
-              ListView.separated(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: user.products.length,
-                separatorBuilder: (_, __) => SizedBox(height: 10.h),
-                itemBuilder: (context, index) {
-                  final product = user.products[index];
-                  return _buildProductCard(context, product, controller);
-                },
-              ),
+              if (user.products.isEmpty)
+                Column(
+                  children: [
+                    SizedBox(
+                      height: 60.h,
+                    ),
+                    Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 30.h),
+                        child: appText(
+                          "No products purchased yet",
+                          fontSize: 14.sp,
+                          color: AppColors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              else
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: user.products.length,
+                  separatorBuilder: (_, __) => SizedBox(height: 10.h),
+                  itemBuilder: (context, index) {
+                    final product = user.products[index];
+                    return _buildProductCard(context, product, controller);
+                  },
+                ),
             ],
           ),
         );
@@ -302,18 +322,30 @@ Widget _buildProductCard(BuildContext context, FriendProduct product,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ---------------- Title + Date ----------------
+
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            appText(
-              product.productName,
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w700,
+            // PRODUCT NAME (takes remaining space)
+            Expanded(
+              child: appText(
+                product.productName,
+                textAlign: TextAlign.left,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w700,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+
+            SizedBox(width: 8.w),
+
+            // DATE (fixed width, never overflows)
             appText(
               "${AppStrings.dp}$formattedDate",
               fontSize: 12.sp,
               color: AppColors.darkGray,
+              textAlign: TextAlign.right,
             ),
           ],
         ),
