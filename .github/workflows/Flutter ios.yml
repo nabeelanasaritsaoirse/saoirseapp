@@ -85,18 +85,18 @@ jobs:
           # Update Podfile post_install (WITHOUT EXCLUDED_ARCHS)
           if ! grep -q "config.build_settings\['IPHONEOS_DEPLOYMENT_TARGET'\] = '16.0'" ios/Podfile; then
             cat >> ios/Podfile <<'RUBY'
-      
-            post_install do |installer|
-              installer.pods_project.targets.each do |target|
-                flutter_additional_ios_build_settings(target)
-                target.build_configurations.each do |config|
-                  config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
-                  config.build_settings['ARCHS'] = 'arm64'
-                  config.build_settings['VALID_ARCHS'] = 'arm64'
-                end
+    
+          post_install do |installer|
+            installer.pods_project.targets.each do |target|
+              flutter_additional_ios_build_settings(target)
+              target.build_configurations.each do |config|
+                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+                config.build_settings['ARCHS'] = 'arm64'
+                config.build_settings['VALID_ARCHS'] = 'arm64'
               end
             end
-            RUBY
+          end
+          RUBY
           fi
 
       - name: 🔥 Create GoogleService-Info.plist
