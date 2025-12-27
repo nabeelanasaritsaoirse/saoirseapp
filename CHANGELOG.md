@@ -1,22 +1,21 @@
-## Version 1.4.18+103
+## Version 1.4.19+104
 
-- Merge pull request #293 from nabeelanasaritsaoirse/deep
+- Merge pull request #295 from nabeelanasaritsaoirse/deep
+- Merge remote-tracking branch 'origin/meganathan' into deep
+- updated open date and closing date in order history
 - fix
 - Merge remote-tracking branch 'origin/sahir' into deep
+- Resolved slect paln sheet issue and added loader on wallet payement
 - fix
-- update pricing and payment method handling on quantity change and implement multiple payment methods
-- added wallet option in peding transaction screen
+- updated oder delivered api and ui
+- Merge remote-tracking branch 'origin/meganathan' into deep
+- updated transaction history small ui changes and pending transaction history image updated based on new response
 - Merge remote-tracking branch 'origin/sahir' into deep
-- add multiple payment methods and construct order payload correctly
+- add automatic retry for failed network requests
+- fix: added condition for delete icon
+- Merge remote-tracking branch 'origin/sahir' into deep
+- add pull-to-refresh for wallet and referral screens; update wallet model
+- Merge remote-tracking branch 'origin/meganathan' into deep
+- added new api in order history screen and updated code based on new response
 - fix
-- trending and best sellet and most popular all with new api
-- Adjust Select Plan bottom sheet height based on plan count
-- Tested application, listed issues, and properly added loaders for all image sections
-- small changes in product detail controller
-- Merge branch 'meganathan' of https://github.com/nishantitsaoirse-head/saoirseapp into shadin
-- Merge branch 'sahir' of https://github.com/nishantitsaoirse-head/saoirseapp into shadin
-- refferal count for refferal limit
-- Resolved hiding category product name on the left slide bar
-- resolved the deeplinking through sharing option issues
-- latest code push
-- implemented instagram story referral share functionality
+- Add user selection highlight for payment methods and show instant balance in order details and pending transaction screens
