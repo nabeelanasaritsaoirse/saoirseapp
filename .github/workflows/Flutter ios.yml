@@ -66,18 +66,23 @@ jobs:
       - run: flutter clean
       - run: flutter pub get
 
-      - name: 🔧 Configure iOS 16 for Debug
+      - name: 🔧 Configure iOS 16 + arm64 for Simulator
         run: |
-          # Update project settings
+          # Update project deployment target
           sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 16.0;/g' ios/Runner.xcodeproj/project.pbxproj
           
-          # Update Podfile platform
+          # Update Podfile
           sed -i '' "s/platform :ios, '[0-9.]\+'/platform :ios, '16.0'/g" ios/Podfile
           
-          # Force Debug.xcconfig to 16.0
-          echo "IPHONEOS_DEPLOYMENT_TARGET = 16.0" >> ios/Flutter/Debug.xcconfig
+          # Force arm64 architecture for Apple Silicon simulator
+          cat > ios/Flutter/Debug.xcconfig <<XCCONFIG
+          IPHONEOS_DEPLOYMENT_TARGET = 16.0
+          ARCHS = arm64
+          VALID_ARCHS = arm64
+          ONLY_ACTIVE_ARCH = YES
+          XCCONFIG
           
-          # Ensure Podfile has the post_install hook to force pods to 16.0
+          # Update Podfile post_install
           if ! grep -q "config.build_settings\['IPHONEOS_DEPLOYMENT_TARGET'\] = '16.0'" ios/Podfile; then
             cat >> ios/Podfile <<'RUBY'
           
@@ -86,6 +91,9 @@ jobs:
               flutter_additional_ios_build_settings(target)
               target.build_configurations.each do |config|
                 config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+                config.build_settings['ARCHS'] = 'arm64'
+                config.build_settings['VALID_ARCHS'] = 'arm64'
+                config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'i386 x86_64'
               end
             end
           end
@@ -128,58 +136,47 @@ jobs:
       - name: 📦 Install Pods
         run: cd ios && pod install --repo-update
   
-      - name: 🛠️ Build for Simulator
+      - name: 🛠️ Build for Simulator (arm64)
         run: |
-          flutter build ios --simulator --debug --no-codesign 
-          
-
-
-          
-
+          flutter build ios --simulator --debug --no-codesign
   
-   #   - name: 🧪 Run Flutter Tests
-   #     run: flutter test
+      - name: 🔍 Verify Build Architecture
+        run: |
+          file build/ios/iphonesimulator/Runner.app/Runner
   
       - name: 📱 List Available Simulators
         run: xcrun simctl list devices available
   
       - name: 🚀 Boot Simulator
         run: |
-          # Boot the simulator if it's not already booted
-          if ! xcrun simctl list devices | grep -q "iPhone 16.*(Booted)"; then
-            xcrun simctl boot "iPhone 16" || echo "Failed to boot iPhone 16, trying another simulator..."
-            xcrun simctl boot "iPhone 15" || echo "Failed to boot iPhone 15"
-          else
-            echo "iPhone 16 is already booted."
+          if ! xcrun simctl list devices | grep -q "iPhone.*(Booted)"; then
+            xcrun simctl boot "iPhone 16" || xcrun simctl boot "iPhone 15" || true
           fi
   
-      - name: ✅ Install App on Simulator
+      - name: 🧹 Clean Install App
         run: |
-          SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone 16.*(Booted)" | awk '{print $NF}' | tr -d '()')
-          if [ -z "$SIMULATOR_UDID" ]; then
-            SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
-          fi
-  
+          SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
+          
+          # Uninstall any existing version
+          xcrun simctl uninstall "$SIMULATOR_UDID" com.saoirse.epi || true
+          
+          # Install fresh build
           APP_PATH="build/ios/iphonesimulator/Runner.app"
-          if [ -d "$APP_PATH" ]; then
-            xcrun simctl install "$SIMULATOR_UDID" "$APP_PATH" || echo "Failed to install app on simulator"
-          else
-            echo "App bundle not found at $APP_PATH"
-            exit 1
-          fi
+          xcrun simctl install "$SIMULATOR_UDID" "$APP_PATH"
   
       - name: 🎬 Launch App on Simulator
         run: |
           SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
           xcrun simctl launch "$SIMULATOR_UDID" com.saoirse.epi &
           LAUNCH_PID=$!
-          sleep 5
+          sleep 10
   
           if xcrun simctl spawn "$SIMULATOR_UDID" launchctl list | grep -q "com.saoirse.epi"; then
-            echo "✅ App launched successfully and is running"
+            echo "✅ App launched successfully"
             kill $LAUNCH_PID 2>/dev/null || true
           else
             echo "❌ App crashed during launch"
+            xcrun simctl spawn "$SIMULATOR_UDID" log show --predicate 'process == "Runner"' --style compact --last 1m
             kill $LAUNCH_PID 2>/dev/null || true
             exit 1
           fi
@@ -188,7 +185,7 @@ jobs:
         if: failure()
         run: |
           SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
-          xcrun simctl io "$SIMULATOR_UDID" screenshot simulator_error.png || echo "Failed to take screenshot"
+          xcrun simctl io "$SIMULATOR_UDID" screenshot simulator_error.png || true
   
       - name: 📤 Upload Screenshot
         if: failure()
@@ -196,7 +193,7 @@ jobs:
         with:
           name: simulator-screenshot
           path: simulator_error.png
-  
+
 
 # ==================================================
 # 2️⃣ IOS BUILD (UNCHANGED – YOUR WORKING PIPELINE)
