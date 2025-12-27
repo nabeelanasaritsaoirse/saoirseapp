@@ -1,21 +1,7 @@
-## Version 1.4.19+104
+## Version 1.4.20+105
 
-- Merge pull request #295 from nabeelanasaritsaoirse/deep
+- Merge pull request #297 from nabeelanasaritsaoirse/deep
 - Merge remote-tracking branch 'origin/meganathan' into deep
-- updated open date and closing date in order history
+- updated transaction histroy ui
 - fix
-- Merge remote-tracking branch 'origin/sahir' into deep
-- Resolved slect paln sheet issue and added loader on wallet payement
-- fix
-- updated oder delivered api and ui
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- updated transaction history small ui changes and pending transaction history image updated based on new response
-- Merge remote-tracking branch 'origin/sahir' into deep
-- add automatic retry for failed network requests
-- fix: added condition for delete icon
-- Merge remote-tracking branch 'origin/sahir' into deep
-- add pull-to-refresh for wallet and referral screens; update wallet model
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- added new api in order history screen and updated code based on new response
-- fix
-- Add user selection highlight for payment methods and show instant balance in order details and pending transaction screens
+- Resolve overflow in Invite Friend details screen and update wallet and friendDetails models
