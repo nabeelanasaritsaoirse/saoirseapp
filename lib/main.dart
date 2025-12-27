@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -25,16 +24,12 @@ import 'services/notification_service_helper.dart';
 /// 🔐 Storage
 final GetStorage storage = GetStorage();
 
-/// 🔴 REQUIRED for iOS background notifications
+/// 🔴 iOS SAFE background handler
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp();
-    NotificationServiceHelper.showFlutterNotification(message);
-  } catch (e, s) {
-    log("🔴 Background handler error", error: e, stackTrace: s);
-  }
+  // ❌ DO NOT initialize Firebase here on iOS
+  NotificationServiceHelper.showFlutterNotification(message);
+  log("🟢 Background message handled");
 }
 
 Future<void> main() async {
@@ -46,56 +41,35 @@ Future<void> main() async {
   await GetStorage.init();
 
   // -----------------------------
-  // ENV (SAFE)
+  // ENV (NON-FIREBASE ONLY)
   // -----------------------------
   try {
     await dotenv.load(fileName: ".env");
-    log("🔵 .env loaded successfully");
+    log("🔵 .env loaded");
   } catch (e) {
     log("⚠️ dotenv load failed: $e");
   }
 
   // -----------------------------
-  // Firebase (SAFE)
+  // Firebase (ONCE – reads plist)
   // -----------------------------
   try {
     log("🔵 Initializing Firebase...");
-    if (Platform.isIOS) {
-      log("🔵 iOS Firebase Options:");
-      log("API Key: ${dotenv.env['IOS_API_KEY']}");
-      log("App ID: ${dotenv.env['IOS_APP_ID']}");
-      log("Sender ID: ${dotenv.env['IOS_MESSAGING_SENDER_ID']}");
-      log("Project ID: ${dotenv.env['IOS_PROJECT_ID']}");
-      await Firebase.initializeApp(
-        options: FirebaseOptions(
-          apiKey: dotenv.env['IOS_API_KEY']!,
-          appId: dotenv.env['IOS_APP_ID']!,
-          messagingSenderId: dotenv.env['IOS_MESSAGING_SENDER_ID']!,
-          projectId: dotenv.env['IOS_PROJECT_ID']!,
-        ),
-      );
-    } else {
-      await Firebase.initializeApp(
-        options: FirebaseOptions(
-          apiKey: dotenv.env['ANDROID_API_KEY']!,
-          appId: dotenv.env['ANDROID_APP_ID']!,
-          messagingSenderId: dotenv.env['ANDROID_MESSAGING_SENDER_ID']!,
-          projectId: dotenv.env['ANDROID_PROJECT_ID']!,
-        ),
-      );
-    }
-    log("🔵 Firebase initialized successfully");
+    await Firebase.initializeApp();
+    log("✅ Firebase initialized");
+    log("📦 Project ID: ${Firebase.app().options.projectId}");
   } catch (e, s) {
     log("🔴 Firebase init failed", error: e, stackTrace: s);
-    // Optionally, exit the app or show an error screen
-    // exit(1);
   }
 
   // -----------------------------
   // Firebase Messaging
   // -----------------------------
   try {
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    FirebaseMessaging.onBackgroundMessage(
+      firebaseMessagingBackgroundHandler,
+    );
+
     await FirebaseMessaging.instance.requestPermission(
       alert: true,
       badge: true,
@@ -103,19 +77,22 @@ Future<void> main() async {
     );
 
     FirebaseMessaging.onMessage.listen((message) {
-      log("🟢 Foreground Msg: ${message.notification?.title}");
+      log("🟢 Foreground message");
       NotificationServiceHelper.showFlutterNotification(message);
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      log("🔵 Notification clicked");
+      log("🔵 Notification tapped");
       NotificationServiceHelper.handleNotificationTap(message.data);
     });
 
-    final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    final initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
-      log("🟥 Terminated → Notification tapped");
-      NotificationServiceHelper.handleNotificationTap(initialMessage.data);
+      log("🟥 App opened from terminated state");
+      NotificationServiceHelper.handleNotificationTap(
+        initialMessage.data,
+      );
     }
   } catch (e, s) {
     log("🔴 Firebase Messaging setup failed", error: e, stackTrace: s);
@@ -127,7 +104,7 @@ Future<void> main() async {
   try {
     await NotificationServiceHelper.initializeLocalNotifications();
   } catch (e, s) {
-    log("🔴 Local notifications setup failed", error: e, stackTrace: s);
+    log("🔴 Local notification init failed", error: e, stackTrace: s);
   }
 
   // -----------------------------
@@ -158,7 +135,7 @@ Future<void> main() async {
   }
 
   // -----------------------------
-  // RUN APP (SAFE POINT)
+  // RUN APP
   // -----------------------------
   runApp(MyApp(locale: locale));
 }
@@ -179,10 +156,7 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return GestureDetector(
           onTap: () {
-            final currentFocus = FocusScope.of(context);
-            if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
-              FocusManager.instance.primaryFocus?.unfocus();
-            }
+            FocusManager.instance.primaryFocus?.unfocus();
           },
           child: GetMaterialApp(
             initialBinding: Allcontroller(),
@@ -190,7 +164,8 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: AppStrings.app_name,
             theme: ThemeData(
-              scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
+              scaffoldBackgroundColor:
+                  const Color.fromARGB(255, 235, 230, 230),
               textTheme: GoogleFonts.poppinsTextTheme(),
               highlightColor: AppColors.transparent,
               splashColor: AppColors.transparent,
@@ -224,7 +199,11 @@ class CustomScrollBehavior extends ScrollBehavior {
   }
 
   @override
-  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) {
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
     return child;
   }
 }
