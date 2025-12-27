@@ -179,7 +179,9 @@ class PendingTransaction extends StatelessWidget {
 
 //-------------------------------- BOTTOM TOTAL AMOUNT SECTION -------------------------------
           Obx(() {
-            if (controller.transactions.isEmpty) {
+            bool hasSelection = controller.selectedList.any((e) => e.value);//check if any item is selected
+
+            if (controller.transactions.isEmpty || !hasSelection) {
               return const SizedBox.shrink();
             }
 
