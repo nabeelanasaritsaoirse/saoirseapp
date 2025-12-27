@@ -144,8 +144,8 @@ jobs:
           flutter build ios \
             --simulator \
             --debug \
-            --no-codesign \
-            --ios-min-version=${{ env.IOS_MIN_VERSION }}
+            --no-codesign 
+         
 
       # --------------------------------------------------
       # Simulator Testing
