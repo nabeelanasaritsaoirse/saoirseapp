@@ -99,7 +99,7 @@ class AppURLs {
   // Orders History
   static String ORDER_HISTORY_API = BASE_API + "api/installments/orders";
   static String ORDER_DELIVERED_HISTORY_API =
-      BASE_API + "api/orders/user/delivered";
+      BASE_API + "api/installments/orders";// same endpoint with different status filter only
 
   // Pending Transactions Api
   static String PENDING_TRANSACTIONS_API =
