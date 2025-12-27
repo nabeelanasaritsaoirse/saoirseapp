@@ -19,6 +19,11 @@ permissions:
 env:
   IOS_MIN_VERSION: "16.0"
   BUNDLE_ID: com.saoirse.epi
+  TEAM_ID: BYQUNNQSQH
+  PROFILE_NAME: "match AppStore com.saoirse.epi 1765456537"
+  ARCHIVE_DIR: build/ios/archive
+  IPA_DIR: build/ios/ipa
+
 
 jobs:
   ios-native-debug:
