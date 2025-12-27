@@ -368,35 +368,56 @@ jobs:
       - name: ✅ Validate GoogleService-Info.plist
         run: plutil -lint ios/Runner/GoogleService-Info.plist
 
-      - name: 📦 Ensure GoogleService-Info.plist is bundled (NO Xcode needed)
+      - name: 📦 Install Pods
+        run: |
+          cd ios
+          pod install --repo-update
+
+      - name: 📦 Ensure GoogleService-Info.plist is bundled (FIXED)
         run: |
           ruby <<'RUBY'
           require 'xcodeproj'
 
           project = Xcodeproj::Project.open('ios/Runner.xcodeproj')
-          target  = project.targets.find { |t| t.name == 'Runner' }
+          target = project.targets.find { |t| t.name == 'Runner' }
           raise 'Runner target not found' unless target
 
           resources = target.resources_build_phase
 
-          # 🔑 Correct + deterministic reference
-          file_ref = project.files.find { |f| f.path == 'Runner/GoogleService-Info.plist' }
+          # Find or create file reference in Runner group
+          runner_group = project.main_group.find_subpath('Runner')
+          raise 'Runner group not found' unless runner_group
 
+          # Look for existing reference
+          file_ref = runner_group.files.find { |f| f.path == 'GoogleService-Info.plist' }
+
+          # Create if doesn't exist
           unless file_ref
-            file_ref = project.main_group
-              .find_subpath('Runner/GoogleService-Info.plist', true)
-            file_ref.set_last_known_file_type('text.plist.xml')
+            file_ref = runner_group.new_file('GoogleService-Info.plist')
+            file_ref.last_known_file_type = 'text.plist.xml'
+            puts '📝 Created file reference for GoogleService-Info.plist'
           end
 
-          unless resources.files.any? { |f| f.file_ref == file_ref }
+          # Add to Copy Bundle Resources if not already there
+          unless resources.files.any? { |build_file| build_file.file_ref == file_ref }
             resources.add_file_reference(file_ref)
             puts '✅ GoogleService-Info.plist added to Copy Bundle Resources'
           else
-            puts 'ℹ️ GoogleService-Info.plist already in Copy Bundle Resources'
+            puts 'ℹ️  GoogleService-Info.plist already in Copy Bundle Resources'
           end
 
           project.save
+          puts '💾 Project saved'
           RUBY
+
+          # Verify it was added
+          if grep -q "GoogleService-Info.plist" ios/Runner.xcodeproj/project.pbxproj; then
+            echo "✅ Verified: GoogleService-Info.plist is in project.pbxproj"
+          else
+            echo "❌ ERROR: Failed to add GoogleService-Info.plist to project"
+            exit 1
+          fi
+
 
       - name: 🔍  Check Firebase Files Before Build
         run: |
@@ -417,12 +438,7 @@ jobs:
             echo "❌ CRITICAL: GoogleService-Info.plist NOT in Copy Bundle Resources!"
             exit 1
           fi
-
-      - name: 📦 Install Pods
-        run: |
-          cd ios
-          pod install --repo-update
-
+          
       - name: ⚙️ Configure Xcode Signing
         run: |
           cat > update_signing.rb <<'RUBY'
