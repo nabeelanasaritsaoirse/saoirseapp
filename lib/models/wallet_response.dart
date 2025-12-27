@@ -43,8 +43,7 @@ class WalletModels {
       investedAmount: (json["investedAmount"] as num?)?.toDouble() ?? 0.0,
       requiredInvestment:
           (json["requiredInvestment"] as num?)?.toDouble() ?? 0.0,
-      availableBalance:
-          (json["availableBalance"] as num?)?.toDouble() ?? 0.0,
+      availableBalance: (json["availableBalance"] as num?)?.toDouble() ?? 0.0,
       totalEarnings: (json["totalEarnings"] as num?)?.toDouble() ?? 0.0,
 
       transactions: (json["transactions"] as List? ?? [])
@@ -143,7 +142,3 @@ class PaymentDetails {
     );
   }
 }
-
-
-
-

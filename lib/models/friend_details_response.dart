@@ -82,14 +82,9 @@ class FriendProduct {
       totalAmount: (json["totalAmount"] as num?)?.toInt() ?? 0,
       dateOfPurchase: json["dateOfPurchase"] ?? "",
       days: (json["days"] as num?)?.toInt() ?? 0,
-      commissionPerDay:
-          (json["commissionPerDay"] as num?)?.toDouble() ?? 0.0,
+      commissionPerDay: (json["commissionPerDay"] as num?)?.toDouble() ?? 0.0,
       paidDays: (json["paidDays"] as num?)?.toInt() ?? 0,
       pendingDays: (json["pendingDays"] as num?)?.toInt() ?? 0,
     );
   }
 }
-
-
-
-
