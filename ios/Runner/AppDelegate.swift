@@ -1,14 +1,17 @@
 import UIKit
 import Flutter
-import Firebase // <-- Add this line
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
+
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    FirebaseApp.configure() // <-- Add this line
+
+    // ❌ DO NOT initialize Firebase here
+    // Flutter firebase_core handles it
+
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
