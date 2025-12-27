@@ -96,32 +96,17 @@ jobs:
           </plist>
           EOF
 
-      - name: 🔧 Configure iOS 16 & Clean Architecture
+      - name: 🔧 Force iOS 16 Everywhere
         run: |
-          # Update deployment target
+          # Update ALL deployment targets to 16.0 (covers iOS 11-15)
           sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 16.0;/g' ios/Runner.xcodeproj/project.pbxproj
-          
-          # Remove EXCLUDED_ARCHS from project file
-          sed -i '' '/EXCLUDED_ARCHS/d' ios/Runner.xcodeproj/project.pbxproj
           
           # Update Podfile platform
           sed -i '' "s/platform :ios, '[0-9.]\+'/platform :ios, '16.0'/g" ios/Podfile
           
-          # Update Podfile post_install (ONLY if not already present)
-          if ! grep -q "config.build_settings\['IPHONEOS_DEPLOYMENT_TARGET'\] = '16.0'" ios/Podfile; then
-            cat >> ios/Podfile <<'RUBY'
-          
-          post_install do |installer|
-            installer.pods_project.targets.each do |target|
-              flutter_additional_ios_build_settings(target)
-              target.build_configurations.each do |config|
-                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
-                config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'i386'
-              end
-            end
-          end
-          RUBY
-          fi
+          # Verify (debug output)
+          echo "=== Deployment targets ==="
+          grep IPHONEOS_DEPLOYMENT_TARGET ios/Runner.xcodeproj/project.pbxproj | head -3
 
       - name: 🧹 Clean & Install Pods
         run: |
@@ -132,9 +117,6 @@ jobs:
 
       - name: 🛠️ Build for Simulator
         run: flutter build ios --simulator --debug --no-codesign
-
-      - name: 📱 List Available Simulators
-        run: xcrun simctl list devices available
 
       - name: 🚀 Boot Simulator
         run: |
@@ -152,16 +134,12 @@ jobs:
         run: |
           SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
           xcrun simctl launch "$SIMULATOR_UDID" com.saoirse.epi &
-          LAUNCH_PID=$!
           sleep 10
           
           if xcrun simctl spawn "$SIMULATOR_UDID" launchctl list | grep -q "com.saoirse.epi"; then
-            echo "✅ App launched successfully"
-            kill $LAUNCH_PID 2>/dev/null || true
+            echo "✅ App launched successfully on simulator!"
           else
             echo "❌ App crashed during launch"
-            xcrun simctl spawn "$SIMULATOR_UDID" log show --predicate 'process == "Runner"' --style compact --last 1m
-            kill $LAUNCH_PID 2>/dev/null || true
             exit 1
           fi
 
