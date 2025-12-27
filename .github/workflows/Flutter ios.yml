@@ -23,9 +23,6 @@ env:
   ARCHIVE_DIR: build/ios/archive
   IPA_DIR: build/ios/ipa
 
-# ==================================================
-# 1️⃣ NATIVE DEBUG (SIMULATOR)
-# ==================================================
 jobs:
   ios-native-debug:
     name: 🧪 iOS Native Debug (Simulator)
@@ -66,51 +63,6 @@ jobs:
       - run: flutter clean
       - run: flutter pub get
 
-      - name: 🔧 Configure iOS 16 (Clean Architecture)
-        run: |
-          # Update deployment target
-          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 16.0;/g' ios/Runner.xcodeproj/project.pbxproj
-          
-          # CRITICAL: Remove ALL EXCLUDED_ARCHS lines from project
-          sed -i '' '/EXCLUDED_ARCHS/d' ios/Runner.xcodeproj/project.pbxproj
-          
-          # Update Podfile platform
-          sed -i '' "s/platform :ios, '[0-9.]\+'/platform :ios, '16.0'/g" ios/Podfile
-          
-          # Create minimal Debug.xcconfig (DO NOT set explicit ARCHS)
-          cat > ios/Flutter/Debug.xcconfig <<'XCCONFIG'
-          #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
-          #include "Generated.xcconfig"
-          IPHONEOS_DEPLOYMENT_TARGET = 16.0
-          EXCLUDED_ARCHS[sdk=iphonesimulator*] = i386
-          XCCONFIG
-          
-          # Update Podfile to clear EXCLUDED_ARCHS properly
-          if ! grep -q "config.build_settings\['IPHONEOS_DEPLOYMENT_TARGET'\] = '16.0'" ios/Podfile; then
-            cat >> ios/Podfile <<'RUBY'
-      
-          post_install do |installer|
-            installer.pods_project.targets.each do |target|
-              flutter_additional_ios_build_settings(target)
-              target.build_configurations.each do |config|
-                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
-                
-                # Only exclude i386, NOT arm64
-                config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'i386'
-              end
-            end
-          end
-          RUBY
-          fi
-
-      
-      - name: 🧹 Clean Pods & Derived Data
-        run: |
-          cd ios
-          rm -rf Pods Podfile.lock
-          rm -rf ~/Library/Developer/Xcode/DerivedData/*
-          cd ..
-      
       - name: 🔥 Create GoogleService-Info.plist
         run: |
           cat > ios/Runner/GoogleService-Info.plist <<'EOF'
@@ -143,45 +95,66 @@ jobs:
           </dict>
           </plist>
           EOF
-  
-      - name: 📦 Install Pods
-        run: cd ios && pod install --repo-update
-  
-      - name: 🛠️ Build for Simulator (arm64)
+
+      - name: 🔧 Configure iOS 16 & Clean Architecture
         run: |
-          flutter build ios --simulator --debug --no-codesign
-  
-      - name: 🔍 Verify Build Architecture
+          # Update deployment target
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 16.0;/g' ios/Runner.xcodeproj/project.pbxproj
+          
+          # Remove EXCLUDED_ARCHS from project file
+          sed -i '' '/EXCLUDED_ARCHS/d' ios/Runner.xcodeproj/project.pbxproj
+          
+          # Update Podfile platform
+          sed -i '' "s/platform :ios, '[0-9.]\+'/platform :ios, '16.0'/g" ios/Podfile
+          
+          # Update Podfile post_install (ONLY if not already present)
+          if ! grep -q "config.build_settings\['IPHONEOS_DEPLOYMENT_TARGET'\] = '16.0'" ios/Podfile; then
+            cat >> ios/Podfile <<'RUBY'
+          
+          post_install do |installer|
+            installer.pods_project.targets.each do |target|
+              flutter_additional_ios_build_settings(target)
+              target.build_configurations.each do |config|
+                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+                config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'i386'
+              end
+            end
+          end
+          RUBY
+          fi
+
+      - name: 🧹 Clean & Install Pods
         run: |
-          file build/ios/iphonesimulator/Runner.app/Runner
-  
+          cd ios
+          rm -rf Pods Podfile.lock
+          pod install --repo-update
+          cd ..
+
+      - name: 🛠️ Build for Simulator
+        run: flutter build ios --simulator --debug --no-codesign
+
       - name: 📱 List Available Simulators
         run: xcrun simctl list devices available
-  
+
       - name: 🚀 Boot Simulator
         run: |
           if ! xcrun simctl list devices | grep -q "iPhone.*(Booted)"; then
             xcrun simctl boot "iPhone 16" || xcrun simctl boot "iPhone 15" || true
           fi
-  
+
       - name: 🧹 Clean Install App
         run: |
           SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
-          
-          # Uninstall any existing version
           xcrun simctl uninstall "$SIMULATOR_UDID" com.saoirse.epi || true
-          
-          # Install fresh build
-          APP_PATH="build/ios/iphonesimulator/Runner.app"
-          xcrun simctl install "$SIMULATOR_UDID" "$APP_PATH"
-  
+          xcrun simctl install "$SIMULATOR_UDID" "build/ios/iphonesimulator/Runner.app"
+
       - name: 🎬 Launch App on Simulator
         run: |
           SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
           xcrun simctl launch "$SIMULATOR_UDID" com.saoirse.epi &
           LAUNCH_PID=$!
           sleep 10
-  
+          
           if xcrun simctl spawn "$SIMULATOR_UDID" launchctl list | grep -q "com.saoirse.epi"; then
             echo "✅ App launched successfully"
             kill $LAUNCH_PID 2>/dev/null || true
@@ -191,19 +164,20 @@ jobs:
             kill $LAUNCH_PID 2>/dev/null || true
             exit 1
           fi
-  
+
       - name: 📸 Take Screenshot (Debug)
         if: failure()
         run: |
           SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
           xcrun simctl io "$SIMULATOR_UDID" screenshot simulator_error.png || true
-  
+
       - name: 📤 Upload Screenshot
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: simulator-screenshot
           path: simulator_error.png
+
 
 
 # ==================================================
