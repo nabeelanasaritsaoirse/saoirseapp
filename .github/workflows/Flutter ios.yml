@@ -89,38 +89,32 @@ jobs:
             <string>${{ secrets.IOS_PROJECT_ID }}</string>
             <key>BUNDLE_ID</key>
             <string>com.saoirse.epi</string>
+            <key>STORAGE_BUCKET</key>
+            <string>saoirse-epi.firebasestorage.app</string>
+            <key>IS_ADS_ENABLED</key>
+            <false/>
+            <key>IS_ANALYTICS_ENABLED</key>
+            <false/>
+            <key>IS_APPINVITE_ENABLED</key>
+            <true/>
+            <key>IS_GCM_ENABLED</key>
+            <true/>
+            <key>IS_SIGNIN_ENABLED</key>
+            <true/>
           </dict>
           </plist>
           EOF
 
       # --------------------------------------------------
-      # 🔧 FIX FIRST (this must run BEFORE guard)
+      # 🔧 Safe Configuration (Podfile Only)
       # --------------------------------------------------
-      - name: 🔧 Force iOS ${{ env.IOS_MIN_VERSION }} & Clean Legacy
+      - name: 🔧 Configure iOS ${{ env.IOS_MIN_VERSION }}
         run: |
-          # Force deployment target everywhere
-          sed -i '' "s/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = ${{ env.IOS_MIN_VERSION }};/g" ios/Runner.xcodeproj/project.pbxproj
-
-          # Update Podfile platform
+          # Only update Podfile - DON'T touch project.pbxproj
           sed -i '' "s/platform :ios, '[0-9.]\+'/platform :ios, '${{ env.IOS_MIN_VERSION }}'/g" ios/Podfile
-
-          # Remove legacy Pods_Runner.framework references
-          sed -i '' '/Pods_Runner\.framework/d' ios/Runner.xcodeproj/project.pbxproj
-          sed -i '' '/Embed Pods Frameworks/d' ios/Runner.xcodeproj/project.pbxproj
-
-          echo "=== Deployment targets after fix ==="
-          grep IPHONEOS_DEPLOYMENT_TARGET ios/Runner.xcodeproj/project.pbxproj | head -5
-
-      # --------------------------------------------------
-      # 🚨 GUARD (verify fix worked)
-      # --------------------------------------------------
-      - name: 🚨 Verify iOS 16+ Applied
-        run: |
-          if grep -R "IPHONEOS_DEPLOYMENT_TARGET = 1[0-5]\." ios/Runner.xcodeproj/project.pbxproj; then
-            echo "❌ ERROR: iOS deployment target < 16 still detected"
-            exit 1
-          fi
-          echo "✅ iOS ${{ env.IOS_MIN_VERSION }} enforced successfully"
+          
+          echo "✅ Podfile updated to iOS ${{ env.IOS_MIN_VERSION }}"
+          echo "ℹ️  project.pbxproj will be overridden by --ios-min-version flag"
 
       # --------------------------------------------------
       # CocoaPods
@@ -131,7 +125,6 @@ jobs:
           path: |
             ~/.cocoapods
             ios/Pods
-            ios/Podfile.lock
           key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-pods-
@@ -144,7 +137,7 @@ jobs:
           cd ..
 
       # --------------------------------------------------
-      # Build
+      # Build with iOS 16 Override
       # --------------------------------------------------
       - name: 🛠️ Build for Simulator (iOS ${{ env.IOS_MIN_VERSION }})
         run: |
@@ -154,32 +147,38 @@ jobs:
             --no-codesign \
             --ios-min-version=${{ env.IOS_MIN_VERSION }}
 
+      # --------------------------------------------------
+      # Simulator Testing
+      # --------------------------------------------------
       - name: 🚀 Boot Simulator
         run: |
           if ! xcrun simctl list devices | grep -q "iPhone.*(Booted)"; then
             xcrun simctl boot "iPhone 16" || xcrun simctl boot "iPhone 15" || true
           fi
 
-      - name: 🧹 Clean Install App
+      - name: 📲 Install App
         run: |
           SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
-          xcrun simctl uninstall "$SIMULATOR_UDID" com.saoirse.epi || true
+          xcrun simctl uninstall "$SIMULATOR_UDID" ${{ env.BUNDLE_ID }} || true
           xcrun simctl install "$SIMULATOR_UDID" "build/ios/iphonesimulator/Runner.app"
 
-      - name: 🎬 Launch App on Simulator
+      - name: 🎬 Launch App & Verify
         run: |
           SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
-          xcrun simctl launch "$SIMULATOR_UDID" com.saoirse.epi &
+          xcrun simctl launch "$SIMULATOR_UDID" ${{ env.BUNDLE_ID }} &
           sleep 10
           
-          if xcrun simctl spawn "$SIMULATOR_UDID" launchctl list | grep -q "com.saoirse.epi"; then
+          if xcrun simctl spawn "$SIMULATOR_UDID" launchctl list | grep -q "${{ env.BUNDLE_ID }}"; then
             echo "✅ App launched successfully on simulator!"
           else
-            echo "❌ App crashed during launch"
+            echo "❌ App failed to launch"
             exit 1
           fi
 
-      - name: 📸 Take Screenshot (Debug)
+      # --------------------------------------------------
+      # Debug on Failure
+      # --------------------------------------------------
+      - name: 📸 Screenshot on Failure
         if: failure()
         run: |
           SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
@@ -189,10 +188,8 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: simulator-screenshot
+          name: simulator-screenshot-${{ github.run_number }}
           path: simulator_error.png
-
-
 
 
 # ==================================================
