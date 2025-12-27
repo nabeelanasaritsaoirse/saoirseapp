@@ -66,27 +66,27 @@ jobs:
       - run: flutter clean
       - run: flutter pub get
 
-      - name: 🔧 Configure iOS 16 + arm64 for Simulator
+      - name: 🔧 Configure iOS 16 + Clean Architecture Settings
         run: |
           # Update project deployment target
           sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 16.0;/g' ios/Runner.xcodeproj/project.pbxproj
           
-          # REMOVE any EXCLUDED_ARCHS settings that block arm64
-          sed -i '' '/EXCLUDED_ARCHS.*arm64/d' ios/Runner.xcodeproj/project.pbxproj
+          # REMOVE any EXCLUDED_ARCHS settings completely
+          sed -i '' '/EXCLUDED_ARCHS/d' ios/Runner.xcodeproj/project.pbxproj
           
           # Update Podfile
           sed -i '' "s/platform :ios, '[0-9.]\+'/platform :ios, '16.0'/g" ios/Podfile
           
-          # Configure for arm64 simulator ONLY
+          # Configure Debug.xcconfig for arm64 BEFORE pod install
           cat > ios/Flutter/Debug.xcconfig <<XCCONFIG
+          #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
+          #include "Generated.xcconfig"
           IPHONEOS_DEPLOYMENT_TARGET = 16.0
           ARCHS[sdk=iphonesimulator*] = arm64
-          VALID_ARCHS = arm64
-          EXCLUDED_ARCHS[sdk=iphonesimulator*] = 
           ONLY_ACTIVE_ARCH = YES
           XCCONFIG
           
-          # Update Podfile post_install
+          # Update Podfile post_install hook
           if ! grep -q "config.build_settings\['IPHONEOS_DEPLOYMENT_TARGET'\] = '16.0'" ios/Podfile; then
             cat >> ios/Podfile <<'RUBY'
       
@@ -95,15 +95,20 @@ jobs:
               flutter_additional_ios_build_settings(target)
               target.build_configurations.each do |config|
                 config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
-                config.build_settings['ARCHS[sdk=iphonesimulator*]'] = 'arm64'
                 config.build_settings.delete('EXCLUDED_ARCHS[sdk=iphonesimulator*]')
               end
             end
           end
           RUBY
           fi
-
-
+      
+      - name: 🧹 Clean Pods & Derived Data
+        run: |
+          cd ios
+          rm -rf Pods Podfile.lock
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
+          cd ..
+      
       - name: 🔥 Create GoogleService-Info.plist
         run: |
           cat > ios/Runner/GoogleService-Info.plist <<'EOF'
