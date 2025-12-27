@@ -269,32 +269,39 @@ jobs:
           curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
           cd ../..
 
-      - name: 🔢 Read Version
+      - name: 🔢 Auto-Increment Build Number
         id: version
         run: |
           VERSION_LINE=$(grep "^version:" pubspec.yaml)
           VERSION_NAME=$(echo "$VERSION_LINE" | cut -d '+' -f 1 | sed 's/version: //')
-          BUILD_NUMBER=$(echo "$VERSION_LINE" | cut -d '+' -f 2)
-
-          if [ -z "$BUILD_NUMBER" ]; then
-            BUILD_NUMBER=$GITHUB_RUN_NUMBER
+          CURRENT_BUILD=$(echo "$VERSION_LINE" | cut -d '+' -f 2)
+          
+          # Always increment from current build number
+          if [ -z "$CURRENT_BUILD" ] || [ "$CURRENT_BUILD" -lt 109 ]; then
+            BUILD_NUMBER=110
+          else
+            BUILD_NUMBER=$((CURRENT_BUILD + 1))
           fi
-
+          
           echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
-          echo "Building version: $VERSION_NAME ($BUILD_NUMBER)"
+          echo "🔢 Building version: $VERSION_NAME (Build $BUILD_NUMBER)"
+          echo "   Previous build: $CURRENT_BUILD → New build: $BUILD_NUMBER"
 
-      - name: 🔧 Configure iOS Settings
+      - name: 🔧 Configure iOS Settings (xcconfig - FIX 1 APPLIED)
         run: |
-          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 16.0;/g' ios/Runner.xcodeproj/project.pbxproj
-
-          cat >> ios/Flutter/Release.xcconfig <<XCCONFIG
+          # ✅ FIX 1: Overwrite instead of append (deterministic)
+          cat > ios/Flutter/Release.xcconfig <<'XCCONFIG'
+          #include "Generated.xcconfig"
+          
           STRIP_STYLE = non-global
           DEAD_CODE_STRIPPING = YES
           IPHONEOS_DEPLOYMENT_TARGET = 16.0
           ENABLE_BITCODE = NO
           ONLY_ACTIVE_ARCH = NO
           XCCONFIG
+          
+          echo "✅ iOS 16.0 deployment target configured via xcconfig (deterministic)"
 
       - name: 🔓 Setup Keychain
         run: |
@@ -361,12 +368,33 @@ jobs:
       - name: ✅ Validate GoogleService-Info.plist
         run: plutil -lint ios/Runner/GoogleService-Info.plist
 
+      - name: 🔍 Debug: Check Firebase Files Before Build
+        run: |
+          echo "=== Checking Firebase configuration ==="
+          
+          if [ -f "ios/Runner/GoogleService-Info.plist" ]; then
+            echo "✅ Source plist exists"
+            plutil -p ios/Runner/GoogleService-Info.plist | grep -E "(PROJECT_ID|BUNDLE_ID)"
+          else
+            echo "❌ Source plist NOT FOUND!"
+            exit 1
+          fi
+          
+          echo "=== Checking Xcode project configuration ==="
+          if grep -A 30 "PBXResourcesBuildPhase" ios/Runner.xcodeproj/project.pbxproj | grep -q GoogleService; then
+            echo "✅ GoogleService-Info.plist configured in Copy Bundle Resources"
+          else
+            echo "⚠️  WARNING: GoogleService-Info.plist NOT in Copy Bundle Resources!"
+            echo "    App may crash on launch if Firebase can't find config"
+            echo "    Action required: Add GoogleService-Info.plist to Copy Bundle Resources in Xcode"
+          fi
+
       - name: 📦 Install Pods
         run: |
           cd ios
           pod install --repo-update
 
-      - name: ⚙️ Configure Xcode Signing
+      - name: ⚙️ Configure Xcode Signing (FIX 3 APPLIED)
         run: |
           cat > update_signing.rb <<'RUBY'
           require 'xcodeproj'
@@ -378,6 +406,7 @@ jobs:
             if target.name == 'Runner'
               target.build_configurations.each do |config|
                 if config.name == 'Release'
+                  # ✅ Signing configuration only (deployment target handled by xcconfig)
                   config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
                   config.build_settings['DEVELOPMENT_TEAM'] = ENV['TEAM_ID']
                   config.build_settings['CODE_SIGN_IDENTITY'] = 'Apple Distribution'
@@ -385,7 +414,7 @@ jobs:
                   config.build_settings['CODE_SIGN_IDENTITY[sdk=iphoneos*]'] = 'Apple Distribution'
                   config.build_settings['ENABLE_BITCODE'] = 'NO'
                   config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
-                  config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+                  # ❌ FIX 3: Removed IPHONEOS_DEPLOYMENT_TARGET (handled by xcconfig)
                 end
               end
             end
@@ -395,6 +424,7 @@ jobs:
           RUBY
 
           ruby update_signing.rb
+          echo "✅ Signing configured (deployment target via xcconfig only)"
 
       - name: 🔨 Build Flutter
         run: |
@@ -461,6 +491,55 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             -allowProvisioningUpdates
 
+      - name: ✅ Verify Firebase Config in IPA
+        run: |
+          IPA_PATH=$(find ${{ env.IPA_DIR }} -name "*.ipa" | head -1)
+          
+          echo "=== Extracting IPA for Firebase validation ==="
+          unzip -q "$IPA_PATH" -d /tmp/ipa_verify
+          APP_PATH=$(find /tmp/ipa_verify/Payload -name "*.app" | head -1)
+          
+          # Check GoogleService-Info.plist exists in IPA
+          PLIST_PATH="$APP_PATH/GoogleService-Info.plist"
+          
+          if [ ! -f "$PLIST_PATH" ]; then
+            echo "❌ CRITICAL: GoogleService-Info.plist NOT found in IPA!"
+            echo "   App will crash on launch with Firebase error"
+            echo ""
+            echo "   Fix: Add GoogleService-Info.plist to 'Copy Bundle Resources' in Xcode"
+            echo "   Steps:"
+            echo "   1. Open ios/Runner.xcworkspace in Xcode"
+            echo "   2. Select Runner project → Runner target → Build Phases"
+            echo "   3. Expand 'Copy Bundle Resources'"
+            echo "   4. Click '+' and add GoogleService-Info.plist"
+            echo "   5. Commit ios/Runner.xcodeproj/project.pbxproj"
+            exit 1
+          fi
+          
+          echo "✅ GoogleService-Info.plist found in IPA"
+          
+          # Validate plist structure
+          plutil -lint "$PLIST_PATH" > /dev/null 2>&1
+          if [ $? -eq 0 ]; then
+            echo "✅ plist is valid XML"
+          else
+            echo "❌ plist is corrupted!"
+            exit 1
+          fi
+          
+          # Verify critical Firebase keys
+          PROJECT_ID=$(plutil -extract PROJECT_ID raw "$PLIST_PATH" 2>/dev/null || echo "")
+          BUNDLE_ID=$(plutil -extract BUNDLE_ID raw "$PLIST_PATH" 2>/dev/null || echo "")
+          
+          if [ -z "$PROJECT_ID" ] || [ -z "$BUNDLE_ID" ]; then
+            echo "❌ Missing critical Firebase configuration!"
+            exit 1
+          fi
+          
+          echo "✅ Firebase config validated successfully:"
+          echo "   PROJECT_ID: $PROJECT_ID"
+          echo "   BUNDLE_ID: $BUNDLE_ID"
+
       - name: 📤 Upload IPA
         uses: actions/upload-artifact@v4
         with:
@@ -490,7 +569,7 @@ jobs:
           name: ios-ipa
           path: build/ios/ipa
       
-      - name: 🔍 Validate IPA Structure
+      - name: 🔍 Comprehensive IPA Validation
         run: |
           IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -1)
           
@@ -502,28 +581,47 @@ jobs:
           IPA_SIZE=$(du -h "$IPA_PATH" | cut -f1)
           echo "✅ IPA found: $IPA_PATH (Size: $IPA_SIZE)"
           
-          echo "=== IPA Contents ==="
-          unzip -l "$IPA_PATH" | grep -E "(Runner|Info.plist|GoogleService)"
+          # Verify IPA integrity
+          unzip -t "$IPA_PATH" > /dev/null 2>&1
+          if [ $? -ne 0 ]; then
+            echo "❌ IPA is corrupted!"
+            exit 1
+          fi
+          echo "✅ IPA integrity verified"
           
-          # Extract and validate
+          # Extract IPA
+          echo "=== Extracting IPA ==="
           unzip -q "$IPA_PATH" -d /tmp/ipa_extract
           APP_PATH=$(find /tmp/ipa_extract/Payload -name "*.app" | head -1)
           
+          # Validate Info.plist
           echo "=== Info.plist Validation ==="
-          plutil -p "$APP_PATH/Info.plist" | grep -E "(CFBundleIdentifier|CFBundleVersion|MinimumOSVersion)"
+          plutil -p "$APP_PATH/Info.plist" | grep -E "(CFBundleIdentifier|CFBundleVersion|CFBundleShortVersionString|MinimumOSVersion)"
           
-          echo "=== Firebase Config Check ==="
+          # Check Firebase Configuration
+          echo "=== Firebase Configuration Check ==="
           if [ -f "$APP_PATH/GoogleService-Info.plist" ]; then
-            echo "✅ Firebase config found"
-            plutil -p "$APP_PATH/GoogleService-Info.plist" | grep -E "(PROJECT_ID|BUNDLE_ID)"
+            echo "✅ Firebase config found in IPA"
+            plutil -p "$APP_PATH/GoogleService-Info.plist" | grep -E "(PROJECT_ID|BUNDLE_ID|GOOGLE_APP_ID)"
           else
-            echo "⚠️ Warning: Firebase config not found in IPA"
+            echo "❌ CRITICAL: Firebase config MISSING from IPA!"
+            echo "   App will crash on launch!"
+            exit 1
           fi
           
+          # Verify Binary Architecture
           echo "=== Binary Architecture ==="
           lipo -info "$APP_PATH/Runner"
           
-          echo "✅ IPA validation complete"
+          # Check Critical Frameworks
+          echo "=== Critical Frameworks Check ==="
+          if [ -d "$APP_PATH/Frameworks" ]; then
+            echo "Frameworks included:"
+            ls -1 "$APP_PATH/Frameworks" | grep -E "(Firebase|Flutter)" || echo "⚠️ Firebase frameworks not found"
+          fi
+          
+          echo ""
+          echo "✅ IPA validation complete - ready for TestFlight!"
 
   # ==================================================
   # 4️⃣ DEPLOY TO TESTFLIGHT
@@ -548,7 +646,7 @@ jobs:
       - name: 🔐 Write API Key
         run: echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > api_key.json
 
-      - name: 🔍 Pre-Upload Check
+      - name: 🔍 Pre-Upload Validation
         run: |
           IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -1)
           
@@ -557,29 +655,43 @@ jobs:
             exit 1
           fi
           
-          # Final validation
+          # Final integrity check
           unzip -t "$IPA_PATH" > /dev/null 2>&1
           if [ $? -eq 0 ]; then
-            echo "✅ IPA structure is valid"
+            IPA_SIZE=$(du -h "$IPA_PATH" | cut -f1)
+            echo "✅ IPA ready for upload"
+            echo "   File: $(basename "$IPA_PATH")"
+            echo "   Size: $IPA_SIZE"
           else
             echo "❌ IPA is corrupted!"
             exit 1
           fi
-          
-          echo "📦 Ready to upload: $IPA_PATH"
 
       - name: 🚀 Upload to TestFlight
         run: |
+          echo "🚀 Starting TestFlight upload..."
+          echo "   Version: ${{ needs.ios-ci.outputs.version_name }}"
+          echo "   Build: ${{ needs.ios-ci.outputs.build_number }}"
+          
           fastlane pilot upload \
             --api_key_path api_key.json \
             --ipa build/ios/ipa/*.ipa \
             --skip_waiting_for_build_processing \
-            --changelog "Build ${{ needs.ios-ci.outputs.build_number }}: Automated CI/CD deployment from GitHub Actions" \
+            --changelog "Build ${{ needs.ios-ci.outputs.build_number }}: Automated CI/CD deployment" \
             --distribute_external false
 
       - name: ✅ Deployment Complete
         run: |
+          echo ""
           echo "🎉 Successfully uploaded to TestFlight!"
+          echo ""
           echo "📱 Version: ${{ needs.ios-ci.outputs.version_name }}"
           echo "🔢 Build: ${{ needs.ios-ci.outputs.build_number }}"
-          echo "⏰ Check App Store Connect in 5-10 minutes for processing status"
+          echo ""
+          echo "⏰ Next steps:"
+          echo "   1. Check App Store Connect in 5-10 minutes"
+          echo "   2. Build will process automatically"
+          echo "   3. Add to internal testing group when ready"
+          echo "   4. For external testing: Submit for Beta App Review"
+          echo ""
+          echo "🔗 https://appstoreconnect.apple.com"
