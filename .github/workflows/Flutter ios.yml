@@ -110,11 +110,11 @@ jobs:
       # --------------------------------------------------
       - name: 🔧 Configure iOS ${{ env.IOS_MIN_VERSION }}
         run: |
-          # Only update Podfile - DON'T touch project.pbxproj
-          sed -i '' "s/platform :ios, '[0-9.]\+'/platform :ios, '${{ env.IOS_MIN_VERSION }}'/g" ios/Podfile
+          # Update Podfile only (xcconfig handles deployment target)
+          sed -i.bak "s/platform :ios, '[0-9.]*'/platform :ios, '${{ env.IOS_MIN_VERSION }}'/" ios/Podfile
           
           echo "✅ Podfile updated to iOS ${{ env.IOS_MIN_VERSION }}"
-          echo "ℹ️  project.pbxproj will be overridden by --ios-min-version flag"
+          echo "ℹ️  Deployment target set via xcconfig files"
 
       # --------------------------------------------------
       # CocoaPods
@@ -137,41 +137,77 @@ jobs:
           cd ..
 
       # --------------------------------------------------
-      # Build with iOS 16 Override
+      # Build
       # --------------------------------------------------
-      - name: 🛠️ Build for Simulator (iOS ${{ env.IOS_MIN_VERSION }})
+      - name: 🛠️ Build for Simulator
         run: |
           flutter build ios \
             --simulator \
             --debug \
-            --no-codesign 
-         
+            --no-codesign
+
+      - name: 🔍 Verify Binary Architecture
+        run: |
+          echo "=== Built app architecture ==="
+          file build/ios/iphonesimulator/Runner.app/Runner
+          lipo -info build/ios/iphonesimulator/Runner.app/Runner || true
 
       # --------------------------------------------------
-      # Simulator Testing
+      # Simulator Testing (ARM64, Runtime-Based Selection)
       # --------------------------------------------------
-      - name: 🚀 Boot Simulator
+      - name: 🚀 Boot ARM64 Simulator
         run: |
-          if ! xcrun simctl list devices | grep -q "iPhone.*(Booted)"; then
-            xcrun simctl boot "iPhone 16" || xcrun simctl boot "iPhone 15" || true
+          # Select iPhone 15 with iOS 17+ (guaranteed ARM64 on GitHub runners)
+          UDID=$(xcrun simctl list devices available | 
+            awk '/iPhone 15/ && /iOS 1[7-9]/ {print $NF}' | 
+            tr -d '()' | 
+            head -1)
+          
+          if [ -z "$UDID" ]; then
+            echo "❌ No suitable ARM64 simulator found"
+            echo "Available simulators:"
+            xcrun simctl list devices available
+            exit 1
           fi
+          
+          echo "✅ Selected ARM64 simulator: $UDID"
+          xcrun simctl boot "$UDID" || echo "Already booted"
+          
+          # Wait for boot
+          sleep 5
 
       - name: 📲 Install App
         run: |
-          SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
-          xcrun simctl uninstall "$SIMULATOR_UDID" ${{ env.BUNDLE_ID }} || true
-          xcrun simctl install "$SIMULATOR_UDID" "build/ios/iphonesimulator/Runner.app"
+          UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
+          
+          if [ -z "$UDID" ]; then
+            echo "❌ No booted simulator found"
+            exit 1
+          fi
+          
+          echo "Installing on simulator: $UDID"
+          xcrun simctl uninstall "$UDID" ${{ env.BUNDLE_ID }} || true
+          xcrun simctl install "$UDID" build/ios/iphonesimulator/Runner.app
+          
+          echo "✅ App installed successfully"
 
-      - name: 🎬 Launch App & Verify
+      - name: 🎬 Launch & Verify
         run: |
-          SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
-          xcrun simctl launch "$SIMULATOR_UDID" ${{ env.BUNDLE_ID }} &
+          UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
+          
+          echo "Launching app on $UDID..."
+          xcrun simctl launch "$UDID" ${{ env.BUNDLE_ID }} &
+          LAUNCH_PID=$!
+          
           sleep 10
           
-          if xcrun simctl spawn "$SIMULATOR_UDID" launchctl list | grep -q "${{ env.BUNDLE_ID }}"; then
-            echo "✅ App launched successfully on simulator!"
+          if xcrun simctl spawn "$UDID" launchctl list | grep -q "${{ env.BUNDLE_ID }}"; then
+            echo "✅ App launched successfully on ARM64 simulator!"
+            kill $LAUNCH_PID 2>/dev/null || true
+            exit 0
           else
             echo "❌ App failed to launch"
+            kill $LAUNCH_PID 2>/dev/null || true
             exit 1
           fi
 
@@ -181,8 +217,8 @@ jobs:
       - name: 📸 Screenshot on Failure
         if: failure()
         run: |
-          SIMULATOR_UDID=$(xcrun simctl list devices | grep "iPhone.*(Booted)" | head -1 | awk '{print $NF}' | tr -d '()')
-          xcrun simctl io "$SIMULATOR_UDID" screenshot simulator_error.png || true
+          UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
+          xcrun simctl io "$UDID" screenshot simulator_error.png || true
 
       - name: 📤 Upload Screenshot
         if: failure()
