@@ -231,16 +231,27 @@ class OrderDetailsController extends GetxController {
       }
 
       if (selectedPaymentMethod.value == PaymentMethod.wallet) {
-        appLoader();
-        await Future.delayed(const Duration(seconds: 2));
+ 
+  Get.dialog(
+    appLoader(),
+    barrierDismissible: false,
+  );
 
-        if (Get.isDialogOpen ?? false) Get.back();
-        await walletController.fetchWallet(forceRefresh: true);
 
-        Get.off(() => BookingConfirmationScreen());
+  await Future.delayed(const Duration(seconds: 2));
 
-        return;
-      }
+
+  if (Get.isDialogOpen ?? false) Get.back();
+
+  
+  await walletController.fetchWallet(forceRefresh: true);
+
+
+  Get.off(() => BookingConfirmationScreen());
+
+  return;
+}
+
 
       final data = response['data'];
 
