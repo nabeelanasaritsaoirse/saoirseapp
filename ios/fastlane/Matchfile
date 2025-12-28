@@ -1,9 +1,0 @@
-git_url("https://github.com/nabeelanasaritsaoirse/ios-certificates.git")
-
-storage_mode("git")
-type("appstore")
-
-api_key_path("./api_key.json")
-
-app_identifier(["com.saoirse.epi"])
-team_id("BYQUNNQSQH")
