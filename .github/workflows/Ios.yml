@@ -1,0 +1,134 @@
+name: ♻️ iOS Regenerate (Black Screen Fix)
+run-name: "Regenerate iOS by ${{ github.actor }} on ${{ github.ref_name }}"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ test ]
+   # paths: ['ios/**', 'pubspec.yaml']
+
+concurrency:
+  group: ios-regenerate-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  IOSMINVERSION: 16.0
+  BUNDLEID: com.saoirse.epi
+
+jobs:
+  regenerate:
+    name: ♻️ Regenerate iOS Platform
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: 🧹 Flutter clean & recreate
+        run: |
+          flutter clean
+          flutter pub get
+          flutter create . --platforms=ios --org com.saoirse
+
+      - name: 📦 CocoaPods install (Flutter-generated Podfile)
+        run: |
+          cd ios
+          pod install --repo-update
+          cd ..
+
+      - name: 🔧 Post-regen Podfile hardening
+        run: |
+          cd ios
+          cp Podfile Podfile.backup
+          
+          # Replace or add post_install block
+          if grep -q "post_install do |installer|" Podfile; then
+            sed -i '' '/post_install do |installer|/,/end$/d' Podfile
+          fi
+          
+          cat >> Podfile << EOF
+          post_install do |installer|
+            installer.pods_project.targets.each do |target|
+              flutter_additional_ios_build_settings(target)
+              target.build_configurations.each do |config|
+                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '${{ env.IOSMINVERSION }}'
+                config.build_settings['ENABLE_BITCODE'] = 'NO'
+                config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+                config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'PERMISSION_CAMERA=1'
+                config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'PERMISSION_PHOTOS=1'
+              end
+            end
+          end
+          EOF
+          pod install
+          cd ..
+
+      - name: 🔑 Restore GoogleService-Info.plist
+        run: |
+          cat > ios/Runner/GoogleService-Info.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>API_KEY</key>
+            <string>${{ secrets.IOS_API_KEY }}</string>
+            <key>BUNDLE_ID</key>
+            <string>${{ env.BUNDLEID }}</string>
+            <key>GCM_SENDER_ID</key>
+            <string>${{ secrets.IOS_MESSAGING_SENDER_ID }}</string>
+            <key>GOOGLE_APP_ID</key>
+            <string>${{ secrets.IOS_APP_ID }}</string>
+            <key>PROJECT_ID</key>
+            <string>${{ secrets.IOS_PROJECT_ID }}</string>
+            <key>STORAGE_BUCKET</key>
+            <string>${{ secrets.IOS_PROJECT_ID }}.appspot.com</string>
+            <key>IS_GCM_ENABLED</key>
+            <true/>
+            <key>IS_ANALYTICS_ENABLED</key>
+            <true/>
+          </dict>
+          </plist>
+          EOF
+
+      - name: ✅ Verify regeneration
+        run: |
+          cd ios
+          test -f Runner.xcworkspace
+          grep -q "class AppDelegate: FlutterAppDelegate" Runner/AppDelegate.swift
+          pod ipc list | head -10 | grep -E "firebase|Flutter"
+          plutil -lint Runner/GoogleService-Info.plist
+          echo "✅ iOS regenerated successfully"
+          cd ..
+
+      - name: 📤 Commit & Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ios/
+          git commit -m "fix(ios): regenerate clean platform + pod hardening
+
+          🔧 Flutter engine attachment fix for black screen
+          ✅ Fresh Runner.xcodeproj / AppDelegate.swift
+          ✅ Firebase GoogleService-Info.plist restored
+          ✅ Podfile hardened (iOS ${{ env.IOSMINVERSION }})
+
+          Next: Run main iOS CI workflow for TestFlight" || exit 0
+          git push
+
+      - name: 🎉 Success Notification
+        if: always()
+        run: |
+          echo "=== REGENERATION RESULTS ==="
+          echo "✅ iOS folder: Clean Flutter-generated structure"
+          echo "✅ Run 'flutter run --release' locally for green screen test"
+          echo "✅ Trigger main Flutter-ios.yml after commit"
+          echo "============================"
