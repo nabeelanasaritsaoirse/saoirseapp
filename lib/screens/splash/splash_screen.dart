@@ -20,38 +20,55 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
 
+  void _navigate() {
+    final bool isLogin = storage.read(AppConst.USER_ID) != null;
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+
+      if (isLogin) {
+        Get.offAll(() => DashboardScreen());
+      } else {
+        Get.offAll(() => const OnBoardScreen());
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
 
-    /// ✅ Delay until FIRST FRAME is rendered (CRITICAL)
+    /// 🔑 CRITICAL FOR iOS
+    /// Wait until first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _navigate();
     });
-  }
-
-  Future<void> _navigate() async {
-    await Future.delayed(const Duration(seconds: 2));
-
-    final userId = storage.read(AppConst.USER_ID);
-
-    if (userId != null) {
-      Get.offAll(() => DashboardScreen());
-    } else {
-      Get.offAll(() => const OnBoardScreen());
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
-      body: Center(
-        child: Image.asset(
-          AppAssets.app_logo,
-          height: 250.h,
-          width: Get.width,
-          fit: BoxFit.contain,
+      body: SafeArea(
+        child: Center(
+          child: Image.asset(
+            AppAssets.app_logo,
+            height: 250.h,
+            width: Get.width,
+            fit: BoxFit.contain,
+
+            /// 🛡 SAFETY: prevents crash if asset fails
+            errorBuilder: (_, __, ___) {
+              return const Text(
+                "EPI",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
