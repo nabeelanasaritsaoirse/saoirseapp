@@ -19,38 +19,39 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  //navigation
-  void _splashScreen() {
-    bool isLogin = !(storage.read(AppConst.USER_ID) == null);
-
-    Future.delayed(const Duration(seconds: 2), () async {
-      if (isLogin) {
-        Get.offAll(() => DashboardScreen());
-      } else {
-        Get.offAll(() => const OnBoardScreen());
-      }
-    });
-  }
 
   @override
   void initState() {
     super.initState();
 
-    _splashScreen();
+    /// ✅ Delay until FIRST FRAME is rendered (CRITICAL)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _navigate();
+    });
+  }
+
+  Future<void> _navigate() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    final userId = storage.read(AppConst.USER_ID);
+
+    if (userId != null) {
+      Get.offAll(() => DashboardScreen());
+    } else {
+      Get.offAll(() => const OnBoardScreen());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColors.primaryColor,
-        body: Center(
-          child: Image.asset(
-            AppAssets.app_logo,
-            height: 250.h,
-            width: Get.width,
-            fit: BoxFit.contain,
-          ),
+    return Scaffold(
+      backgroundColor: AppColors.primaryColor,
+      body: Center(
+        child: Image.asset(
+          AppAssets.app_logo,
+          height: 250.h,
+          width: Get.width,
+          fit: BoxFit.contain,
         ),
       ),
     );
