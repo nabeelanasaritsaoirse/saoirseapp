@@ -534,6 +534,33 @@ jobs:
             -exportPath ../${{ env.IPA_DIR }} \
             -exportOptionsPlist ExportOptions.plist \
             -allowProvisioningUpdates
+      - name: 🔍 Inspect iOS Info.plist (CI)
+        run: |
+          PLIST_PATH="ios/Runner/Info.plist"
+          echo "=== Raw Info.plist ==="
+          plutil -p "$PLIST_PATH"
+
+          echo "=== Launch storyboard keys ==="
+          plutil -extract UILaunchStoryboardName xml1 -o - "$PLIST_PATH" || echo "No UILaunchStoryboardName"
+          plutil -extract UIMainStoryboardFile xml1 -o - "$PLIST_PATH" || echo "No UIMainStoryboardFile"
+          plutil -extract UIApplicationSceneManifest xml1 -o - "$PLIST_PATH" || echo "No UIApplicationSceneManifest"
+
+        
+      - name: 🔍 Check LaunchScreen.storyboard in IPA
+        run: |
+          IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -1)
+          unzip -q "$IPA_PATH" -d /tmp/ipa_launch
+          APP_PATH=$(find /tmp/ipa_launch/Payload -name "*.app" | head -1)
+
+          echo "=== LaunchScreen.storyboard presence ==="
+          find "$APP_PATH" -path "*LaunchScreen.storyboard*" || echo "❌ LaunchScreen.storyboard not found in app bundle"
+          
+      - name: 🔍 Show AppDelegate.swift
+        run: |
+          echo "=== AppDelegate.swift ==="
+          cat ios/Runner/AppDelegate.swift
+
+
 
       - name: ✅ Verify Firebase Config in IPA
         run: |
