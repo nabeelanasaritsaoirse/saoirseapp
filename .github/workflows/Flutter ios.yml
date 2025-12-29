@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - test
-    paths: ['ios/**', 'pubspec.yaml']
+    # paths: ['ios/**', 'pubspec.yaml']
 
 concurrency:
   group: ios-build-${{ github.ref }}
