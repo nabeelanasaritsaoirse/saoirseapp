@@ -142,14 +142,22 @@ jobs:
       # --------------------------------------------------
       # Verification
       # --------------------------------------------------
-      - name: 🔍 Verify iOS platform (SAFE)
+      - name: 🔍 Verify iOS platform (robust)
         run: |
-          echo "🔍 Verifying iOS platform"
+          set -e
+      
+          echo "🔍 Verifying iOS platform structure"
+      
+          ls -la ios/Runner || true
+          ls -la ios/Runner.xcworkspace || true
       
           test -f ios/Runner.xcodeproj/project.pbxproj
           test -f ios/Runner.xcworkspace
           test -f ios/Runner/AppDelegate.swift
-          grep -q "class AppDelegate" ios/Runner/AppDelegate.swift
+          test -f ios/Runner/GoogleService-Info.plist
+      
+          echo "📄 AppDelegate.swift content:"
+          sed -n '1,40p' ios/Runner/AppDelegate.swift
       
           plutil -lint ios/Runner/GoogleService-Info.plist
       
