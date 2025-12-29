@@ -386,10 +386,37 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          child: appText(
-                            list.listName,
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w600,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              /// LIST TITLE
+                              appText(
+                                list.listName,
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.06,
+                              ),
+
+                              /// SEE ALL
+                              InkWell(
+                                onTap: () {
+                                  Get.to(
+                                    () => const ProductListing(),
+                                    arguments: {
+                                      'slug': list.slug,
+                                      'listId': list.listId,
+                                      'title': list.listName,
+                                    },
+                                  );
+                                },
+                                child: appText(
+                                  AppStrings.see_all,
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         SizedBox(height: 8.h),
