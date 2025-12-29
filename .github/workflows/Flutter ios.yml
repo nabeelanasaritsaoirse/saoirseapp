@@ -36,173 +36,130 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 📝 Create .env
-        run: |
-          cat > .env <<EOF
-          IOS_API_KEY=${{ secrets.IOS_API_KEY }}
-          IOS_APP_ID=${{ secrets.IOS_APP_ID }}
-          IOS_MESSAGING_SENDER_ID=${{ secrets.IOS_MESSAGING_SENDER_ID }}
-          IOS_PROJECT_ID=${{ secrets.IOS_PROJECT_ID }}
-          ANDROID_API_KEY=dummy
-          ANDROID_APP_ID=dummy
-          ANDROID_MESSAGING_SENDER_ID=dummy
-          ANDROID_PROJECT_ID=dummy
-          EOF
+# --------------------------------------------------
+# Flutter setup
+# --------------------------------------------------
+- uses: subosito/flutter-action@v2
+  with:
+    flutter-version: "3.35.7"
+    channel: stable
+    cache: true
 
-      - name: 📥 Download Fonts
-        run: |
-          mkdir -p assets/fonts
-          cd assets/fonts
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Medium.ttf
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
-          cd ../..
+- run: flutter clean
+- run: flutter pub get
 
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.35.7"
-          channel: stable
-          cache: true
+# --------------------------------------------------
+# Fonts (required by your app)
+# --------------------------------------------------
+- name: 📥 Download Fonts
+  run: |
+    mkdir -p assets/fonts
+    cd assets/fonts
+    curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf
+    curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Medium.ttf
+    curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf
+    curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
+    cd ../..
 
-      - run: flutter clean
-      - run: flutter pub get
+# --------------------------------------------------
+# Firebase plist (simulator)
+# --------------------------------------------------
+- name: 🔥 Create GoogleService-Info.plist
+  run: |
+    mkdir -p ios/Runner
+    cat > ios/Runner/GoogleService-Info.plist <<'EOF'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+      <key>API_KEY</key>
+      <string>${{ secrets.IOS_API_KEY }}</string>
+      <key>GCM_SENDER_ID</key>
+      <string>${{ secrets.IOS_MESSAGING_SENDER_ID }}</string>
+      <key>GOOGLE_APP_ID</key>
+      <string>${{ secrets.IOS_APP_ID }}</string>
+      <key>PROJECT_ID</key>
+      <string>${{ secrets.IOS_PROJECT_ID }}</string>
+      <key>BUNDLE_ID</key>
+      <string>com.saoirse.epi</string>
+    </dict>
+    </plist>
+    EOF
 
-      - name: 🔥 Create GoogleService-Info.plist
-        run: |
-          cat > ios/Runner/GoogleService-Info.plist <<'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>API_KEY</key>
-            <string>${{ secrets.IOS_API_KEY }}</string>
-            <key>GCM_SENDER_ID</key>
-            <string>${{ secrets.IOS_MESSAGING_SENDER_ID }}</string>
-            <key>GOOGLE_APP_ID</key>
-            <string>${{ secrets.IOS_APP_ID }}</string>
-            <key>PROJECT_ID</key>
-            <string>${{ secrets.IOS_PROJECT_ID }}</string>
-            <key>BUNDLE_ID</key>
-            <string>com.saoirse.epi</string>
-            <key>STORAGE_BUCKET</key>
-            <string>saoirse-epi.firebasestorage.app</string>
-            <key>IS_ADS_ENABLED</key>
-            <false/>
-            <key>IS_ANALYTICS_ENABLED</key>
-            <false/>
-            <key>IS_APPINVITE_ENABLED</key>
-            <true/>
-            <key>IS_GCM_ENABLED</key>
-            <true/>
-            <key>IS_SIGNIN_ENABLED</key>
-            <true/>
-          </dict>
-          </plist>
-          EOF
+# --------------------------------------------------
+# 🚨 CRITICAL FIX — REMOVE Main.storyboard
+# --------------------------------------------------
+- name: 🚨 Fix Info.plist (BLACK SCREEN FIX)
+  run: |
+    /usr/libexec/PlistBuddy -c "Delete :UIMainStoryboardFile" ios/Runner/Info.plist || true
+    /usr/libexec/PlistBuddy -c "Print :UILaunchStoryboardName" ios/Runner/Info.plist
+    echo "✅ Main.storyboard removed (Flutter-safe)"
 
-      - name: 🔧 Configure iOS ${{ env.IOS_MIN_VERSION }}
-        run: |
-          sed -i.bak "s/platform :ios, '[0-9.]*'/platform :ios, '${{ env.IOS_MIN_VERSION }}'/" ios/Podfile
-          echo "✅ Podfile updated to iOS ${{ env.IOS_MIN_VERSION }}"
+# --------------------------------------------------
+# CocoaPods
+# --------------------------------------------------
+- name: 🧹 Install Pods
+  run: |
+    cd ios
+    rm -rf Pods Podfile.lock
+    pod install --repo-update
+    cd ..
 
-      - name: ♻️ Cache CocoaPods
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cocoapods
-            ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
+# --------------------------------------------------
+# Build for Simulator
+# --------------------------------------------------
+- name: 🛠️ Build iOS Simulator
+  run: |
+    flutter build ios --simulator --debug --no-codesign
 
-      - name: 🧹 Install Pods
-        run: |
-          cd ios
-          rm -rf Pods Podfile.lock
-          pod install --repo-update
-          cd ..
+# --------------------------------------------------
+# Boot simulator
+# --------------------------------------------------
+- name: 🚀 Boot Simulator
+  run: |
+    UDID=$(xcrun simctl list devices available | grep "iPhone" | head -1 | awk -F '[()]' '{print $2}')
+    xcrun simctl boot "$UDID" || true
+    sleep 5
+    echo "Using simulator: $UDID"
 
-      - name: 🛠️ Build for Simulator
-        run: |
-          flutter build ios \
-            --simulator \
-            --debug \
-            --no-codesign
+# --------------------------------------------------
+# Install & Launch (CI-safe)
+# --------------------------------------------------
+- name: 📲 Install & Launch App
+  run: |
+    UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
+    xcrun simctl uninstall "$UDID" com.saoirse.epi || true
+    xcrun simctl install "$UDID" build/ios/iphonesimulator/Runner.app
+    xcrun simctl launch "$UDID" com.saoirse.epi
+    echo "✅ App launched successfully"
 
-      - name: 🔍 Verify Binary Architecture
-        run: |
-          echo "=== Built app architecture ==="
-          file build/ios/iphonesimulator/Runner.app/Runner
-          lipo -info build/ios/iphonesimulator/Runner.app/Runner || true
+# --------------------------------------------------
+# Logs + Screenshot
+# --------------------------------------------------
+- name: 🔍 Capture Logs
+  if: always()
+  run: |
+    UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
+    xcrun simctl spawn "$UDID" log show \
+      --predicate 'process == "Runner"' \
+      --last 2m \
+      --style compact > simulator_logs.txt || true
+    tail -50 simulator_logs.txt
 
-      - name: 🚀 Boot ARM64 Simulator
-        run: |
-          UDID=$(xcrun simctl list devices available | grep "iPhone 16 (" | head -1 | grep -oE '\([A-Z0-9-]+\)' | tr -d '()')
-          
-          if [ -z "$UDID" ]; then
-            echo "❌ No iPhone 16 simulator found"
-            xcrun simctl list devices available | grep iPhone
-            exit 1
-          fi
-          
-          echo "✅ Booting iPhone 16: $UDID"
-          xcrun simctl boot "$UDID" || echo "Already booted"
-          sleep 5
+- name: 📸 Screenshot
+  if: always()
+  run: |
+    UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
+    xcrun simctl io "$UDID" screenshot simulator.png || true
 
-      - name: 📲 Install App
-        run: |
-          UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
-          
-          if [ -z "$UDID" ]; then
-            echo "❌ No booted simulator found"
-            exit 1
-          fi
-          
-          echo "Installing on simulator: $UDID"
-          xcrun simctl uninstall "$UDID" ${{ env.BUNDLE_ID }} || true
-          xcrun simctl install "$UDID" build/ios/iphonesimulator/Runner.app
-          
-          echo "✅ App installed successfully"
-
-      - name: 🎬 Launch App (Simulator – CI Safe)
-        run: |
-          UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
-      
-          echo "Launching app once (CI-safe)…"
-          xcrun simctl launch "$UDID" ${{ env.BUNDLE_ID }} || {
-            echo "❌ iOS refused to launch the app"
-            exit 1
-          }
-      
-          echo "✅ App launch command accepted by simulator"
-
-      - name: 🔍 Capture Simulator Logs
-        if: always()
-        run: |
-          UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
-          
-          echo "=== Capturing last 2 minutes of logs ===" > simulator_logs.txt
-          xcrun simctl spawn "$UDID" log show --predicate 'process == "Runner"' --style compact --last 2m >> simulator_logs.txt 2>&1 || true
-          
-          echo "=== Logs captured ===" 
-          tail -50 simulator_logs.txt
-
-      - name: 📸 Screenshot
-        if: always()
-        run: |
-          UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
-          xcrun simctl io "$UDID" screenshot simulator_screenshot.png || true
-
-      - name: 📤 Upload Debug Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: simulator-debug-${{ github.run_number }}
-          path: |
-            simulator_screenshot.png
-            simulator_logs.txt
-            launch_output.txt
+- name: 📤 Upload Artifacts
+  if: always()
+  uses: actions/upload-artifact@v4
+  with:
+    name: ios-simulator-debug
+    path: |
+      simulator_logs.txt
+      simulator.png
 
   # ==================================================
   # 2️⃣ RELEASE BUILD
