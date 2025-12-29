@@ -24,12 +24,14 @@ class AppURLs {
   //     BASE_API + "api/products/featured/trending?";
 
   // home screen api
-  static String POPULAR_PRODUCT_API =
-      BASE_API + "api/featured-lists/most-popular?";
-  static String BEST_SELLER_PRODUCT_API =
-      BASE_API + "api/featured-lists/best-selling?";
-  static String TRENDING_PRODUCT_API =
-      BASE_API + "api/featured-lists/trending-products?";
+  // static String POPULAR_PRODUCT_API =
+  //     BASE_API + "api/featured-lists/most-popular?";
+  // static String BEST_SELLER_PRODUCT_API =
+  //     BASE_API + "api/featured-lists/best-selling?";
+  // static String TRENDING_PRODUCT_API =
+  //     BASE_API + "api/featured-lists/trending-products?";
+
+  static String FEATURED_LISTS_API = BASE_API + "api/featured-lists";
 
   //refferal api
   static String getRefferal_API = BASE_API + "api/referrals/generate-code";
