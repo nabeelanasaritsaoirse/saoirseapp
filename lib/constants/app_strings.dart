@@ -112,7 +112,6 @@ class AppStrings {
       "You haven’t selected a plan yet. Please choose a plan before proceeding to Check out.";
 
   // KYC page
-
   static String KycTitle = "KYC Status";
 
   //Cart page

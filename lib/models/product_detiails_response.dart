@@ -10,8 +10,7 @@ class ProductDetailsResponse {
   factory ProductDetailsResponse.fromJson(Map<String, dynamic> json) {
     return ProductDetailsResponse(
       success: json["success"] ?? false,
-      productDetails:
-          ProductDetails.fromJson(json["productDetails"] ?? {}),
+      productDetails: ProductDetails.fromJson(json["productDetails"] ?? {}),
     );
   }
 }
@@ -65,27 +64,16 @@ class ProductDetails {
       productName: json["productName"] ?? "",
       productId: json["productId"] ?? "",
       dateOfPurchase: json["dateOfPurchase"] ?? "",
-
       totalPrice: (json["totalPrice"] as num?)?.toInt() ?? 0,
-
-      commissionPerDay:
-          (json["commissionPerDay"] as num?)?.toDouble() ?? 0.0,
-
-      totalCommission:
-          (json["totalCommission"] as num?)?.toDouble() ?? 0.0,
-
-      earnedCommission:
-          (json["earnedCommission"] as num?)?.toDouble() ?? 0.0,
-
+      commissionPerDay: (json["commissionPerDay"] as num?)?.toDouble() ?? 0.0,
+      totalCommission: (json["totalCommission"] as num?)?.toDouble() ?? 0.0,
+      earnedCommission: (json["earnedCommission"] as num?)?.toDouble() ?? 0.0,
       pendingDays: json["pendingDays"] ?? 0,
-
       pendingInvestmentAmount:
           (json["pendingInvestmentAmount"] as num?)?.toDouble() ?? 0.0,
-
       dailySip: json["dailySip"] ?? 0,
       paidDays: json["paidDays"] ?? 0,
       totalDays: json["totalDays"] ?? 0,
-
       orderId: json["orderId"] ?? "",
       source: json["source"] ?? "",
       status: json["status"] ?? "",

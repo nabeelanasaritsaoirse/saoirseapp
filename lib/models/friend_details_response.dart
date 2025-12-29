@@ -10,8 +10,7 @@ class FriendDetailsResponse {
   factory FriendDetailsResponse.fromJson(Map<String, dynamic> json) {
     return FriendDetailsResponse(
       success: json["success"] ?? false,
-      friendDetails:
-          FriendDetails.fromJson(json["friendDetails"] ?? {}),
+      friendDetails: FriendDetails.fromJson(json["friendDetails"] ?? {}),
     );
   }
 }
@@ -46,8 +45,7 @@ class FriendDetails {
       email: json["email"] ?? "",
       profilePicture: json["profilePicture"] ?? "",
       totalProducts: (json["totalProducts"] as num?)?.toInt() ?? 0,
-      totalCommission:
-          (json["totalCommission"] as num?)?.toDouble() ?? 0.0,
+      totalCommission: (json["totalCommission"] as num?)?.toDouble() ?? 0.0,
       products: (json["products"] as List? ?? [])
           .map((item) => FriendProduct.fromJson(item ?? {}))
           .toList(),
@@ -95,22 +93,16 @@ class FriendProduct {
     return FriendProduct(
       productId: json["productId"]?.toString() ?? "",
       productName: json["productName"] ?? "",
-
       productImage: json["productImage"] != null
           ? ProductImage.fromJson(json["productImage"])
           : null,
-
       pendingStatus: json["pendingStatus"] ?? "",
       totalAmount: (json["totalAmount"] as num?)?.toInt() ?? 0,
       dateOfPurchase: json["dateOfPurchase"] ?? "",
-
       days: (json["days"] as num?)?.toInt() ?? 0,
-      commissionPerDay:
-          (json["commissionPerDay"] as num?)?.toDouble() ?? 0.0,
-
+      commissionPerDay: (json["commissionPerDay"] as num?)?.toDouble() ?? 0.0,
       paidDays: (json["paidDays"] as num?)?.toInt() ?? 0,
       pendingDays: (json["pendingDays"] as num?)?.toInt() ?? 0,
-
       source: json["source"] ?? "",
       orderId: json["orderId"] ?? "",
     );
@@ -144,7 +136,6 @@ class ProductImage {
     );
   }
 }
-
 
 // class FriendDetailsResponse {
 //   final bool success;

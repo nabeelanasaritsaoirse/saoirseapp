@@ -414,8 +414,7 @@ class ReferralController extends GetxController {
   }
 
   String formatAmount(double value) {
-  final formatted = value.toStringAsFixed(2);
-  return formatted.replaceAll(RegExp(r'\.?0+$'), '');
-}
-
+    final formatted = value.toStringAsFixed(2);
+    return formatted.replaceAll(RegExp(r'\.?0+$'), '');
+  }
 }
