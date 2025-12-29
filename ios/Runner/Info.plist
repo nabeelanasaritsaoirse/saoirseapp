@@ -60,5 +60,18 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app may access the microphone for media-related features.</string>
 
+	<!-- Google Sign-In / Firebase Auth -->
+	<key>CFBundleURLTypes</key>
+	<array>
+	  <dict>
+	    <key>CFBundleTypeRole</key>
+	    <string>Editor</string>
+	    <key>CFBundleURLSchemes</key>
+	    <array>
+	      <string>com.googleusercontent.apps.486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q</string>
+	    </array>
+	  </dict>
+	</array>
+
 </dict>
 </plist>
