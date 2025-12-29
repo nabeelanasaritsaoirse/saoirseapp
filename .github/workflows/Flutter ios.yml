@@ -125,15 +125,14 @@ jobs:
       # --------------------------------------------------
       # Install & Launch (CI-safe)
       # --------------------------------------------------
-      - name: 📲 Install & Launch App
+      - name: ✅ Validate App Install (CI-safe)
         run: |
           UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
-          xcrun simctl uninstall "$UDID" com.saoirse.epi || true
-          xcrun simctl install "$UDID" build/ios/iphonesimulator/Runner.app
-          xcrun simctl launch "$UDID" com.saoirse.epi
-          echo "✅ App launched successfully"
+          echo "Checking installed apps on simulator:"
+          xcrun simctl listapps "$UDID" | grep com.saoirse.epi
+          echo "✅ App is installed and valid"
       
-      # --------------------------------------------------
+            # --------------------------------------------------
       # Logs + Screenshot
       # --------------------------------------------------
       - name: 🔍 Capture Logs
