@@ -51,42 +51,42 @@ jobs:
       # --------------------------------------------------
       # Fix Podfile BEFORE pod install (CRITICAL)
       # --------------------------------------------------
-      - name: 🔧 Fix Podfile (platform + post_install)
+      - name: 🔧 Fix Podfile (SAFE)
         run: |
           cd ios
-
+      
           cp Podfile Podfile.backup
-
-          echo "🔧 Setting platform iOS ${IOSMINVERSION}"
-
+      
+          echo "🔧 Ensuring platform iOS ${IOSMINVERSION}"
+      
           # Ensure platform is FIRST line
           if grep -q "^platform :ios" Podfile; then
-            sed -i '' "s/platform :ios, .*/platform :ios, '${IOSMINVERSION}'/" Podfile
+            sed -i '' "s/^platform :ios.*/platform :ios, '${IOSMINVERSION}'/" Podfile
           else
             sed -i '' "1s/^/platform :ios, '${IOSMINVERSION}'\n\n/" Podfile
           fi
-
-          # Remove any existing post_install
-          if grep -q "post_install do |installer|" Podfile; then
-            sed -i '' '/post_install do |installer|/,/end$/d' Podfile
-          fi
-
-          # Add safe post_install
-          cat >> Podfile << EOF
-          post_install do |installer|
-            installer.pods_project.targets.each do |target|
-              flutter_additional_ios_build_settings(target)
-              target.build_configurations.each do |config|
-                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '${IOSMINVERSION}'
-                config.build_settings['ENABLE_BITCODE'] = 'NO'
+      
+          # Add post_install ONLY if missing
+          if ! grep -q "post_install do |installer|" Podfile; then
+            cat >> Podfile << 'EOF'
+            
+            post_install do |installer|
+              installer.pods_project.targets.each do |target|
+                flutter_additional_ios_build_settings(target)
+                target.build_configurations.each do |config|
+                  config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '${IOSMINVERSION}'
+                  config.build_settings['ENABLE_BITCODE'] = 'NO'
+                end
               end
             end
-          end
-          EOF
-
+            EOF
+          else
+            echo "ℹ️ post_install already exists – not modifying"
+          fi
+      
           echo "📦 Installing Pods"
           pod install --repo-update
-
+      
           cd ..
 
       # --------------------------------------------------
