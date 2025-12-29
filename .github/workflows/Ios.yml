@@ -2,10 +2,10 @@ name: ♻️ iOS Regenerate (Clean Platform Fix)
 
 run-name: "♻️ iOS Regenerate by ${{ github.actor }}"
 
-on:
-  workflow_dispatch:
-  push:
-    branches: [ test ]
+# on:
+#   workflow_dispatch:
+#   push:
+#     branches: [ test ]
 
 concurrency:
   group: ios-regenerate-${{ github.ref }}
