@@ -1,8 +1,10 @@
+// ignore_for_file: curly_braces_in_flow_control_structures
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../constants/app_assets.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
@@ -80,11 +82,42 @@ class PendingTransaction extends StatelessWidget {
                             //-------------------------------- IMAGE (Placeholder) -------------------------------
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8.r),
-                              child: Image.asset(
-                                AppAssets.mobile,
+                              child: Container(
                                 width: 80.w,
                                 height: 70.h,
-                                fit: BoxFit.contain,
+                                decoration: BoxDecoration(
+                                  color: AppColors.lightGrey,
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                child: item.productImage.isNotEmpty
+                                    ? Image.network(
+                                        item.productImage,
+                                        fit: BoxFit.contain,
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                          if (loadingProgress == null)
+                                            return child;
+                                          return const Center(
+                                            child: CupertinoActivityIndicator(),
+                                          );
+                                        },
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const Center(
+                                          child: Icon(
+                                            Icons.image_not_supported,
+                                            size: 30,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      )
+                                    : const Center(
+                                        child: Icon(
+                                          Icons.image_not_supported,
+                                          size: 30,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
                               ),
                             ),
 
@@ -96,15 +129,16 @@ class PendingTransaction extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    appText(item.productName,
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textBlack,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.start),
+                                    SizedBox(height: 4.h),
                                     appText(
-                                      item.productName,
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textBlack,
-                                    ),
-                                    SizedBox(height: 2.h),
-                                    appText(
-                                      "Installment ${item.installmentNumber}",
+                                      "Installment : ${item.installmentNumber}",
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.textBlack,
@@ -145,7 +179,10 @@ class PendingTransaction extends StatelessWidget {
 
 //-------------------------------- BOTTOM TOTAL AMOUNT SECTION -------------------------------
           Obx(() {
-            if (controller.transactions.isEmpty) {
+            bool hasSelection = controller.selectedList
+                .any((e) => e.value); //check if any item is selected
+
+            if (controller.transactions.isEmpty || !hasSelection) {
               return const SizedBox.shrink();
             }
 

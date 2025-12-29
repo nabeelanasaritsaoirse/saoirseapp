@@ -1,22 +1,7 @@
-## Version 1.4.18+103
+## Version 1.4.20+105
 
-- Merge pull request #293 from nabeelanasaritsaoirse/deep
+- Merge pull request #297 from nabeelanasaritsaoirse/deep
+- Merge remote-tracking branch 'origin/meganathan' into deep
+- updated transaction histroy ui
 - fix
-- Merge remote-tracking branch 'origin/sahir' into deep
-- fix
-- update pricing and payment method handling on quantity change and implement multiple payment methods
-- added wallet option in peding transaction screen
-- Merge remote-tracking branch 'origin/sahir' into deep
-- add multiple payment methods and construct order payload correctly
-- fix
-- trending and best sellet and most popular all with new api
-- Adjust Select Plan bottom sheet height based on plan count
-- Tested application, listed issues, and properly added loaders for all image sections
-- small changes in product detail controller
-- Merge branch 'meganathan' of https://github.com/nishantitsaoirse-head/saoirseapp into shadin
-- Merge branch 'sahir' of https://github.com/nishantitsaoirse-head/saoirseapp into shadin
-- refferal count for refferal limit
-- Resolved hiding category product name on the left slide bar
-- resolved the deeplinking through sharing option issues
-- latest code push
-- implemented instagram story referral share functionality
+- Resolve overflow in Invite Friend details screen and update wallet and friendDetails models

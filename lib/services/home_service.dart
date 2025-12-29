@@ -1,11 +1,10 @@
-import 'package:saoirse_app/constants/app_urls.dart';
-import 'package:saoirse_app/models/product_model.dart';
-import 'package:saoirse_app/services/api_service.dart';
-
 import 'dart:developer';
 import 'package:get_storage/get_storage.dart';
 
 import '../constants/app_constant.dart';
+import '../constants/app_urls.dart';
+import '../models/product_model.dart';
+import 'api_service.dart';
 
 class HomeService {
   static final GetStorage storage = GetStorage();

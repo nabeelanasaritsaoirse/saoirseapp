@@ -11,7 +11,7 @@ import '/services/api_service.dart';
 
 class WalletService {
   final token = storage.read(AppConst.ACCESS_TOKEN);
-  Future<WalletmModels?> fetchWallet() async {
+  Future<WalletModels?> fetchWallet() async {
     try {
       final url = AppURLs.Wallet;
 
@@ -25,7 +25,7 @@ class WalletService {
 
       log(" Calling Wallet API → $url");
 
-      return await APIService.getRequest<WalletmModels>(
+      return await APIService.getRequest<WalletModels>(
         url: url,
         headers: {
           'Authorization': 'Bearer $token', // FIXED
@@ -33,7 +33,7 @@ class WalletService {
         },
         onSuccess: (json) {
           log(" Wallet API Response: $json");
-          return WalletmModels.fromJson(json);
+          return WalletModels.fromJson(json);
         },
       );
     } catch (e) {

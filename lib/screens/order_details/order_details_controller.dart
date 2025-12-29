@@ -13,9 +13,11 @@ import '../../services/order_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_toast.dart';
 import '../booking_confirmation/booking_confirmation_screen.dart';
+import '../my_wallet/my_wallet_controller.dart';
 import '../razorpay/razorpay_controller.dart';
 
 class OrderDetailsController extends GetxController {
+  final walletController = Get.put(MyWalletController());
   RxInt selectedDays = 0.obs;
   RxDouble selectedAmount = 0.0.obs;
 
@@ -229,10 +231,16 @@ class OrderDetailsController extends GetxController {
       }
 
       if (selectedPaymentMethod.value == PaymentMethod.wallet) {
-        appLoader();
+        Get.dialog(
+          appLoader(),
+          barrierDismissible: false,
+        );
+
         await Future.delayed(const Duration(seconds: 2));
 
         if (Get.isDialogOpen ?? false) Get.back();
+
+        await walletController.fetchWallet(forceRefresh: true);
 
         Get.off(() => BookingConfirmationScreen());
 

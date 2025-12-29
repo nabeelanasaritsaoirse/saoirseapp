@@ -145,11 +145,12 @@ class _ReferralScreenState extends State<ReferralScreen> {
           ),
           SizedBox(width: 8.w),
           IconBox(
-              image: AppAssets.wallet,
-              padding: 5.w,
-              onTap: () {
-                Get.to(WalletScreen());
-              }),
+            image: AppAssets.wallet,
+            padding: 5.w,
+            onTap: () {
+              Get.to(WalletScreen());
+            },
+          ),
           SizedBox(width: 12.w),
         ],
       ),
@@ -170,7 +171,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       AppStrings.referalBannerContent,
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w700,
-                      textAlign: TextAlign.start,
                     ),
                     Image.asset(
                       AppAssets.refferal,
@@ -180,7 +180,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                   ],
                 ),
               ),
-            )
+            ),
           ];
         },
         body: Container(
@@ -191,14 +191,20 @@ class _ReferralScreenState extends State<ReferralScreen> {
               top: Radius.circular(16.r),
             ),
           ),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(16.w),
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            child: _buildContentSection(
-              loginController: loginController,
-              referralController: controller,
-              searchController: searchController,
-              focusNode: searchFocusNode,
+          child: RefreshIndicator(
+            onRefresh: controller.refreshAll,
+            color: AppColors.primaryColor, // spinner color
+            backgroundColor: AppColors.white,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.all(16.w),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: _buildContentSection(
+                loginController: loginController,
+                referralController: controller,
+                searchController: searchController,
+                focusNode: searchFocusNode,
+              ),
             ),
           ),
         ),

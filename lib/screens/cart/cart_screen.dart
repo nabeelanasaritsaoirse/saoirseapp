@@ -26,16 +26,27 @@ class CartScreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: AppStrings.carttitle,
         actions: [
-          IconBox(
-            image: AppAssets.delete,
-            padding: 5.w,
-            onTap: () {
-              controller.clearCartItems();
-            },
-          ),
-          SizedBox(
-            width: 12.w,
-          )
+          Obx(() {
+            final hasItems = controller.cartData.value != null &&
+                controller.cartData.value!.products.isNotEmpty;
+
+            if (!hasItems) {
+              return const SizedBox.shrink(); // hide delete icon
+            }
+
+            return Row(
+              children: [
+                IconBox(
+                  image: AppAssets.delete,
+                  padding: 5.w,
+                  onTap: () {
+                    controller.clearCartItems();
+                  },
+                ),
+                SizedBox(width: 12.w),
+              ],
+            );
+          }),
         ],
       ),
       body: Column(

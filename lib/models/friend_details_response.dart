@@ -9,8 +9,10 @@ class FriendDetailsResponse {
 
   factory FriendDetailsResponse.fromJson(Map<String, dynamic> json) {
     return FriendDetailsResponse(
-      success: json["success"],
-      friendDetails: FriendDetails.fromJson(json["friendDetails"]),
+      success: json["success"] ?? false,
+      friendDetails: FriendDetails.fromJson(
+        json["friendDetails"] ?? {},
+      ),
     );
   }
 }
@@ -36,14 +38,14 @@ class FriendDetails {
 
   factory FriendDetails.fromJson(Map<String, dynamic> json) {
     return FriendDetails(
-      id: json["_id"],
+      id: json["_id"]?.toString() ?? "",
       name: json["name"] ?? "N/A",
       email: json["email"] ?? "",
       profilePicture: json["profilePicture"] ?? "",
-      totalProducts: json["totalProducts"] ?? 0,
-      totalCommission: json["totalCommission"] ?? 0,
-      products: (json["products"] as List)
-          .map((item) => FriendProduct.fromJson(item))
+      totalProducts: (json["totalProducts"] as num?)?.toInt() ?? 0,
+      totalCommission: (json["totalCommission"] as num?)?.toInt() ?? 0,
+      products: (json["products"] as List? ?? [])
+          .map((item) => FriendProduct.fromJson(item ?? {}))
           .toList(),
     );
   }
@@ -56,7 +58,7 @@ class FriendProduct {
   final int totalAmount;
   final String dateOfPurchase;
   final int days;
-  final int commissionPerDay;
+  final double commissionPerDay;
   final int paidDays;
   final int pendingDays;
 
@@ -74,15 +76,15 @@ class FriendProduct {
 
   factory FriendProduct.fromJson(Map<String, dynamic> json) {
     return FriendProduct(
-      productId: json["productId"],
-      productName: json["productName"],
-      pendingStatus: json["pendingStatus"],
-      totalAmount: json["totalAmount"],
-      dateOfPurchase: json["dateOfPurchase"],
-      days: json["days"],
-      commissionPerDay: json["commissionPerDay"],
-      paidDays: json["paidDays"],
-      pendingDays: json["pendingDays"],
+      productId: json["productId"]?.toString() ?? "",
+      productName: json["productName"] ?? "",
+      pendingStatus: json["pendingStatus"] ?? "",
+      totalAmount: (json["totalAmount"] as num?)?.toInt() ?? 0,
+      dateOfPurchase: json["dateOfPurchase"] ?? "",
+      days: (json["days"] as num?)?.toInt() ?? 0,
+      commissionPerDay: (json["commissionPerDay"] as num?)?.toDouble() ?? 0.0,
+      paidDays: (json["paidDays"] as num?)?.toInt() ?? 0,
+      pendingDays: (json["pendingDays"] as num?)?.toInt() ?? 0,
     );
   }
 }
