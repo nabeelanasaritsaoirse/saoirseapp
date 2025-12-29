@@ -4,9 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/edit_profile/edit_profile_screen.dart';
 
 import 'package:saoirse_app/screens/kyc/kyc_controller.dart';
+import '../edit_profile/edit_profile_screen.dart';
 import '../kyc/kyc_screen.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -119,16 +119,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             ),
                                           );
                                         },
-                                        errorBuilder: (_, __, ___) =>
-                                            Image.asset(
-                                          AppAssets.user_img,
-                                          fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => ClipOval(
+                                          child: Image.asset(
+                                            AppAssets.user_img,
+                                            fit: BoxFit.cover,
+                                            width: 84,
+                                            height: 84,
+                                          ),
                                         ),
                                       ),
                                     )
-                                  : Image.asset(
-                                      AppAssets.user_img,
-                                      fit: BoxFit.cover,
+                                  : ClipOval(
+                                      child: Image.asset(
+                                        AppAssets.user_img,
+                                        fit: BoxFit.cover,
+                                        width: 84,
+                                        height: 84,
+                                      ),
                                     ),
                             ),
 
