@@ -206,11 +206,11 @@ class _WalletScreenState extends State<WalletScreen> {
   // ---------------- WALLET CARD ----------------
 
   Widget walletCard({
-    required int mainBalance,
-    required int totalBalance,
-    required int referralBonus,
-    required int holdBalance,
-    required int investDaily,
+    required double mainBalance,
+    required double totalBalance,
+    required double referralBonus,
+    required double holdBalance,
+    required double investDaily,
   }) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 15.h),
@@ -260,7 +260,7 @@ class _WalletScreenState extends State<WalletScreen> {
     );
   }
 
-  Widget balanceColumn(int value, String label) {
+  Widget balanceColumn(double value, String label) {
     return Column(
       children: [
         appText(

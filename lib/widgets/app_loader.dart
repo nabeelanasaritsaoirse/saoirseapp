@@ -9,15 +9,19 @@ import '../constants/app_colors.dart';
 Widget appLoader({double? height, double? width}) {
   return PopScope(
     canPop: false,
-    child: InkWell(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: Container(
-          alignment: Alignment.center,
-          child: SizedBox(
-            height: height ?? 60.h,
-            width: width ?? 60.w,
-            child: const CupertinoActivityIndicator(color: AppColors.grey),
+    child: Material(
+      color: AppColors.transparent,
+      child: InkWell(
+        onTap: () {},
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: Container(
+            alignment: Alignment.center,
+            child: SizedBox(
+              height: height ?? 60.h,
+              width: width ?? 60.w,
+              child: const CupertinoActivityIndicator(color: AppColors.grey),
+            ),
           ),
         ),
       ),

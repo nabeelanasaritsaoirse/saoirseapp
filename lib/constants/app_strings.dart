@@ -79,9 +79,9 @@ class AppStrings {
       "If someone referred you, enter their referral code below. This helps us apply rewards correctly.";
   static String refferal_applied_success =
       "Your referral code has been\nsuccessfully applied.";
-  static String productId = "Product ID";
-  static String amount = "Amount";
-  static String pending_status = "Pending Status";
+  static String productId = "Product ID :";
+  static String amount = "Amount :";
+  static String pending_status = "Pending Status :";
   static String view_details = "View Details";
   static String total_product = "Total Product";
   static String my_commission = "My commission";

@@ -231,10 +231,15 @@ class OrderDetailsController extends GetxController {
       }
 
       if (selectedPaymentMethod.value == PaymentMethod.wallet) {
-        appLoader();
+        Get.dialog(
+          appLoader(),
+          barrierDismissible: false,
+        );
+
         await Future.delayed(const Duration(seconds: 2));
 
         if (Get.isDialogOpen ?? false) Get.back();
+
         await walletController.fetchWallet(forceRefresh: true);
 
         Get.off(() => BookingConfirmationScreen());
