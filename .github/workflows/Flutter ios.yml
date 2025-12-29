@@ -302,11 +302,13 @@ jobs:
           cd ios
           fastlane match appstore \
             --readonly \
+            --app_identifier "com.saoirse.epi" \
             --api_key_path ./api_key.json \
             --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git \
             --git_branch main \
             --keychain_name build.keychain-db \
             --keychain_password "ci_keychain_pass"
+
 
       - name: 🔥 GoogleService-Info.plist
         run: |
