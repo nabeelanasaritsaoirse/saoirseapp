@@ -125,13 +125,29 @@ jobs:
       # --------------------------------------------------
       # Install & Launch (CI-safe)
       # --------------------------------------------------
-      - name: ✅ Validate App Install (CI-safe)
+      - name: ✅ Validate Simulator Build Artifact (CI-safe)
         run: |
-          UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
-          echo "Checking installed apps on simulator:"
-          xcrun simctl listapps "$UDID" | grep com.saoirse.epi
-          echo "✅ App is installed and valid"
+          APP_PATH="build/ios/iphonesimulator/Runner.app"
       
+          echo "🔍 Checking Runner.app exists"
+          test -d "$APP_PATH"
+      
+          echo "🔍 Validating Info.plist"
+          plutil -lint "$APP_PATH/Info.plist"
+      
+          echo "🔍 Verifying bundle identifier"
+          BUNDLE_ID_IN_APP=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$APP_PATH/Info.plist")
+          echo "Found bundle id: $BUNDLE_ID_IN_APP"
+          test "$BUNDLE_ID_IN_APP" = "com.saoirse.epi"
+      
+          echo "🔍 Checking executable"
+          test -x "$APP_PATH/Runner"
+      
+          echo "🔍 Checking architecture"
+          lipo -info "$APP_PATH/Runner"
+      
+          echo "✅ Simulator build artifact is valid"
+
             # --------------------------------------------------
       # Logs + Screenshot
       # --------------------------------------------------
