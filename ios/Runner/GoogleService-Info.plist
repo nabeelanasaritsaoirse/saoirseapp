@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>API_KEY</key>
+  <string>AIzaSyDpQb5HVM28WGffCCwrMmNs9luxSMFyaBY</string>
+  <key>BUNDLE_ID</key>
+  <string>com.saoirse.epi</string>
+  <key>GCM_SENDER_ID</key>
+  <string>486829564070</string>
+  <key>GOOGLE_APP_ID</key>
+  <string>1:486829564070:ios:07e32a618113ab29479467</string>
+  <key>PROJECT_ID</key>
+  <string>saoirse-epi</string>
+  <key>STORAGE_BUCKET</key>
+  <string>saoirse-epi.appspot.com</string>
+  <key>IS_GCM_ENABLED</key>
+  <true/>
+  <key>IS_ANALYTICS_ENABLED</key>
+  <true/>
+</dict>
+</plist>
