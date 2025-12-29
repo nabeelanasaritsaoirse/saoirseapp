@@ -51,7 +51,7 @@ jobs:
       # --------------------------------------------------
       # Fix Podfile BEFORE pod install (CRITICAL)
       # --------------------------------------------------
-      - name: 🔧 Fix Podfile (SAFE)
+      - name: 🔧 Fix Podfile (Bash Safe)
         run: |
           cd ios
       
@@ -68,18 +68,18 @@ jobs:
       
           # Add post_install ONLY if missing
           if ! grep -q "post_install do |installer|" Podfile; then
-            cat >> Podfile << 'EOF'
-            
-            post_install do |installer|
-              installer.pods_project.targets.each do |target|
-                flutter_additional_ios_build_settings(target)
-                target.build_configurations.each do |config|
-                  config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '${IOSMINVERSION}'
-                  config.build_settings['ENABLE_BITCODE'] = 'NO'
-                end
+          cat >> Podfile <<EOF
+          
+          post_install do |installer|
+            installer.pods_project.targets.each do |target|
+              flutter_additional_ios_build_settings(target)
+              target.build_configurations.each do |config|
+                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '${IOSMINVERSION}'
+                config.build_settings['ENABLE_BITCODE'] = 'NO'
               end
             end
-            EOF
+          end
+          EOF
           else
             echo "ℹ️ post_install already exists – not modifying"
           fi
@@ -88,6 +88,7 @@ jobs:
           pod install --repo-update
       
           cd ..
+    
 
       # --------------------------------------------------
       # Restore Firebase Config
