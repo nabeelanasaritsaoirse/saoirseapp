@@ -708,7 +708,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          "₹${(referral.totalCommission).toStringAsFixed(0)}",
+                          "₹${controller.formatAmount(referral.totalCommission)}",
                           style: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.w600,
