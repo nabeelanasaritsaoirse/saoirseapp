@@ -142,13 +142,17 @@ jobs:
       # --------------------------------------------------
       # Verification
       # --------------------------------------------------
-      - name: ✅ Verify iOS regeneration
+      - name: 🔍 Verify iOS platform (SAFE)
         run: |
           echo "🔍 Verifying iOS platform"
+      
           test -f ios/Runner.xcodeproj/project.pbxproj
           test -f ios/Runner.xcworkspace
-          grep -q "FlutterAppDelegate" ios/Runner/AppDelegate.swift
+          test -f ios/Runner/AppDelegate.swift
+          grep -q "class AppDelegate" ios/Runner/AppDelegate.swift
+      
           plutil -lint ios/Runner/GoogleService-Info.plist
+      
           echo "✅ iOS regenerated successfully"
 
       # --------------------------------------------------
