@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - test
-  workflow_dispatch:
+    paths: ['ios/**', 'pubspec.yaml']
 
 concurrency:
   group: ios-build-${{ github.ref }}
