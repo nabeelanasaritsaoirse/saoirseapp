@@ -142,23 +142,27 @@ jobs:
       # --------------------------------------------------
       # Verification
       # --------------------------------------------------
-      - name: 🔍 Verify iOS platform (robust)
+      - name: 🔍 Verify iOS platform (FINAL)
         run: |
           set -e
       
           echo "🔍 Verifying iOS platform structure"
       
-          ls -la ios/Runner || true
-          ls -la ios/Runner.xcworkspace || true
+          ls -la ios
+          ls -la ios/Runner
+          ls -la ios/Runner.xcodeproj
+          ls -la ios/Runner.xcworkspace
       
+          # Correct paths
           test -f ios/Runner.xcodeproj/project.pbxproj
-          test -f ios/Runner.xcworkspace
+          test -f ios/Runner.xcworkspace/contents.xcworkspacedata
           test -f ios/Runner/AppDelegate.swift
           test -f ios/Runner/GoogleService-Info.plist
       
-          echo "📄 AppDelegate.swift content:"
+          echo "📄 AppDelegate.swift:"
           sed -n '1,40p' ios/Runner/AppDelegate.swift
       
+          echo "📄 GoogleService-Info.plist:"
           plutil -lint ios/Runner/GoogleService-Info.plist
       
           echo "✅ iOS regenerated successfully"
