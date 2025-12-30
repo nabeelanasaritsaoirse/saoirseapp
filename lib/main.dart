@@ -1,4 +1,5 @@
 import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -9,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 
 import 'bindings/allcontroller.dart';
 import 'constants/app_colors.dart';
@@ -26,7 +28,7 @@ import 'services/appsflyer_service.dart';
 final GetStorage storage = GetStorage();
 
 /// ----------------------------------------------------
-/// BACKGROUND NOTIFICATIONS (NO Firebase init here!)
+/// BACKGROUND NOTIFICATIONS
 /// ----------------------------------------------------
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -35,18 +37,18 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 /// ----------------------------------------------------
-/// MAIN (KEEP IT LIGHT!)
+/// MAIN
 /// ----------------------------------------------------
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
 
-  /// 🚀 Render UI immediately
+  /// Render UI immediately
   runApp(const BootstrapApp());
 }
 
 /// ----------------------------------------------------
-/// BOOTSTRAP APP (ALL HEAVY INIT HERE)
+/// BOOTSTRAP APP
 /// ----------------------------------------------------
 class BootstrapApp extends StatefulWidget {
   const BootstrapApp({super.key});
@@ -73,10 +75,16 @@ class _BootstrapAppState extends State<BootstrapApp> {
       await dotenv.load(fileName: ".env");
 
       /// -----------------------------
-      /// FIREBASE (ONLY ONCE)
+      /// FIREBASE INIT
       /// -----------------------------
       await Firebase.initializeApp();
       log("✅ Firebase initialized");
+
+      /// 🔐 REQUIRED: Firebase App Check (FIXES OTP + GOOGLE SIGN-IN CRASH)
+      await FirebaseAppCheck.instance.activate(
+        appleProvider: AppleProvider.debug,
+      );
+      log("✅ Firebase App Check activated");
 
       /// -----------------------------
       /// FIREBASE MESSAGING
