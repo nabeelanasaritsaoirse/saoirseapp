@@ -740,6 +740,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           product.name,
                           fontSize: 13.sp,
                           maxLines: 2,
+                          textAlign: TextAlign.left,
                           overflow: TextOverflow.ellipsis,
                           fontWeight: FontWeight.w600,
                         ),
