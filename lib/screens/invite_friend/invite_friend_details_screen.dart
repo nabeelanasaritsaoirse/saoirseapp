@@ -178,7 +178,7 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                                         fontWeight: FontWeight.w600,
                                       ),
                                       appText(
-                                        "₹${user.totalCommission}",
+                                        "₹${controller.formatAmount(user.totalCommission)}",
                                         fontSize: 15.sp,
                                         fontWeight: FontWeight.w700,
                                       ),

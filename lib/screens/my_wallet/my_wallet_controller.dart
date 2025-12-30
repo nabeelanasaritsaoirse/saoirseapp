@@ -3,9 +3,10 @@
 import 'dart:developer';
 import 'package:get/get.dart';
 
-import '../../models/wallet_response.dart' hide WalletTransaction;
 import '../../models/wallet_transcation_model.dart';
 import '/services/wallet_service.dart';
+
+import '../../models/wallet_response.dart' hide WalletTransaction;
 
 class MyWalletController extends GetxController {
   final WalletService serviceData = WalletService();

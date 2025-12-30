@@ -4,6 +4,8 @@ class FeaturedList {
   final String listName;
   final String slug;
   final String description;
+  final int displayOrder;
+  final int totalProducts;
   final List<FeaturedProduct> products;
 
   FeaturedList({
@@ -11,6 +13,8 @@ class FeaturedList {
     required this.listName,
     required this.slug,
     required this.description,
+    required this.displayOrder,
+    required this.totalProducts,
     required this.products,
   });
 
@@ -20,18 +24,39 @@ class FeaturedList {
       listName: json['listName'] ?? '',
       slug: json['slug'] ?? '',
       description: json['description'] ?? '',
+      displayOrder: json['displayOrder'] ?? 0,
+      totalProducts: json['totalProducts'] ?? 0,
       products: (json['products'] as List? ?? [])
-          .map((p) => FeaturedProduct.fromJson(p))
+          .map((e) => FeaturedProduct.fromJson(e))
           .toList(),
+    );
+  }
+}
+
+class FeaturedListsResponse {
+  final List<FeaturedList> lists;
+  final String region;
+
+  FeaturedListsResponse({
+    required this.lists,
+    required this.region,
+  });
+
+  factory FeaturedListsResponse.fromJson(Map<String, dynamic> json) {
+    return FeaturedListsResponse(
+      lists:
+          (json['data'] as List).map((e) => FeaturedList.fromJson(e)).toList()
+            ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder)),
+      region: json['region'] ?? '',
     );
   }
 }
 
 class FeaturedProduct {
   final String productId;
-  final String productMongoId;
+  final String? productMongoId;
   final String name;
-  final String brand;
+  final String? brand;
   final String image;
   final double price;
   final double finalPrice;
@@ -39,7 +64,7 @@ class FeaturedProduct {
 
   FeaturedProduct({
     required this.productId,
-    required this.productMongoId,
+    this.productMongoId,
     required this.name,
     required this.brand,
     required this.image,
@@ -55,21 +80,17 @@ class FeaturedProduct {
       'https://via.placeholder.com/300x300.png?text=No+Image';
 
   factory FeaturedProduct.fromJson(Map<String, dynamic> json) {
-    final rawImage = json['productImage'];
-
     return FeaturedProduct(
       productId: json['productId'] ?? '',
-      productMongoId: json['productMongoId'] ?? '',
+      productMongoId: json['productMongoId'],
       name: json['productName'] ?? '',
-      brand: json['brand'] ?? '',
-      image: (rawImage != null && rawImage.toString().isNotEmpty)
-          ? rawImage
+      brand: json['brand'],
+      image: (json['productImage'] != null &&
+              json['productImage'].toString().isNotEmpty)
+          ? json['productImage']
           : placeholderImage,
-
-      // NO /100 — backend already sends rupees
       price: (json['price'] ?? 0).toDouble(),
       finalPrice: (json['finalPrice'] ?? 0).toDouble(),
-
       order: json['order'] ?? 0,
     );
   }

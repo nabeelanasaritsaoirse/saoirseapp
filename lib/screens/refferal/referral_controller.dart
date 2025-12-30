@@ -412,4 +412,9 @@ class ReferralController extends GetxController {
       content: "Referral code copied to clipboard",
     );
   }
+
+  String formatAmount(double value) {
+    final formatted = value.toStringAsFixed(2);
+    return formatted.replaceAll(RegExp(r'\.?0+$'), '');
+  }
 }

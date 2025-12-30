@@ -107,4 +107,9 @@ class InviteFriendController extends GetxController {
             ),
         transition: Transition.rightToLeft);
   }
+
+  String formatAmount(double value) {
+    final formatted = value.toStringAsFixed(2);
+    return formatted.replaceAll(RegExp(r'\.?0+$'), '');
+  }
 }

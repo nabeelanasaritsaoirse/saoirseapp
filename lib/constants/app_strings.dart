@@ -51,8 +51,8 @@ class AppStrings {
   static String checkout = "Check Out";
 
   // Refferal page
-  static String refferalTitle = "Referral Details";
-  static String refferal_details = "Referral";
+  static String refferalTitle = "Referral";
+  static String refferal_details = "Referral Details";
   static String referalBannerContent =
       "Invite Friends\nEarn Money\nStart Referring Today!";
   static String refer_via = "Refer Via";
@@ -112,7 +112,6 @@ class AppStrings {
       "You haven’t selected a plan yet. Please choose a plan before proceeding to Check out.";
 
   // KYC page
-
   static String KycTitle = "KYC Status";
 
   //Cart page

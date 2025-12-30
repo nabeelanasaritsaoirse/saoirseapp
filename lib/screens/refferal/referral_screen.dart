@@ -1,7 +1,3 @@
-// FULL UPDATED REFERRAL SCREEN
-// Behaves exactly as requested
-// No design or UI property changes
-
 // ignore_for_file: deprecated_member_use
 
 import 'dart:developer';
@@ -708,7 +704,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          "₹${(referral.totalCommission).toStringAsFixed(0)}",
+                          "₹${controller.formatAmount(referral.totalCommission)}",
                           style: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.w600,

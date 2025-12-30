@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import 'package:get/get.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_gradient.dart';
+import '../../models/product_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
@@ -351,301 +354,86 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
 //--------------------------------------------------------
             // Most Popular Product Section
-            Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      appText(
-                        AppStrings.poular,
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.06,
-                      ),
-                      InkWell(
-                        onTap: () => Get.to(ProductListing()),
-                        child: appText(
-                          AppStrings.see_all,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.06,
-                        ),
-                      ),
-                    ],
+            Obx(() {
+              log(' UI → FEATURED LIST COUNT: ${homeController.featuredLists.length}');
+              log(' UI → FEATURED LOADING: ${homeController.featuredLoading.value}');
+
+              //Loading state
+              if (homeController.featuredLoading.value) {
+                return Center(child: appLoader());
+              }
+
+              // Empty state
+              if (homeController.featuredLists.isEmpty) {
+                return Center(
+                  child: appText(
+                    "No featured products available",
+                    color: Colors.grey,
                   ),
-                ),
-                SizedBox(height: 8.h),
-                SizedBox(
-                  height: 205.h,
-                  child: Obx(() {
-                    final list = homeController.popularList.value;
-                    if (homeController.loading.value &&
-                        homeController.popularLoading.value) {
-                      return Center(child: appLoader());
-                    }
+                );
+              }
 
-                    if (list == null || list.products.isEmpty) {
-                      return Center(
-                        child: appText(
-                          AppStrings.no_popular_products,
-                          fontSize: 14.sp,
-                          color: Colors.grey,
-                        ),
-                      );
-                    }
+              //Data state
+              return Column(
+                children: List.generate(
+                  homeController.featuredLists.length,
+                  (index) {
+                    final list = homeController.featuredLists[index];
+                    final isBigLayout = index % 2 == 0;
 
-                    return ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
-                      itemCount: list.products.length,
-                      itemBuilder: (context, index) {
-                        final product = list.products[index];
-                        return ProductCard(
-                          productId: product.productId,
-                          showFavorite: false,
-                          id: product.productMongoId,
-                          name: product.name,
-                          image: product.image,
-                          brand: product.brand,
-                          price: product.finalPrice.toStringAsFixed(0),
-                          isFavorite: product.isFavorite,
-                          margin: EdgeInsets.only(right: 12.w),
-                        );
-                      },
-                    );
-                  }),
-                ),
-              ],
-            ),
-            SizedBox(height: 13.h),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              /// LIST TITLE
+                              appText(
+                                list.listName,
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.06,
+                              ),
 
-            // Best seller Product section
-            Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      appText(
-                        AppStrings.best_products,
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.06,
-                      ),
-                      InkWell(
-                        onTap: () => Get.to(ProductListing()),
-                        child: appText(
-                          AppStrings.see_all,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.06,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                SizedBox(
-                  height: 85.h,
-                  child: Obx(
-                    () {
-                      final list = homeController.bestSellerList.value;
-                      if (homeController.bestSellerLoading.value) {
-                        return Center(
-                          child: appLoader(),
-                        );
-                      }
-
-                      if (list == null || list.products.isEmpty) {
-                        return Center(
-                            child: appText(AppStrings.no_best_seller_products));
-                      }
-
-                      return ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        itemCount: list.products.length,
-                        itemBuilder: (context, index) {
-                          final product = list.products[index];
-
-                          return Padding(
-                            padding: EdgeInsets.all(8.0.w),
-                            child: InkWell(
-                              onTap: () => Get.to(
-                                ProductDetailsScreen(
-                                  productId: product.productId,
-                                  id: product.productMongoId,
+                              /// SEE ALL
+                              InkWell(
+                                onTap: () {
+                                  Get.to(
+                                    () => const ProductListing(),
+                                    arguments: {
+                                      'slug': list.slug,
+                                      'listId': list.listId,
+                                      'title': list.listName,
+                                    },
+                                  );
+                                },
+                                child: appText(
+                                  AppStrings.see_all,
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryColor,
                                 ),
                               ),
-                              child: Container(
-                                width: 220.w,
-                                padding: EdgeInsets.all(5.sp),
-                                decoration: BoxDecoration(
-                                  color: AppColors.white,
-                                  borderRadius: BorderRadius.circular(12.sp),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.shadowColor,
-                                      blurRadius: 6.r,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    // --- PRODUCT IMAGE --- //
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.r),
-                                      child: Image.network(
-                                        product.image,
-                                        width: 70.w,
-                                        height: 70.w,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) {
-                                          return Container(
-                                            width: 70.w,
-                                            height: 70.w,
-                                            color: Colors.grey.shade200,
-                                            child: Icon(
-                                              Icons.broken_image,
-                                              size: 28.sp,
-                                              color: Colors.grey,
-                                            ),
-                                          );
-                                        },
-                                        loadingBuilder:
-                                            (context, child, loadingProgress) {
-                                          if (loadingProgress == null) {
-                                            return child;
-                                          }
-
-                                          return Center(
-                                            child: CupertinoActivityIndicator(
-                                              radius: 10.0,
-                                              color: AppColors.textGray,
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-
-                                    SizedBox(width: 12.w),
-
-                                    // --- PRODUCT TEXT --- //
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          SizedBox(height: 5.h),
-                                          appText(
-                                            product.name,
-                                            fontFamily: 'inter',
-                                            fontSize: 13.sp,
-                                            maxLines: 2,
-                                            textAlign: TextAlign.start,
-                                            fontWeight: FontWeight.w600,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          SizedBox(height: 4.h),
-                                          appText(
-                                            "₹ ${product.price.toStringAsFixed(0)}",
-                                            fontFamily: 'inter',
-                                            fontSize: 13.sp,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.h),
-
-            // Trending Product section
-            Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      appText(
-                        AppStrings.trending,
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.06,
-                      ),
-                      InkWell(
-                        onTap: () => Get.to(ProductListing()),
-                        child: appText(
-                          AppStrings.see_all,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.06,
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 12.h),
-                SizedBox(
-                  height: 205.h,
-                  child: Obx(() {
-                    final list = homeController.trendingList.value;
-                    if (homeController.trendingLoading.value) {
-                      return Center(child: appLoader());
-                    }
-
-                    if (list == null || list.products.isEmpty) {
-                      return Center(
-                        child: appText(
-                          AppStrings.no_trending_products,
-                          fontSize: 14.sp,
-                          color: Colors.grey,
+                        SizedBox(height: 8.h),
+                        SizedBox(
+                          height: isBigLayout ? 205.h : 85.h,
+                          child: isBigLayout
+                              ? _bigProductList(list)
+                              : _compactProductList(list),
                         ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
-                      itemCount: list.products.length,
-                      itemBuilder: (context, index) {
-                        final product = list.products[index];
-                        return ProductCard(
-                          productId: product.productId,
-                          showFavorite: false,
-                          id: product.productMongoId,
-                          name: product.name,
-                          image: product.image,
-                          brand: product.brand,
-                          price: product.finalPrice.toStringAsFixed(0),
-                          isFavorite: product.isFavorite,
-                          margin: EdgeInsets.only(right: 12.w),
-                        );
-                      },
+                        SizedBox(height: 14.h),
+                      ],
                     );
-                  }),
+                  },
                 ),
-              ],
-            ),
+              );
+            }),
+
             SizedBox(height: 10.h),
 
             // Adverticement Section
@@ -883,6 +671,105 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _bigProductList(FeaturedList list) {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
+      itemCount: list.products.length,
+      itemBuilder: (context, index) {
+        final product = list.products[index];
+
+        return ProductCard(
+          productId: product.productId,
+          id: product.productMongoId,
+          name: product.name,
+          image: product.image,
+          brand: product.brand ?? "",
+          price: product.finalPrice.toStringAsFixed(0),
+          isFavorite: product.isFavorite,
+          showFavorite: false,
+          margin: EdgeInsets.only(right: 12.w),
+        );
+      },
+    );
+  }
+
+  Widget _compactProductList(FeaturedList list) {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      itemCount: list.products.length,
+      itemBuilder: (context, index) {
+        final product = list.products[index];
+
+        return Padding(
+          padding: EdgeInsets.all(8.0.w),
+          child: InkWell(
+            onTap: () => Get.to(
+              ProductDetailsScreen(
+                productId: product.productId,
+                id: product.productMongoId,
+              ),
+            ),
+            child: Container(
+              width: 220.w,
+              padding: EdgeInsets.all(6.sp),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(12.sp),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.shadowColor,
+                    blurRadius: 6.r,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8.r),
+                    child: Image.network(
+                      product.image,
+                      width: 70.w,
+                      height: 70.w,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.broken_image,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        appText(
+                          product.name,
+                          fontSize: 13.sp,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        SizedBox(height: 4.h),
+                        appText(
+                          "₹ ${product.finalPrice.toStringAsFixed(0)}",
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

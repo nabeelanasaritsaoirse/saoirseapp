@@ -30,77 +30,86 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Obx(() => pages[controller.selectedIndex.value]),
-      ),
-      bottomNavigationBar: Obx(
-        () => Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, -3),
+    return WillPopScope(
+      onWillPop: () async {
+        if (controller.selectedIndex.value != 0) {
+          controller.changeTab(0);
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        body: SafeArea(
+          bottom: false,
+          child: Obx(() => pages[controller.selectedIndex.value]),
+        ),
+        bottomNavigationBar: Obx(
+          () => Container(
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -3),
+                ),
+              ],
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20.r),
+                topRight: Radius.circular(20.r),
               ),
-            ],
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20.r),
-              topRight: Radius.circular(20.r),
             ),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: EdgeInsets.only(top: 4.h, bottom: 2.h),
-              child: BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: Colors.transparent,
-                currentIndex: controller.selectedIndex.value,
-                onTap: controller.changeTab,
-                elevation: 0,
-                selectedItemColor: AppColors.primaryColor,
-                unselectedItemColor: AppColors.grey,
-                showUnselectedLabels: true,
-                selectedLabelStyle: TextStyle(
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w600,
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: EdgeInsets.only(top: 4.h, bottom: 2.h),
+                child: BottomNavigationBar(
+                  type: BottomNavigationBarType.fixed,
+                  backgroundColor: Colors.transparent,
+                  currentIndex: controller.selectedIndex.value,
+                  onTap: controller.changeTab,
+                  elevation: 0,
+                  selectedItemColor: AppColors.primaryColor,
+                  unselectedItemColor: AppColors.grey,
+                  showUnselectedLabels: true,
+                  selectedLabelStyle: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  unselectedLabelStyle: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  items: [
+                    _navItem(
+                      icon: Iconsax.home,
+                      activeIcon: Iconsax.home,
+                      label: 'Home',
+                    ),
+                    _navItem(
+                      icon: Iconsax.category,
+                      activeIcon: Iconsax.category5,
+                      label: 'Category',
+                    ),
+                    _navItem(
+                      icon: Iconsax.gift,
+                      activeIcon: Iconsax.gift,
+                      label: 'Referral',
+                    ),
+                    _navItem(
+                      icon: Iconsax.shopping_cart,
+                      activeIcon: Iconsax.shopping_cart,
+                      label: 'Cart',
+                      badgeCount:
+                          cartController.cartCount.value, //directy passing
+                    ),
+                    _navItem(
+                      icon: Iconsax.user,
+                      activeIcon: Iconsax.user,
+                      label: 'You',
+                    ),
+                  ],
                 ),
-                unselectedLabelStyle: TextStyle(
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-                items: [
-                  _navItem(
-                    icon: Iconsax.home,
-                    activeIcon: Iconsax.home,
-                    label: 'Home',
-                  ),
-                  _navItem(
-                    icon: Iconsax.category,
-                    activeIcon: Iconsax.category5,
-                    label: 'Category',
-                  ),
-                  _navItem(
-                    icon: Iconsax.gift,
-                    activeIcon: Iconsax.gift,
-                    label: 'Referral',
-                  ),
-                  _navItem(
-                    icon: Iconsax.shopping_cart,
-                    activeIcon: Iconsax.shopping_cart,
-                    label: 'Cart',
-                    badgeCount:
-                        cartController.cartCount.value, //directy passing
-                  ),
-                  _navItem(
-                    icon: Iconsax.user,
-                    activeIcon: Iconsax.user,
-                    label: 'You',
-                  ),
-                ],
               ),
             ),
           ),
