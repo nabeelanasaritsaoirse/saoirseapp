@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/category/category_controller.dart';
-import 'package:saoirse_app/services/deep_link_navigation_service.dart';
 
+import '../../services/deep_link_navigation_service.dart';
 import '../cart/cart_controller.dart';
+import '../category/category_controller.dart';
 import '../home/home_controller.dart';
 import '../profile/profile_controller.dart';
 import '../refferal/referral_controller.dart';
