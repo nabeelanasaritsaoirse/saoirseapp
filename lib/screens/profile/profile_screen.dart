@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import 'package:saoirse_app/screens/kyc/kyc_controller.dart';
+import 'package:saoirse_app/screens/orders_active/orders_active_screen.dart';
 import '../edit_profile/edit_profile_screen.dart';
 import '../kyc/kyc_screen.dart';
 import '../../constants/app_assets.dart';
@@ -107,8 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         fit: BoxFit.cover,
                                         width: 84,
                                         height: 84,
-                                        loadingBuilder:
-                                            (context, child, loadingProgress) {
+                                        loadingBuilder: (context, child, loadingProgress) {
                                           if (loadingProgress == null) {
                                             return child;
                                           }
@@ -220,8 +220,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       return Obx(() => ProfileMenuCard(
                             icon: controller.myOrders[index]["icon"]!,
                             title: controller.myOrders[index]["title"]!,
-                            count:
-                                controller.wishlistCount.value, // 🔥 reactive
+                            count: controller.wishlistCount.value, // 🔥 reactive
                             onTap: () {
                               Get.to(WishlistScreen())?.then((_) {
                                 controller.fetchWishlistCount();
@@ -242,8 +241,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         } else if (index == 2) {
                           Get.to(WishlistScreen());
                         } else if (index == 3) {
-                          Get.to(TransactionHistory());
+                          Get.to(OrdersActiveScreen());
                         } else if (index == 4) {
+                          Get.to(TransactionHistory());
+                        } else if (index == 5) {
                           Get.to(OrderDeliveredScreen());
                         } else {}
                       },

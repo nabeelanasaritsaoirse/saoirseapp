@@ -50,6 +50,7 @@ class AppAssets {
   static String pending_payment = "assets/icons/pending_payment.png";
   static String order_history = "assets/icons/order_history.png";
   static String wishlist = "assets/icons/wishlist.png";
+  static String active_oders = "assets/icons/active_orders.png";
   static String transactions = "assets/icons/transaction.png";
   static String delivered = "assets/icons/delivered.png";
   static String customer_care = "assets/icons/customer_care.png";

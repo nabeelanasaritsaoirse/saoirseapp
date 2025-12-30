@@ -53,8 +53,7 @@ class AppStrings {
   // Refferal page
   static String refferalTitle = "Referral";
   static String refferal_details = "Referral Details";
-  static String referalBannerContent =
-      "Invite Friends\nEarn Money\nStart Referring Today!";
+  static String referalBannerContent = "Invite Friends\nEarn Money\nStart Referring Today!";
   static String refer_via = "Refer Via";
   static String shareTo = "Share to";
   static String search = "Search";
@@ -75,10 +74,8 @@ class AppStrings {
   static String your_refferal = "Your referral";
   static String no_refferal_content = "Refer your friends and earn money";
   static String enter_refferal_code = "Enter referral code";
-  static String refferal_discription =
-      "If someone referred you, enter their referral code below. This helps us apply rewards correctly.";
-  static String refferal_applied_success =
-      "Your referral code has been\nsuccessfully applied.";
+  static String refferal_discription = "If someone referred you, enter their referral code below. This helps us apply rewards correctly.";
+  static String refferal_applied_success = "Your referral code has been\nsuccessfully applied.";
   static String productId = "Product ID :";
   static String amount = "Amount :";
   static String pending_status = "Pending Status :";
@@ -106,10 +103,8 @@ class AppStrings {
   static String equivalent_time = "Equivalent Time:";
   static String selected = "Select";
   static String warning_label = "Please Select Your Plan";
-  static String warning_body =
-      "You haven’t selected a plan yet. Please choose a plan before proceeding to Add to Cart.";
-  static String checkout_warning_body =
-      "You haven’t selected a plan yet. Please choose a plan before proceeding to Check out.";
+  static String warning_body = "You haven’t selected a plan yet. Please choose a plan before proceeding to Add to Cart.";
+  static String checkout_warning_body = "You haven’t selected a plan yet. Please choose a plan before proceeding to Check out.";
 
   // KYC page
   static String KycTitle = "KYC Status";
@@ -125,14 +120,12 @@ class AppStrings {
 
   //snackbars
   static String no_internet = 'No internet connection';
-  static String something_went_wrong =
-      'Something went wrong. Please try again.';
+  static String something_went_wrong = 'Something went wrong. Please try again.';
 
   //otp screen
   static String verify = "Verify";
   static String invalid_email = 'Please enter valid email ID';
-  static String invalid_pass =
-      'Password length should be minimum 8 with uppercase, lowercase, number, and special character.';
+  static String invalid_pass = 'Password length should be minimum 8 with uppercase, lowercase, number, and special character.';
   static String invalid_phone = 'Please enter valid phone number';
 
   //payment Succsess
@@ -192,8 +185,7 @@ class AppStrings {
   static String add_address_label = "Add Address";
 
   // Booking confirmed screen
-  static String confirm_content =
-      "Your EMI plan is activated.\nProduct will be delivered after all EMIs are paid.";
+  static String confirm_content = "Your EMI plan is activated.\nProduct will be delivered after all EMIs are paid.";
   static String confirm_title = "Payment Successful";
 
   // Pending Transaction
@@ -201,6 +193,7 @@ class AppStrings {
 
   // Order history
   static String order_history_label = "Order History";
+  static String order_active_label = "Active Orders";
 
   // Transaction History
   static String transaction_history_label = "Transaction History";
