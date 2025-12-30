@@ -7,7 +7,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:saoirse_app/screens/notification/notification_controller.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -16,6 +15,7 @@ import '../../models/profile_response.dart';
 import '../../services/profile_service.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_toast.dart';
+import '../notification/notification_controller.dart';
 import '../onboard/onboard_screen.dart';
 
 class ProfileController extends GetxController {
@@ -55,6 +55,7 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.pending_payment, "title": "Pending Payment"},
     {"icon": AppAssets.order_history, "title": "Order History"},
     {"icon": AppAssets.wishlist, "title": "Wishlist"},
+    {"icon": AppAssets.active_oders, "title": "Active Orders"},
     {"icon": AppAssets.transactions, "title": "Transactions"},
     {"icon": AppAssets.delivered, "title": "Delivered"},
     // {"icon": AppAssets.customer_care, "title": "Customer Care"},
@@ -116,7 +117,6 @@ class ProfileController extends GetxController {
   //     isLoading(false);
   //   }
   // }
-
 
   Future<void> fetchUserProfile() async {
     try {

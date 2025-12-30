@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import 'package:saoirse_app/screens/kyc/kyc_controller.dart';
 import '../edit_profile/edit_profile_screen.dart';
+import '../kyc/kyc_controller.dart';
 import '../kyc/kyc_screen.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -17,6 +17,7 @@ import '../../widgets/custom_appbar.dart';
 import '../../widgets/profile_menu_card.dart';
 import '../order_delivered/order_delivered_screen.dart';
 import '../order_history/order_history_screen.dart';
+import '../orders_active/orders_active_screen.dart';
 import '../pending_transaction/pending_transaction_screen.dart';
 import '../terms_and_privacy/privacy_policy.dart';
 import '../terms_and_privacy/terms_conditions.dart';
@@ -242,8 +243,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         } else if (index == 2) {
                           Get.to(WishlistScreen());
                         } else if (index == 3) {
-                          Get.to(TransactionHistory());
+                          Get.to(OrdersActiveScreen());
                         } else if (index == 4) {
+                          Get.to(TransactionHistory());
+                        } else if (index == 5) {
                           Get.to(OrderDeliveredScreen());
                         } else {}
                       },
