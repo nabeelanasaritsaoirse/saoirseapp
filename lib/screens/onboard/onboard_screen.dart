@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../bindings/allcontroller.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -59,7 +60,10 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                     children: [
                       appButton(
                         onTap: () {
-                          Get.offAll(() => const LoginPage());
+                          Get.offAll(
+                            () => const LoginPage(),
+                            binding: Allcontroller(),
+                          );
                         },
                         height: 40.h,
                         width: 100.w,
