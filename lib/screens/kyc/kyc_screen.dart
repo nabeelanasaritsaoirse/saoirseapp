@@ -26,10 +26,6 @@ class KycScreen extends StatelessWidget {
       body: Obx(() {
         if (controller.isLoading.value) return appLoader();
 
-  
-
-       
-
         final status = controller.kyc.value!.status;
 
         switch (status) {
