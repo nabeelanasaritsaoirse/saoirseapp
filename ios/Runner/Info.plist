@@ -45,7 +45,8 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-		<!-- Camera Access -->
+	
+	<!-- Camera Access -->
 	<key>NSCameraUsageDescription</key>
 	<string>This app uses the camera to scan QR codes and capture images when required.</string>
 
@@ -66,6 +67,11 @@
 	  <dict>
 	    <key>CFBundleTypeRole</key>
 	    <string>Editor</string>
+	    
+	    <!-- 🔑 THIS LINE FIXES THE CRASH -->
+	    <key>CFBundleURLName</key>
+	    <string>REVERSED_CLIENT_ID</string>
+	    
 	    <key>CFBundleURLSchemes</key>
 	    <array>
 	      <string>com.googleusercontent.apps.486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q</string>
