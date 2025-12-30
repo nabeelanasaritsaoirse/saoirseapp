@@ -13,7 +13,6 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_gradient.dart';
 import '../../models/product_model.dart';
 import '../../widgets/app_button.dart';
-import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/custom_appbar.dart';
@@ -28,6 +27,7 @@ import '../pending_transaction/pending_transaction_screen.dart';
 import '../productListing/product_listing.dart';
 import '../product_details/product_details_screen.dart';
 import 'home_controller.dart';
+import 'home_shimmer.dart';
 import 'investment_status_controller.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -122,155 +122,136 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: 8.h),
 
             // --------- Carousel Section (Banner Top)-------------------------
-            Obx(
-              () => homeController.carouselImages.isEmpty
-                  ? Container(
-                      height: 140.h,
-                      margin: EdgeInsets.symmetric(horizontal: 8.w),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12.r),
-                        color: AppColors.lightBlack.withOpacity(0.1),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.lightBlack,
-                            blurRadius: 8.r,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.image,
-                          size: 50.sp,
-                          color: Colors.grey.withOpacity(0.5),
-                        ),
-                      ),
-                    )
-                  : Stack(
-                      alignment: Alignment.bottomCenter,
-                      children: [
-                        CarouselSlider(
-                          items: homeController.carouselImages.map((imagePath) {
-                            return Builder(
-                              builder: (BuildContext context) {
-                                return Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 8.w),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.lightBlack,
-                                        blurRadius: 8.r,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    child: Image.network(
-                                      imagePath,
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      loadingBuilder:
-                                          (context, child, loadingProgress) {
-                                        if (loadingProgress == null) {
-                                          return child;
-                                        }
-                                        return Center(
-                                          child: CupertinoActivityIndicator(
-                                            radius: 10.0,
-                                            color: AppColors.textGray,
-                                          ),
-                                        );
-                                      },
-                                      errorBuilder: (_, __, ___) => Container(
-                                        color: Colors.grey.shade300,
-                                        child: Icon(
-                                          Icons.broken_image,
-                                          size: 40.sp,
-                                          color: Colors.grey.shade600,
-                                        ),
-                                      ),
+            Obx(() {
+              if (homeController.bannerLoading.value) {
+                return const HomeBannerShimmer();
+              }
+              if (homeController.carouselImages.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  CarouselSlider(
+                    items: homeController.carouselImages.map((imagePath) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Container(
+                            margin: EdgeInsets.symmetric(horizontal: 8.w),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.lightBlack,
+                                  blurRadius: 8.r,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12.r),
+                              child: Image.network(
+                                imagePath,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child;
+                                  }
+                                  return Center(
+                                    child: CupertinoActivityIndicator(
+                                      radius: 10.0,
+                                      color: AppColors.textGray,
                                     ),
+                                  );
+                                },
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: Colors.grey.shade300,
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    size: 40.sp,
+                                    color: Colors.grey.shade600,
                                   ),
-                                );
-                              },
-                            );
-                          }).toList(),
-                          options: CarouselOptions(
-                            autoPlay: true,
-                            autoPlayInterval: const Duration(seconds: 5),
-                            enlargeCenterPage: true,
-                            viewportFraction: 1.0,
-                            height: 140.h,
-                            onPageChanged: (index, reason) {
-                              homeController.currentCarouselIndex.value = index;
-                            },
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 8.h,
-                          child: Obx(
-                            () => Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: homeController.carouselImages
-                                  .asMap()
-                                  .entries
-                                  .map((entry) {
-                                return Container(
-                                  width: homeController
-                                              .currentCarouselIndex.value ==
-                                          entry.key
-                                      ? 24.w
-                                      : 8.w,
-                                  height: 8.h,
-                                  margin: EdgeInsets.symmetric(horizontal: 4.w),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4.r),
-                                    color: homeController
-                                                .currentCarouselIndex.value ==
-                                            entry.key
-                                        ? AppColors.white
-                                        : AppColors.transparentWhite,
-                                  ),
-                                );
-                              }).toList(),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 8.h,
-                          child: Obx(
-                            () => Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: homeController.carouselImages
-                                  .asMap()
-                                  .entries
-                                  .map((entry) {
-                                return Container(
-                                  width: homeController
-                                              .currentCarouselIndex.value ==
-                                          entry.key
-                                      ? 24.w
-                                      : 8.w,
-                                  height: 8.h,
-                                  margin: EdgeInsets.symmetric(horizontal: 4.w),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4.r),
-                                    color: homeController
-                                                .currentCarouselIndex.value ==
-                                            entry.key
-                                        ? AppColors.white
-                                        : AppColors.transparentWhite,
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ],
+                          );
+                        },
+                      );
+                    }).toList(),
+                    options: CarouselOptions(
+                      autoPlay: true,
+                      autoPlayInterval: const Duration(seconds: 5),
+                      enlargeCenterPage: true,
+                      viewportFraction: 1.0,
+                      height: 140.h,
+                      onPageChanged: (index, reason) {
+                        homeController.currentCarouselIndex.value = index;
+                      },
                     ),
-            ),
+                  ),
+                  Positioned(
+                    bottom: 8.h,
+                    child: Obx(
+                      () => Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: homeController.carouselImages
+                            .asMap()
+                            .entries
+                            .map((entry) {
+                          return Container(
+                            width: homeController.currentCarouselIndex.value ==
+                                    entry.key
+                                ? 24.w
+                                : 8.w,
+                            height: 8.h,
+                            margin: EdgeInsets.symmetric(horizontal: 4.w),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4.r),
+                              color:
+                                  homeController.currentCarouselIndex.value ==
+                                          entry.key
+                                      ? AppColors.white
+                                      : AppColors.transparentWhite,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 8.h,
+                    child: Obx(
+                      () => Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: homeController.carouselImages
+                            .asMap()
+                            .entries
+                            .map((entry) {
+                          return Container(
+                            width: homeController.currentCarouselIndex.value ==
+                                    entry.key
+                                ? 24.w
+                                : 8.w,
+                            height: 8.h,
+                            margin: EdgeInsets.symmetric(horizontal: 4.w),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4.r),
+                              color:
+                                  homeController.currentCarouselIndex.value ==
+                                          entry.key
+                                      ? AppColors.white
+                                      : AppColors.transparentWhite,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }),
 
             SizedBox(height: 10.h),
 
@@ -281,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 final categories = homeController.parentCategories;
 
                 if (homeController.homeCategoryLoading.value) {
-                  return SizedBox();
+                  return const CategoryChipShimmer();
                 }
 
                 if (categories.isEmpty) {
@@ -360,7 +341,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
               //Loading state
               if (homeController.featuredLoading.value) {
-                return Center(child: appLoader());
+                return Column(
+                  children: List.generate(
+                    3,
+                    (index) => Padding(
+                      padding: EdgeInsets.only(bottom: 14.h),
+                      child: FeaturedProductShimmer(isBig: index % 2 == 0),
+                    ),
+                  ),
+                );
               }
 
               // Empty state
@@ -752,6 +741,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           product.name,
                           fontSize: 13.sp,
                           maxLines: 2,
+                          textAlign: TextAlign.left,
                           overflow: TextOverflow.ellipsis,
                           fontWeight: FontWeight.w600,
                         ),

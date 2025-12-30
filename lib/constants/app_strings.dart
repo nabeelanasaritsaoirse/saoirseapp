@@ -201,6 +201,7 @@ class AppStrings {
 
   // Order history
   static String order_history_label = "Order History";
+  static String order_active_label = "Active Orders";
 
   // Transaction History
   static String transaction_history_label = "Transaction History";

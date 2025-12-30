@@ -15,7 +15,25 @@ class OrderHistoryService {
   }) async {
     final token = await _token();
 
-    final url = "${AppURLs.ORDER_HISTORY_API}?status=ACTIVE&limit=$limit&page=$page";
+    final url = "${AppURLs.ORDER_HISTORY_API}?limit=$limit&page=$page";
+
+    return APIService.getRequest<OrderHistoryResponse>(
+      url: url,
+      headers: {"Authorization": "Bearer $token"},
+      onSuccess: (json) => OrderHistoryResponse.fromJson(json),
+    );
+  }
+
+  //----------FETCH ALL ACTIVE ORDERS----------------//
+
+  Future<OrderHistoryResponse?> fetchActiveOrders({
+    required int page,
+    required int limit,
+  }) async {
+    final token = await _token();
+
+    final url =
+        "${AppURLs.ORDER_HISTORY_API}?status=ACTIVE&limit=$limit&page=$page";
 
     return APIService.getRequest<OrderHistoryResponse>(
       url: url,
@@ -32,7 +50,8 @@ class OrderHistoryService {
   }) async {
     final token = await _token();
 
-    final url = "${AppURLs.ORDER_HISTORY_API}?status=COMPLETE&limit=$limit&page=$page";
+    final url =
+        "${AppURLs.ORDER_HISTORY_API}?status=COMPLETE&limit=$limit&page=$page";
 
     return APIService.getRequest<OrderHistoryResponse>(
       url: url,
