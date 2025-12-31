@@ -26,14 +26,6 @@ class KycScreen extends StatelessWidget {
       body: Obx(() {
         if (controller.isLoading.value) return appLoader();
 
-        if (controller.errorMessage.isNotEmpty) {
-          return Center(child: Text(controller.errorMessage.value));
-        }
-
-        if (controller.kyc.value == null) {
-          return const Center(child: Text("No KYC data found"));
-        }
-
         final status = controller.kyc.value!.status;
 
         switch (status) {

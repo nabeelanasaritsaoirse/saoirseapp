@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
@@ -435,6 +436,49 @@ class ProfileController extends GetxController {
     }
   }
 
+  // void confirmLogout() {
+  //   Get.defaultDialog(
+  //     title: "Logout",
+  //     middleText: "Are you sure you want to exit?",
+  //     textConfirm: "Yes",
+  //     textCancel: "No",
+  //     confirmTextColor: Colors.white,
+  //     buttonColor: AppColors.primaryColor,
+  //     cancelTextColor: AppColors.primaryColor,
+  //     onConfirm: () async {
+  //       await Get.find<NotificationController>().removeFCM();
+  //       await FirebaseMessaging.instance.deleteToken();
+  //       print("🗑 Local FCM token deleted.");
+  //       Get.back(); // close dialog
+  //       await logoutUser();
+  //     },
+  //   );
+  // }
+
+  // Future<void> logoutUser() async {
+  //   try {
+  //     isLoading(true);
+
+  //     bool success = await _profileService.logout();
+
+  //     if (success) {
+  //       // CLEAR STORAGE
+  //       await storage.erase();
+  //       appToast(content: "Logged out successfully!");
+
+  //       // GO TO ONBOARD SCREEN
+  //       Get.offAll(() => OnBoardScreen());
+  //     } else {
+  //       appToast(content: "Logout failed!", error: true);
+  //     }
+  //   } catch (e) {
+  //     print("Logout Error: $e");
+  //     appToast(content: "Something went wrong", error: true);
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
+
   void confirmLogout() {
     Get.defaultDialog(
       title: "Logout",
@@ -444,37 +488,47 @@ class ProfileController extends GetxController {
       confirmTextColor: Colors.white,
       buttonColor: AppColors.primaryColor,
       cancelTextColor: AppColors.primaryColor,
-      onConfirm: () async {
-        await Get.find<NotificationController>().removeFCM();
-        await FirebaseMessaging.instance.deleteToken();
-        print("🗑 Local FCM token deleted.");
+      onConfirm: () {
         Get.back(); // close dialog
-        await logoutUser();
+
+        // Navigate immediately
+        Get.offAll(() => OnBoardScreen());
+
+        // Perform logout in background
+        logoutUserInBackground();
       },
     );
   }
 
-  Future<void> logoutUser() async {
+  Future<void> logoutUserInBackground() async {
     try {
-      isLoading(true);
+      log("🚪 Logout started in background");
 
-      bool success = await _profileService.logout();
-
-      if (success) {
-        // CLEAR STORAGE
-        await storage.erase();
-        appToast(content: "Logged out successfully!");
-
-        // GO TO ONBOARD SCREEN
-        Get.offAll(() => OnBoardScreen());
-      } else {
-        appToast(content: "Logout failed!", error: true);
+      // Remove FCM from backend
+      if (Get.isRegistered<NotificationController>()) {
+        await Get.find<NotificationController>().removeFCM();
       }
+
+      // Delete local FCM token
+      await FirebaseMessaging.instance.deleteToken();
+      log("🗑 Local FCM token deleted");
+
+      // Call logout API (optional but recommended)
+      try {
+        await _profileService.logout();
+      } catch (e) {
+        log("⚠ Logout API failed (ignored): $e");
+      }
+
+      // Clear storage
+      await storage.erase();
+
+      // // Clear controllers
+      // Get.deleteAll(force: true);
+
+      log(" Logout cleanup completed");
     } catch (e) {
-      print("Logout Error: $e");
-      appToast(content: "Something went wrong", error: true);
-    } finally {
-      isLoading(false);
+      log(" Logout background error: $e");
     }
   }
 
