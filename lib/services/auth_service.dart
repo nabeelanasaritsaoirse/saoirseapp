@@ -141,7 +141,7 @@ class AuthService {
       // Initialize Google Sign-In
       await google.initialize(
         serverClientId:
-            '486829564070-mkrkm4v9tji249t6u7gdfiefups09gs4.apps.googleusercontent.com',
+            '486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q.apps.googleusercontent.com',
       );
 
       // Authenticate (opens Google account selector)
