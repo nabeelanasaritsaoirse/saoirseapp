@@ -98,6 +98,37 @@ class _WalletScreenState extends State<WalletScreen> {
             );
           }
 
+          if (walletData.transactions.isEmpty) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                walletCard(
+                  mainBalance: walletData.walletBalance,
+                  totalBalance: walletData.totalBalance,
+                  referralBonus: walletData.referralBonus,
+                  holdBalance: walletData.holdBalance,
+                  investDaily: walletData.totalBalance,
+                ),
+                SizedBox(height: 40.h),
+                Column(
+                  children: [
+                    SizedBox(
+                      height: 50.h,
+                    ),
+                    Center(
+                      child: appText(
+                        "No wallet history found",
+                        color: AppColors.grey,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }
+
           return ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: EdgeInsets.zero,
@@ -185,21 +216,29 @@ class _WalletScreenState extends State<WalletScreen> {
           );
         }),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(10),
-        child: appButton(
-          buttonColor: AppColors.primaryColor,
-          onTap: () => Get.to(WithdrawScreen()),
-          child: Center(
-            child: appText(
-              "Withdraw",
-              color: AppColors.white,
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
+      bottomNavigationBar: Obx(() {
+        final walletData = controller.wallet.value;
+
+        if (walletData == null || walletData.walletBalance <= 0) {
+          return const SizedBox.shrink(); // hide withdraw button
+        }
+
+        return Padding(
+          padding: const EdgeInsets.all(10),
+          child: appButton(
+            buttonColor: AppColors.primaryColor,
+            onTap: () => Get.to(WithdrawScreen()),
+            child: Center(
+              child: appText(
+                "Withdraw",
+                color: AppColors.white,
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
