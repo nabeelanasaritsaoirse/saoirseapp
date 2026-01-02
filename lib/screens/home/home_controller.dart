@@ -1,5 +1,3 @@
-// home_controller.dart
-
 import 'package:get/get.dart';
 
 import '../../models/category_model.dart';
@@ -60,21 +58,14 @@ class HomeController extends GetxController {
   Future<void> fetchFeaturedLists() async {
     try {
       featuredLoading.value = true;
-   
 
       final lists = await HomeService.fetchFeaturedLists();
 
-   
-
       if (lists.isNotEmpty) {
         featuredLists.assignAll(lists);
-     
-      } else {
- 
-      }
+      } else {}
     } finally {
       featuredLoading.value = false;
-   
     }
   }
 
@@ -98,7 +89,7 @@ class HomeController extends GetxController {
   //       popularList.value = list;
   //     }
   //   } catch (e) {
- 
+
   //   } finally {
   //     popularLoading.value = false;
   //   }
@@ -114,7 +105,7 @@ class HomeController extends GetxController {
   //       bestSellerList.value = list;
   //     }
   //   } catch (e) {
- 
+
   //   } finally {
   //     bestSellerLoading.value = false;
   //   }
@@ -130,7 +121,7 @@ class HomeController extends GetxController {
   //       trendingList.value = list;
   //     }
   //   } catch (e) {
- 
+
   //   } finally {
   //     trendingLoading.value = false;
   //   }

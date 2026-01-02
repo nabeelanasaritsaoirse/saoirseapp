@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'dart:io';
 
 import 'package:http/http.dart';
@@ -15,11 +13,9 @@ import 'package:http/http.dart' as http;
 class ProfileService {
   final token = storage.read(AppConst.ACCESS_TOKEN);
 
-      Future<UserProfileModel?> fetchProfile() async {
+  Future<UserProfileModel?> fetchProfile() async {
     try {
       final url = AppURLs.MY_PROFILE;
-
-      print("TOKEN: $token");
 
       final response = await APIService.getRequest<UserProfileModel>(
         url: url,
@@ -30,14 +26,12 @@ class ProfileService {
 
         // ⬇️ THIS maps JSON → UserProfileModel
         onSuccess: (json) {
-       
           return UserProfileModel.fromJson(json);
         },
       );
 
       return response;
     } catch (e) {
-  
       return null;
     }
   }
@@ -46,12 +40,6 @@ class ProfileService {
   Future<bool> updateProfilePicture(String userId, String imagePath) async {
     try {
       final url = "${AppURLs.BASE_API}api/users/$userId/profile-picture";
-      
-
- 
-      print("User ID     : $userId");
-      print("TOKEN       : $token");
-
 
       // ---- FORCE NEW FILE NAME WITH .jpg ----
       final originalFile = File(imagePath);
@@ -60,8 +48,6 @@ class ProfileService {
           "${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
 
       final newFile = await originalFile.copy(newPath);
-
-    
 
       // ---- Convert to MultipartFile ----
       final multipart = await http.MultipartFile.fromPath(
@@ -80,20 +66,15 @@ class ProfileService {
       );
 
       if (response == null) {
-       
         return false;
       }
 
-     
-
       if (response.statusCode == 200 || response.statusCode == 201) {
-       return true;
+        return true;
       }
 
-    
       return false;
     } catch (e) {
-  
       return false;
     }
   }
@@ -139,13 +120,10 @@ class ProfileService {
         onSuccess: (json) => json,
       );
 
-     
-
       if (response == null) return false;
 
       return response["success"] == true;
     } catch (e) {
-    
       return false;
     }
   }

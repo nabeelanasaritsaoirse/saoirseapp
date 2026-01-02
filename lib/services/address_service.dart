@@ -1,5 +1,3 @@
-
-
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -12,7 +10,6 @@ class AddressService {
     String? userId = storage.read(AppConst.USER_ID);
 
     if (userId!.isEmpty) {
-    
       return null;
     }
 
@@ -25,12 +22,9 @@ class AddressService {
   }
 
   static Future<bool> addAddress(Map<String, dynamic> body) async {
-   
     String? userId = storage.read(AppConst.USER_ID);
-  
 
     if (userId!.isEmpty) {
-    
       return false;
     }
 

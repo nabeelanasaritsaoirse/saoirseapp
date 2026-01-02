@@ -1,6 +1,4 @@
-// ignore_for_file: unused_local_variable, deprecated_member_use, prefer_const_constructors_in_immutables
-
-
+// ignore_for_file: prefer_const_constructors_in_immutables, deprecated_member_use
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -71,8 +69,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
- 
-
     if (orderController.originalAmount == 0.0) {
       orderController.originalAmount = widget.selectedAmount;
       orderController.originalDays = widget.selectedDays;
@@ -80,16 +76,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
     final couponController = TextEditingController();
     final pricing = widget.product!.pricing;
-
-    final String? productImageUrl =
-        widget.product != null && widget.product!.images.isNotEmpty
-            ? widget.product!.images
-                .firstWhere(
-                  (img) => img.isPrimary,
-                  orElse: () => widget.product!.images.first,
-                )
-                .url
-            : null;
 
     return Scaffold(
       backgroundColor: AppColors.paperColor,
@@ -573,7 +559,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                               final p = v.pricing;
                               final ins = v.installment;
                               final b = v.benefits;
-                              final type = v.coupon.type;
 
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

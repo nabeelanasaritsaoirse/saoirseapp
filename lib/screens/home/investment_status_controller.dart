@@ -1,4 +1,3 @@
-
 import 'package:get/get.dart';
 
 import '../../models/investment_status_card_model.dart';
@@ -34,7 +33,7 @@ class InvestmentStatusController extends GetxController {
       if (response != null && response.success) {
         overview.value = response.overview;
       }
-    }  finally {
+    } finally {
       isLoading.value = false;
     }
   }

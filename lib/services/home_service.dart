@@ -1,6 +1,5 @@
 // ignore_for_file: unnecessary_type_check
 
-
 import 'package:get_storage/get_storage.dart';
 
 import '../constants/app_constant.dart';
@@ -18,23 +17,17 @@ class HomeService {
     final token = storage.read(AppConst.ACCESS_TOKEN);
     final url = AppURLs.FEATURED_LISTS_API;
 
-  
-
     final response = await APIService.getRequest(
       url: url,
       headers: {
         if (token != null) 'Authorization': 'Bearer $token',
       },
       onSuccess: (data) {
-      
         return data;
       },
     );
 
-   
-
     if (response == null) {
-    
       return [];
     }
 
@@ -46,10 +39,8 @@ class HomeService {
           .toList()
         ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
 
-    
       return lists;
     }
-
 
     return [];
   }
@@ -65,22 +56,18 @@ class HomeService {
   //   final token = storage.read(AppConst.ACCESS_TOKEN);
   //   final url = '${AppURLs.POPULAR_PRODUCT_API}page=$page&limit=$limit';
 
-
-
   //   return await APIService.getRequest<FeaturedList?>(
   //     url: url,
   //     headers: {
   //       if (token != null) 'Authorization': 'Bearer $token',
   //     },
   //     onSuccess: (data) {
-  
 
   //       if (data['success'] == true && data['data'] != null) {
   //         final list = FeaturedList.fromJson(data['data']);
- 
+
   //         return list;
   //       }
-
 
   //       return null;
   //     },
@@ -98,8 +85,6 @@ class HomeService {
   //   final token = storage.read(AppConst.ACCESS_TOKEN);
   //   final url = '${AppURLs.BEST_SELLER_PRODUCT_API}page=$page&limit=$limit';
 
-
-
   //   return await APIService.getRequest<FeaturedList?>(
   //     url: url,
   //     headers: {
@@ -107,14 +92,12 @@ class HomeService {
   //     },
   //     onSuccess: (data) {
 
-
   //       if (data['success'] == true && data['data'] != null) {
   //         final list = FeaturedList.fromJson(data['data']);
 
   //         return list;
   //       }
 
-  
   //       return null;
   //     },
   //   );
@@ -131,15 +114,12 @@ class HomeService {
   //   final token = storage.read(AppConst.ACCESS_TOKEN);
   //   final url = '${AppURLs.TRENDING_PRODUCT_API}page=$page&limit=$limit';
 
- 
-
   //   return await APIService.getRequest<FeaturedList?>(
   //     url: url,
   //     headers: {
   //       if (token != null) 'Authorization': 'Bearer $token',
   //     },
   //     onSuccess: (data) {
- 
 
   //       if (data['success'] == true && data['data'] != null) {
   //         final list = FeaturedList.fromJson(data['data']);
@@ -147,7 +127,6 @@ class HomeService {
   //         return list;
   //       }
 
- 
   //       return null;
   //     },
   //   );

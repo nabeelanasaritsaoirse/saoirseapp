@@ -1,5 +1,3 @@
-// FILE: lib/controllers/product_details_controller.dart
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';

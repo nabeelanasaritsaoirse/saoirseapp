@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -89,12 +87,6 @@ class VerifyOtpController extends GetxController {
     storage.write(AppConst.REFERRAL_CODE, data.referralCode);
     storage.write(AppConst.USER_NAME, data.name);
 
-    print("✔ SAVED userId: ${storage.read(AppConst.USER_ID)}");
-    print("✔ SAVED accessToken: ${storage.read(AppConst.ACCESS_TOKEN)}");
-    print("✔ SAVED refreshToken: ${storage.read(AppConst.REFRESH_TOKEN)}");
-    print("Backend Login Successful → userId: ${data.userId}");
-    print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
-
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
     final notif = Get.find<NotificationController>();
     notif.updateToken(data.accessToken!); // update token in controller
@@ -130,8 +122,6 @@ class VerifyOtpController extends GetxController {
 
     /// ✅ STEP 5 — TOKEN REFRESH LISTENER (Only after login)
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-      print("🔄 New FCM token generated: $newToken");
-
       final accessToken = storage.read(AppConst.ACCESS_TOKEN);
       if (accessToken != null) {
         Get.find<NotificationController>().registerFCM(newToken);
@@ -155,7 +145,6 @@ class VerifyOtpController extends GetxController {
       String? deviceToken = await getDeviceToken();
       deviceToken ??= "";
 
-      print("   DeviceToken: $deviceToken");
       Map<String, dynamic> body = {
         "deviceToken": deviceToken,
         "name": username,
@@ -189,7 +178,6 @@ class VerifyOtpController extends GetxController {
   Future<String?> getDeviceToken() async {
     try {
       final token = await FirebaseMessaging.instance.getToken();
-      print("FCM Token: $token");
       return token;
     } catch (e) {
       return null;

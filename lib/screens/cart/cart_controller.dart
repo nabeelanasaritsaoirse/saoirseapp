@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:get/get.dart';
 
 import '../../models/cart_response_model.dart';

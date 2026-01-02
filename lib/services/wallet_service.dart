@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import '../models/wallet_transcation_model.dart';
 import '/constants/app_constant.dart';
 import '/constants/app_urls.dart';
@@ -13,14 +11,9 @@ class WalletService {
     try {
       final url = AppURLs.Wallet;
 
-  
-
       if (token == null || token.isEmpty) {
-        
         return null;
       }
-
-     
 
       return await APIService.getRequest<WalletModels>(
         url: url,
@@ -29,21 +22,16 @@ class WalletService {
           'Content-Type': 'application/json',
         },
         onSuccess: (json) {
-        
           return WalletModels.fromJson(json);
         },
       );
     } catch (e) {
-    
-
       return null;
     }
   }
 
   Future<WalletTransactionsResponse?> fetchTransactions() async {
     final url = AppURLs.WALLET_TRANSACTIONS;
-
- 
 
     final response = await APIService.getRequest(
       url: url,

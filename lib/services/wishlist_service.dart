@@ -1,5 +1,3 @@
-// ignore_for_file: await_only_futures
-
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';

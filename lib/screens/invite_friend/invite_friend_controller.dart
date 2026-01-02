@@ -1,5 +1,3 @@
-
-
 import 'package:get/get.dart';
 
 import '../../models/friend_details_response.dart';
@@ -38,7 +36,7 @@ class InviteFriendController extends GetxController {
       if (response != null && response.success) {
         friendDetails.value = response.friendDetails;
       }
-    }finally {
+    } finally {
       isLoading.value = false;
     }
   }
@@ -68,8 +66,6 @@ class InviteFriendController extends GetxController {
   // ---------------- MESSAGE BUTTON ACTION ----------------
 // ---------------- MESSAGE BUTTON ACTION ----------------
   Future<void> openChat({required String name}) async {
-  
-
     isLoading.value = true;
 
     final chat = await chatService.createIndividualChat(userId);
@@ -77,16 +73,12 @@ class InviteFriendController extends GetxController {
     isLoading.value = false;
 
     if (chat == null) {
-   
       return;
     }
 
-  
-  
-  
     await Future.delayed(Duration(milliseconds: 100));
     // Navigate to chat screen
- 
+
     Get.to(
         () => PaymentMessageScreen(
               conversationId: chat.conversationId,

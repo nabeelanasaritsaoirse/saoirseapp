@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, unnecessary_nullable_for_final_variable_declarations, await_only_futures
+// ignore_for_file: unnecessary_nullable_for_final_variable_declarations, await_only_futures
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -30,14 +30,6 @@ class AuthService {
       if (response.success != true) {
         return null;
       }
-
-      final data = response.data!;
-
-      print(" [LOGIN SUCCESS - PARSED DATA]");
-      print("   ➤ userId: ${data.userId}");
-      print("   ➤ accessToken: ${data.accessToken}");
-      print("   ➤ refreshToken: ${data.refreshToken}");
-      print("============================================");
 
       return response;
     } catch (e) {
@@ -82,8 +74,6 @@ class AuthService {
     }
 
     try {
-      print("Using verificationId: $verificationId");
-
       final credential = PhoneAuthProvider.credential(
         verificationId: verificationId!,
         smsCode: otp,
@@ -92,7 +82,6 @@ class AuthService {
       UserCredential result = await auth.signInWithCredential(credential);
 
       final token = await result.user?.getIdToken();
-      print("[FIREBASE ID TOKEN] $token");
 
       return token;
     } catch (e) {

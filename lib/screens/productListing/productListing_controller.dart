@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, avoid_print
+// ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -50,18 +50,14 @@ class ProductlistingController extends GetxController {
   }
 
   Future<void> fetchProducts() async {
-   
-
     if (!hasNextPage.value) return;
 
     try {
       if (page == 1) {
         isLoading(true);
         products.clear();
-     
       } else {
         isMoreLoading(true);
-   
       }
 
       final response = await service.getProducts(
@@ -71,23 +67,17 @@ class ProductlistingController extends GetxController {
         categoryId: categoryId,
       );
 
-    
-
       if (response != null && response.success) {
-       
         products.addAll(response.data);
 
         // FIX HAS NEXT
         hasNextPage.value =
             response.pagination.current < response.pagination.pages;
 
-      
-
         // FIX PAGE INCREMENT
         page = response.pagination.current + 1;
-  
       }
-    }  finally {
+    } finally {
       isLoading(false);
       isMoreLoading(false);
     }

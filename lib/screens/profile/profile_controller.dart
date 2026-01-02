@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
@@ -420,9 +418,8 @@ class ProfileController extends GetxController {
       await FirebaseMessaging.instance.deleteToken();
 
       // Call logout API (optional but recommended)
-     
-        await _profileService.logout();
-     
+
+      await _profileService.logout();
 
       // Clear storage
       await storage.erase();

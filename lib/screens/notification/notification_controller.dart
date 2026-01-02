@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:get/get.dart';
 
 import '../../models/notification_details_response_model.dart';
@@ -26,8 +24,6 @@ class NotificationController extends GetxController {
   int page = 1;
   final int limit = 20;
   var hasMore = true.obs;
-
- 
 
   // ------------------------------------------------------------
   // 🔑 Update token after login
@@ -66,7 +62,7 @@ class NotificationController extends GetxController {
           page++;
         }
       }
-    }  finally {
+    } finally {
       isLoading(false);
     }
   }
@@ -76,7 +72,6 @@ class NotificationController extends GetxController {
   // ------------------------------------------------------------
   Future<void> getNotificationDetails(String id) async {
     if (!hasToken) {
-  
       return;
     }
 
@@ -89,7 +84,7 @@ class NotificationController extends GetxController {
         notificationDetails.value = response.data!.notification;
         comments.value = response.data!.comments;
       }
-    }  finally {
+    } finally {
       isDetailsLoading(false);
     }
   }
@@ -99,7 +94,6 @@ class NotificationController extends GetxController {
   // ------------------------------------------------------------
   Future<void> toggleLike(String notificationId) async {
     if (!hasToken) {
-   
       return;
     }
 
@@ -129,10 +123,8 @@ class NotificationController extends GetxController {
           notifications.refresh();
         }
       }
-    // ignore: empty_catches
-    } catch (e) {
-    
-    }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   // ------------------------------------------------------------
@@ -157,10 +149,8 @@ class NotificationController extends GetxController {
           notifications.refresh();
         }
       }
-    // ignore: empty_catches
-    } catch (e) {
-    
-    }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   // ------------------------------------------------------------
@@ -172,16 +162,13 @@ class NotificationController extends GetxController {
     final trimmed = text.trim();
 
     if (trimmed.isEmpty) {
-     
       return;
     }
     if (trimmed.length > 1000) {
-    
       return;
     }
     final urlRegex = RegExp(r'(https?:\/\/|www\.)');
     if (urlRegex.hasMatch(trimmed)) {
-     
       return;
     }
 
@@ -216,19 +203,13 @@ class NotificationController extends GetxController {
   // ------------------------------------------------------------
   Future<void> registerFCM(String fcmToken) async {
     if (!hasToken) {
-    
       return;
     }
-
-    print("🔥 Registering FCM → $fcmToken");
 
     final success = await service.registerFCMToken(fcmToken);
 
     if (success) {
-    
-    } else {
-     
-    }
+    } else {}
   }
 
   // ------------------------------------------------------------
@@ -240,10 +221,7 @@ class NotificationController extends GetxController {
     final success = await service.removeFCMToken();
 
     if (success) {
-     
-    } else {
-     
-    }
+    } else {}
   }
 
   Future<void> refreshNotifications() async {
@@ -258,7 +236,6 @@ class NotificationController extends GetxController {
   // ------------------------------------------------------------
   Future<void> fetchUnreadCount() async {
     if (!hasToken) {
-     
       return;
     }
 
@@ -271,11 +248,8 @@ class NotificationController extends GetxController {
   // ------------------------------------------------------------
   Future<void> sendWelcomeNotification(String userName) async {
     if (!hasToken) {
-    
       return;
     }
-
-  
 
     final success = await service.sendInAppWelcomeNotification(
       userName: userName,
@@ -283,20 +257,14 @@ class NotificationController extends GetxController {
     );
 
     if (success) {
-    
-    } else {
-    
-    }
+    } else {}
   }
 
   // FOR ORDER CONFIRMATION
   Future<void> sendOrderConfirmation(String userName) async {
     if (!hasToken) {
-   
       return;
     }
-
-   
 
     final success = await service.sendCustomNotification(
       title: "Thank you, $userName!",
@@ -306,24 +274,17 @@ class NotificationController extends GetxController {
     );
 
     if (success) {
-      
-
       /// refresh notifications
       refreshNotifications();
       fetchUnreadCount();
-    } else {
-    
-    }
+    } else {}
   }
 
   /// 🚨 Send Only Push Notification (Urgent Alert)
   Future<void> sendUrgentAlert() async {
     if (!hasToken) {
-   
       return;
     }
-
-   
 
     final success = await service.sendCustomNotification(
       title: "⚡ Flash Sale Alert!",
@@ -333,9 +294,6 @@ class NotificationController extends GetxController {
     );
 
     if (success) {
-    
-    } else {
-     
-    }
+    } else {}
   }
 }

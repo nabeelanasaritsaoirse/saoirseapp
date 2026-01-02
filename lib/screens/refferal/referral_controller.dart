@@ -1,6 +1,3 @@
-// ignore_for_file: deprecated_member_use, avoid_print
-
-
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:android_intent_plus/android_intent.dart';
@@ -46,7 +43,6 @@ class ReferralController extends GetxController {
   }
 
   Future<void> refreshAll() async {
-  
     if (isLoading.value) return;
 
     try {
@@ -57,27 +53,22 @@ class ReferralController extends GetxController {
         fetchReferralData(),
         fetchReferrerInfo(),
       ]);
-    }  finally {
+    } finally {
       isLoading.value = false;
     }
   }
 
   Future<void> fetchReferrerInfo() async {
-  
     isLoading.value = true;
 
     final result = await _referralService.getReferrerInfo();
 
     if (result != null) {
-     
-    } else {
-     
-    }
+    } else {}
 
     referrer.value = result;
 
     isLoading.value = false;
-   
   }
 
   // ---------------------------------------------------------------------------
@@ -85,13 +76,11 @@ class ReferralController extends GetxController {
   // ---------------------------------------------------------------------------
 
   Future<void> loadReferralFromStorage() async {
-  
-      final storedCode = await storage.read(AppConst.REFERRAL_CODE);
+    final storedCode = await storage.read(AppConst.REFERRAL_CODE);
 
-      if (storedCode != null && storedCode.toString().isNotEmpty) {
-        referralCode.value = storedCode.toString();
-      }
-  
+    if (storedCode != null && storedCode.toString().isNotEmpty) {
+      referralCode.value = storedCode.toString();
+    }
   }
 
   //---------------------------------------------------------------------------
@@ -161,7 +150,7 @@ class ReferralController extends GetxController {
         totalReferrals.value = data.totalReferrals;
         referralLimit.value = data.referralLimit;
       }
-    }finally {
+    } finally {
       isLoading(false);
     }
   }
@@ -261,8 +250,6 @@ class ReferralController extends GetxController {
         content: "Referral link copied. Paste it or add Link sticker.",
       );
     } catch (e) {
-    
-
       appToast(
         error: true,
         content: "Failed to open Instagram Story",
@@ -349,34 +336,30 @@ class ReferralController extends GetxController {
     required GlobalKey qrKey,
     String? message,
   }) async {
-   
-      final renderObject = qrKey.currentContext?.findRenderObject();
-      if (renderObject == null || renderObject is! RenderRepaintBoundary) {
+    final renderObject = qrKey.currentContext?.findRenderObject();
+    if (renderObject == null || renderObject is! RenderRepaintBoundary) {
+      return;
+    }
 
-        return;
-      }
+    final ui.Image image = await renderObject.toImage(pixelRatio: 3.0);
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    if (byteData == null) {
+      return;
+    }
 
-      final ui.Image image = await renderObject.toImage(pixelRatio: 3.0);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      if (byteData == null) {
-        
-        return;
-      }
+    final Uint8List pngBytes = byteData.buffer.asUint8List();
 
-      final Uint8List pngBytes = byteData.buffer.asUint8List();
+    final tempDir = await getTemporaryDirectory();
+    final file = File("${tempDir.path}/referral_qr.png");
+    await file.writeAsBytes(pngBytes);
 
-      final tempDir = await getTemporaryDirectory();
-      final file = File("${tempDir.path}/referral_qr.png");
-      await file.writeAsBytes(pngBytes);
+    final params = ShareParams(
+      files: [XFile(file.path)],
+      text: message ??
+          "Join this app & earn rewards! Use my referral link: $referralLink",
+    );
 
-      final params = ShareParams(
-        files: [XFile(file.path)],
-        text: message ??
-            "Join this app & earn rewards! Use my referral link: $referralLink",
-      );
-
-      await SharePlus.instance.share(params);
-  
+    await SharePlus.instance.share(params);
   }
 
   // ---------------------------------------------------------------------------

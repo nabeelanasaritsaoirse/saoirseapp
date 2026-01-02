@@ -1,5 +1,3 @@
-
-
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -13,8 +11,6 @@ class ConversationService {
     final token = await storage.read(AppConst.ACCESS_TOKEN);
     final body = {'withUserId': userId};
 
- 
-
     try {
       final response = await APIService.postRequest(
         url: AppURLs.CREATE_INDIVIDUAL_CHAT_FROM_REFFERAL,
@@ -26,22 +22,17 @@ class ConversationService {
         onSuccess: (json) => json,
       );
 
-
       if (response == null) {
-   
         return null;
       }
 
       if (response['success'] == true) {
-    
         return ConversationModel.fromJson(response['data']);
       }
 
-     
       appToast(error: true, content: response['message']);
       return null;
     } catch (e) {
-   
       return null;
     }
   }
@@ -57,8 +48,6 @@ class ConversationService {
       "text": text,
     };
 
-  
-
     try {
       final response = await APIService.postRequest(
         url:
@@ -71,8 +60,6 @@ class ConversationService {
         onSuccess: (json) => json,
       );
 
-
-
       if (response == null) return null;
 
       if (response['success'] == true) {
@@ -82,7 +69,6 @@ class ConversationService {
       appToast(error: true, content: response['message']);
       return null;
     } catch (e) {
-
       return null;
     }
   }
@@ -97,8 +83,6 @@ class ConversationService {
     final url =
         "${AppURLs.BASE_API}api/chat/conversations/$conversationId/messages?page=$page&limit=$limit";
 
-   
-
     final response = await APIService.getRequest(
       url: url,
       headers: {
@@ -108,8 +92,6 @@ class ConversationService {
     );
 
     if (response == null) return [];
-
-   
 
     return (response["data"]["messages"] as List)
         .map((m) => ChatMessage.fromJson(m))
@@ -125,8 +107,6 @@ class ConversationService {
     final url =
         "${AppURLs.BASE_API}api/chat/poll?lastPollTime=${lastPollTime.toIso8601String()}"
         "${conversationId != null ? "&conversationId=$conversationId" : ""}";
-
-    
 
     final response = await APIService.getRequest(
       url: url,

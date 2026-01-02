@@ -1,10 +1,10 @@
-
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:saoirse_app/widgets/app_toast.dart';
+
 import '../../models/LoginAuth/kyc_model.dart';
+import '../../widgets/app_toast.dart';
 import '/screens/kyc/document_type.dart';
 import '/services/kyc_service.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -59,7 +59,7 @@ class KycController extends GetxController {
       isLoading(false);
     }
   }
-  
+
   // ======================================================================
   // IMAGE PICKERS
   // ======================================================================
@@ -222,16 +222,12 @@ class KycController extends GetxController {
 
       await kycServices.submitKyc(documents: documents);
 
-    
-
       Get.snackbar("Success", "KYC submitted successfully!");
       await fetchKycData();
     } catch (e) {
-  
       appToast(
           content: "KYC submission failed...! Upload AADHAAR and PAN ",
           error: true);
-  
     } finally {
       isLoading(false);
     }

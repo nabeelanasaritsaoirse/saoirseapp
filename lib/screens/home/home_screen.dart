@@ -1,7 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
-
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -335,8 +331,6 @@ class _HomeScreenState extends State<HomeScreen> {
 //--------------------------------------------------------
             // Most Popular Product Section
             Obx(() {
-            
-
               //Loading state
               if (homeController.featuredLoading.value) {
                 return Column(

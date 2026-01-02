@@ -1,7 +1,5 @@
 // ignore_for_file: deprecated_member_use
 
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -232,10 +230,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
             ),
             Obx(() {
               if (referralController.referrer.value != null) {
-             
                 return referredByCard(referralController.referrer.value!);
               } else {
-            
                 return applyReferralSection(); // show input + apply button
               }
             })
@@ -824,7 +820,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
                     onPressed: () {
                       showQRPicker((code) {
                         referralCtrl.text = code;
-                      
                       });
                     },
                   ),
@@ -858,8 +853,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
                             .applyReferral(referralCtrl.text.trim());
 
                         if (success) {
-                        
-
                           // CLOSE ONLY THE INPUT POPUP
                           Get.back();
 
@@ -961,7 +954,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
     Get.to(() => QRScannerScreen(
           onReferralDetected: (value) {
             final code = extractReferral(value);
-       
 
             onCodeSelected(code);
             Get.back();
@@ -975,22 +967,16 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
     if (image == null) return;
 
- 
-      final MobileScannerController scanner = MobileScannerController();
+    final MobileScannerController scanner = MobileScannerController();
 
-      final BarcodeCapture? result = await scanner.analyzeImage(image.path);
+    final BarcodeCapture? result = await scanner.analyzeImage(image.path);
 
-      if (result != null && result.barcodes.isNotEmpty) {
-        final value = result.barcodes.first.rawValue ?? "";
-        final code = extractReferral(value);
+    if (result != null && result.barcodes.isNotEmpty) {
+      final value = result.barcodes.first.rawValue ?? "";
+      final code = extractReferral(value);
 
-    
-
-        onCodeSelected(code);
-      } else {
-    
-      }
-  
+      onCodeSelected(code);
+    } else {}
   }
 
   void showQRPicker(Function(String) onCodeSelected) {
@@ -1141,13 +1127,11 @@ Widget referredByCard(ReferrerInfoModel r) {
   return GestureDetector(
     onTap: () async {
       // LOGS (optional)
-   
 
       // Create chat
       final chat = await ConversationService().createIndividualChat(r.userId);
 
       if (chat == null) {
-       
         return;
       }
 

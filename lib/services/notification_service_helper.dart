@@ -1,7 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/notification_details/notification_details_screen.dart';
+
+import '../screens/notification_details/notification_details_screen.dart';
 
 class NotificationServiceHelper {
   static final _plugin = FlutterLocalNotificationsPlugin();

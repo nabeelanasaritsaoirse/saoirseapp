@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -37,14 +35,10 @@ class AddAddressController extends GetxController {
     isLoading.value = false;
 
     if (result) {
-     
-        Get.find<SelectAddressController>().fetchAddresses();
-        Get.back();
-     
+      Get.find<SelectAddressController>().fetchAddresses();
+      Get.back();
 
       appToast(title: "Success", content: "Address added successfully");
-
-      
     } else {
       appToast(error: true, title: "Error", content: "Failed to add address");
     }

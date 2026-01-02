@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -30,7 +28,6 @@ class CartService {
 
       return CartResponse.fromJson(response);
     } catch (e) {
-    
       return null;
     }
   }
@@ -55,8 +52,6 @@ class CartService {
         }
       };
 
-     
-
       final response = await APIService.postRequest(
         url: url,
         body: body,
@@ -71,7 +66,6 @@ class CartService {
 
       return AddToCartResponse.fromJson(response);
     } catch (e) {
-   
       return null;
     }
   }
@@ -92,7 +86,6 @@ class CartService {
 
       return response['success'] ?? false;
     } catch (e) {
-    
       return false;
     }
   }
@@ -115,7 +108,6 @@ class CartService {
 
       return RemoveCartItemResponse.fromJson(response);
     } catch (e) {
-     
       return null;
     }
   }
@@ -136,7 +128,6 @@ class CartService {
 
       return CartCountResponse.fromJson(response);
     } catch (e) {
-     
       return null;
     }
   }
@@ -146,7 +137,6 @@ class CartService {
     final url = AppURLs.UPDATE_CART + productId;
 
     try {
-    
       final response = await APIService.putRequest(
         url: url,
         onSuccess: (json) => json,
@@ -158,10 +148,9 @@ class CartService {
           "Authorization": "Bearer $token",
         },
       );
-     
+
       return response;
     } catch (e) {
-     
       return null;
     }
   }

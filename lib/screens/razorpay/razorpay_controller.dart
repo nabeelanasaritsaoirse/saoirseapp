@@ -1,5 +1,3 @@
-
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -18,17 +16,11 @@ class RazorpayController extends GetxController {
   void onInit() {
     super.onInit();
 
-   
-     
-   
-      razorpay = Razorpay();
+    razorpay = Razorpay();
 
-      razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-      razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-      razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-
-    
-  
+    razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
   //  Use this for REAL PAYMENT (orderId, amount, key from API)
@@ -39,8 +31,6 @@ class RazorpayController extends GetxController {
   }) {
     this.orderId = orderId;
     try {
-     
-
       final options = {
         'key': dotenv.env['RAZORPAY_KEY_ID'],
         'amount': amount,
@@ -61,11 +51,8 @@ class RazorpayController extends GetxController {
       //   },
       // };
 
-    
-
       razorpay.open(options);
     } catch (e) {
-    
       appToast(error: true, content: "Could not open payment window");
     }
   }
@@ -73,8 +60,6 @@ class RazorpayController extends GetxController {
   // -------------------- CALLBACKS ----------------------
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
-
-
     appToast(content: "Payment Success: ${response.paymentId}");
 
     final paymentData = RazorpayPaymentResponse(
@@ -82,13 +67,11 @@ class RazorpayController extends GetxController {
       paymentId: response.paymentId ?? "",
       signature: response.signature ?? "",
     );
-  
+
     _verifyPayment(paymentData);
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-  
-
     appToast(
       error: true,
       content: "Payment Failed. Code: ${response.code}",
@@ -96,8 +79,6 @@ class RazorpayController extends GetxController {
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-  
-
     appToast(
       content: "Wallet Selected: ${response.walletName}",
     );
@@ -115,8 +96,6 @@ class RazorpayController extends GetxController {
         "razorpaySignature": data.signature,
       };
 
-     
-
       final response = await PaymentService.processPayment(body);
 
       if (Get.isDialogOpen ?? false) Get.back();
@@ -133,7 +112,7 @@ class RazorpayController extends GetxController {
       }
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
-     
+
       appToast(
           error: true, content: "Payment verification failed unexpectedly!");
     }

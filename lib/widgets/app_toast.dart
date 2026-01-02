@@ -1,15 +1,12 @@
-
-
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:saoirse_app/constants/app_colors.dart';
+
+import '../constants/app_colors.dart';
 
 void appToast({
   required String content,
   String title = 'Message',
   bool error = false,
-}) {
-  
-}
+}) {}
 
 void appToaster({
   required String content,

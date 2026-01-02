@@ -74,7 +74,6 @@ class LoginController extends GetxController {
         fallbackToManual();
       }
     } catch (e) {
-  
       fallbackToManual();
     }
 
@@ -163,16 +162,12 @@ class LoginController extends GetxController {
           : Get.put(ReferralController());
 
       await referralCtrl.fetchReferrerInfo();
-    
 
       if (updated) {
-      
         Get.offAll(() => DashboardScreen());
         appToast(content: "Login Successful!");
       }
     } catch (e) {
-     
-   
       appToast(content: "Something went wrong", error: true);
     } finally {
       loading.value = false;
@@ -213,7 +208,6 @@ class LoginController extends GetxController {
       }
       return fcmtoken;
     } catch (e) {
-    
       return null;
     }
   }
@@ -243,38 +237,33 @@ class LoginController extends GetxController {
       appToast(content: result["message"], error: true);
       return false;
     } catch (e) {
-   
       return false;
     }
   }
 
   // ================= APPLY REFERRAL CODE API =================
   Future<bool> applyReferral(String code) async {
-
     if (code.isEmpty) {
-    
       return true;
     }
 
     final result = await referralService.applyReferralCode(code);
 
     if (result == null) {
-     
       appToast(error: true, content: "Something went wrong");
       return false;
     }
 
     if (result.success == true) {
-     
       storage.write("referral_applied", true);
       referralApplied.value = true;
 
       appToast(title: "Success", content: result.message);
       final referralController = Get.find<ReferralController>();
       referralController.fetchReferralData();
-    
+
       referralController.fetchReferrerInfo();
-   
+
       return true;
     }
 

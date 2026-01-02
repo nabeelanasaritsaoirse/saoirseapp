@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:get/get.dart';
 
 import '../../models/wallet_transcation_model.dart';
@@ -39,10 +37,8 @@ class MyWalletController extends GetxController {
         fetchWallet(forceRefresh: true),
         fetchWalletTransactions(),
       ]);
-
     } catch (e) {
       errorMessage.value = "Failed to refresh wallet";
-    
     } finally {
       isLoading.value = false;
     }
@@ -53,30 +49,25 @@ class MyWalletController extends GetxController {
     try {
       // Avoid unnecessary API calls
       if (!forceRefresh && wallet.value != null) {
-      
         return;
       }
 
       _startLoading();
       errorMessage.value = '';
 
-      
-
       final data = await serviceData.fetchWallet();
 
       if (data == null) {
         errorMessage.value = 'Unable to load wallet data';
-      
+
         return;
       }
 
       wallet.value = data;
 
       // Debug logs
-    
     } catch (e) {
       errorMessage.value = 'Something went wrong while fetching wallet';
-     
     } finally {
       _stopLoading();
     }
@@ -88,7 +79,6 @@ class MyWalletController extends GetxController {
       _startLoading();
       errorMessage.value = '';
 
-
       final response = await serviceData.fetchTransactions();
 
       if (response == null || response.success != true) {
@@ -98,7 +88,6 @@ class MyWalletController extends GetxController {
 
       transactions.assignAll(response.transactions);
       summary.value = response.summary;
-
     } catch (e) {
       errorMessage.value = 'Something went wrong while fetching transactions';
     } finally {
