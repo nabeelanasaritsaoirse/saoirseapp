@@ -1,5 +1,8 @@
 import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -26,22 +29,32 @@ import 'services/appsflyer_service.dart';
 final GetStorage storage = GetStorage();
 
 /// ----------------------------------------------------
-/// BACKGROUND NOTIFICATIONS (NO Firebase init here!)
+/// BACKGROUND NOTIFICATIONS (SAFE FOR iOS)
 /// ----------------------------------------------------
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  log("🟢 Background message received");
-  NotificationServiceHelper.showFlutterNotification(message);
+  try {
+    await Firebase.initializeApp();
+    NotificationServiceHelper.showFlutterNotification(message);
+  } catch (e, s) {
+    log("❌ Background notification error", error: e, stackTrace: s);
+  }
 }
 
 /// ----------------------------------------------------
-/// MAIN (KEEP IT LIGHT!)
+/// MAIN (LIGHTWEIGHT)
 /// ----------------------------------------------------
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  /// Orientation lock (safe before runApp)
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
   await GetStorage.init();
 
-  /// 🚀 Render UI immediately
+  /// 🚀 Render UI immediately (NO heavy work here)
   runApp(const BootstrapApp());
 }
 
@@ -57,7 +70,7 @@ class BootstrapApp extends StatefulWidget {
 
 class _BootstrapAppState extends State<BootstrapApp> {
   bool _ready = false;
-  late Locale _locale;
+  Locale _locale = const Locale('en');
 
   @override
   void initState() {
@@ -68,22 +81,34 @@ class _BootstrapAppState extends State<BootstrapApp> {
   Future<void> _initializeApp() async {
     try {
       /// -----------------------------
-      /// ENV
+      /// ENV (NEVER crash release)
       /// -----------------------------
-      await dotenv.load(fileName: ".env");
+      try {
+        await dotenv.load(fileName: ".env");
+        log("✅ .env loaded");
+      } catch (_) {
+        log("⚠️ .env not found (expected in release)");
+      }
 
       /// -----------------------------
-      /// FIREBASE (ONLY ONCE)
+      /// FIREBASE
       /// -----------------------------
       await Firebase.initializeApp();
       log("✅ Firebase initialized");
 
-      /// -----------------------------
-      /// FIREBASE MESSAGING
-      /// -----------------------------
       FirebaseMessaging.onBackgroundMessage(
         firebaseMessagingBackgroundHandler,
       );
+
+      /// iOS foreground notifications
+      if (Platform.isIOS) {
+        await FirebaseMessaging.instance
+            .setForegroundNotificationPresentationOptions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+      }
 
       await FirebaseMessaging.instance.requestPermission(
         alert: true,
@@ -102,7 +127,9 @@ class _BootstrapAppState extends State<BootstrapApp> {
       final initialMessage =
           await FirebaseMessaging.instance.getInitialMessage();
       if (initialMessage != null) {
-        NotificationServiceHelper.handleNotificationTap(initialMessage.data);
+        NotificationServiceHelper.handleNotificationTap(
+          initialMessage.data,
+        );
       }
 
       /// -----------------------------
@@ -111,9 +138,13 @@ class _BootstrapAppState extends State<BootstrapApp> {
       await NotificationServiceHelper.initializeLocalNotifications();
 
       /// -----------------------------
-      /// APPSFLYER
+      /// APPSFLYER (OPTIONAL)
       /// -----------------------------
-      await AppsFlyerService.instance.init();
+      try {
+        await AppsFlyerService.instance.init();
+      } catch (e) {
+        log("⚠️ AppsFlyer init failed: $e");
+      }
 
       /// -----------------------------
       /// LANGUAGE
@@ -146,6 +177,7 @@ class _BootstrapAppState extends State<BootstrapApp> {
   Widget build(BuildContext context) {
     if (!_ready) {
       return const MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: Scaffold(
           backgroundColor: Colors.white,
           body: Center(child: CircularProgressIndicator()),
@@ -178,7 +210,8 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: AppStrings.app_name,
           theme: ThemeData(
-            scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
+            scaffoldBackgroundColor:
+                const Color.fromARGB(255, 235, 230, 230),
             textTheme: GoogleFonts.poppinsTextTheme(),
             highlightColor: AppColors.transparent,
             splashColor: AppColors.transparent,
