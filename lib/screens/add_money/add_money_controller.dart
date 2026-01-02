@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -86,9 +86,9 @@ class AddMoneyController extends GetxController {
       rpOrderId: order.orderId,
       amount: order.amount,
     );
-  } catch (e, s) {
+  } catch (e) {
     /// Catch unexpected exceptions
-    log("Add Money Exception → $e\n$s");
+
 
     appToast(
       title: "Error",

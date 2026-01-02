@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 
 import 'package:get/get.dart';
 
@@ -38,9 +38,7 @@ class InviteFriendController extends GetxController {
       if (response != null && response.success) {
         friendDetails.value = response.friendDetails;
       }
-    } catch (e) {
-      log("Error fetching friend details: $e");
-    } finally {
+    }finally {
       isLoading.value = false;
     }
   }
@@ -60,8 +58,6 @@ class InviteFriendController extends GetxController {
       if (response != null && response.success) {
         return response.productDetails;
       }
-    } catch (e) {
-      log("Product details fetch error: $e");
     } finally {
       isProductLoading.value = false;
     }
@@ -72,9 +68,7 @@ class InviteFriendController extends GetxController {
   // ---------------- MESSAGE BUTTON ACTION ----------------
 // ---------------- MESSAGE BUTTON ACTION ----------------
   Future<void> openChat({required String name}) async {
-    log("\n================ OPEN CHAT =================");
-    log("UserId used to create chat: $userId");
-    log("============================================");
+  
 
     isLoading.value = true;
 
@@ -83,21 +77,16 @@ class InviteFriendController extends GetxController {
     isLoading.value = false;
 
     if (chat == null) {
-      log("❌ Chat creation failed → chat == null");
+   
       return;
     }
 
-    log("\n========== CHAT CREATED SUCCESSFULLY ==========");
-    log("Conversation ID: ${chat.conversationId}");
-    log("New conversation?  ${chat.isNewConversation}");
-    log("Participants:");
-    for (var p in chat.participants) {
-      log(" - ${p.name} (${p.id})");
-    }
-    log("===============================================\n");
+  
+  
+  
     await Future.delayed(Duration(milliseconds: 100));
     // Navigate to chat screen
-    log("➡️ Navigating to PaymentMessageScreen...");
+ 
     Get.to(
         () => PaymentMessageScreen(
               conversationId: chat.conversationId,

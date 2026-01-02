@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 
 import 'package:saoirse_app/models/add_money_order_model.dart';
 
@@ -13,7 +13,7 @@ class PaymentService {
     try {
       final token = await storage.read(AppConst.ACCESS_TOKEN);
 
-      log("Processing Payment => $body");
+
 
       final response = await APIService.postRequest<Map<String, dynamic>>(
         url: AppURLs.PAYMENT_PROCESS_API,
@@ -27,7 +27,7 @@ class PaymentService {
 
       return response;
     } catch (e) {
-      log("Payment Process Error: $e");
+ 
       return null;
     }
   }
@@ -52,7 +52,7 @@ class PaymentService {
     return AddMoneyOrderModel.fromJson(response);
 
   } catch (e) {
-    log("Add Money Error: $e");
+  
     return null;
   }
 }
@@ -74,7 +74,7 @@ class PaymentService {
         onSuccess: (data) => data,
       );
     } catch (e) {
-      log("Wallet Verify Payment Error: $e");
+    
       return null;
     }
   }

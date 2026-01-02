@@ -1,6 +1,5 @@
 // FILE: lib/controllers/product_details_controller.dart
 
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
@@ -62,10 +61,10 @@ class ProductDetailsController extends GetxController {
 
   //     if (result != null && result.hasVariants && result.variants.isNotEmpty) {
   //       selectedVariantId.value = result.variants.first.variantId;
-  //       log("Default Variant Selected: ${selectedVariantId.value}");
+
   //     }
   //   } catch (e) {
-  //     log("ERROR FETCHING PRODUCT DETAILS: $e");
+
   //     appToast(content: "Failed to load product details");
   //   } finally {
   //     isLoading(false);
@@ -97,20 +96,14 @@ class ProductDetailsController extends GetxController {
       // Reset page
       currentImageIndex.value = 0;
       pageController.jumpToPage(0);
-    } catch (e) {
-      log("ERROR: $e");
     } finally {
       isLoading(false);
     }
   }
 
   Future<void> checkIfInWishlist(String id) async {
-    try {
-      final exists = await wishlistService.checkWishlist(id);
-      isFavorite.value = exists;
-    } catch (e) {
-      log("ERROR CHECKING WISHLIST: $e");
-    }
+    final exists = await wishlistService.checkWishlist(id);
+    isFavorite.value = exists;
   }
 
   Future<void> toggleFavorite(String id) async {

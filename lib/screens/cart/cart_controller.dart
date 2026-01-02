@@ -37,10 +37,6 @@ class CartController extends GetxController {
       }
 
       cartData.value = response.data;
-
-      print("=== CART LOADED ===");
-      print("Total Items: ${response.data.totalItems}");
-      print("Total Price: ${response.data.totalPrice}");
     } catch (e) {
       errorMessage("Error: $e");
     } finally {
@@ -52,11 +48,9 @@ class CartController extends GetxController {
   void increaseQty(int index) async {
     final product = cartData.value!.products[index];
     final newQty = product.quantity + 1;
-    print("Increasing qty for: ${product.productId}");
-    print("Old qty: ${product.quantity}, New qty: $newQty");
 
     final response = await service.updateCartQty(product.productId, newQty);
-    print("API Response: $response");
+
     if (response == null) {
       appToast(content: "Unable to update quantity", error: true);
       return;
@@ -76,18 +70,16 @@ class CartController extends GetxController {
   void decreaseQty(int index) async {
     final product = cartData.value!.products[index];
     final newQty = product.quantity - 1;
-    print("Decreasing qty for: ${product.productId}");
-    print("Old qty: ${product.quantity}, New qty: $newQty");
+
     // If quantity becomes 0 → remove item
     if (newQty < 1) {
-      print("Quantity reached 0 → Removing product from cart");
       // CALL REMOVE API
       await removeCartItem(product.productId);
       return;
     }
 
     final response = await service.updateCartQty(product.productId, newQty);
-    print("API Response: $response");
+
     if (response == null) {
       appToast(content: "Unable to update quantity", error: true);
       return;
@@ -209,21 +201,11 @@ class CartController extends GetxController {
 
   // Fetch cart count
   Future<void> fetchCartCount() async {
-    try {
-      final response = await service.getCartCount();
+    final response = await service.getCartCount();
 
-      print("Fetching Cart Count...");
-
-      if (response != null && response.success) {
-        cartCount.value = response.count;
-
-        print("Cart Count Updated: ${response.count}");
-      } else {
-        print(" Failed to fetch cart count!");
-      }
-    } catch (e) {
-      print("Count fetch error: $e");
-    }
+    if (response != null && response.success) {
+      cartCount.value = response.count;
+    } else {}
   }
 
   ProductDetailsData convertCartToProductDetails(CartProduct item) {

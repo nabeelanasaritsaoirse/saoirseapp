@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:saoirse_app/constants/app_colors.dart';
@@ -8,9 +8,7 @@ void appToast({
   String title = 'Message',
   bool error = false,
 }) {
-  final status = error ? "❌ ERROR" : "✅ SUCCESS";
-
-  log("$status | $title → $content");
+  
 }
 
 void appToaster({

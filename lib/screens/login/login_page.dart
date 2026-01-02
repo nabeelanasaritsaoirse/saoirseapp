@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:developer';
 
 import 'package:country_phone_validator/country_phone_validator.dart' as cpv;
 import 'package:country_picker/country_picker.dart';
@@ -56,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("LOGIN PAGE CONTROLLER HASH: ${loginController.hashCode}");
+
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
       resizeToAvoidBottomInset: true,
@@ -266,42 +265,35 @@ class _LoginPageState extends State<LoginPage> {
                                       )
                                     : appButton(
                                         onTap: () async {
-                                          print("[SEND OTP BUTTON PRESSED]");
+                                      
 
                                           // if (!loginController.validateInputs()) {
-                                          //   print("Validation Failed");
+                                    
                                           //   return;
                                           // }
                                           if (!loginController
                                               .formKey.currentState!
                                               .validate()) {
-                                            print(
-                                                "❌ Validation Failed — Required Fields Missing");
+                                          
                                             return;
                                           }
-                                          print("✔ Validation Passed");
-                                          print(
-                                              "Phone: ${loginController.fullPhoneNumber}");
+                                        
                                           loginController.loading.value =
                                               true; // START LOADING
 
-                                          print("✔ Validation Passed");
-                                          print(
-                                              "Phone Number = ${loginController.fullPhoneNumber}");
-
+                                       
                                           bool isSent =
                                               await AuthService.sendOTP(
                                             loginController.fullPhoneNumber,
                                           );
 
-                                          print("📨 sendOTP Result: $isSent");
+                                      
 
                                           loginController.loading.value =
                                               false; // STOP LOADING
 
                                           if (isSent) {
-                                            print(
-                                                "Navigating to VerifyOTPScreen");
+                                         
                                             Get.to(() => VerifyOTPScreen(
                                                   phoneNumber: loginController
                                                       .fullPhoneNumber,
@@ -415,7 +407,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (image == null) return;
 
-    try {
+  
       final MobileScannerController scanner = MobileScannerController();
 
       final BarcodeCapture? result = await scanner.analyzeImage(image.path);
@@ -427,13 +419,11 @@ class _LoginPageState extends State<LoginPage> {
         loginController.referreltextController.text = code;
         loginController.update();
 
-        print("QR from image: $code");
+      
       } else {
-        log("No QR found in image");
+       
       }
-    } catch (e) {
-      log("Failed to read QR: $e");
-    }
+
   }
 
   void showQRPicker() {

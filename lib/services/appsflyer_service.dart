@@ -1,5 +1,4 @@
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
-import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 
 // import 'deep_link_navigation_service.dart';
@@ -22,7 +21,7 @@ class AppsFlyerService {
     final savedReferral = storage.read('pending_referral_code');
     if (savedReferral != null && savedReferral.isNotEmpty) {
       referralFromDeepLink = savedReferral;
-      debugPrint("✅ Restored referral from storage: $savedReferral");
+    
     }
     //----------------------------------------------------
 
@@ -73,7 +72,7 @@ class AppsFlyerService {
     });
 
     _sdk.onAppOpenAttribution((data) {
-      debugPrint("🔵 App Open Attribution: $data");
+     
 
       // -------------------------------
       // PRODUCT DEEP LINK (BACKGROUND)
@@ -86,7 +85,7 @@ class AppsFlyerService {
         storage.write("pending_product_id", productId);
         // DeepLinkNavigationService.handleProductNavigation();
 
-        debugPrint("📦 Product deep link received (background): $productId");
+       
       }
     });
 

@@ -46,7 +46,6 @@ class _ProductCardState extends State<ProductCard> {
       ),
       child: Container(
         width: 150.w,
-        height: 230.h, // 🔥 FIXED, RESPONSIVE SAFE HEIGHT
         margin: widget.margin ?? EdgeInsets.only(right: 10.w),
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -59,7 +58,6 @@ class _ProductCardState extends State<ProductCard> {
             ),
           ],
         ),
-
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

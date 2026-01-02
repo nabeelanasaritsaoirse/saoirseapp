@@ -50,7 +50,7 @@ class ProductlistingController extends GetxController {
   }
 
   Future<void> fetchProducts() async {
-    print("📌 Fetching Page: $page | hasNext: ${hasNextPage.value}");
+   
 
     if (!hasNextPage.value) return;
 
@@ -58,10 +58,10 @@ class ProductlistingController extends GetxController {
       if (page == 1) {
         isLoading(true);
         products.clear();
-        print("🔄 Loading first page...");
+     
       } else {
         isMoreLoading(true);
-        print("⬇ Loading more products...");
+   
       }
 
       final response = await service.getProducts(
@@ -71,25 +71,23 @@ class ProductlistingController extends GetxController {
         categoryId: categoryId,
       );
 
-      print("📥 API Response Received");
+    
 
       if (response != null && response.success) {
-        print("🟢 Adding ${response.data.length} new products...");
+       
         products.addAll(response.data);
 
         // FIX HAS NEXT
         hasNextPage.value =
             response.pagination.current < response.pagination.pages;
 
-        print("📌 hasNextPage = ${hasNextPage.value}");
+      
 
         // FIX PAGE INCREMENT
         page = response.pagination.current + 1;
-        print("➡ Next page will be: $page");
+  
       }
-    } catch (e) {
-      print("❌ Fetch product error: $e");
-    } finally {
+    }  finally {
       isLoading(false);
       isMoreLoading(false);
     }

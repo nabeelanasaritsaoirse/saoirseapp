@@ -1,6 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
-import 'dart:developer';
+
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -49,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.didChangeDependencies();
     Future.delayed(Duration(milliseconds: 200), () {
       Get.find<InvestmentStatusController>().fetchInvestmentStatus();
-      debugPrint("👍Investment Status Refreshed");
     });
   }
 
@@ -336,8 +335,7 @@ class _HomeScreenState extends State<HomeScreen> {
 //--------------------------------------------------------
             // Most Popular Product Section
             Obx(() {
-              log(' UI → FEATURED LIST COUNT: ${homeController.featuredLists.length}');
-              log(' UI → FEATURED LOADING: ${homeController.featuredLoading.value}');
+            
 
               //Loading state
               if (homeController.featuredLoading.value) {

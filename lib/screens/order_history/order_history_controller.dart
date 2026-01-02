@@ -63,8 +63,6 @@ class OrderHistoryController extends GetxController {
           _page++;
         }
       }
-    } catch (e) {
-      debugPrint("Error fetching order history: $e");
     } finally {
       isLoading.value = false;
       isPageLoading.value = false;

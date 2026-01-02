@@ -1,6 +1,6 @@
 // ignore_for_file: deprecated_member_use, avoid_print
 
-import 'dart:developer';
+
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:android_intent_plus/android_intent.dart';
@@ -46,7 +46,7 @@ class ReferralController extends GetxController {
   }
 
   Future<void> refreshAll() async {
-    log("🔄 REFRESH STARTED");
+  
     if (isLoading.value) return;
 
     try {
@@ -57,35 +57,27 @@ class ReferralController extends GetxController {
         fetchReferralData(),
         fetchReferrerInfo(),
       ]);
-    } catch (e) {
-      log("🔴 Refresh failed: $e");
-    } finally {
+    }  finally {
       isLoading.value = false;
     }
   }
 
   Future<void> fetchReferrerInfo() async {
-    log("\n================ FETCH REFERRER INFO ================");
-    log("📡 Calling API: /api/referral/referrer-info");
+  
     isLoading.value = true;
 
     final result = await _referralService.getReferrerInfo();
 
     if (result != null) {
-      log("✅ Referrer found:");
-      log("ID     : ${result.userId}");
-      log("Name   : ${result.name}");
-      log("Email  : ${result.email}");
-      log("Photo  : ${result.profilePicture}");
-      log("Code   : ${result.referralCode}");
+     
     } else {
-      log("❌ No referrer data / null received");
+     
     }
 
     referrer.value = result;
 
     isLoading.value = false;
-    log("=====================================================\n");
+   
   }
 
   // ---------------------------------------------------------------------------
@@ -93,15 +85,13 @@ class ReferralController extends GetxController {
   // ---------------------------------------------------------------------------
 
   Future<void> loadReferralFromStorage() async {
-    try {
+  
       final storedCode = await storage.read(AppConst.REFERRAL_CODE);
 
       if (storedCode != null && storedCode.toString().isNotEmpty) {
         referralCode.value = storedCode.toString();
       }
-    } catch (e) {
-      log("Error reading referral code from storage: $e");
-    }
+  
   }
 
   //---------------------------------------------------------------------------
@@ -171,9 +161,7 @@ class ReferralController extends GetxController {
         totalReferrals.value = data.totalReferrals;
         referralLimit.value = data.referralLimit;
       }
-    } catch (e) {
-      print("Controller Error: $e");
-    } finally {
+    }finally {
       isLoading(false);
     }
   }
@@ -272,8 +260,8 @@ class ReferralController extends GetxController {
         error: false,
         content: "Referral link copied. Paste it or add Link sticker.",
       );
-    } catch (e, st) {
-      log("Instagram Story Error: $e\n$st");
+    } catch (e) {
+    
 
       appToast(
         error: true,
@@ -361,17 +349,17 @@ class ReferralController extends GetxController {
     required GlobalKey qrKey,
     String? message,
   }) async {
-    try {
+   
       final renderObject = qrKey.currentContext?.findRenderObject();
       if (renderObject == null || renderObject is! RenderRepaintBoundary) {
-        log("❌ QR RenderRepaintBoundary not found");
+
         return;
       }
 
       final ui.Image image = await renderObject.toImage(pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) {
-        log("❌ QR ByteData is null");
+        
         return;
       }
 
@@ -388,9 +376,7 @@ class ReferralController extends GetxController {
       );
 
       await SharePlus.instance.share(params);
-    } catch (e, st) {
-      log("QR Image Share Error: $e\n$st");
-    }
+  
   }
 
   // ---------------------------------------------------------------------------

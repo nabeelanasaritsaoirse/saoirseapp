@@ -74,7 +74,7 @@ class LoginController extends GetxController {
         fallbackToManual();
       }
     } catch (e) {
-      print("Error fetching country code: $e");
+  
       fallbackToManual();
     }
 
@@ -163,16 +163,16 @@ class LoginController extends GetxController {
           : Get.put(ReferralController());
 
       await referralCtrl.fetchReferrerInfo();
-      print("🌿 Google Login Referral Info Loaded");
+    
 
       if (updated) {
-        print("✔ Login + Profile Update SUCCESS");
+      
         Get.offAll(() => DashboardScreen());
         appToast(content: "Login Successful!");
       }
-    } catch (e, s) {
-      log("Google Login Error: $e");
-      log("StackTrace: $s");
+    } catch (e) {
+     
+   
       appToast(content: "Something went wrong", error: true);
     } finally {
       loading.value = false;
@@ -213,7 +213,7 @@ class LoginController extends GetxController {
       }
       return fcmtoken;
     } catch (e) {
-      print("FCM TOKEN ERROR: $e");
+    
       return null;
     }
   }
@@ -243,40 +243,38 @@ class LoginController extends GetxController {
       appToast(content: result["message"], error: true);
       return false;
     } catch (e) {
-      print("UPDATE ERROR::: $e");
+   
       return false;
     }
   }
 
   // ================= APPLY REFERRAL CODE API =================
   Future<bool> applyReferral(String code) async {
-    print("\n========= APPLYING REFERRAL =========");
-    print("Entered Code: $code");
+
     if (code.isEmpty) {
-      print("⚠ Referral Empty → Skipping");
+    
       return true;
     }
 
     final result = await referralService.applyReferralCode(code);
 
     if (result == null) {
-      print("❌ API Returned NULL → Something failed");
+     
       appToast(error: true, content: "Something went wrong");
       return false;
     }
 
     if (result.success == true) {
-      print("🎉 Referral Applied Successfully!");
-      print("Message: ${result.message}");
+     
       storage.write("referral_applied", true);
       referralApplied.value = true;
 
       appToast(title: "Success", content: result.message);
       final referralController = Get.find<ReferralController>();
       referralController.fetchReferralData();
-      print("🔁 Fetching new referral info to update UI...");
+    
       referralController.fetchReferrerInfo();
-      print("🔄 UI updated with referrer info");
+   
       return true;
     }
 

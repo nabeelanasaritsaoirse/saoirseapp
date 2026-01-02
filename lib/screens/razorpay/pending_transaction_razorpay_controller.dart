@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -20,15 +20,13 @@ class PendingTransactionRazorpayController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    try {
+   
       razorpay = Razorpay();
       razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
       razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
       razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-      log("CombinedRazorpayController initialized");
-    } catch (e, s) {
-      log("Error initializing CombinedRazorpayController: $e\n$s");
-    }
+    
+ 
   }
 
 
@@ -46,13 +44,13 @@ class PendingTransactionRazorpayController extends GetxController {
 
       if (apiRazorpayOrderId.isEmpty || apiAmount == 0 || apiKeyId.isEmpty) {
         appToast(error: true, content: "Invalid payment data from server.");
-        log("Invalid create-combined response: $createResponse");
+      
         return;
       }
 
       _openCheckout(razorpayOrderId: apiRazorpayOrderId, amount: apiAmount, keyId: apiKeyId);
-    } catch (e, s) {
-      log("startCombinedPayment error: $e\n$s");
+    } catch (e) {
+     
       appToast(error: true, content: "Could not start payment.");
     }
   }
@@ -71,10 +69,10 @@ class PendingTransactionRazorpayController extends GetxController {
         'currency': 'INR',
       };
 
-      log("Opening Razorpay with options: $options");
+    
       razorpay.open(options);
-    } catch (e, s) {
-      log("Error opening Razorpay: $e\n$s");
+    } catch (e) {
+   
       appToast(error: true, content: "Could not open payment window");
     }
   }
@@ -82,7 +80,7 @@ class PendingTransactionRazorpayController extends GetxController {
 
   // -------------------- CALLBACKS ----------------------
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    log("Combined payment success: ${response.paymentId}");
+
     appToast(content: "Payment Success: ${response.paymentId}");
 
     final paymentData = RazorpayPaymentResponse(
@@ -96,13 +94,12 @@ class PendingTransactionRazorpayController extends GetxController {
 
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    log("Combined payment failed: ${response.code} ${response.message}");
+    
     appToast(error: true, content: "Pending Payment Failed");
   }
 
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    log("External wallet selected: ${response.walletName}");
     appToast(content: "Wallet Selected: ${response.walletName}");
   }
 
@@ -119,7 +116,7 @@ class PendingTransactionRazorpayController extends GetxController {
         "razorpaySignature": data.signature,
       };
 
-      log("Finalizing combined payment with body: $body");
+
 
       final response = await PendingTransactionService.payDailySelected(body);
 
@@ -132,11 +129,10 @@ class PendingTransactionRazorpayController extends GetxController {
       } else {
         final msg = response?['message'] ?? 'Payment verification failed. Contact support.';
         appToast(error: true, content: msg);
-        log("payDailySelected failed response: $response");
+ 
       }
-    } catch (e, s) {
+    } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
-      log("Error finalizing combined payment: $e\n$s");
       appToast(error: true, content: "Payment verification error!");
     }
   }

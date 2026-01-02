@@ -17,36 +17,22 @@ class AuthService {
 
   static Future<LoginResponse?> loginWithIdToken(String idToken) async {
     try {
-      print("============================================");
-      print(" [LOGIN SERVICE] Starting login process...");
-      print("ID Token:");
-      print(idToken);
-      print("============================================");
-
       final response = await APIService.postRequest(
         url: AppURLs.LOGIN_API,
         body: {"idToken": idToken},
         onSuccess: (json) => LoginResponse.fromJson(json),
       );
 
-      print("[RAW RESPONSE] $response");
-
       if (response == null) {
-        print("[LOGIN ERROR] Response NULL");
         return null;
       }
 
-      print(" [LOGIN SUCCESS FLAG] ${response.success}");
-      print(" [LOGIN MESSAGE] ${response.message}");
-
       if (response.success != true) {
-        print(" [LOGIN FAIL MESSAGE] ${response.message}");
         return null;
       }
 
       final data = response.data!;
 
-      print("============================================");
       print(" [LOGIN SUCCESS - PARSED DATA]");
       print("   ➤ userId: ${data.userId}");
       print("   ➤ accessToken: ${data.accessToken}");
@@ -55,44 +41,32 @@ class AuthService {
 
       return response;
     } catch (e) {
-      print(" [LOGIN EXCEPTION] $e");
       return null;
     }
   }
 
   /// STEP 1: SEND OTP
   static Future<bool> sendOTP(String phone, {bool isResend = false}) async {
-    print("[SEND OTP] Requesting OTP for: $phone");
-    print("Is Resend    : $isResend");
-    print("Resend Token : $_resendToken");
     try {
       await auth.verifyPhoneNumber(
         phoneNumber: phone,
         timeout: const Duration(seconds: 60),
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          // Auto complete
-          print(" [AUTO VERIFIED] Firebase auto verified OTP.");
-        },
+        verificationCompleted: (PhoneAuthCredential credential) async {},
         verificationFailed: (FirebaseAuthException e) {
-          print(" [OTP FAILED] ${e.code} : ${e.message}");
           // appToast(content: e.message!, error: true);
         },
         codeSent: (String vId, int? resendToken) {
-          print("[CODE SENT] verificationId: $vId");
           verificationId = vId;
           _resendToken = resendToken;
-          print("resendToken   : $resendToken");
         },
         codeAutoRetrievalTimeout: (String vId) {
-          print("[TIMEOUT] Auto-retrieval timed out");
           verificationId = vId;
         },
         forceResendingToken: isResend ? _resendToken : null,
       );
-      print("[SEND OTP COMPLETED]");
+
       return true;
     } catch (e) {
-      print("[SEND OTP ERROR] $e");
       // appToast(content: "OTP sending failed: $e", error: true);
       return false;
     }
@@ -100,10 +74,7 @@ class AuthService {
 
   /// STEP 2: VERIFY OTP
   static Future<String?> verifyOTP(String otp) async {
-    print("[VERIFY OTP] Verifying OTP: $otp");
-
     if (verificationId == null) {
-      print("[ERROR] verificationId is NULL!");
       appToast(
           content: "OTP expired or not sent. Please send OTP again.",
           error: true);
@@ -120,14 +91,11 @@ class AuthService {
 
       UserCredential result = await auth.signInWithCredential(credential);
 
-      print("[OTP VERIFIED] Firebase logged in: ${result.user?.uid}");
-
       final token = await result.user?.getIdToken();
       print("[FIREBASE ID TOKEN] $token");
 
       return token;
     } catch (e) {
-      print("[VERIFY OTP ERROR] $e");
       appToast(content: "Invalid OTP: $e", error: true);
       return null;
     }
@@ -152,9 +120,7 @@ class AuthService {
         return null;
       }
       googleUser = account;
-      print("GOOGLE NAME: ${account.displayName}");
-      print("GOOGLE EMAIL: ${account.email}");
-      print("GOOGLE PHOTO: ${account.photoUrl}");
+
       // Get Google authentication tokens
       final GoogleSignInAuthentication authData = await account.authentication;
 
@@ -174,19 +140,14 @@ class AuthService {
 
       return idToken;
     } catch (e) {
-      print("GOOGLE LOGIN ERROR::: $e");
       appToast(content: "Google Login Error: $e", error: true);
       return null;
     }
   }
 
   static Future<void> signOut() async {
-    try {
-      await auth.signOut();
-      await GoogleSignIn.instance.signOut();
-      await storage.erase();
-    } catch (e) {
-      print("GET ERROR::: $e");
-    }
+    await auth.signOut();
+    await GoogleSignIn.instance.signOut();
+    await storage.erase();
   }
 }

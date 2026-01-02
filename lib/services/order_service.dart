@@ -10,7 +10,7 @@ class OrderService {
       Map<String, dynamic> body) async {
     final token = await storage.read(AppConst.ACCESS_TOKEN);
 
-    log("🔐 Access Token = $token"); // <--- PRINT HERE
+    log(" Access Token = $token"); // <--- PRINT HERE
 
     return await APIService.postRequest<Map<String, dynamic>>(
       url: AppURLs.CREATE_ORDER_API,

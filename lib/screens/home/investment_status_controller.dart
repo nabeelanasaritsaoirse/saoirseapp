@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
 
 import '../../models/investment_status_card_model.dart';
@@ -34,9 +34,7 @@ class InvestmentStatusController extends GetxController {
       if (response != null && response.success) {
         overview.value = response.overview;
       }
-    } catch (e) {
-      debugPrint("Error fetching investment status: $e");
-    } finally {
+    }  finally {
       isLoading.value = false;
     }
   }

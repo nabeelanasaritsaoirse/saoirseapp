@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -220,14 +220,14 @@ class KycController extends GetxController {
         });
       }
 
-      final submitResponse = await kycServices.submitKyc(documents: documents);
+      await kycServices.submitKyc(documents: documents);
 
-      log("📥 SUBMIT RESPONSE → $submitResponse");
+    
 
       Get.snackbar("Success", "KYC submitted successfully!");
       await fetchKycData();
     } catch (e) {
-      log("❌ KYC SUBMISSION ERROR: $e");
+  
       appToast(
           content: "KYC submission failed...! Upload AADHAAR and PAN ",
           error: true);

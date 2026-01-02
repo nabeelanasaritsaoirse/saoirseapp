@@ -63,9 +63,7 @@ class OrderDeliveredController extends GetxController {
           _page++;
         }
       }
-    } catch (e) {
-      debugPrint("Error fetching order delivered: $e");
-    } finally {
+    }  finally {
       isLoading.value = false;
       isPageLoading.value = false;
     }

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+
 import 'dart:io';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
@@ -25,16 +25,13 @@ class KycServices {
     final uri = Uri.parse(AppURLs.KYC_UPLOAD_API);
 
     final bytes = await imageFile.readAsBytes();
-    final fileLength = bytes.length;
+  
     final detectedMime =
         lookupMimeType(imageFile.path, headerBytes: bytes.take(16).toList()) ??
             'application/octet-stream';
     final mimeParts = detectedMime.split('/');
 
-    log('📎 Uploading file: ${imageFile.path}');
-    log('📏 File size bytes: $fileLength');
-    log('🧾 Detected mime: $detectedMime');
-    log('🔤 type field: $type, side field: $side');
+  
 
     var request = http.MultipartRequest("PUT", uri);
     request.headers["Authorization"] = "Bearer $token";
@@ -52,8 +49,6 @@ class KycServices {
     );
     request.files.add(multipartFile);
 
-    log("🔐 Request headers before send: ${request.headers}");
-    log("🔗 Request method: PUT, endpoint: $uri");
 
     final streamed = await request.send().timeout(
           const Duration(seconds: 60),
@@ -62,8 +57,7 @@ class KycServices {
 
     final resp = await http.Response.fromStream(streamed);
 
-    log("📤 PUT → ${resp.statusCode}");
-    log("📥 ${resp.body}");
+  
 
     if (resp.statusCode == 200 || resp.statusCode == 201) {
       return jsonDecode(resp.body);
@@ -90,8 +84,7 @@ class KycServices {
       body: jsonEncode({"documents": documents}),
     );
 
-    log("📤 SUBMIT DOCS → ${jsonEncode({"documents": documents})}");
-    log("📥 SUBMIT RESPONSE (${response.statusCode}) → ${response.body}");
+
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(response.body);
@@ -115,8 +108,7 @@ class KycServices {
       },
     );
 
-    log("📥 GET KYC STATUS → ${response.statusCode}");
-    log(response.body);
+  
 
     if (response.statusCode == 200) {
       return kycModelFromJson(response.body);

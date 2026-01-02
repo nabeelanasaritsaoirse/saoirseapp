@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -308,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           break;
 
                         default:
-                          log("Clicked $title");
+                        
                       }
                     },
                   );

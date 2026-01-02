@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -215,7 +213,7 @@ class OrderDetailsController extends GetxController {
       body["couponCode"] = couponCode.trim();
     }
 
-    log("📦 FINAL JSON = ${jsonEncode(body)}");
+   
 
     appLoader();
 
@@ -267,15 +265,15 @@ class OrderDetailsController extends GetxController {
         return;
       }
 
-      log("🚀 Opening Razorpay with orderId = ${payment.payment.razorpayOrderId}");
+     
 
       Get.find<RazorpayController>().openCheckout(
         razorpayOrderId: payment.payment.razorpayOrderId,
         orderId: payment.order.id,
         amount: payment.payment.amount,
       );
-    } catch (e, s) {
-      log("❌ placeOrder error", error: e, stackTrace: s);
+    } catch (e) {
+     
       appToast(
         error: true,
         content: "Payment initialization failed",
@@ -289,7 +287,7 @@ class OrderDetailsController extends GetxController {
   void setCustomPlan(int days, double amount) {
     selectedDays.value = days;
     selectedAmount.value = amount;
-    log("CUSTOM PLAN SELECTED → $days Days | ₹$amount");
+  
   }
 
   void selectPaymentMethod(String method) {

@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+
 import 'package:saoirse_app/constants/app_urls.dart';
 import 'package:saoirse_app/models/coupon_validation_model.dart';
 import '../services/api_service.dart';
@@ -26,7 +26,7 @@ class CouponService {
 
   //-------------send the request to the api so it will send the coupon validation response---------//
 static Future<CouponValidationResponse?> validateCoupon(Map<String, dynamic> body) async {
-  debugPrint("Validate Coupon Body => $body");
+ 
   final url = AppURLs.POST_RQ_COUPONS_VALIDATION;
 
   return await APIService.postRequest<CouponValidationResponse?>(
@@ -40,8 +40,8 @@ static Future<CouponValidationResponse?> validateCoupon(Map<String, dynamic> bod
         final payload = json.containsKey("data") ? json["data"] : json;
         if (payload == null) return null;
         return CouponValidationResponse.fromJson(payload as Map<String, dynamic>);
-      } catch (e, st) {
-        debugPrint("Coupon parse error: $e\n$st");
+      } catch (e) {
+       
         return null;
       }
     },

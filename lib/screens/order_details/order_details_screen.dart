@@ -1,6 +1,6 @@
 // ignore_for_file: unused_local_variable, deprecated_member_use, prefer_const_constructors_in_immutables
 
-import 'dart:developer';
+
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +71,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    log("DEBUG → incoming selectVarientId: ${widget.selectVarientId}");
+ 
 
     if (orderController.originalAmount == 0.0) {
       orderController.originalAmount = widget.selectedAmount;

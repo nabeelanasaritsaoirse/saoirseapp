@@ -1,6 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
-import 'dart:developer';
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -232,10 +232,10 @@ class _ReferralScreenState extends State<ReferralScreen> {
             ),
             Obx(() {
               if (referralController.referrer.value != null) {
-                log("🟢 Showing ReferredByCard");
+             
                 return referredByCard(referralController.referrer.value!);
               } else {
-                log("🔵 Showing Apply Referral Button");
+            
                 return applyReferralSection(); // show input + apply button
               }
             })
@@ -824,7 +824,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                     onPressed: () {
                       showQRPicker((code) {
                         referralCtrl.text = code;
-                        log("🟢 Referral code updated in popup: $code"); // ← fill input
+                      
                       });
                     },
                   ),
@@ -858,7 +858,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                             .applyReferral(referralCtrl.text.trim());
 
                         if (success) {
-                          log("✅ Referral Applied — Closing Input Popup...");
+                        
 
                           // CLOSE ONLY THE INPUT POPUP
                           Get.back();
@@ -961,7 +961,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
     Get.to(() => QRScannerScreen(
           onReferralDetected: (value) {
             final code = extractReferral(value);
-            log("📸 Camera scanned QR: $code");
+       
 
             onCodeSelected(code);
             Get.back();
@@ -975,7 +975,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
     if (image == null) return;
 
-    try {
+ 
       final MobileScannerController scanner = MobileScannerController();
 
       final BarcodeCapture? result = await scanner.analyzeImage(image.path);
@@ -984,15 +984,13 @@ class _ReferralScreenState extends State<ReferralScreen> {
         final value = result.barcodes.first.rawValue ?? "";
         final code = extractReferral(value);
 
-        log("🖼 QR from image: $code");
+    
 
         onCodeSelected(code);
       } else {
-        log("No QR found in image");
+    
       }
-    } catch (e) {
-      log("Failed to read QR: $e");
-    }
+  
   }
 
   void showQRPicker(Function(String) onCodeSelected) {
@@ -1143,14 +1141,13 @@ Widget referredByCard(ReferrerInfoModel r) {
   return GestureDetector(
     onTap: () async {
       // LOGS (optional)
-      log("👆 ReferredBy Clicked → Opening Chat Directly");
-      log("📩 Friend UserId = ${r.userId}");
+   
 
       // Create chat
       final chat = await ConversationService().createIndividualChat(r.userId);
 
       if (chat == null) {
-        log("❌ Chat creation failed");
+       
         return;
       }
 

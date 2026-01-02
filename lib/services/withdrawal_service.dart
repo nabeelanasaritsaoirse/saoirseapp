@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -11,8 +11,7 @@ class WithdrawalService {
     try {
       final token = await storage.read(AppConst.ACCESS_TOKEN);
 
-      log("🔐 Token: $token");
-      log("📤 Withdrawal Body: $body");
+     
 
       return await APIService.postRequest<Map<String, dynamic>>(
         url: AppURLs.WITHDRAWAL_API,
@@ -22,12 +21,12 @@ class WithdrawalService {
           "Content-Type": "application/json",
         },
         onSuccess: (data) {
-          log("✔️ Withdrawal Success Response: $data");
+      
           return data;
         },
       );
     } catch (e) {
-      log("❌ Withdrawal API Error: $e");
+      
       return null; 
     }
   }

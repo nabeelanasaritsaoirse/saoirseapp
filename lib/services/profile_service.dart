@@ -15,52 +15,10 @@ import 'package:http/http.dart' as http;
 class ProfileService {
   final token = storage.read(AppConst.ACCESS_TOKEN);
 
-  // ------- Fetch Profile ---------
-  // Future<UserProfileModel?> fetchProfile() async {
-  //   try {
-  //     final url = AppURLs.MY_PROFILE;
-
-  //     print("==========================================");
-  //     print(" PROFILE API CALL");
-  //     print("URL        : $url");
-  //     print("TOKEN      : $token");
-  //     print("==========================================");
-
-  //     final response = await APIService.getRequest(
-  //       url: url,
-  //       headers: {
-  //         "Authorization": "Bearer $token",
-  //       },
-  //       onSuccess: (data) => data,
-  //     );
-
-  //     print(" RAW RESPONSE: $response");
-
-  //     if (response == null) {
-  //       print(" RESPONSE IS NULL");
-  //       return null;
-  //     }
-
-  //     final parsed = UserProfileModel.fromJson(response);
-
-  //     print(" PARSED SUCCESS:");
-  //     print("User Name  : ${parsed.user.name}");
-  //     print("Email      : ${parsed.user.email}");
-  //     print("Phone      : ${parsed.user.phoneNumber}");
-  //     print("==========================================");
-
-  //     return parsed;
-  //   } catch (e) {
-  //     print(" Profile fetch error: $e");
-  //     return null;
-  //   }
-  // }
-
       Future<UserProfileModel?> fetchProfile() async {
     try {
       final url = AppURLs.MY_PROFILE;
 
-      print("Calling PROFILE API...");
       print("TOKEN: $token");
 
       final response = await APIService.getRequest<UserProfileModel>(
@@ -72,14 +30,14 @@ class ProfileService {
 
         // ⬇️ THIS maps JSON → UserProfileModel
         onSuccess: (json) {
-          print("PROFILE DATA RECEIVED");
+       
           return UserProfileModel.fromJson(json);
         },
       );
 
       return response;
     } catch (e) {
-      print("Profile fetch error: $e");
+  
       return null;
     }
   }
@@ -90,13 +48,10 @@ class ProfileService {
       final url = "${AppURLs.BASE_API}api/users/$userId/profile-picture";
       
 
-      print("============================================");
-      print(" UPLOADING PROFILE IMAGE");
-      print("URL         : $url");
+ 
       print("User ID     : $userId");
       print("TOKEN       : $token");
-      print("IMAGE PATH  : $imagePath");
-      print("============================================");
+
 
       // ---- FORCE NEW FILE NAME WITH .jpg ----
       final originalFile = File(imagePath);
@@ -106,7 +61,7 @@ class ProfileService {
 
       final newFile = await originalFile.copy(newPath);
 
-      print("NEW FILE PATH: $newPath");
+    
 
       // ---- Convert to MultipartFile ----
       final multipart = await http.MultipartFile.fromPath(
@@ -125,22 +80,20 @@ class ProfileService {
       );
 
       if (response == null) {
-        print(" NULL RESPONSE");
+       
         return false;
       }
 
-      print("STATUS: ${response.statusCode}");
-      print("BODY: ${response.body}");
+     
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print(" IMAGE UPLOADED SUCCESSFULLY");
-        return true;
+       return true;
       }
 
-      print(" IMAGE UPLOAD FAILED");
+    
       return false;
     } catch (e) {
-      print(" Exception during image upload: $e");
+  
       return false;
     }
   }
@@ -186,13 +139,13 @@ class ProfileService {
         onSuccess: (json) => json,
       );
 
-      print("LOGOUT RESPONSE: $response");
+     
 
       if (response == null) return false;
 
       return response["success"] == true;
     } catch (e) {
-      print("Logout Error: $e");
+    
       return false;
     }
   }
