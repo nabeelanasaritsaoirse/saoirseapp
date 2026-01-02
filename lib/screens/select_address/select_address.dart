@@ -28,10 +28,12 @@ class SelectAddress extends StatelessWidget {
     this.product,
     this.selectVarientId,
     required this.selectedDays,
-    required this.selectedAmount,this.quantity,
+    required this.selectedAmount,
+    this.quantity,
   });
 
-  final SelectAddressController controller = Get.find<SelectAddressController>();
+  final SelectAddressController controller =
+      Get.find<SelectAddressController>();
 
   @override
   Widget build(BuildContext context) {
@@ -105,30 +107,29 @@ class SelectAddress extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
                 onTap: () {
-  final selectedAddress =
-      controller.addressList[controller.selectedIndex.value];
+                  final selectedAddress =
+                      controller.addressList[controller.selectedIndex.value];
 
-  if (!Get.isRegistered<OrderDetailsController>()) {
-    Get.put(OrderDetailsController());
-  }
+                  if (!Get.isRegistered<OrderDetailsController>()) {
+                    Get.put(OrderDetailsController());
+                  }
 
-  final orderCtrl = Get.find<OrderDetailsController>();
+                  final orderCtrl = Get.find<OrderDetailsController>();
 
-  // Save selected data
-  orderCtrl.selectedDays.value = selectedDays;
-  orderCtrl.selectedAmount.value = selectedAmount;
+                  // Save selected data
+                  orderCtrl.selectedDays.value = selectedDays;
+                  orderCtrl.selectedAmount.value = selectedAmount;
 
-  // Navigate to Order Details
-  Get.to(() => OrderDetailsScreen(
-        addresses: selectedAddress,
-        product: product,
-        selectedDays: selectedDays,
-        selectVarientId: selectVarientId ?? "",
-        selectedAmount: selectedAmount,
-        quantity: quantity,
-      ));
-},
-
+                  // Navigate to Order Details
+                  Get.to(() => OrderDetailsScreen(
+                        addresses: selectedAddress,
+                        product: product,
+                        selectedDays: selectedDays,
+                        selectVarientId: selectVarientId ?? "",
+                        selectedAmount: selectedAmount,
+                        quantity: quantity,
+                      ));
+                },
               ),
             ),
           ],

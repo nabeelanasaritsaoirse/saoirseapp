@@ -23,7 +23,8 @@ class _AddAddressState extends State<AddAddress> {
 
   @override
   Widget build(BuildContext context) {
-    AddAddressController addAddressController = Get.find<AddAddressController>();
+    AddAddressController addAddressController =
+        Get.find<AddAddressController>();
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,

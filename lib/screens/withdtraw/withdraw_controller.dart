@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/my_wallet/my_wallet.dart';
-import 'package:saoirse_app/services/withdrawal_service.dart';
+
+import '../../services/withdrawal_service.dart';
 import '../../widgets/app_toast.dart';
+import '../my_wallet/my_wallet.dart';
 
 class WithdrawController extends GetxController {
   TextEditingController nameController = TextEditingController();
@@ -32,7 +33,9 @@ class WithdrawController extends GetxController {
       isLoading.value = false;
 
       if (res != null) {
-        appToast(title: "Success", content: "Withdrawal request submitted successfully!");
+        appToast(
+            title: "Success",
+            content: "Withdrawal request submitted successfully!");
         Get.off(WalletScreen());
       } else {
         appToast(title: "Error", content: "Something went wrong");

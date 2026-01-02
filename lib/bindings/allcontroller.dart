@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/add_address/add_address_controller.dart';
-import 'package:saoirse_app/screens/add_money/add_money_controller.dart';
 
 // ---------------- AUTH & USER ----------------
+import '../screens/add_address/add_address_controller.dart';
+import '../screens/add_money/add_money_controller.dart';
 import '../screens/home/investment_status_controller.dart';
 import '../screens/login/login_controller.dart';
 import '../screens/my_wallet/my_wallet_controller.dart';
@@ -32,7 +32,7 @@ class AllController extends Bindings {
     Get.put(CartController(), permanent: true);
     // Get.put(MessageController(conversationId: '', participants: []),
     //     permanent: true);
- 
+
     // 🔐 AUTH / USER
     Get.lazyPut<LoginController>(
       () => LoginController(),
