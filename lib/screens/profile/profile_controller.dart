@@ -16,6 +16,7 @@ import '../../models/profile_response.dart';
 import '../../services/profile_service.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_toast.dart';
+import '../dashboard/dashboard_controller.dart';
 import '../notification/notification_controller.dart';
 import '../onboard/onboard_screen.dart';
 
@@ -490,7 +491,9 @@ class ProfileController extends GetxController {
       cancelTextColor: AppColors.primaryColor,
       onConfirm: () {
         Get.back(); // close dialog
-
+        if (Get.isRegistered<DashboardController>()) {
+          Get.find<DashboardController>().selectedIndex.value = 0;
+        }
         // Navigate immediately
         Get.offAll(() => OnBoardScreen());
 

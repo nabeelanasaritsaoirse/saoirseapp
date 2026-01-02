@@ -51,12 +51,12 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     }
 
     if (index == 1) {
-      Get.put(ProfileController()).fetchWishlistCount();
+      Get.find<ProfileController>().fetchWishlistCount();
       Get.find<CategoryController>().fetchCategories();
     }
 
     if (index == 2) {
-      Get.put(ReferralController()).fetchReferralData();
+      Get.find<ReferralController>().fetchReferralData();
     }
 
     /// If user goes to Cart tab → refresh cart
@@ -65,8 +65,8 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     }
 
     if (index == 4) {
-      Get.put(ProfileController()).fetchWishlistCount();
-      Get.put(ProfileController()).fetchUserProfile();
+      Get.find<ProfileController>().fetchWishlistCount();
+      Get.find<ProfileController>().fetchUserProfile();
     }
   }
 }

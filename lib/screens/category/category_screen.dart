@@ -25,8 +25,8 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  final CategoryController controller = Get.put(CategoryController());
-  final ProfileController profileController = Get.put(ProfileController());
+  final CategoryController controller = Get.find<CategoryController>();
+  final ProfileController profileController = Get.find<ProfileController>();
 
   @override
   void initState() {

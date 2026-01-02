@@ -13,7 +13,7 @@ import '/widgets/app_text.dart';
 class KycScreen extends StatelessWidget {
   KycScreen({super.key});
 
-  final controller = Get.put(KycController());
+  final controller = Get.find<KycController>();
 
   @override
   Widget build(BuildContext context) {

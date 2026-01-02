@@ -17,7 +17,7 @@ import '../my_wallet/my_wallet_controller.dart';
 import '../razorpay/razorpay_controller.dart';
 
 class OrderDetailsController extends GetxController {
-  final walletController = Get.put(MyWalletController());
+  final walletController = Get.find<MyWalletController>();
   RxInt selectedDays = 0.obs;
   RxDouble selectedAmount = 0.0.obs;
 

@@ -18,7 +18,7 @@ class TransactionHistory extends StatefulWidget {
 }
 
 class _TransactionHistoryState extends State<TransactionHistory> {
-  final MyWalletController controller = Get.put(MyWalletController());
+  final MyWalletController controller = Get.find<MyWalletController>();
 
   @override
   Widget build(BuildContext context) {

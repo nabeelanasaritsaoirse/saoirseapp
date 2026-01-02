@@ -22,7 +22,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final withdrawController = Get.put(WithdrawController());
+    final withdrawController = Get.find<WithdrawController>();
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,

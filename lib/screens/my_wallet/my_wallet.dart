@@ -22,7 +22,7 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
-  final controller = Get.put(MyWalletController());
+  final controller = Get.find<MyWalletController>();
 
   @override
   Widget build(BuildContext context) {

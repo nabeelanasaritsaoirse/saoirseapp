@@ -31,7 +31,7 @@ class SelectAddress extends StatelessWidget {
     required this.selectedAmount,this.quantity,
   });
 
-  final SelectAddressController controller = Get.put(SelectAddressController());
+  final SelectAddressController controller = Get.find<SelectAddressController>();
 
   @override
   Widget build(BuildContext context) {
