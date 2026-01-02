@@ -12,7 +12,7 @@ import 'order_history_controller.dart';
 class OrderHistoryScreen extends StatelessWidget {
   OrderHistoryScreen({super.key});
 
-  final OrderHistoryController controller = Get.put(OrderHistoryController());
+  final OrderHistoryController controller = Get.find<OrderHistoryController>();
 
   @override
   Widget build(BuildContext context) {

@@ -34,11 +34,11 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late final ProfileController controller;
-  final kyccontroller = Get.put(KycController());
+  final kyccontroller = Get.find<KycController>();
 
   @override
   void initState() {
-    controller = Get.put(ProfileController());
+    controller = Get.find<ProfileController>();
     super.initState();
   }
 
@@ -237,17 +237,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: controller.myOrders[index]["title"]!,
                       onTap: () {
                         if (index == 0) {
-                          Get.to(PendingTransaction());
+                          Get.to(() => PendingTransaction());
                         } else if (index == 1) {
-                          Get.to(OrderHistoryScreen());
+                          Get.to(() => OrderHistoryScreen());
                         } else if (index == 2) {
-                          Get.to(WishlistScreen());
+                          Get.to(() => WishlistScreen());
                         } else if (index == 3) {
-                          Get.to(OrdersActiveScreen());
+                          Get.to(() => OrdersActiveScreen());
                         } else if (index == 4) {
-                          Get.to(TransactionHistory());
+                          Get.to(() => TransactionHistory());
                         } else if (index == 5) {
-                          Get.to(OrderDeliveredScreen());
+                          Get.to(() => OrderDeliveredScreen());
                         } else {}
                       },
                     );

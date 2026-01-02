@@ -62,7 +62,7 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                         onTap: () {
                           Get.offAll(
                             () => const LoginPage(),
-                            binding: Allcontroller(),
+                            binding: AllController(),
                           );
                         },
                         height: 40.h,

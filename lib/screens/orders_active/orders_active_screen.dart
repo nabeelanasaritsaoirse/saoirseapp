@@ -12,7 +12,7 @@ import 'orders_active_controller.dart';
 class OrdersActiveScreen extends StatelessWidget {
   OrdersActiveScreen({super.key});
 
-  final OrderActiveController controller = Get.put(OrderActiveController());
+  final OrderActiveController controller = Get.find<OrderActiveController>();
 
   @override
   Widget build(BuildContext context) {

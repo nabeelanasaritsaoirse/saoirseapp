@@ -17,8 +17,8 @@ import 'dashboard_controller.dart';
 class DashboardScreen extends StatelessWidget {
   DashboardScreen({super.key});
 
-  final DashboardController controller = Get.put(DashboardController());
-  final CartController cartController = Get.put(CartController());
+  final DashboardController controller = Get.find<DashboardController>();
+  final CartController cartController = Get.find<CartController>();
 
   final List<Widget> pages = [
     const HomeScreen(),

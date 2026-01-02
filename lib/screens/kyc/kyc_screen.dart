@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/LoginAuth/kyc_model.dart';
+
+import '../../models/LoginAuth/kyc_model.dart';
 import '/constants/app_strings.dart';
 import '/widgets/custom_appbar.dart';
 import '/widgets/app_loader.dart';
@@ -13,7 +14,7 @@ import '/widgets/app_text.dart';
 class KycScreen extends StatelessWidget {
   KycScreen({super.key});
 
-  final controller = Get.put(KycController());
+  final controller = Get.find<KycController>();
 
   @override
   Widget build(BuildContext context) {

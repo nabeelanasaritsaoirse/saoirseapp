@@ -81,7 +81,7 @@ class _ProductListingState extends State<ProductListing> {
           ),
           actions: [
             Obx(() {
-              final count = Get.put(ProfileController()).wishlistCount.value;
+              final count = Get.find<ProfileController>().wishlistCount.value;
 
               return Stack(
                 clipBehavior: Clip.none,

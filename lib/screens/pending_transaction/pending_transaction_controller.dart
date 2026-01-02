@@ -183,7 +183,7 @@ class PendingTransactionController extends GetxController {
       return;
     }
 
-    final razorController = Get.put(PendingTransactionRazorpayController());
+    final razorController = Get.find<PendingTransactionRazorpayController>();
 
     razorController.startCombinedPayment(
       createResponse: response['data'],

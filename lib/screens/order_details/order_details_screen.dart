@@ -46,9 +46,9 @@ class OrderDetailsScreen extends StatefulWidget {
 class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   final orderController = Get.find<OrderDetailsController>();
 
-  final razorpayController = Get.put(RazorpayController());
+  final razorpayController = Get.find<RazorpayController>();
 
-  final walletController = Get.put(MyWalletController());
+  final walletController = Get.find<MyWalletController>();
   @override
   void initState() {
     super.initState();

@@ -38,11 +38,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  HomeController homeController = Get.put(HomeController());
+  HomeController homeController = Get.find<HomeController>();
   NotificationController notificationController =
-      Get.put(NotificationController());
+      Get.find<NotificationController>();
   InvestmentStatusController investmentController =
-      Get.put(InvestmentStatusController());
+      Get.find<InvestmentStatusController>();
 
   @override
   void didChangeDependencies() {

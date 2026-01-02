@@ -124,7 +124,7 @@ class MyApp extends StatelessWidget {
             }
           },
           child: GetMaterialApp(
-            initialBinding: Allcontroller(),
+            initialBinding: AllController(),
             locale: locale,
             debugShowCheckedModeBanner: false,
             title: AppStrings.app_name,
