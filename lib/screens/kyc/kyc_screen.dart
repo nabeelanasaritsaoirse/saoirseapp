@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/app_text_field.dart';
 
 import '../../models/LoginAuth/kyc_model.dart';
 import '/constants/app_strings.dart';
@@ -11,6 +12,40 @@ import '/screens/kyc/kyc_controller.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
 
+import 'package:flutter/services.dart';
+
+class AadhaarInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // Remove non-digits
+    String digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+
+    // Limit to 12 digits
+    if (digits.length > 12) {
+      digits = digits.substring(0, 12);
+    }
+
+    // Add space after every 4 digits
+    final buffer = StringBuffer();
+    for (int i = 0; i < digits.length; i++) {
+      buffer.write(digits[i]);
+      if ((i + 1) % 4 == 0 && i != digits.length - 1) {
+        buffer.write(' ');
+      }
+    }
+
+    final formattedText = buffer.toString();
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
+    );
+  }
+}
+
 class KycScreen extends StatelessWidget {
   KycScreen({super.key});
 
@@ -18,7 +53,14 @@ class KycScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+
+  return WillPopScope(
+  onWillPop: () async {
+    controller.resetKycForm(); // 👈 CLEAR EVERYTHING
+    return true; // allow back navigation
+  },
+  child: Scaffold(
+
       backgroundColor: AppColors.scaffoldColor,
       appBar: CustomAppBar(
         showBack: true,
@@ -44,6 +86,7 @@ class KycScreen extends StatelessWidget {
             return const Center(child: Text("Unknown KYC State"));
         }
       }),
+  )
     );
   }
 }
@@ -168,6 +211,18 @@ class NotSubmittedUI extends StatelessWidget {
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    appText("Aadhaar Number",
+                        fontSize: 16.sp, fontWeight: FontWeight.w600),
+                    SizedBox(height: 4.h),
+                    appTextField(
+                      controller: controller.aadhaarNumberController,
+                      hintText: "xxxx xxxx xxxx",
+                      textInputType: TextInputType.number,
+                      hintColor: AppColors.darkGray,
+                      textColor: AppColors.black,
+                      validator: aadhaarValidator,
+                    ),
+                    SizedBox(height: 10.h),
                     appText("Aadhaar Front Image",
                         fontSize: 16.sp, fontWeight: FontWeight.w600),
                     SizedBox(height: 10.h),
@@ -190,7 +245,7 @@ class NotSubmittedUI extends StatelessWidget {
                               ),
                       ),
                     ),
-                    SizedBox(height: 20.h),
+                    SizedBox(height: 10.h),
                     appText("Aadhaar Back Image",
                         fontSize: 16.sp, fontWeight: FontWeight.w600),
                     SizedBox(height: 10.h),
@@ -226,9 +281,20 @@ class NotSubmittedUI extends StatelessWidget {
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    appText("PAN Number",
+                        fontSize: 16.sp, fontWeight: FontWeight.w600),
+                    SizedBox(height: 4.h),
+                    appTextField(
+                      controller: controller.panNumberController,
+                      hintText: "ABCDE1234F",
+                      hintColor: AppColors.darkGray,
+                      textColor: AppColors.black,
+                      validator: panValidator,
+                    ),
+                    SizedBox(height: 10.h),
                     appText("PAN Front Image",
                         fontSize: 16.sp, fontWeight: FontWeight.w600),
-                    SizedBox(height: 10.h),
+                    SizedBox(height: 6.h),
 
                     GestureDetector(
                       onTap: controller.pickPanFront,
@@ -249,9 +315,9 @@ class NotSubmittedUI extends StatelessWidget {
                               ),
                       ),
                     ),
-                    SizedBox(height: 20.h),
+                    SizedBox(height: 10.h),
 
-                    // 🔥 PAN BACK IMAGE (NEW)
+                    //  PAN BACK IMAGE (NEW)
 
                     appText("PAN Back Image",
                         fontSize: 16.sp, fontWeight: FontWeight.w600),
@@ -424,4 +490,80 @@ class RejectedUI extends StatelessWidget {
       ),
     );
   }
+}
+
+//======================================================
+//     AADHAAR VALIDATOR
+//======================================================
+
+String? aadhaarValidator(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'Please enter Aadhaar number';
+  }
+
+  // Remove spaces
+  value = value.replaceAll(' ', '');
+
+  // Aadhaar must be 12 digits & start with 2–9
+  if (!RegExp(r'^[2-9][0-9]{11}$').hasMatch(value)) {
+    return 'Enter a valid 12-digit Aadhaar number';
+  }
+
+  if (!_verhoeffCheck(value)) {
+    return 'Invalid Aadhaar number';
+  }
+
+  return null;
+}
+
+/* ------------ Verhoeff Algorithm ------------ */
+
+const List<List<int>> _d = [
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
+  [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],
+  [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],
+  [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+  [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],
+  [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
+  [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
+  [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
+  [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+];
+
+const List<List<int>> _p = [
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
+  [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],
+  [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],
+  [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
+  [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
+  [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
+  [7, 0, 4, 6, 9, 1, 3, 2, 5, 8]
+];
+
+bool _verhoeffCheck(String num) {
+  int c = 0;
+  final digits = num.split('').map(int.parse).toList().reversed.toList();
+
+  for (int i = 0; i < digits.length; i++) {
+    c = _d[c][_p[i % 8][digits[i]]];
+  }
+  return c == 0;
+}
+//======================================================
+//     PAN VALIDATOR
+//======================================================
+
+String? panValidator(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'Please enter PAN number';
+  }
+
+  // PAN must be 10 characters: 5 letters + 4 digits + 1 letter
+  if (!RegExp(r'^[A-Z]{5}[0-9]{4}[A-Z]$').hasMatch(value)) {
+    return 'Enter a valid PAN number (e.g., ABCDE1234F)';
+  }
+
+  return null;
 }

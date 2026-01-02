@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +12,33 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 
 class KycController extends GetxController {
+  @override
+  void onClose() {
+    resetKycForm();
+    super.onClose();
+  }
+
+  TextEditingController aadhaarNumberController = TextEditingController();
+  TextEditingController panNumberController = TextEditingController();
+
+  void resetKycForm() {
+    // Clear text fields
+    log("Resetting KYC form...");
+    aadhaarNumberController.clear();
+    panNumberController.clear();
+
+    // Clear images
+    selfieImage.value = null;
+    aadhaarFront.value = null;
+    aadhaarBack.value = null;
+    panFront.value = null;
+    panBack.value = null;
+
+    // Reset selections
+    aadhaarSelected.value = false;
+    panSelected.value = false;
+  }
+
   /// Storage & Services
   final box = Get.put(GetStorage());
   final KycServices kycServices = KycServices();
@@ -59,7 +87,7 @@ class KycController extends GetxController {
       isLoading(false);
     }
   }
-  
+
   // ======================================================================
   // IMAGE PICKERS
   // ======================================================================
@@ -231,7 +259,6 @@ class KycController extends GetxController {
       appToast(
           content: "KYC submission failed...! Upload AADHAAR and PAN ",
           error: true);
-  
     } finally {
       isLoading(false);
     }
