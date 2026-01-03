@@ -1,7 +1,4 @@
-// ignore_for_file: avoid_print
-
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -131,11 +128,6 @@ class LoginController extends GetxController {
       storage.write(AppConst.REFERRAL_CODE, data.referralCode);
       storage.write(AppConst.USER_NAME, data.name);
 
-      print("✔ SAVED userId: ${storage.read(AppConst.USER_ID)}");
-      print("✔ SAVED accessToken: ${storage.read(AppConst.ACCESS_TOKEN)}");
-      print("✔ SAVED refreshToken: ${storage.read(AppConst.REFRESH_TOKEN)}");
-      print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
-
       final notif = Get.find<NotificationController>();
       notif.updateToken(data.accessToken!);
 
@@ -146,7 +138,6 @@ class LoginController extends GetxController {
 
       final fcmToken = await getDeviceToken();
       if (fcmToken != null) {
-        log("Assign FCM token after Google login: $fcmToken");
         notif.registerFCM(fcmToken);
       }
 
