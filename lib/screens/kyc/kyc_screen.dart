@@ -1,17 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/widgets/app_text_field.dart';
-
-import '../../models/LoginAuth/kyc_model.dart';
-import '/constants/app_strings.dart';
-import '/widgets/custom_appbar.dart';
-import '/widgets/app_loader.dart';
-import '/constants/app_colors.dart';
-import '/screens/kyc/kyc_controller.dart';
-import '/widgets/app_button.dart';
-import '/widgets/app_text.dart';
-
+import 'package:image_picker/image_picker.dart';
+import '/models/LoginAuth/kyc_model.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_loader.dart';
+import '../../widgets/app_text.dart';
+import '../../widgets/app_text_field.dart';
+import '../../widgets/custom_appbar.dart';
+import 'kyc_controller.dart';
 import 'package:flutter/services.dart';
 
 class AadhaarInputFormatter extends TextInputFormatter {
@@ -53,48 +53,41 @@ class KycScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return WillPopScope(
+        onWillPop: () async {
+          controller.resetKycForm(); // 👈 CLEAR EVERYTHING
+          return true; // allow back navigation
+        },
+        child: Scaffold(
+          backgroundColor: AppColors.scaffoldColor,
+          appBar: CustomAppBar(
+            title: AppStrings.KycTitle,
+            showBack: true,
+          ),
+          body: Obx(() {
+            if (controller.isLoading.value) return appLoader();
 
-  return WillPopScope(
-  onWillPop: () async {
-    controller.resetKycForm(); // 👈 CLEAR EVERYTHING
-    return true; // allow back navigation
-  },
-  child: Scaffold(
+            final status = controller.kyc.value?.status ?? "not_submitted";
 
-      backgroundColor: AppColors.scaffoldColor,
-      appBar: CustomAppBar(
-        showBack: true,
-        title: AppStrings.KycTitle,
-      ),
-      body: Obx(() {
-        if (controller.isLoading.value) return appLoader();
-
-        final status = controller.kyc.value!.status;
-
-        switch (status) {
-          case "not_submitted":
-            return const NotSubmittedUI();
-          case "pending":
-            return const PendingUI();
-          case "approved":
-            return const ApprovedUI(isAuto: false);
-          case "auto_approved":
-            return const ApprovedUI(isAuto: true);
-          case "rejected":
-            return const RejectedUI();
-          default:
-            return const Center(child: Text("Unknown KYC State"));
-        }
-      }),
-  )
-    );
+            switch (status) {
+              case "pending":
+                return const PendingUI();
+              case "approved":
+              case "auto_approved":
+                return const ApprovedUI();
+              case "rejected":
+                return const RejectedUI();
+              default:
+                return const NotSubmittedUI();
+            }
+          }),
+        ));
   }
 }
 
-//==========================================================================
-//                 NOT SUBMITTED UI
-//==========================================================================
-
+// ==========================================================
+// NOT SUBMITTED UI
+// ==========================================================
 class NotSubmittedUI extends StatelessWidget {
   const NotSubmittedUI({super.key});
 
@@ -113,39 +106,21 @@ class NotSubmittedUI extends StatelessWidget {
           appText("KYC Not Submitted",
               fontSize: 18.sp, fontWeight: FontWeight.bold),
           SizedBox(height: 20.h),
-
           // ============================
           //      SELFIE (Required)
           // ============================
           appText("Upload Selfie (Required)",
               fontSize: 16.sp, fontWeight: FontWeight.w600),
           SizedBox(height: 10.h),
+          imagePicker(
+            image: controller.selfieImage,
+            onTap: () => controller.pickImage(
+                ImageSource.camera, controller.selfieImage),
+          ),
 
-          Obx(() => GestureDetector(
-                onTap: controller.pickSelfie,
-                child: Container(
-                  height: 150.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.grey),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: controller.selfieImage.value == null
-                      ? Center(child: appText("Tap to capture/upload selfie"))
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(12.r),
-                          child: Image.file(
-                            controller.selfieImage.value!,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                ),
-              )),
-          SizedBox(height: 25.h),
+          SizedBox(height: 20.h),
 
-          // =======================================================================
-          //      DOCUMENT SELECTION
-          // =======================================================================
+          // ---------------- DOCUMENT SELECT ----------------
           appText("Upload Document",
               fontSize: 16.sp, fontWeight: FontWeight.w600),
           SizedBox(height: 12.h),
@@ -204,151 +179,20 @@ class NotSubmittedUI extends StatelessWidget {
               )),
           SizedBox(height: 20.h),
 
-// ==========================================================================
-//      AADHAAR UPLOADS
-// ==========================================================================
+          SizedBox(height: 20.h),
+
+          // ---------------- AADHAAR ----------------
           Obx(() => controller.aadhaarSelected.value
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    appText("Aadhaar Number",
-                        fontSize: 16.sp, fontWeight: FontWeight.w600),
-                    SizedBox(height: 4.h),
-                    appTextField(
-                      controller: controller.aadhaarNumberController,
-                      hintText: "xxxx xxxx xxxx",
-                      textInputType: TextInputType.number,
-                      hintColor: AppColors.darkGray,
-                      textColor: AppColors.black,
-                      validator: aadhaarValidator,
-                    ),
-                    SizedBox(height: 10.h),
-                    appText("Aadhaar Front Image",
-                        fontSize: 16.sp, fontWeight: FontWeight.w600),
-                    SizedBox(height: 10.h),
-                    GestureDetector(
-                      onTap: controller.pickAadhaarFront,
-                      child: Container(
-                        height: 150.h,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.grey),
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: controller.aadhaarFront.value == null
-                            ? Center(child: appText("Tap to upload front"))
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(12.r),
-                                child: Image.file(
-                                  controller.aadhaarFront.value!,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                      ),
-                    ),
-                    SizedBox(height: 10.h),
-                    appText("Aadhaar Back Image",
-                        fontSize: 16.sp, fontWeight: FontWeight.w600),
-                    SizedBox(height: 10.h),
-                    GestureDetector(
-                      onTap: controller.pickAadhaarBack,
-                      child: Container(
-                        height: 150.h,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.grey),
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: controller.aadhaarBack.value == null
-                            ? Center(child: appText("Tap to upload back"))
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(12.r),
-                                child: Image.file(
-                                  controller.aadhaarBack.value!,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                      ),
-                    ),
-                    SizedBox(height: 25.h),
-                  ],
-                )
-              : SizedBox()),
+              ? aadhaarSection(controller)
+              : const SizedBox()),
 
-// ==============================================================================
-//     PAN UPLOADS
-// ==============================================================================
-
+          // ---------------- PAN ----------------
           Obx(() => controller.panSelected.value
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    appText("PAN Number",
-                        fontSize: 16.sp, fontWeight: FontWeight.w600),
-                    SizedBox(height: 4.h),
-                    appTextField(
-                      controller: controller.panNumberController,
-                      hintText: "ABCDE1234F",
-                      hintColor: AppColors.darkGray,
-                      textColor: AppColors.black,
-                      validator: panValidator,
-                    ),
-                    SizedBox(height: 10.h),
-                    appText("PAN Front Image",
-                        fontSize: 16.sp, fontWeight: FontWeight.w600),
-                    SizedBox(height: 6.h),
+              ? panSection(controller)
+              : const SizedBox()),
 
-                    GestureDetector(
-                      onTap: controller.pickPanFront,
-                      child: Container(
-                        height: 150.h,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.grey),
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: controller.panFront.value == null
-                            ? Center(child: appText("Tap to upload front"))
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(12.r),
-                                child: Image.file(
-                                  controller.panFront.value!,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                      ),
-                    ),
-                    SizedBox(height: 10.h),
+          SizedBox(height: 20.h),
 
-                    //  PAN BACK IMAGE (NEW)
-
-                    appText("PAN Back Image",
-                        fontSize: 16.sp, fontWeight: FontWeight.w600),
-                    SizedBox(height: 10.h),
-
-                    GestureDetector(
-                      onTap: controller.pickPanBack,
-                      child: Container(
-                        height: 150.h,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.grey),
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        child: controller.panBack.value == null
-                            ? Center(child: appText("Tap to upload back"))
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(12.r),
-                                child: Image.file(
-                                  controller.panBack.value!,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                      ),
-                    ),
-                    SizedBox(height: 25.h),
-                  ],
-                )
-              : SizedBox()),
-          // ============================
-          //      SUBMIT BUTTON
-          // ============================
           Obx(() => appButton(
                 buttonText:
                     controller.isLoading.value ? "Uploading..." : "Submit KYC",
@@ -361,58 +205,159 @@ class NotSubmittedUI extends StatelessWidget {
   }
 }
 
-//===============================================
-//     PENDING UI
-//===============================================
+// ==========================================================
+// AADHAAR SECTION
+// ==========================================================
+Widget aadhaarSection(KycController controller) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      sectionTitle("Aadhaar Details"),
+      appTextField(
+        controller: controller.aadhaarNumberController,
+        hintText: "XXXX XXXX XXXX",
+        textInputType: TextInputType.number,
+        textColor: AppColors.black,
+        hintColor: AppColors.darkGray,
+        validator: aadhaarValidator,
+      ),
+      SizedBox(height: 10.h),
+      imagePicker(
+        label: "Aadhaar Front",
+        image: controller.aadhaarFront,
+        onTap: () =>
+            controller.pickImage(ImageSource.gallery, controller.aadhaarFront),
+      ),
+      SizedBox(height: 10.h),
+      imagePicker(
+        label: "Aadhaar Back",
+        image: controller.aadhaarBack,
+        onTap: () =>
+            controller.pickImage(ImageSource.gallery, controller.aadhaarBack),
+      ),
+      SizedBox(height: 20.h),
+    ],
+  );
+}
+
+// ==========================================================
+// PAN SECTION (FRONT ONLY)
+// ==========================================================
+Widget panSection(KycController c) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      sectionTitle("PAN Details"),
+      appTextField(
+        controller: c.panNumberController,
+        hintText: "ABCDE1234F",
+        hintColor: AppColors.darkGray,
+        textColor: AppColors.black,
+        validator: panValidator,
+      ),
+      SizedBox(height: 10.h),
+      imagePicker(
+        label: "PAN Front",
+        image: c.panFront,
+        onTap: () => c.pickImage(ImageSource.gallery, c.panFront),
+      ),
+      SizedBox(height: 20.h),
+    ],
+  );
+}
+
+// ==========================================================
+// COMMON IMAGE PICKER
+// ==========================================================
+
+Widget imagePicker({
+  String label = "Tap to upload",
+  required Rx<File?> image,
+  required VoidCallback onTap,
+}) {
+  return Obx(() => GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 150.h,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.grey),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: image.value == null
+              ? Center(child: appText(label))
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(12.r),
+                  child: Image.file(image.value!, fit: BoxFit.cover),
+                ),
+        ),
+      ));
+}
+
+// ==========================================================
+// CHECKBOX TILE
+// ==========================================================
+
+Widget checkboxTile(String text, RxBool value) {
+  return Obx(() => CheckboxListTile(
+        value: value.value,
+        title: appText(text),
+        onChanged: (_) => value.toggle(),
+        controlAffinity: ListTileControlAffinity.leading,
+      ));
+}
+
+// ==========================================================
+// SECTION TITLE
+// ==========================================================
+
+Widget sectionTitle(String title) {
+  return Padding(
+    padding: EdgeInsets.only(bottom: 8.h),
+    child: appText(
+      title,
+      fontSize: 16.sp,
+      fontWeight: FontWeight.w600,
+    ),
+  );
+}
+
+// ==========================================================
+// Pending UI
+// ==========================================================
+
 class PendingUI extends StatelessWidget {
   const PendingUI({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: EdgeInsets.all(20.r),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.hourglass_bottom, size: 70.sp, color: AppColors.orange),
-            SizedBox(height: 15.h),
-            appText("KYC Pending",
-                fontSize: 22.sp, fontWeight: FontWeight.bold),
-            SizedBox(height: 8.h),
-            appText("Your documents are under review.",
-                fontSize: 15.sp, fontWeight: FontWeight.w500),
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.hourglass_bottom, size: 80.sp, color: AppColors.orange),
+          SizedBox(height: 10.h),
+          appText("KYC Pending", fontSize: 20.sp),
+          appText("Documents under review"),
+        ],
       ),
     );
   }
 }
 
-//=============================================================
-//     APPROVED UI
-//=============================================================
 class ApprovedUI extends StatelessWidget {
-  final bool isAuto;
-  const ApprovedUI({super.key, required this.isAuto});
+  const ApprovedUI({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: EdgeInsets.all(20.r),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.check_circle, size: 100.sp, color: AppColors.green),
-            SizedBox(height: 15.sp),
-            appText(isAuto ? "KYC Auto Approved" : "KYC Approved",
-                fontSize: 20.sp, fontWeight: FontWeight.bold),
-            SizedBox(height: 8.h),
-            appText("You can continue using all features.",
-                fontSize: 16.sp, fontWeight: FontWeight.w500),
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.check_circle, size: 90.sp, color: AppColors.green),
+          SizedBox(height: 10.h),
+          appText("KYC Approved", fontSize: 20.sp),
+        ],
       ),
     );
   }
@@ -421,6 +366,8 @@ class ApprovedUI extends StatelessWidget {
 //======================================================
 //     REJECTED UI
 //======================================================
+
+
 class RejectedUI extends StatelessWidget {
   const RejectedUI({super.key});
 
@@ -442,7 +389,8 @@ class RejectedUI extends StatelessWidget {
                 fontSize: 20.sp, fontWeight: FontWeight.bold),
             SizedBox(height: 10.sp),
 
-            ///  SHOW REJECTION NOTE
+  ///  SHOW REJECTION NOTE
+  
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -453,7 +401,7 @@ class RejectedUI extends StatelessWidget {
                   width: 4.sp,
                 ),
                 appText(
-                  note, // <-- backend reason shown here
+                  note, 
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w500,
                   color: AppColors.red,
@@ -471,7 +419,6 @@ class RejectedUI extends StatelessWidget {
                 controller.aadhaarFront.value = null;
                 controller.aadhaarBack.value = null;
                 controller.panFront.value = null;
-                controller.panBack.value = null;
 
                 controller.aadhaarSelected.value = false;
                 controller.panSelected.value = false;
