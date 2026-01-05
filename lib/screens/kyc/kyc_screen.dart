@@ -55,14 +55,15 @@ class KycScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
-          controller.resetKycForm(); // 👈 CLEAR EVERYTHING
-          return true; // allow back navigation
+          controller.resetKycForm();
+          return true;
         },
         child: Scaffold(
           backgroundColor: AppColors.scaffoldColor,
           appBar: CustomAppBar(
             title: AppStrings.KycTitle,
             showBack: true,
+             
           ),
           body: Obx(() {
             if (controller.isLoading.value) return appLoader();
@@ -112,11 +113,26 @@ class NotSubmittedUI extends StatelessWidget {
           appText("Upload Selfie (Required)",
               fontSize: 16.sp, fontWeight: FontWeight.w600),
           SizedBox(height: 10.h),
-          imagePicker(
-            image: controller.selfieImage,
-            onTap: () => controller.pickImage(
-                ImageSource.camera, controller.selfieImage),
-          ),
+          Obx(() => GestureDetector(
+                onTap: () => controller.pickImage(
+                    ImageSource.camera, controller.selfieImage),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: controller.selfieError.value
+                          ? Colors.red
+                          : AppColors.grey,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: imagePicker(
+                    image: controller.selfieImage,
+                    onTap: () => controller.pickImage(
+                        ImageSource.camera, controller.selfieImage),
+                  ),
+                ),
+              )),
 
           SizedBox(height: 20.h),
 
@@ -124,8 +140,9 @@ class NotSubmittedUI extends StatelessWidget {
           appText("Upload Document",
               fontSize: 16.sp, fontWeight: FontWeight.w600),
           SizedBox(height: 12.h),
-
+//=================================================================
           // Aadhaar checkbox
+//=================================================================
           Obx(() => GestureDetector(
                 onTap: () => controller.aadhaarSelected.toggle(),
                 child: Container(
@@ -133,9 +150,11 @@ class NotSubmittedUI extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10.r),
                     border: Border.all(
-                        color: controller.aadhaarSelected.value
-                            ? AppColors.primaryColor
-                            : AppColors.grey),
+                        color: controller.aadhaarError.value
+                            ? Colors.red
+                            : controller.aadhaarSelected.value
+                                ? AppColors.primaryColor
+                                : AppColors.grey),
                   ),
                   child: Row(
                     children: [
@@ -161,9 +180,11 @@ class NotSubmittedUI extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10.r),
                     border: Border.all(
-                        color: controller.panSelected.value
-                            ? AppColors.primaryColor
-                            : AppColors.grey),
+                        color: controller.panError.value
+                            ? Colors.red
+                            : controller.panSelected.value
+                                ? AppColors.primaryColor
+                                : AppColors.grey),
                   ),
                   child: Row(
                     children: [
@@ -222,19 +243,45 @@ Widget aadhaarSection(KycController controller) {
         validator: aadhaarValidator,
       ),
       SizedBox(height: 10.h),
-      imagePicker(
-        label: "Aadhaar Front",
-        image: controller.aadhaarFront,
-        onTap: () =>
-            controller.pickImage(ImageSource.gallery, controller.aadhaarFront),
-      ),
+      
+      Obx(() => Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: controller.aadhaarBackError.value
+                    ? Colors.red
+                    : AppColors.grey,
+              ),
+            ),
+            child: imagePicker(
+              image: controller.aadhaarFront,
+              onTap: () => controller.pickImage(
+                ImageSource.gallery,
+                controller.aadhaarFront,
+                errorFlag: controller.aadhaarFrontError,
+              ),
+            ),
+          )),
       SizedBox(height: 10.h),
-      imagePicker(
-        label: "Aadhaar Back",
-        image: controller.aadhaarBack,
-        onTap: () =>
-            controller.pickImage(ImageSource.gallery, controller.aadhaarBack),
-      ),
+     
+      Obx(() => Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: controller.aadhaarBackError.value
+                    ? Colors.red
+                    : AppColors.grey,
+              ),
+            ),
+            child: imagePicker(
+              image: controller.aadhaarBack,
+              onTap: () => controller.pickImage(
+                ImageSource.gallery,
+                controller.aadhaarBack,
+                errorFlag: controller.aadhaarBackError,
+              ),
+            ),
+          )),
       SizedBox(height: 20.h),
     ],
   );
@@ -243,24 +290,46 @@ Widget aadhaarSection(KycController controller) {
 // ==========================================================
 // PAN SECTION (FRONT ONLY)
 // ==========================================================
-Widget panSection(KycController c) {
+Widget panSection(KycController controller) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       sectionTitle("PAN Details"),
       appTextField(
-        controller: c.panNumberController,
+        controller: controller.panNumberController,
         hintText: "ABCDE1234F",
         hintColor: AppColors.darkGray,
         textColor: AppColors.black,
         validator: panValidator,
+        borderRadius: BorderRadius.all(
+          Radius.circular(8.r),
+        ),
       ),
       SizedBox(height: 10.h),
-      imagePicker(
-        label: "PAN Front",
-        image: c.panFront,
-        onTap: () => c.pickImage(ImageSource.gallery, c.panFront),
-      ),
+      // imagePicker(
+      //   label: "PAN Front",
+      //   image: controller.panFront,
+      //   onTap: () => controller.pickImage(ImageSource.gallery, controller.panFront),
+      // ),
+      Obx(() => Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: controller.panFrontError.value
+                    ? Colors.red
+                    : AppColors.grey,
+              ),
+            ),
+            child: imagePicker(
+              image: controller.panFront,
+              onTap: () => controller.pickImage(
+                ImageSource.camera,
+                controller.panFront,
+                errorFlag: controller.panFrontError,
+              ),
+            ),
+          )),
+
       SizedBox(height: 20.h),
     ],
   );
@@ -345,6 +414,9 @@ class PendingUI extends StatelessWidget {
   }
 }
 
+//======================================================
+//     Approved UI
+//======================================================
 class ApprovedUI extends StatelessWidget {
   const ApprovedUI({super.key});
 
@@ -367,7 +439,6 @@ class ApprovedUI extends StatelessWidget {
 //     REJECTED UI
 //======================================================
 
-
 class RejectedUI extends StatelessWidget {
   const RejectedUI({super.key});
 
@@ -389,8 +460,8 @@ class RejectedUI extends StatelessWidget {
                 fontSize: 20.sp, fontWeight: FontWeight.bold),
             SizedBox(height: 10.sp),
 
-  ///  SHOW REJECTION NOTE
-  
+            ///  SHOW REJECTION NOTE
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -401,7 +472,7 @@ class RejectedUI extends StatelessWidget {
                   width: 4.sp,
                 ),
                 appText(
-                  note, 
+                  note,
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w500,
                   color: AppColors.red,
