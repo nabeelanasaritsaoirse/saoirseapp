@@ -15,9 +15,8 @@ import 'package:http/http.dart' as http;
 
 class KycServices {
   final box = GetStorage();
-  // ================================================================
-  // 1️⃣ UPLOAD SINGLE KYC IMAGE (PUT /api/kyc/upload)
-  // ================================================================
+
+  // ===================== UPLOAD IMAGE =====================
   Future<Map<String, dynamic>> uploadKycImage({
     required File imageFile,
     required String type,
@@ -27,50 +26,55 @@ class KycServices {
     final uri = Uri.parse(AppURLs.KYC_UPLOAD_API);
 
     final bytes = await imageFile.readAsBytes();
-
-    final detectedMime =
+    final mime =
         lookupMimeType(imageFile.path, headerBytes: bytes.take(16).toList()) ??
-            'application/octet-stream';
-    final mimeParts = detectedMime.split('/');
+            "image/jpeg";
+    final mimeParts = mime.split('/');
 
-    var request = http.MultipartRequest("PUT", uri);
+    final request = http.MultipartRequest("PUT", uri);
     request.headers["Authorization"] = "Bearer $token";
+    request.fields["type"] = type;
+    request.fields["side"] = side;
 
-    // text fields
-    request.fields["type"] = type; // selfie / aadhaar / pan / ...
-    request.fields["side"] = side; // front / back
-
-    final filename = path.basename(imageFile.path);
-    final multipartFile = http.MultipartFile.fromBytes(
-      "image",
-      bytes,
-      filename: filename,
-      contentType: MediaType(mimeParts[0], mimeParts[1]),
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        "image",
+        bytes,
+        filename: path.basename(imageFile.path),
+        contentType: MediaType(mimeParts[0], mimeParts[1]),
+      ),
     );
-    request.files.add(multipartFile);
 
-    final streamed = await request.send().timeout(
-          const Duration(seconds: 60),
-          onTimeout: () => throw TimeoutException('Upload took too long'),
-        );
+    final streamed = await request.send();
+    final response = await http.Response.fromStream(streamed);
 
-    final resp = await http.Response.fromStream(streamed);
-
-    if (resp.statusCode == 200 || resp.statusCode == 201) {
-      return jsonDecode(resp.body);
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body);
     } else {
-      throw "Upload failed (${resp.statusCode}): ${resp.body}";
+      throw response.body;
     }
   }
 
-  // =====================================================================
-  // 2️⃣ SUBMIT KYC (POST /api/kyc/submit)
-  // =====================================================================
+  // ===================== SUBMIT KYC =====================
   Future<Map<String, dynamic>> submitKyc({
+    String? aadhaarNumber,
+    String? panNumber,
     required List<Map<String, dynamic>> documents,
   }) async {
     final token = box.read(AppConst.ACCESS_TOKEN);
     final uri = Uri.parse(AppURLs.KYC_SUBMIT_API);
+
+    final Map<String, dynamic> body = {
+      "documents": documents,
+    };
+
+    if (aadhaarNumber != null) {
+      body["aadhaarNumber"] = aadhaarNumber;
+    }
+
+    if (panNumber != null) {
+      body["panNumber"] = panNumber;
+    }
 
     final response = await http.post(
       uri,
@@ -78,7 +82,7 @@ class KycServices {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json",
       },
-      body: jsonEncode({"documents": documents}),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -88,9 +92,7 @@ class KycServices {
     }
   }
 
-  // =====================================================================
-  // 3️⃣ GET KYC STATUS (GET /api/kyc/status)
-  // =====================================================================
+  // ===================== GET KYC =====================
   Future<KycModel> getKyc() async {
     final token = box.read(AppConst.ACCESS_TOKEN);
     final uri = Uri.parse(AppURLs.KYC_API);
