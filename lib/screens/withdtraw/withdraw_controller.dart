@@ -1,8 +1,11 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../services/withdrawal_service.dart';
 import '../../widgets/app_toast.dart';
+import '../../widgets/warning_dialog.dart';
 import '../my_wallet/my_wallet.dart';
 
 class WithdrawController extends GetxController {
@@ -48,6 +51,43 @@ class WithdrawController extends GetxController {
 
   void onAmountChanged(String value) {
     showSuffix.value = value.isNotEmpty;
+  }
+
+  Future<bool> checkWithdrawalEligibility() async {
+    try {
+      isLoading.value = true;
+      
+
+      final response = await WithdrawalService.getKycWithdrawalStatus();
+
+      if (response == null) {
+      
+        return false;
+      }
+
+     
+      if (response.isEligibleForWithdrawal) {
+      
+        return true;
+      }
+
+    
+
+      KycRequiredDialog.show();
+
+      return false;
+    } catch (e) {
+    
+
+      appToast(
+        title: "Error",
+        content: "Failed to verify KYC status",
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+     
+    }
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/select_account/managa_account.dart';
 
 import '../edit_profile/edit_profile_screen.dart';
 import '../kyc/kyc_controller.dart';
@@ -293,7 +294,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         case "KYC":
                           Get.to(() => KycScreen());
                           break;
-
+                        case "Account":
+                          Get.to(() => ManageAccountScreen());
+                          break;
                         case "Privacy Policy":
                           Get.to(() => PrivacyPolicyScreen());
                           break;

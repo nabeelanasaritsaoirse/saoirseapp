@@ -82,21 +82,25 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   items: [
                     _navItem(
+                      index: 0,
                       icon: Iconsax.home,
                       activeIcon: Iconsax.home,
                       label: 'Home',
                     ),
                     _navItem(
+                      index: 1,
                       icon: Iconsax.category,
                       activeIcon: Iconsax.category5,
                       label: 'Category',
                     ),
                     _navItem(
+                      index: 2,
                       icon: Iconsax.gift,
                       activeIcon: Iconsax.gift,
                       label: 'Referral',
                     ),
                     _navItem(
+                      index: 3,
                       icon: Iconsax.shopping_cart,
                       activeIcon: Iconsax.shopping_cart,
                       label: 'Cart',
@@ -104,6 +108,7 @@ class DashboardScreen extends StatelessWidget {
                           cartController.cartCount.value, //directy passing
                     ),
                     _navItem(
+                      index: 4,
                       icon: Iconsax.user,
                       activeIcon: Iconsax.user,
                       label: 'You',
@@ -120,11 +125,13 @@ class DashboardScreen extends StatelessWidget {
 
   /// Custom BottomNav Item Builder with Badge Support
   BottomNavigationBarItem _navItem({
+    required int index,
     required IconData icon,
     required IconData activeIcon,
     required String label,
     int? badgeCount,
   }) {
+    final bool isReferral = index == 2;
     return BottomNavigationBarItem(
       label: label,
 
@@ -132,7 +139,24 @@ class DashboardScreen extends StatelessWidget {
       icon: Stack(
         clipBehavior: Clip.none,
         children: [
-          Icon(icon, size: 22.sp),
+          isReferral
+              ? Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 18.sp,
+                    color: Colors.white,
+                  ),
+                )
+              : Icon(
+                  icon,
+                  size: 22.sp,
+                  color: AppColors.grey,
+                ),
           if (badgeCount != null && badgeCount > 0)
             Positioned(
               right: -4,
@@ -160,14 +184,31 @@ class DashboardScreen extends StatelessWidget {
       activeIcon: Stack(
         clipBehavior: Clip.none,
         children: [
-          Container(
-            padding: EdgeInsets.all(6.w),
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(activeIcon, color: AppColors.white, size: 19.sp),
-          ),
+          isReferral
+              ? Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    activeIcon,
+                    size: 18.sp,
+                    color: AppColors.white,
+                  ),
+                )
+              // OTHERS → NO CIRCLE
+              : Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    activeIcon,
+                    size: 22.sp,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
           if (badgeCount != null && badgeCount > 0)
             Positioned(
               right: -2,

@@ -113,6 +113,9 @@ class AppStrings {
 
   // KYC page
   static String KycTitle = "KYC Status";
+  static String kyc_required_discription =
+      "You must complete your KYC before processing withdrawal.";
+  static String kyc_required = "KYC Required";
 
   //Cart page
   static String carttitle = "Cart";

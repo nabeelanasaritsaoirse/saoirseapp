@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/select_account/select_account_controller.dart';
 
 // ---------------- AUTH & USER ----------------
 import '../screens/add_address/add_address_controller.dart';
@@ -72,6 +73,11 @@ class AllController extends Bindings {
     );
     Get.lazyPut<InvestmentStatusController>(
       () => InvestmentStatusController(),
+      fenix: true,
+    );
+
+    Get.lazyPut<SelectAccountController>(
+      () => SelectAccountController(),
       fenix: true,
     );
 
