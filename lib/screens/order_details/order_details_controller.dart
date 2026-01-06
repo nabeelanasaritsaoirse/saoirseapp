@@ -6,6 +6,7 @@ import '../../models/coupon_model.dart';
 import '../../models/coupon_validation_model.dart';
 import '../../models/order_response_model.dart';
 import '../../services/coupon_service.dart';
+import '../../services/notification_service.dart';
 import '../../services/order_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_toast.dart';
@@ -15,8 +16,11 @@ import '../razorpay/razorpay_controller.dart';
 
 class OrderDetailsController extends GetxController {
   final walletController = Get.find<MyWalletController>();
+  NotificationService notificationService = NotificationService();
   RxInt selectedDays = 0.obs;
   RxDouble selectedAmount = 0.0.obs;
+  RxBool enableAutoPay = true.obs;
+  RxBool showWalletAutoPay = false.obs;
 
   var quantity = 1.obs;
   String orderid = "";
@@ -36,7 +40,8 @@ class OrderDetailsController extends GetxController {
 
   RxString appliedCouponCode = "".obs;
 
-  RxString selectedPaymentMethod = PaymentMethod.razorpay.obs;
+  // RxString selectedPaymentMethod = PaymentMethod.razorpay.obs;
+  RxString selectedPaymentMethod = "".obs;
 
   // storing first values for remove coupon
   double originalAmount = 0.0;
@@ -45,6 +50,8 @@ class OrderDetailsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    selectedPaymentMethod.value = PaymentMethod.razorpay;
+    enableAutoPay.value = true;
     fetchCoupons();
   }
 
@@ -225,7 +232,37 @@ class OrderDetailsController extends GetxController {
         return;
       }
 
+      final data = response['data'];
+
+      if (data == null || data is! Map<String, dynamic>) {
+        appToast(
+          error: true,
+          content: "Invalid payment response from server",
+        );
+        return;
+      }
+
+      final payment = OrderResponseModel.fromJson(data);
+
+      // ---------------- WALLET FLOW ----------------
       if (selectedPaymentMethod.value == PaymentMethod.wallet) {
+        final String orderId = payment.order.id;
+
+        if (enableAutoPay.value == true && orderId.isNotEmpty) {
+          final autoPayResponse =
+              await OrderService.enableAutoPay(orderId: orderId);
+
+          if (autoPayResponse != null && autoPayResponse.success) {
+            await notificationService.sendCustomNotification(
+              title: "Autopay Enabled",
+              message:
+                  "Your payments will now be made automatically from your wallet.",
+              sendPush: true,
+              sendInApp: true,
+            );
+          }
+        }
+
         Get.dialog(
           appLoader(),
           barrierDismissible: false,
@@ -241,18 +278,6 @@ class OrderDetailsController extends GetxController {
 
         return;
       }
-
-      final data = response['data'];
-
-      if (data == null || data is! Map<String, dynamic>) {
-        appToast(
-          error: true,
-          content: "Invalid payment response from server",
-        );
-        return;
-      }
-
-      final payment = OrderResponseModel.fromJson(data);
 
       if (payment.payment.razorpayOrderId.isEmpty) {
         appToast(
@@ -283,8 +308,18 @@ class OrderDetailsController extends GetxController {
     selectedAmount.value = amount;
   }
 
+  // void selectPaymentMethod(String method) {
+  //   selectedPaymentMethod.value = method;
+  // }
+
   void selectPaymentMethod(String method) {
     selectedPaymentMethod.value = method;
+
+    if (method == PaymentMethod.wallet) {
+      showWalletAutoPay.value = true;
+    } else {
+      showWalletAutoPay.value = false;
+    }
   }
 
   // ------------------------- QUANTITY ----------------------------------------

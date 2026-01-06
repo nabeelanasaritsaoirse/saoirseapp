@@ -15,14 +15,6 @@ class AppURLs {
   static String USER_UPDATE_API = BASE_API + "api/auth/profiles/";
   static String PROFILE_UPDATE_API = BASE_API + "api/users/";
 
-  // home screen api
-  // static String POPULAR_PRODUCT_API =
-  //     BASE_API + "api/featured-lists/most-popular?";
-  // static String BEST_SELLER_PRODUCT_API =
-  //     BASE_API + "api/featured-lists/best-selling?";
-  // static String TRENDING_PRODUCT_API =
-  //     BASE_API + "api/featured-lists/trending-products?";
-
   static String FEATURED_LISTS_API = BASE_API + "api/featured-lists";
 
   //refferal api
@@ -89,6 +81,7 @@ class AppURLs {
   static String NOTIFICATIONS = BASE_API + "api/notifications";
   static String UNREAD_NOTIFICATIONS =
       BASE_API + "api/notifications/unread-count";
+  static String ENABLE_AUTOPAY = BASE_API + "api/installments/autopay/enable";
 
   // Orders History
   static String ORDER_HISTORY_API = BASE_API + "api/installments/orders";

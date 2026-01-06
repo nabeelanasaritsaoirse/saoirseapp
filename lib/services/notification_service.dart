@@ -1,4 +1,6 @@
+import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
+import '../main.dart';
 import '../models/notification_details_response_model.dart';
 import '../models/notification_response.dart';
 import '../services/api_service.dart';
@@ -213,6 +215,12 @@ class NotificationService {
     bool sendInApp = true,
   }) async {
     try {
+      final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+      if (token == null || token.isEmpty) {
+        return false;
+      }
+
       final body = {
         "title": title,
         "message": message,
@@ -229,8 +237,6 @@ class NotificationService {
         },
         onSuccess: (json) => json,
       );
-
-      if (response != null) {}
 
       return response != null && response["success"] == true;
     } catch (e) {

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:android_intent_plus/android_intent.dart';
@@ -21,7 +22,7 @@ class ReferralController extends GetxController {
 
   // Observables
   final referralCode = ''.obs;
-  final isLoading = false.obs;
+
   final isDashboardLoading = false.obs;
 
   final referrals = <Referral>[].obs;
@@ -43,32 +44,22 @@ class ReferralController extends GetxController {
   }
 
   Future<void> refreshAll() async {
-    if (isLoading.value) return;
-
     try {
-      isLoading.value = true;
-
       await Future.wait([
         fetchReferralStats(),
         fetchReferralData(),
         fetchReferrerInfo(),
       ]);
-    } finally {
-      isLoading.value = false;
-    }
+    } finally {}
   }
 
   Future<void> fetchReferrerInfo() async {
-    isLoading.value = true;
-
     final result = await _referralService.getReferrerInfo();
 
     if (result != null) {
     } else {}
 
     referrer.value = result;
-
-    isLoading.value = false;
   }
 
   // ---------------------------------------------------------------------------
@@ -100,7 +91,7 @@ class ReferralController extends GetxController {
 
   Future<void> fetchReferralData() async {
     try {
-      isDashboardLoading(true);
+      isDashboardLoading.value = true;
 
       final response = await _referralService.fetchReferralResponseFromServer();
 
@@ -116,7 +107,7 @@ class ReferralController extends GetxController {
     } catch (e) {
       appToast(error: true, content: e.toString());
     } finally {
-      isDashboardLoading(false);
+      isDashboardLoading.value = false;
     }
   }
 
@@ -141,8 +132,6 @@ class ReferralController extends GetxController {
 
   Future<void> fetchReferralStats() async {
     try {
-      isLoading(true);
-
       final response = await _referralService.fetchReferralStats();
 
       if (response != null && response.success) {
@@ -150,8 +139,8 @@ class ReferralController extends GetxController {
         totalReferrals.value = data.totalReferrals;
         referralLimit.value = data.referralLimit;
       }
-    } finally {
-      isLoading(false);
+    } catch (e) {
+      log(e.toString());
     }
   }
   // ---------------------------------------------------------------------------

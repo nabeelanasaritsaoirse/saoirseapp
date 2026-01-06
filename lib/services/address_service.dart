@@ -38,4 +38,46 @@ class AddressService {
 
     return result ?? false;
   }
+
+  // ---------------- EDIT ADDRESS ----------------
+  static Future<bool> editAddress({
+    required String addressId,
+    required Map<String, dynamic> body,
+  }) async {
+    String? userId = storage.read(AppConst.USER_ID);
+
+    if (userId == null || userId.isEmpty) {
+      return false;
+    }
+
+    final String url = "${AppURLs.ADDRESS_API}$userId/addresses/$addressId";
+
+    final result = await APIService.putRequest<bool>(
+      url: url,
+      body: body,
+      onSuccess: (_) => true,
+    );
+
+    return result ?? false;
+  }
+
+  // ---------------- DELETE ADDRESS ----------------
+  static Future<bool> deleteAddress({
+    required String addressId,
+  }) async {
+    String? userId = storage.read(AppConst.USER_ID);
+
+    if (userId == null || userId.isEmpty) {
+      return false;
+    }
+
+    final String url = "${AppURLs.ADDRESS_API}$userId/addresses/$addressId";
+
+    final result = await APIService.deleteRequest<bool>(
+      url: url,
+      onSuccess: (_) => true,
+    );
+
+    return result ?? false;
+  }
 }
