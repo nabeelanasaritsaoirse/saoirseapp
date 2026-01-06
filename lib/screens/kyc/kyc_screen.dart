@@ -323,7 +323,7 @@ Widget panSection(KycController controller) {
             child: imagePicker(
               image: controller.panFront,
               onTap: () => controller.pickImage(
-                ImageSource.camera,
+                ImageSource.gallery,
                 controller.panFront,
                 errorFlag: controller.panFrontError,
               ),
