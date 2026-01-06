@@ -122,6 +122,7 @@ class AppStrings {
 
   // select address screen
   static String select_address = "Select Address";
+  static String manage_address = "Manage Address";
 
   //snackbars
   static String no_internet = 'No internet connection';

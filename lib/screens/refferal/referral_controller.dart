@@ -24,7 +24,7 @@ class ReferralController extends GetxController {
 
   // Observables
   final referralCode = ''.obs;
-  final isLoading = false.obs;
+
   final isDashboardLoading = false.obs;
 
   final referrals = <Referral>[].obs;
@@ -47,10 +47,10 @@ class ReferralController extends GetxController {
 
   Future<void> refreshAll() async {
     log("🔄 REFRESH STARTED");
-    if (isLoading.value) return;
+ 
 
     try {
-      isLoading.value = true;
+      
 
       await Future.wait([
         fetchReferralStats(),
@@ -60,14 +60,14 @@ class ReferralController extends GetxController {
     } catch (e) {
       log("🔴 Refresh failed: $e");
     } finally {
-      isLoading.value = false;
+  
     }
   }
 
   Future<void> fetchReferrerInfo() async {
     log("\n================ FETCH REFERRER INFO ================");
     log("📡 Calling API: /api/referral/referrer-info");
-    isLoading.value = true;
+   
 
     final result = await _referralService.getReferrerInfo();
 
@@ -84,7 +84,7 @@ class ReferralController extends GetxController {
 
     referrer.value = result;
 
-    isLoading.value = false;
+    
     log("=====================================================\n");
   }
 
@@ -121,7 +121,7 @@ class ReferralController extends GetxController {
 
   Future<void> fetchReferralData() async {
     try {
-      isDashboardLoading(true);
+        isDashboardLoading.value = true;
 
       final response = await _referralService.fetchReferralResponseFromServer();
 
@@ -137,7 +137,7 @@ class ReferralController extends GetxController {
     } catch (e) {
       appToast(error: true, content: e.toString());
     } finally {
-      isDashboardLoading(false);
+        isDashboardLoading.value = false;
     }
   }
 
@@ -162,7 +162,7 @@ class ReferralController extends GetxController {
 
   Future<void> fetchReferralStats() async {
     try {
-      isLoading(true);
+ 
 
       final response = await _referralService.fetchReferralStats();
 
@@ -172,10 +172,8 @@ class ReferralController extends GetxController {
         referralLimit.value = data.referralLimit;
       }
     } catch (e) {
-      print("Controller Error: $e");
-    } finally {
-      isLoading(false);
-    }
+      log(e.toString());
+    } 
   }
   // ---------------------------------------------------------------------------
   // SHARE OPTIONS

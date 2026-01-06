@@ -888,6 +888,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   void _showPaymentMethodSheet() {
     walletController.fetchWallet();
 
+    // 🔹 TEMP state (does NOT affect order until confirmed)
+    final RxString tempPaymentMethod =
+        orderController.selectedPaymentMethod.value.obs;
+    final RxBool tempEnableAutoPay = orderController.enableAutoPay.value.obs;
+
     Get.bottomSheet(
       Container(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 25.h),
@@ -902,7 +907,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with close button
+            // ---------------- HEADER ----------------
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -916,21 +921,22 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   onPressed: () => Get.back(),
                   icon: Icon(Icons.close, size: 24.sp),
                   padding: EdgeInsets.zero,
-                  constraints: BoxConstraints(),
+                  constraints: const BoxConstraints(),
                 ),
               ],
             ),
 
             SizedBox(height: 15.h),
 
+            // ---------------- WALLET OPTION ----------------
             Obx(() {
               final walletData = walletController.wallet.value;
               final walletBalance = walletData?.walletBalance ?? 0.0;
+              final isSelected =
+                  tempPaymentMethod.value == PaymentMethod.wallet;
 
-              final isSelected = orderController.selectedPaymentMethod.value ==
-                  PaymentMethod.wallet;
               return GestureDetector(
-                onTap: () async {
+                onTap: () {
                   if (walletBalance < orderController.selectedAmount.value) {
                     appToaster(
                       content: "Insufficient wallet balance",
@@ -939,110 +945,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     return;
                   }
 
-                  orderController.selectPaymentMethod(PaymentMethod.wallet);
-                  await Future.delayed(const Duration(milliseconds: 400));
-                  Get.back();
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.primaryColor.withOpacity(0.08)
-                        : AppColors.white,
-                    border: Border.all(
-                      color:
-                          isSelected ? AppColors.primaryColor : AppColors.grey,
-                      width: isSelected ? 2 : 1.5,
-                    ),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Row(
-                    children: [
-                      // Icon Container
-                      Container(
-                        padding: EdgeInsets.all(10.w),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                        child: Icon(
-                          Icons.account_balance_wallet_rounded,
-                          color: AppColors.primaryColor,
-                          size: 24.sp,
-                        ),
-                      ),
-
-                      SizedBox(width: 12.w),
-
-                      // Text Content
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Wallet Payment",
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              "Balance: ₹${walletBalance.toStringAsFixed(1)}",
-                              style: TextStyle(
-                                fontSize: 13.sp,
-                                color: AppColors.grey,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // ✅ Modern Animated Radio
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        width: 24.w,
-                        height: 24.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: isSelected
-                              ? AppColors.primaryColor
-                              : Colors.transparent,
-                          border: Border.all(
-                            color: isSelected
-                                ? AppColors.primaryColor
-                                : AppColors.grey.withOpacity(0.5),
-                            width: 2,
-                          ),
-                        ),
-                        child: isSelected
-                            ? Icon(
-                                Icons.check,
-                                size: 16.sp,
-                                color: Colors.white,
-                              )
-                            : null,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-
-            SizedBox(height: 12.h),
-
-            Obx(() {
-              final isSelected = orderController.selectedPaymentMethod.value ==
-                  PaymentMethod.razorpay;
-
-              return GestureDetector(
-                onTap: () async {
-                  orderController.selectPaymentMethod(PaymentMethod.razorpay);
-                  await Future.delayed(const Duration(milliseconds: 400));
-                  Get.back();
+                  // ✅ TEMP selection only
+                  tempPaymentMethod.value = PaymentMethod.wallet;
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
@@ -1054,14 +958,142 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     border: Border.all(
                       color: isSelected
                           ? AppColors.primaryColor
-                          : AppColors.grey.withOpacity(0.3),
+                          : AppColors.grey.withOpacity(0.4),
+                      width: isSelected ? 2 : 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(10.w),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            child: Icon(
+                              Icons.account_balance_wallet_rounded,
+                              color: AppColors.primaryColor,
+                              size: 24.sp,
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Wallet Payment",
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  "Balance: ₹${walletBalance.toStringAsFixed(1)}",
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    color: AppColors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          _buildRadio(isSelected),
+                        ],
+                      ),
+                      SizedBox(height: 6.h),
+                      Padding(
+                        padding: EdgeInsets.only(left: 3.w),
+                        child: Obx(() {
+                          final show =
+                              tempPaymentMethod.value == PaymentMethod.wallet;
+
+                          return AnimatedOpacity(
+                            duration: const Duration(milliseconds: 250),
+                            opacity: show ? 1 : 0,
+                            child: AnimatedSlide(
+                              duration: const Duration(milliseconds: 250),
+                              offset:
+                                  show ? Offset.zero : const Offset(0, -0.1),
+                              child: show
+                                  ? Padding(
+                                      padding:
+                                          EdgeInsets.only(left: 3.w, top: 6.h),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 18.w,
+                                            height: 18.w,
+                                            child: Checkbox(
+                                              value: tempEnableAutoPay.value,
+                                              onChanged: (val) {
+                                                tempEnableAutoPay.value =
+                                                    val ?? true;
+                                              },
+                                              activeColor:
+                                                  AppColors.primaryColor,
+                                              materialTapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                            ),
+                                          ),
+                                          SizedBox(width: 8.w),
+                                          Text(
+                                            "Enable AutoPay for future payments",
+                                            style: TextStyle(
+                                              fontSize: 12.5.sp,
+                                              color: AppColors.grey,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+
+            SizedBox(height: 12.h),
+
+            // ---------------- RAZORPAY OPTION ----------------
+            Obx(() {
+              final isSelected =
+                  tempPaymentMethod.value == PaymentMethod.razorpay;
+
+              return GestureDetector(
+                onTap: () {
+                  // ✅ TEMP selection only
+                  tempPaymentMethod.value = PaymentMethod.razorpay;
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primaryColor.withOpacity(0.08)
+                        : AppColors.white,
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.primaryColor
+                          : AppColors.grey.withOpacity(0.4),
                       width: isSelected ? 2 : 1.5,
                     ),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Row(
                     children: [
-                      // Icon Container
                       Container(
                         padding: EdgeInsets.all(10.w),
                         decoration: BoxDecoration(
@@ -1074,10 +1106,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           size: 24.sp,
                         ),
                       ),
-
                       SizedBox(width: 12.w),
-
-                      // Text Content
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1087,7 +1116,6 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                               style: TextStyle(
                                 fontSize: 15.sp,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.black87,
                               ),
                             ),
                             SizedBox(height: 4.h),
@@ -1096,38 +1124,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                               style: TextStyle(
                                 fontSize: 13.sp,
                                 color: AppColors.grey,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
                       ),
-
-                      // ✅ Modern Animated Radio
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        width: 24.w,
-                        height: 24.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: isSelected
-                              ? AppColors.primaryColor
-                              : Colors.transparent,
-                          border: Border.all(
-                            color: isSelected
-                                ? AppColors.primaryColor
-                                : AppColors.grey.withOpacity(0.5),
-                            width: 2,
-                          ),
-                        ),
-                        child: isSelected
-                            ? Icon(
-                                Icons.check,
-                                size: 16.sp,
-                                color: Colors.white,
-                              )
-                            : null,
-                      ),
+                      _buildRadio(isSelected),
                     ],
                   ),
                 ),
@@ -1135,12 +1137,73 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             }),
 
             SizedBox(height: 20.h),
+
+            // ---------------- CONFIRM BUTTON ----------------
+            Obx(() {
+              final canConfirm = tempPaymentMethod.value.isNotEmpty;
+
+              return SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: canConfirm
+                      ? () {
+                          // ✅ FINAL COMMIT
+                          orderController.selectPaymentMethod(
+                            tempPaymentMethod.value,
+                          );
+
+                          orderController.enableAutoPay.value =
+                              tempEnableAutoPay.value;
+
+                          Get.back();
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor,
+                    disabledBackgroundColor: AppColors.grey.withOpacity(0.4),
+                    padding: EdgeInsets.symmetric(vertical: 14.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  child: Text(
+                    "Confirm Payment Method",
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              );
+            }),
           ],
         ),
       ),
       isScrollControlled: true,
-      isDismissible: true,
       enableDrag: true,
+    );
+  }
+
+// ---------------- RADIO HELPER ----------------
+  Widget _buildRadio(bool isSelected) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      width: 24.w,
+      height: 24.w,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isSelected ? AppColors.primaryColor : Colors.transparent,
+        border: Border.all(
+          color: isSelected
+              ? AppColors.primaryColor
+              : AppColors.grey.withOpacity(0.5),
+          width: 2,
+        ),
+      ),
+      child: isSelected
+          ? Icon(Icons.check, size: 16.sp, color: Colors.white)
+          : null,
     );
   }
 

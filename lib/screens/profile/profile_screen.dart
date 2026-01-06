@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/manage_address/manage_address_screen.dart';
 
 import '../edit_profile/edit_profile_screen.dart';
 import '../kyc/kyc_controller.dart';
@@ -306,6 +307,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         case "Log Out":
                           controller.confirmLogout();
                           break;
+                        case "Manage Address" :
+                         Get.to(ManageAddressScreen());
 
                         default:
                           log("Clicked $title");

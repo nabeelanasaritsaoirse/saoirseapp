@@ -95,4 +95,37 @@ class Address {
       '_id': id,
     };
   }
+
+  Address copyWith({
+  String? name,
+  String? addressLine1,
+  String? addressLine2,
+  String? city,
+  String? state,
+  String? pincode,
+  String? country,
+  String? phoneNumber,
+  bool? isDefault,
+  String? addressType,
+  String? landmark,
+  DateTime? updatedAt,
+}) {
+  return Address(
+    id: id,
+    name: name ?? this.name,
+    addressLine1: addressLine1 ?? this.addressLine1,
+    addressLine2: addressLine2 ?? this.addressLine2,
+    city: city ?? this.city,
+    state: state ?? this.state,
+    pincode: pincode ?? this.pincode,
+    country: country ?? this.country,
+    phoneNumber: phoneNumber ?? this.phoneNumber,
+    isDefault: isDefault ?? this.isDefault,
+    addressType: addressType ?? this.addressType,
+    landmark: landmark ?? this.landmark,
+    createdAt: createdAt,
+    updatedAt: updatedAt ?? DateTime.now(),
+  );
+}
+
 }

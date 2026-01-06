@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/address_response.dart';
 
 import '../../constants/app_strings.dart';
 import '../../widgets/custom_appbar.dart';
@@ -12,7 +13,8 @@ import '/widgets/app_text_field.dart';
 import 'add_address_validation.dart';
 
 class AddAddress extends StatefulWidget {
-  const AddAddress({super.key});
+  final Address? address;
+  const AddAddress({super.key, this.address});
 
   @override
   State<AddAddress> createState() => _AddAddressState();
@@ -20,6 +22,18 @@ class AddAddress extends StatefulWidget {
 
 class _AddAddressState extends State<AddAddress> {
   final _formKey = GlobalKey<FormState>();
+  late AddAddressController addAddressController;
+
+  @override
+  void initState() {
+    super.initState();
+    addAddressController = Get.find<AddAddressController>();
+
+    // ✅ PREFILL DATA
+    if (widget.address != null) {
+      addAddressController.setEditAddress(widget.address!);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +43,9 @@ class _AddAddressState extends State<AddAddress> {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
       appBar: CustomAppBar(
-        title: AppStrings.add_address_label,
+        title: addAddressController.isEdit.value
+            ? "Edit Address"
+            : AppStrings.add_address_label,
         showBack: true,
       ),
       body: SingleChildScrollView(

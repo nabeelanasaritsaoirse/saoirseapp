@@ -72,6 +72,7 @@ class AppURLs {
 
   // Address api
   static String ADDRESS_API = BASE_API + "api/users/";
+  
 
   // KYC api
   static String KYC_API = BASE_API + "api/kyc/status";
@@ -89,6 +90,7 @@ class AppURLs {
   static String NOTIFICATIONS = BASE_API + "api/notifications";
   static String UNREAD_NOTIFICATIONS =
       BASE_API + "api/notifications/unread-count";
+      static String ENABLE_AUTOPAY =BASE_API + "api/installments/autopay/enable";
 
   // Orders History
   static String ORDER_HISTORY_API = BASE_API + "api/installments/orders";

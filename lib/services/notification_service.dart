@@ -2,6 +2,8 @@
 
 import 'dart:developer';
 
+import 'package:saoirse_app/constants/app_constant.dart';
+import 'package:saoirse_app/main.dart';
 import 'package:saoirse_app/models/notification_details_response_model.dart';
 import '../constants/app_urls.dart';
 import '../models/notification_response.dart';
@@ -242,13 +244,22 @@ class NotificationService {
     ).then((value) => value ?? false);
   }
 
-  Future<bool> sendCustomNotification({
+
+
+Future<bool> sendCustomNotification({
   required String title,
   required String message,
   bool sendPush = true,
   bool sendInApp = true,
 }) async {
   try {
+    final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+    if (token == null || token.isEmpty) {
+      log("❌ Notification token missing");
+      return false;
+    }
+
     final body = {
       "title": title,
       "message": message,
@@ -266,16 +277,14 @@ class NotificationService {
       onSuccess: (json) => json,
     );
 
-    if (response != null) {
-      log("SERVER RESPONSE: $response");   // ✔ This is perfect
-    }
+    log("📨 Notification response: $response");
 
     return response != null && response["success"] == true;
-
   } catch (e) {
     log("❌ sendCustomNotification Error: $e");
     return false;
   }
 }
+
 
 }

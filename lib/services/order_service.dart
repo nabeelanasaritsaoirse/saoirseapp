@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:saoirse_app/models/enable_autopay_response.dart';
+
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -24,4 +26,32 @@ class OrderService {
       },
     );
   }
+  // ---------------- ENABLE AUTOPAY ----------------
+
+
+  static Future<EnableAutoPayResponse?> enableAutoPay({
+  required String orderId,
+}) async {
+  try {
+      final token = await storage.read(AppConst.ACCESS_TOKEN);
+    final response = await APIService.postRequest(
+      url: "${AppURLs.ENABLE_AUTOPAY}/$orderId",
+      body: { "priority": 1,},
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (json) => json,
+    );
+
+    if (response != null) {
+      return EnableAutoPayResponse.fromJson(response);
+    }
+    return null;
+  } catch (e) {
+    log("❌ enableAutoPay Error: $e");
+    return null;
+  }
+}
+
 }

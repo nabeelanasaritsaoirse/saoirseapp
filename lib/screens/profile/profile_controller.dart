@@ -65,11 +65,13 @@ class ProfileController extends GetxController {
 
   final settings = [
     // {"icon": AppAssets.password_security, "title": "Password & security"},
+    {"icon": AppAssets.address, "title": "Manage Address"},
     {"icon": AppAssets.kyc, "title": "KYC"},
     {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
     {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
     // {"icon": AppAssets.faq, "title": "FAQ"},
     // {"icon": AppAssets.about, "title": "About EPI"},
+
     {"icon": AppAssets.logout, "title": "Log Out"},
   ];
 

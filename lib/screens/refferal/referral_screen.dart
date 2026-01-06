@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -192,7 +193,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
             color: AppColors.primaryColor, // spinner color
             backgroundColor: AppColors.white,
             child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               padding: EdgeInsets.all(16.w),
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: _buildContentSection(
@@ -246,39 +247,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
         Center(
           child: Obx(() {
-            if (controller.isLoading.value) {
-              // loading spinner
-              return Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 24.w,
-                  vertical: 16.h,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.shadowColor),
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      height: 22.h,
-                      width: 22.w,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.w,
-                        color: AppColors.darkGray,
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    appText(
-                      AppStrings.fetching_message,
-                      fontSize: 14.sp,
-                      color: AppColors.grey,
-                    ),
-                  ],
-                ),
-              );
-            }
-
             // no code fetched yet or failed
             if (controller.referralCode.value.isEmpty) {
               return Container(
@@ -592,11 +560,10 @@ class _ReferralScreenState extends State<ReferralScreen> {
         // Referral list / empty state / loading
         Obx(() {
           if (controller.isDashboardLoading.value) {
-            return SizedBox(
-              height: 40.h,
-              width: 150.w,
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 40),
               child: Center(
-                child: appLoader(),
+                child: CupertinoActivityIndicator(color: AppColors.grey),
               ),
             );
           }
