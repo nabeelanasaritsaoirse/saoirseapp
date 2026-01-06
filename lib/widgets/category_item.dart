@@ -59,7 +59,7 @@ class CategoryItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   fontSize: 10.sp,
-                  height: 1.2, // 🔥 IMPORTANT
+                  height: 1.2, 
                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   color:
                       isSelected ? AppColors.primaryColor : AppColors.textBlack,

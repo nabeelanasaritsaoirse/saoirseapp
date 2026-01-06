@@ -1,14 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/category/sub_category_screen.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
-import '../../models/category_model.dart';
+
 import '../../widgets/app_text.dart';
-import '../../widgets/category_item.dart';
 import '../../widgets/custom_appbar.dart';
 import '../productListing/product_listing.dart';
 import '../profile/profile_controller.dart';
@@ -33,8 +35,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
     super.initState();
 
     Future.microtask(() {
-      final controller = Get.find<CategoryController>();
-
       if (widget.initialIndex < controller.categoryGroups.length) {
         controller.selectedIndex.value = widget.initialIndex;
       }
@@ -44,278 +44,144 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: AppColors.paperColor,
-        appBar: CustomAppBar(
-          title: AppStrings.category_title,
-          actions: [
-            IconBox(
-                image: AppAssets.search,
-                padding: 9.w,
-                onTap: () {
-                  Get.to(() => const ProductListing());
-                }),
-            SizedBox(width: 8.w),
-            Obx(() {
-              final count = Get.find<ProfileController>().wishlistCount.value;
+      backgroundColor: AppColors.paperColor,
 
-              return Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  IconBox(
-                    image: AppAssets.wish,
-                    padding: 8.w,
-                    onTap: () {
-                      Get.to(() => const WishlistScreen());
-                    },
-                  ),
-
-                  // Show badge only if count > 0
-                  if (count > 0)
-                    Positioned(
-                      right: -2,
-                      top: -2,
-                      child: Container(
-                        padding: EdgeInsets.all(4.r),
-                        decoration: BoxDecoration(
-                          color: AppColors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          count > 9 ? "9+" : count.toString(),
-                          style: TextStyle(
-                            color: AppColors.white,
-                            fontSize: 9.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
+     
+      appBar: CustomAppBar(
+        title: AppStrings.category_title,
+        actions: [
+          IconBox(
+            image: AppAssets.search,
+            padding: 9.w,
+            onTap: () {
+              Get.to(() => const ProductListing());
+            },
+          ),
+          SizedBox(width: 8.w),
+          Obx(() {
+            final count = profileController.wishlistCount.value;
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                IconBox(
+                  image: AppAssets.wish,
+                  padding: 8.w,
+                  onTap: () {
+                    Get.to(() => const WishlistScreen());
+                  },
+                ),
+                if (count > 0)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      padding: EdgeInsets.all(4.r),
+                      decoration: const BoxDecoration(
+                        color: AppColors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        count > 9 ? "9+" : count.toString(),
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 9.sp,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                ],
-              );
-            }),
-            SizedBox(width: 12.w),
-          ],
-        ),
-        body: Obx(() {
-          if (controller.isLoading.value) {
-            return Center(child: CategoryScreenShimmer());
-          }
-          if (controller.errorMessage.value.isNotEmpty) {
-            return Center(
-              child: appText(controller.errorMessage.value),
+                  ),
+              ],
             );
-          }
-          if (controller.categoryGroups.isEmpty) {
-            return Center(
-              child: appText(
-                'No categories found',
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-              ),
-            );
-          }
-//------------------ Left Sidebar Categories------------------//
-          return Row(
-            children: [
-              Container(
-                width: 85.h,
-                color: AppColors.white,
+          }),
+          SizedBox(width: 12.w),
+        ],
+      ),
+
+
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const CategoryScreenShimmer();
+        }
+
+        if (controller.errorMessage.value.isNotEmpty) {
+          return Center(
+            child: appText(controller.errorMessage.value),
+          );
+        }
+
+        if (controller.categoryGroups.isEmpty) {
+          return Center(
+            child: appText(
+              'No categories found',
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          );
+        }
+
+        return Padding(
+          padding: EdgeInsets.all(12.w),
+          child: GridView.builder(
+            itemCount: controller.categoryGroups.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3, // As per Figma
+              mainAxisSpacing: 14.h,
+              crossAxisSpacing: 14.w,
+              childAspectRatio: 0.85,
+            ),
+            itemBuilder: (context, index) {
+              final category = controller.categoryGroups[index];
+
+              return GestureDetector(
+                onTap: () {
+                  log("Tapped category: ${category.name}");
+                  () => SubCategoryScreen(
+                        category: category,
+                      );
+                },
                 child: Column(
                   children: [
-                    Expanded(
-                      child: ListView.separated(
-                        controller: controller.scrollController.value,
-                        physics: const ClampingScrollPhysics(), // IMPORTANT
-                        padding: EdgeInsets.zero,
-                        itemCount: controller.categoryGroups.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 0),
-                        itemBuilder: (context, index) {
-                          return CategoryItem(
-                            index: index,
-                            controller: controller,
-                          );
-                        },
+                    Container(
+                      height: 80.h,
+                      width: 80.h,
+                      decoration: BoxDecoration(
+                        color: AppColors.lightGrey,
+                        borderRadius: BorderRadius.circular(14.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.shadowColor,
+                            blurRadius: 6.r,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      padding: EdgeInsets.all(12.w),
+                      child: Image.network(
+                        category.image?.url ?? '',
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => Icon(
+                          Icons.image_outlined,
+                          size: 40.sp,
+                          color: AppColors.grey,
+                        ),
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Get.to(() => const ProductListing());
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 15.h,
-                          horizontal: 7.w,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          border: Border(
-                            top: BorderSide(
-                              color: AppColors.lightGrey,
-                              width: 1.w,
-                            ),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.grid_view_rounded,
-                              size: 24.sp,
-                              color: AppColors.primaryColor,
-                            ),
-                            SizedBox(height: 7.h),
-                            appText(
-                              'See All',
-                              textAlign: TextAlign.center,
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textBlack,
-                            ),
-                          ],
-                        ),
-                      ),
+                    SizedBox(height: 8.h),
+                    appText(
+                      category.name,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w500,
                     ),
                   ],
                 ),
-              ),
-
-              ///------------------ Right Side Subcategory Grid View ------------------//
-              Expanded(
-                child: () {
-                  final subCategories = controller.selectedSubCategories;
-
-                  if (subCategories.isEmpty) {
-                    return Center(
-                      child: appText(
-                        'No subcategories found',
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    );
-                  }
-                  return GridView.builder(
-                    padding: EdgeInsets.all(12.w),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12.h,
-                      crossAxisSpacing: 12.w,
-                      childAspectRatio: .72,
-                    ),
-                    itemCount: subCategories.length,
-                    itemBuilder: (context, index) {
-                      final subCategory = subCategories[index];
-
-                      return SubCategoryCard(
-                        subCategory: subCategory,
-                        id: controller
-                            .categoryGroups[controller.selectedIndex.value],
-                      );
-                    },
-                  );
-                }(),
-              ),
-            ],
-          );
-        }));
-  }
-}
-
-//---------------------- SubCategoryCard Widget ---------------------//
-class SubCategoryCard extends StatelessWidget {
-  final SubCategory subCategory;
-  final CategoryGroup id;
-
-  const SubCategoryCard(
-      {super.key, required this.subCategory, required this.id});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Get.to(() => const ProductListing(),
-            arguments: {'categoryId': subCategory.id});
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.transparent,
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              height: 95.h,
-              decoration: BoxDecoration(
-                color: AppColors.lightGrey,
-                borderRadius: BorderRadius.circular(10.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.shadowColor,
-                    blurRadius: 5.r,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-              child: Builder(
-                builder: (_) {
-                  final imageUrl = subCategory.image?.url;
-
-                  if (imageUrl == null || imageUrl.isEmpty) {
-                    // No image: only icon
-                    return Center(
-                      child: Icon(
-                        Icons.image_outlined,
-                        size: 40.sp,
-                        color: AppColors.grey,
-                      ),
-                    );
-                  }
-
-                  // Image available: show network image, fallback to icon on error
-                  return Center(
-                    child: Image.network(
-                      imageUrl,
-                      height: 75.h,
-                      width: 80.w,
-                      fit: BoxFit.contain,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) {
-                          return child;
-                        }
-                        return Center(
-                          child: CupertinoActivityIndicator(
-                            radius: 10.0,
-                            color: AppColors.textGray,
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Center(
-                          child: Icon(
-                            Icons.image_outlined,
-                            size: 50.sp,
-                            color: AppColors.grey,
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 8.h),
-            appText(
-              subCategory.name,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              fontSize: 11.sp,
-              overflow: TextOverflow.ellipsis,
-              fontWeight: FontWeight.w500,
-            ),
-          ],
-        ),
-      ),
+              );
+            },
+          ),
+        );
+      }),
     );
   }
 }
