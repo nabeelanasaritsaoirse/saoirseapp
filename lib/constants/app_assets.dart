@@ -61,6 +61,7 @@ class AppAssets {
   static String about = "assets/icons/about.png";
   static String logout = "assets/icons/log_out.png";
   static String kyc = "assets/icons/KYC.png";
+  static String manage_accounts = "assets/icons/manage_account.png";
 
   //Dummy Assets for image needed response
   static String mobile = "assets/images/phone.png";

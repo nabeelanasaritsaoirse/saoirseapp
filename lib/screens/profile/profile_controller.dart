@@ -63,6 +63,7 @@ class ProfileController extends GetxController {
   final settings = [
     // {"icon": AppAssets.password_security, "title": "Password & security"},
     {"icon": AppAssets.kyc, "title": "KYC"},
+    {"icon": AppAssets.manage_accounts, "title": "Manage Account"},
     {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
     {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
     // {"icon": AppAssets.faq, "title": "FAQ"},

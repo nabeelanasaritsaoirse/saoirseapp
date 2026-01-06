@@ -8,7 +8,7 @@ import '../../constants/app_strings.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
 import '../add_money/add_money_screen.dart';
-import '../withdtraw/withdraw_screen.dart';
+import '../select_account/select_account.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
@@ -227,7 +227,7 @@ class _WalletScreenState extends State<WalletScreen> {
           padding: const EdgeInsets.all(10),
           child: appButton(
             buttonColor: AppColors.primaryColor,
-            onTap: () => Get.to(WithdrawScreen()),
+            onTap: () => Get.to(() => SelectAccountScreen()),
             child: Center(
               child: appText(
                 "Withdraw",

@@ -17,6 +17,7 @@ import '../order_delivered/order_delivered_screen.dart';
 import '../order_history/order_history_screen.dart';
 import '../orders_active/orders_active_screen.dart';
 import '../pending_transaction/pending_transaction_screen.dart';
+import '../select_account/managa_account.dart';
 import '../terms_and_privacy/privacy_policy.dart';
 import '../terms_and_privacy/terms_conditions.dart';
 import '../transaction_history/transaction_history.dart';
@@ -293,7 +294,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         case "KYC":
                           Get.to(() => KycScreen());
                           break;
-
+                        case "Account":
+                          Get.to(() => ManageAccountScreen());
+                          break;
                         case "Privacy Policy":
                           Get.to(() => PrivacyPolicyScreen());
                           break;

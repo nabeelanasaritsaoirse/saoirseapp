@@ -281,7 +281,79 @@ class CartScreen extends StatelessWidget {
           Divider(
             height: 2.h,
             color: AppColors.grey.withOpacity(0.1),
-          )
+          ),
+          Obx(() {
+            final cart = controller.cartData.value;
+
+            if (cart == null || cart.products.isEmpty) {
+              return const SizedBox.shrink(); // 🔥 Hide when empty
+            }
+
+            return Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  /// TOTAL AMOUNT
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      appText(
+                        "Total Amount",
+                        fontSize: 12.sp,
+                        color: AppColors.grey,
+                      ),
+                      SizedBox(height: 4.h),
+                      appText(
+                        "₹ ${controller.totalAmount.toStringAsFixed(0)}",
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ],
+                  ),
+
+                  /// CHECKOUT BUTTON
+                  SizedBox(
+                    height: 45.h,
+                    width: 140.w,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                      ),
+                      onPressed: () {
+                        // 👉 Navigate to checkout / address screen
+                        Get.to(() => SelectAddress(
+                              product: null, // or pass cart summary
+                              quantity: 1,
+                              selectedDays: 0,
+                              selectedAmount: controller.totalAmount,
+                            ));
+                      },
+                      child: appText(
+                        "Check Out",
+                        color: AppColors.white,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
         ],
       ),
     );

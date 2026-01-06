@@ -11,7 +11,7 @@ class CartController extends GetxController {
   var cartData = Rxn<CartData>();
   var isLoading = false.obs;
   var errorMessage = ''.obs;
-  double get totalAmount => cartData.value?.totalPrice ?? 0;
+  // double get totalAmount => cartData.value?.totalPrice ?? 0;
   var cartCount = 0.obs;
 
   @override
@@ -257,6 +257,15 @@ class CartController extends GetxController {
       createdAt: "",
       updatedAt: "",
       v: 0,
+    );
+  }
+
+  double get totalAmount {
+    if (cartData.value == null) return 0;
+
+    return cartData.value!.products.fold(
+      0,
+      (sum, item) => sum + (item.finalPrice * item.quantity),
     );
   }
 }
