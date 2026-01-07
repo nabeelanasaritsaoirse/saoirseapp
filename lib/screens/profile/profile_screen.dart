@@ -309,7 +309,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           controller.confirmLogout();
                           break;
                         case "Manage Address":
-                          Get.to(ManageAddressScreen());
+                          Get.to(() => ManageAddressScreen());
 
                         default:
                       }

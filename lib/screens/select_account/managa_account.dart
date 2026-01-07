@@ -201,7 +201,7 @@ class DeleteAccountDialog {
 
               /// TITLE
               appText(
-                "Delete Account?",
+                "Delete Account",
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w700,
                 color: AppColors.black,
@@ -212,7 +212,7 @@ class DeleteAccountDialog {
 
               /// DESCRIPTION
               appText(
-                "Are you sure you want to delete this account?\nThis action cannot be undone.",
+                "Are you sure you want to delete this account?",
                 fontSize: 13.sp,
                 color: AppColors.black54,
                 textAlign: TextAlign.center,
