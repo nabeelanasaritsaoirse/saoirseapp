@@ -51,33 +51,48 @@ class WithdrawController extends GetxController {
     showSuffix.value = value.isNotEmpty;
   }
 
-  Future<bool> checkWithdrawalEligibility() async {
-    try {
-      isLoading.value = true;
+Future<bool> checkWithdrawalEligibility() async {
+  try {
+    debugPrint("🔵 [KYC] Checking withdrawal eligibility...");
+    isLoading.value = true;
 
-      final response = await WithdrawalService.getKycWithdrawalStatus();
+    final response = await WithdrawalService.getKycWithdrawalStatus();
 
-      if (response == null) {
-        return false;
-      }
+    debugPrint("🟡 [KYC] API response received: $response");
 
-      if (response.isEligibleForWithdrawal) {
-        return true;
-      }
-
-      KycRequiredDialog.show();
-
+    if (response == null) {
+      debugPrint("🔴 [KYC] Response is NULL");
       return false;
-    } catch (e) {
-      appToast(
-        title: "Error",
-        content: "Failed to verify KYC status",
-      );
-      return false;
-    } finally {
-      isLoading.value = false;
     }
+
+    debugPrint(
+      "🟢 [KYC] isEligibleForWithdrawal: ${response.isEligibleForWithdrawal}",
+    );
+
+    if (response.isEligibleForWithdrawal) {
+      debugPrint("✅ [KYC] User is eligible for withdrawal");
+      return true;
+    }
+
+    debugPrint("⚠️ [KYC] User NOT eligible → Showing KYC dialog");
+    KycRequiredDialog.show();
+
+    return false;
+  } catch (e, stack) {
+    debugPrint("❌ [KYC] Exception occurred: $e");
+    debugPrint("📌 StackTrace: $stack");
+
+    appToast(
+      title: "Error",
+      content: "Failed to verify KYC status",
+    );
+    return false;
+  } finally {
+    isLoading.value = false;
+    debugPrint("🔵 [KYC] Loading finished");
   }
+}
+
 
   @override
   void onClose() {

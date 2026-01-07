@@ -77,26 +77,33 @@ class SelectAccountScreen extends StatelessWidget {
             ),
 
             /// CONTINUE BUTTON
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
-              child: appButton(
-                buttonColor: AppColors.primaryColor,
-                child: appText(
-                  "Continue",
-                  color: AppColors.white,
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-                onTap: () {
-                  final selectedAccount =
-                      controller.accountList[controller.selectedIndex.value];
+            /// CONTINUE BUTTON (SHOW ONLY IF ACCOUNTS EXIST)
+            Obx(() {
+              if (controller.accountList.isEmpty) {
+                return const SizedBox.shrink(); // hide button
+              }
 
-                  Get.to(() => WithdrawScreen(
-                        account: selectedAccount,
-                      ));
-                },
-              ),
-            ),
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
+                child: appButton(
+                  buttonColor: AppColors.primaryColor,
+                  child: appText(
+                    "Continue",
+                    color: AppColors.white,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  onTap: () {
+                    final selectedAccount =
+                        controller.accountList[controller.selectedIndex.value];
+
+                    Get.to(() => WithdrawScreen(
+                          account: selectedAccount,
+                        ));
+                  },
+                ),
+              );
+            }),
           ],
         ),
       ),

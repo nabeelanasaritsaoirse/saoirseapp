@@ -1,10 +1,11 @@
-// models/product_model.dart
+
 class FeaturedList {
   final String listId;
   final String listName;
   final String slug;
   final String description;
   final int displayOrder;
+  final int design;
   final int totalProducts;
   final List<FeaturedProduct> products;
 
@@ -14,6 +15,7 @@ class FeaturedList {
     required this.slug,
     required this.description,
     required this.displayOrder,
+    required this.design,
     required this.totalProducts,
     required this.products,
   });
@@ -25,6 +27,7 @@ class FeaturedList {
       slug: json['slug'] ?? '',
       description: json['description'] ?? '',
       displayOrder: json['displayOrder'] ?? 0,
+      design: json['design'] ?? 0,
       totalProducts: json['totalProducts'] ?? 0,
       products: (json['products'] as List? ?? [])
           .map((e) => FeaturedProduct.fromJson(e))
