@@ -295,7 +295,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         case "KYC":
                           Get.to(() => KycScreen());
                           break;
-                        case "Account":
+                        case "Manage Account":
                           Get.to(() => ManageAccountScreen());
                           break;
                         case "Privacy Policy":

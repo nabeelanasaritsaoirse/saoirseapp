@@ -100,11 +100,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           if (controller.isLoading.value) {
             return Center(child: CategoryScreenShimmer());
           }
-          if (controller.errorMessage.value.isNotEmpty) {
-            return Center(
-              child: appText(controller.errorMessage.value),
-            );
-          }
+
           if (controller.categoryGroups.isEmpty) {
             return Center(
               child: appText(

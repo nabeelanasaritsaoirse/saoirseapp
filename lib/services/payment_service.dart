@@ -56,7 +56,7 @@ class PaymentService {
       final token = await storage.read(AppConst.ACCESS_TOKEN);
 
       return await APIService.postRequest<Map<String, dynamic>>(
-        url: "https://api.epielio.com/api/wallet/verify-payment",
+        url: AppURLs.VERIFY_PAYMENT,
         body: body,
         headers: {
           "Authorization": "Bearer $token",
