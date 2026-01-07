@@ -45,8 +45,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.paperColor,
-
-     
       appBar: CustomAppBar(
         title: AppStrings.category_title,
         actions: [
@@ -96,8 +94,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
           SizedBox(width: 12.w),
         ],
       ),
-
-
       body: Obx(() {
         if (controller.isLoading.value) {
           return const CategoryScreenShimmer();
@@ -124,10 +120,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
           child: GridView.builder(
             itemCount: controller.categoryGroups.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3, // As per Figma
+              crossAxisCount: 3,
               mainAxisSpacing: 14.h,
               crossAxisSpacing: 14.w,
-              childAspectRatio: 0.85,
+              childAspectRatio: 0.78,
             ),
             itemBuilder: (context, index) {
               final category = controller.categoryGroups[index];
@@ -135,9 +131,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
               return GestureDetector(
                 onTap: () {
                   log("Tapped category: ${category.name}");
-                  () => SubCategoryScreen(
-                        category: category,
-                      );
+                  Get.to(
+                    () => SubCategoryScreen(
+                      category: category,
+                    ),
+                  );
                 },
                 child: Column(
                   children: [

@@ -306,11 +306,7 @@ Widget panSection(KycController controller) {
         ),
       ),
       SizedBox(height: 10.h),
-      // imagePicker(
-      //   label: "PAN Front",
-      //   image: controller.panFront,
-      //   onTap: () => controller.pickImage(ImageSource.gallery, controller.panFront),
-      // ),
+      
       Obx(() => Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.r),
