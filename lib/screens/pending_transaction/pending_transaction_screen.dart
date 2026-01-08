@@ -177,7 +177,7 @@ class PendingTransaction extends StatelessWidget {
             }),
           ),
 
-//-------------------------------- BOTTOM TOTAL AMOUNT SECTION -------------------------------
+          //-------------------------------- BOTTOM TOTAL AMOUNT SECTION -------------------------------
           Obx(() {
             bool hasSelection = controller.selectedList
                 .any((e) => e.value); //check if any item is selected
