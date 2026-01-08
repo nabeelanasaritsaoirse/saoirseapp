@@ -7,7 +7,6 @@ import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../models/category_model.dart';
-import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/category_item.dart';
 import '../../widgets/custom_appbar.dart';
@@ -15,6 +14,7 @@ import '../productListing/product_listing.dart';
 import '../profile/profile_controller.dart';
 import '../wishlist/wishlist_screen.dart';
 import 'category_controller.dart';
+import 'category_shimmer.dart';
 
 class CategoryScreen extends StatefulWidget {
   final int initialIndex;
@@ -25,8 +25,8 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  final CategoryController controller = Get.put(CategoryController());
-  final ProfileController profileController = Get.put(ProfileController());
+  final CategoryController controller = Get.find<CategoryController>();
+  final ProfileController profileController = Get.find<ProfileController>();
 
   @override
   void initState() {
@@ -98,13 +98,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
         ),
         body: Obx(() {
           if (controller.isLoading.value) {
-            return Center(child: appLoader());
+            return Center(child: CategoryScreenShimmer());
           }
-          if (controller.errorMessage.value.isNotEmpty) {
-            return Center(
-              child: appText(controller.errorMessage.value),
-            );
-          }
+
           if (controller.categoryGroups.isEmpty) {
             return Center(
               child: appText(

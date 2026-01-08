@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_assets.dart';
-import '../../widgets/app_loader.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/product_card.dart';
@@ -12,6 +11,7 @@ import '../profile/profile_controller.dart';
 import '../wishlist/wishlist_screen.dart';
 import '/screens/productListing/productListing_controller.dart';
 import '../../constants/app_colors.dart';
+import 'productlist_shimmer.dart';
 
 class ProductListing extends StatefulWidget {
   const ProductListing({super.key});
@@ -80,7 +80,7 @@ class _ProductListingState extends State<ProductListing> {
           ),
           actions: [
             Obx(() {
-              final count = Get.put(ProfileController()).wishlistCount.value;
+              final count = Get.find<ProfileController>().wishlistCount.value;
 
               return Stack(
                 clipBehavior: Clip.none,
@@ -170,7 +170,7 @@ class _ProductListingState extends State<ProductListing> {
             child: Obx(() {
               if (productlistingController.isLoading.value &&
                   productlistingController.products.isEmpty) {
-                return Center(child: appLoader());
+                return Center(child: ProductGridShimmer());
               }
 
               if (productlistingController.products.isEmpty) {
@@ -183,6 +183,7 @@ class _ProductListingState extends State<ProductListing> {
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 0.70.r,
+                  mainAxisExtent: 190.h,
                   mainAxisSpacing: 10.h,
                   crossAxisSpacing: 10.w,
                 ),
@@ -217,10 +218,9 @@ class _ProductListingState extends State<ProductListing> {
                     child: SizedBox(
                       height: 30.h,
                       width: 30.h,
-                      child: appLoader(),
                     ),
                   )
-                : const SizedBox();
+                : const SizedBox.shrink();
           }),
         ],
       ),

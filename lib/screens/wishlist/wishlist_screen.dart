@@ -13,7 +13,7 @@ class WishlistScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WishlistController controller = Get.put(WishlistController());
+    WishlistController controller = Get.find<WishlistController>();
 
     return Scaffold(
       appBar: CustomAppBar(

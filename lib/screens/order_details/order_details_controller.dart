@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -9,6 +6,7 @@ import '../../models/coupon_model.dart';
 import '../../models/coupon_validation_model.dart';
 import '../../models/order_response_model.dart';
 import '../../services/coupon_service.dart';
+import '../../services/notification_service.dart';
 import '../../services/order_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_toast.dart';
@@ -17,9 +15,12 @@ import '../my_wallet/my_wallet_controller.dart';
 import '../razorpay/razorpay_controller.dart';
 
 class OrderDetailsController extends GetxController {
-  final walletController = Get.put(MyWalletController());
+  final walletController = Get.find<MyWalletController>();
+  NotificationService notificationService = NotificationService();
   RxInt selectedDays = 0.obs;
   RxDouble selectedAmount = 0.0.obs;
+  RxBool enableAutoPay = true.obs;
+  RxBool showWalletAutoPay = false.obs;
 
   var quantity = 1.obs;
   String orderid = "";
@@ -39,7 +40,8 @@ class OrderDetailsController extends GetxController {
 
   RxString appliedCouponCode = "".obs;
 
-  RxString selectedPaymentMethod = PaymentMethod.razorpay.obs;
+  // RxString selectedPaymentMethod = PaymentMethod.razorpay.obs;
+  RxString selectedPaymentMethod = "".obs;
 
   // storing first values for remove coupon
   double originalAmount = 0.0;
@@ -48,6 +50,8 @@ class OrderDetailsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    selectedPaymentMethod.value = PaymentMethod.razorpay;
+    enableAutoPay.value = true;
     fetchCoupons();
   }
 
@@ -182,7 +186,7 @@ class OrderDetailsController extends GetxController {
     controller.clear();
   }
 
-  // ------------------------- PLACE ORDER -------------------------------------
+  // ------------------------- PLACE ORDER FOR SINGLE PRODUCT-------------------------------------
   Future<void> placeOrder({
     required String productId,
     String variantId = "",
@@ -215,8 +219,6 @@ class OrderDetailsController extends GetxController {
       body["couponCode"] = couponCode.trim();
     }
 
-    log("📦 FINAL JSON = ${jsonEncode(body)}");
-
     appLoader();
 
     try {
@@ -230,7 +232,37 @@ class OrderDetailsController extends GetxController {
         return;
       }
 
+      final data = response['data'];
+
+      if (data == null || data is! Map<String, dynamic>) {
+        appToast(
+          error: true,
+          content: "Invalid payment response from server",
+        );
+        return;
+      }
+
+      final payment = OrderResponseModel.fromJson(data);
+
+      // ---------------- WALLET FLOW ----------------
       if (selectedPaymentMethod.value == PaymentMethod.wallet) {
+        final String orderId = payment.order.id;
+
+        if (enableAutoPay.value == true && orderId.isNotEmpty) {
+          final autoPayResponse =
+              await OrderService.enableAutoPay(orderId: orderId);
+
+          if (autoPayResponse != null && autoPayResponse.success) {
+            await notificationService.sendCustomNotification(
+              title: "Autopay Enabled",
+              message:
+                  "Your payments will now be made automatically from your wallet.",
+              sendPush: true,
+              sendInApp: true,
+            );
+          }
+        }
+
         Get.dialog(
           appLoader(),
           barrierDismissible: false,
@@ -247,18 +279,6 @@ class OrderDetailsController extends GetxController {
         return;
       }
 
-      final data = response['data'];
-
-      if (data == null || data is! Map<String, dynamic>) {
-        appToast(
-          error: true,
-          content: "Invalid payment response from server",
-        );
-        return;
-      }
-
-      final payment = OrderResponseModel.fromJson(data);
-
       if (payment.payment.razorpayOrderId.isEmpty) {
         appToast(
           error: true,
@@ -267,15 +287,12 @@ class OrderDetailsController extends GetxController {
         return;
       }
 
-      log("🚀 Opening Razorpay with orderId = ${payment.payment.razorpayOrderId}");
-
       Get.find<RazorpayController>().openCheckout(
         razorpayOrderId: payment.payment.razorpayOrderId,
         orderId: payment.order.id,
         amount: payment.payment.amount,
       );
-    } catch (e, s) {
-      log("❌ placeOrder error", error: e, stackTrace: s);
+    } catch (e) {
       appToast(
         error: true,
         content: "Payment initialization failed",
@@ -289,11 +306,20 @@ class OrderDetailsController extends GetxController {
   void setCustomPlan(int days, double amount) {
     selectedDays.value = days;
     selectedAmount.value = amount;
-    log("CUSTOM PLAN SELECTED → $days Days | ₹$amount");
   }
+
+  // void selectPaymentMethod(String method) {
+  //   selectedPaymentMethod.value = method;
+  // }
 
   void selectPaymentMethod(String method) {
     selectedPaymentMethod.value = method;
+
+    if (method == PaymentMethod.wallet) {
+      showWalletAutoPay.value = true;
+    } else {
+      showWalletAutoPay.value = false;
+    }
   }
 
   // ------------------------- QUANTITY ----------------------------------------

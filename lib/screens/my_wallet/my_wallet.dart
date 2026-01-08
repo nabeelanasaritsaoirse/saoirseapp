@@ -8,7 +8,7 @@ import '../../constants/app_strings.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
 import '../add_money/add_money_screen.dart';
-import '../withdtraw/withdraw_screen.dart';
+import '../select_account/select_account.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
 import '/widgets/app_text.dart';
@@ -22,7 +22,7 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
-  final controller = Get.put(MyWalletController());
+  final controller = Get.find<MyWalletController>();
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +93,37 @@ class _WalletScreenState extends State<WalletScreen> {
                     fontWeight: FontWeight.w400,
                     fontSize: 16.sp,
                   ),
+                ),
+              ],
+            );
+          }
+
+          if (walletData.transactions.isEmpty) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                walletCard(
+                  mainBalance: walletData.walletBalance,
+                  totalBalance: walletData.totalBalance,
+                  referralBonus: walletData.referralBonus,
+                  holdBalance: walletData.holdBalance,
+                  investDaily: walletData.totalBalance,
+                ),
+                SizedBox(height: 40.h),
+                Column(
+                  children: [
+                    SizedBox(
+                      height: 50.h,
+                    ),
+                    Center(
+                      child: appText(
+                        "No wallet history found",
+                        color: AppColors.grey,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -185,21 +216,29 @@ class _WalletScreenState extends State<WalletScreen> {
           );
         }),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(10),
-        child: appButton(
-          buttonColor: AppColors.primaryColor,
-          onTap: () => Get.to(WithdrawScreen()),
-          child: Center(
-            child: appText(
-              "Withdraw",
-              color: AppColors.white,
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
+      bottomNavigationBar: Obx(() {
+        final walletData = controller.wallet.value;
+
+        if (walletData == null || walletData.walletBalance <= 0) {
+          return const SizedBox.shrink(); // hide withdraw button
+        }
+
+        return Padding(
+          padding: const EdgeInsets.all(10),
+          child: appButton(
+            buttonColor: AppColors.primaryColor,
+            onTap: () => Get.to(() => SelectAccountScreen()),
+            child: Center(
+              child: appText(
+                "Withdraw",
+                color: AppColors.white,
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 

@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable, body_might_complete_normally_nullable, deprecated_member_use
+// ignore_for_file: deprecated_member_use, curly_braces_in_flow_control_structures
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +53,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       body: SafeArea(
         child: Obx(() {
           /// LOADING
-          if (controller.isLoading.value) {
+          if (controller.isProductLoading.value) {
             return Center(child: appLoader());
           }
 
@@ -391,44 +391,41 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       child: Row(
         children: [
           /// Add to Cart
-          appButton(
-            onTap: () {
-              bool hasPlan = controller.selectedPlanIndex.value != -1 ||
-                  (controller.customDays.value > 0 &&
-                      controller.customAmount.value > 0);
+          Obx(() => appButton(
+                onTap: () {
+                  if (cartController.isAddToCartLoading.value)
+                    return; // ⛔ block tap
 
-              if (!hasPlan) {
-                WarningDialog.show(
-                    title: AppStrings.warning_label,
-                    message: AppStrings.warning_body);
-                return;
-              }
+                  debugPrint("ADD TO CART BUTTON TAPPED");
 
-              final selectedPlan = controller.getSelectedPlan();
-              final selectedVariantId =
-                  controller.selectedVariantId.value.isEmpty
-                      ? null
-                      : controller.selectedVariantId.value;
+                  final selectedVariantId =
+                      controller.selectedVariantId.value.isEmpty
+                          ? null
+                          : controller.selectedVariantId.value;
 
-              cartController.addProductToCart(
-                productId: controller.product.value!.id,
-                variantId: selectedVariantId,
-                days: selectedPlan["days"],
-                dailyAmount: selectedPlan["amount"],
-              );
-            },
-            width: 50.w,
-            height: 35.h,
-            padding: EdgeInsets.all(0),
-            borderRadius: BorderRadius.circular(10.r),
-            borderColor: AppColors.shadowColor,
-            child: Center(
-              child: Icon(
-                Icons.shopping_cart_checkout,
-                color: AppColors.textBlack,
-              ),
-            ),
-          ),
+                  cartController.addProductToCart(
+                    productId: controller.product.value!.id,
+                    variantId: selectedVariantId,
+                  );
+                },
+                width: 50.w,
+                height: 35.h,
+                padding: EdgeInsets.all(0),
+                borderRadius: BorderRadius.circular(10.r),
+                borderColor: AppColors.shadowColor,
+                child: Center(
+                  child: cartController.isAddToCartLoading.value
+                      ? SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Icon(
+                          Icons.shopping_cart_checkout,
+                          color: AppColors.textBlack,
+                        ),
+                ),
+              )),
 
           SizedBox(width: 8.w),
 
@@ -509,6 +506,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     selectVarientId: controller.selectedVariantId.value,
                     selectedDays: selectedDays,
                     selectedAmount: selectedAmount,
+                    checkoutSource: CheckoutSource.product,
                   ),
                 );
               },
@@ -551,49 +549,49 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         child: Stack(
           children: [
             /// PAGEVIEW USING mergedImages
-           PageView.builder(
-  controller: controller.pageController,
-  itemCount: images.length,
-  onPageChanged: (i) => controller.currentImageIndex.value = i,
-  itemBuilder: (_, i) {
-    final img = images[i];
-    return Container(
-      alignment: Alignment.center,
-      color: AppColors.lightGrey,
-      child: Padding(
-        padding: EdgeInsets.all(15.w),
-        child: Image.network(
-          img.url,
-          fit: BoxFit.cover,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) {
-              return child;
-            }
-            return Center(
-              child: CupertinoActivityIndicator(
-                radius: 10.0,
-                color: AppColors.textGray,
-              ),
-            );
-          },
-          errorBuilder: (_, __, ___) {
-            return Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: Colors.grey.shade200,
-              alignment: Alignment.center,
-              child: Icon(
-                Icons.broken_image,
-                size: 32.sp,
-                color: Colors.grey,
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  },
-),
+            PageView.builder(
+              controller: controller.pageController,
+              itemCount: images.length,
+              onPageChanged: (i) => controller.currentImageIndex.value = i,
+              itemBuilder: (_, i) {
+                final img = images[i];
+                return Container(
+                  alignment: Alignment.center,
+                  color: AppColors.lightGrey,
+                  child: Padding(
+                    padding: EdgeInsets.all(15.w),
+                    child: Image.network(
+                      img.url,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        }
+                        return Center(
+                          child: CupertinoActivityIndicator(
+                            radius: 10.0,
+                            color: AppColors.textGray,
+                          ),
+                        );
+                      },
+                      errorBuilder: (_, __, ___) {
+                        return Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          color: Colors.grey.shade200,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.broken_image,
+                            size: 32.sp,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
 
             /// DOT INDICATOR USING mergedImages
             Positioned(

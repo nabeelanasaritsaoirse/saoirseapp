@@ -1,8 +1,8 @@
-import 'dart:developer';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/notification_details/notification_details_screen.dart';
+
+import '../screens/notification_details/notification_details_screen.dart';
 
 class NotificationServiceHelper {
   static final _plugin = FlutterLocalNotificationsPlugin();
@@ -22,8 +22,6 @@ class NotificationServiceHelper {
       initSettings,
       onDidReceiveNotificationResponse: (details) {
         final payload = details.payload?.toString();
-
-        log("🔵 Local Notification Tapped → payload = $payload");
 
         if (payload != null && payload.isNotEmpty) {
           handleNotificationTap({"id": payload});
@@ -77,19 +75,12 @@ class NotificationServiceHelper {
     final id = data["id"]?.toString();
 
     if (id == null || id.isEmpty) {
-      log("⚠️ Notification tap ignored — ID missing");
       return;
     }
 
-    log("➡ Opening Notification Details for ID = $id");
-
     // Delay navigation until app is ready
     Future.delayed(const Duration(milliseconds: 300), () {
-      try {
-        Get.to(() => NotificationDetailsScreen(notificationId: id));
-      } catch (e) {
-        log("❌ Navigation failed: $e");
-      }
+      Get.to(() => NotificationDetailsScreen(notificationId: id));
     });
   }
 }

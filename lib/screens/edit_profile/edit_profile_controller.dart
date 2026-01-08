@@ -78,7 +78,7 @@
 //     } catch (e) {
 //       appToast(
 //           error: true, title: "Error", content: "Unable to open gallery");
-//       print("Image Picker Error: $e");
+//     
 //     }
 //   }
 
@@ -93,7 +93,7 @@
 //     String? userId = storage.read(AppConst.USER_ID);
 
 //     if (userId == null || userId.isEmpty) {
-//       log("❌ ERROR: User ID not found in storage");
+
 //       return;
 //     }
 
@@ -134,7 +134,7 @@
 //         title: "Error",
 //         content: "Upload Failed",
 //       );
-//       print("UPLOAD IMAGE ERROR => $e");
+//      
 //     }
 //   }
 

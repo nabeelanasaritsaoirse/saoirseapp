@@ -3,6 +3,12 @@ allprojects {
         google()
         mavenCentral()
     }
+
+    configurations.all {
+        resolutionStrategy {
+            force("com.razorpay:checkout:1.6.33")
+        }
+    }
 }
 
 val newBuildDir: Directory =

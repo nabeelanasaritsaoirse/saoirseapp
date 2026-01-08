@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -12,7 +10,6 @@ class AddressService {
     String? userId = storage.read(AppConst.USER_ID);
 
     if (userId!.isEmpty) {
-      log("❌ ERROR: User ID not found in storage");
       return null;
     }
 
@@ -25,13 +22,9 @@ class AddressService {
   }
 
   static Future<bool> addAddress(Map<String, dynamic> body) async {
-    log("Entered function");
     String? userId = storage.read(AppConst.USER_ID);
-    log("body ===> $body");
-    log("Userid : $userId");
 
     if (userId!.isEmpty) {
-      log("❌ USER ID NOT FOUND");
       return false;
     }
 
@@ -40,6 +33,48 @@ class AddressService {
     final result = await APIService.postRequest<bool>(
       url: url,
       body: body,
+      onSuccess: (_) => true,
+    );
+
+    return result ?? false;
+  }
+
+  // ---------------- EDIT ADDRESS ----------------
+  static Future<bool> editAddress({
+    required String addressId,
+    required Map<String, dynamic> body,
+  }) async {
+    String? userId = storage.read(AppConst.USER_ID);
+
+    if (userId == null || userId.isEmpty) {
+      return false;
+    }
+
+    final String url = "${AppURLs.ADDRESS_API}$userId/addresses/$addressId";
+
+    final result = await APIService.putRequest<bool>(
+      url: url,
+      body: body,
+      onSuccess: (_) => true,
+    );
+
+    return result ?? false;
+  }
+
+  // ---------------- DELETE ADDRESS ----------------
+  static Future<bool> deleteAddress({
+    required String addressId,
+  }) async {
+    String? userId = storage.read(AppConst.USER_ID);
+
+    if (userId == null || userId.isEmpty) {
+      return false;
+    }
+
+    final String url = "${AppURLs.ADDRESS_API}$userId/addresses/$addressId";
+
+    final result = await APIService.deleteRequest<bool>(
+      url: url,
       onSuccess: (_) => true,
     );
 

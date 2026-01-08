@@ -13,6 +13,7 @@ class AppAssets {
   static String refer_image = "assets/images/refer_image.png";
   static String notification = "assets/icons/notification.png";
   static String add_banner = "assets/images/add_banner.jpeg";
+  static String banner_refer = "assets/images/banner_refer.png";
 
   //icons
   static String google_icon = "assets/icons/google_icon.webp";
@@ -50,6 +51,7 @@ class AppAssets {
   static String pending_payment = "assets/icons/pending_payment.png";
   static String order_history = "assets/icons/order_history.png";
   static String wishlist = "assets/icons/wishlist.png";
+  static String active_oders = "assets/icons/active_orders.png";
   static String transactions = "assets/icons/transaction.png";
   static String delivered = "assets/icons/delivered.png";
   static String customer_care = "assets/icons/customer_care.png";
@@ -60,6 +62,8 @@ class AppAssets {
   static String about = "assets/icons/about.png";
   static String logout = "assets/icons/log_out.png";
   static String kyc = "assets/icons/KYC.png";
+  static String manage_accounts = "assets/icons/manage_account.png";
+  static String address = "assets/icons/address.png";
 
   //Dummy Assets for image needed response
   static String mobile = "assets/images/phone.png";

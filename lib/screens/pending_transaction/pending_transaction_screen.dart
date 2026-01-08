@@ -20,9 +20,9 @@ class PendingTransaction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PendingTransactionController controller =
-        Get.put(PendingTransactionController());
+        Get.find<PendingTransactionController>();
 
-    Get.put(MyWalletController(), permanent: true);
+    Get.find<MyWalletController>();
 
     return Scaffold(
       backgroundColor: AppColors.paperColor,
@@ -177,7 +177,7 @@ class PendingTransaction extends StatelessWidget {
             }),
           ),
 
-//-------------------------------- BOTTOM TOTAL AMOUNT SECTION -------------------------------
+          //-------------------------------- BOTTOM TOTAL AMOUNT SECTION -------------------------------
           Obx(() {
             bool hasSelection = controller.selectedList
                 .any((e) => e.value); //check if any item is selected

@@ -1,7 +1,4 @@
-// ignore_for_file: avoid_print
-
 import 'dart:async';
-import 'dart:developer';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
@@ -78,12 +75,7 @@ class ReferralService {
       final token = storage.read(AppConst.ACCESS_TOKEN);
       final url = AppURLs.APPLY_REFERRAL;
 
-      print("APPLY REFERRAL");
-      print("URL: $url");
-      print("Token: $token");
-      print("Referral Code: $referralCode");
       if (token == null || token.isEmpty) {
-        print("❌ Token Missing - Cannot Apply Referral");
         return null;
       }
       final response = await APIService.postRequest(
@@ -102,7 +94,6 @@ class ReferralService {
 
       return ApplyReferralResponse.fromJson(response);
     } catch (e) {
-      print("Referral Error: $e");
       return null;
     }
   }
@@ -123,7 +114,6 @@ class ReferralService {
     if (response["success"] == true && response["referredBy"] != null) {
       return ReferrerInfoModel.fromJson(response["referredBy"]);
     } else {
-      log("Referrer Info Error: ${response["message"]}");
       return null;
     }
   }
@@ -145,11 +135,9 @@ class ReferralService {
       if (response["success"] == true && response["data"] != null) {
         return ReferralStatsResponse.fromJson(response);
       } else {
-        log("Referral Stats Error: ${response["message"]}");
         return null;
       }
     } catch (e) {
-      log("Referral Stats Exception: $e");
       return null;
     }
   }

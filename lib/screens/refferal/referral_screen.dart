@@ -1,11 +1,6 @@
-// FULL UPDATED REFERRAL SCREEN
-// Behaves exactly as requested
-// No design or UI property changes
-
 // ignore_for_file: deprecated_member_use
 
-import 'dart:developer';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -21,7 +16,6 @@ import '../../constants/app_colors.dart';
 import '../../services/converstion_service.dart';
 import '../../services/login_service.dart';
 import '../../widgets/app_button.dart';
-import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
@@ -196,7 +190,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
             color: AppColors.primaryColor, // spinner color
             backgroundColor: AppColors.white,
             child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               padding: EdgeInsets.all(16.w),
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: _buildContentSection(
@@ -236,10 +230,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
             ),
             Obx(() {
               if (referralController.referrer.value != null) {
-                log("🟢 Showing ReferredByCard");
                 return referredByCard(referralController.referrer.value!);
               } else {
-                log("🔵 Showing Apply Referral Button");
                 return applyReferralSection(); // show input + apply button
               }
             })
@@ -250,39 +242,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
         Center(
           child: Obx(() {
-            if (controller.isLoading.value) {
-              // loading spinner
-              return Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 24.w,
-                  vertical: 16.h,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.shadowColor),
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      height: 22.h,
-                      width: 22.w,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.w,
-                        color: AppColors.darkGray,
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    appText(
-                      AppStrings.fetching_message,
-                      fontSize: 14.sp,
-                      color: AppColors.grey,
-                    ),
-                  ],
-                ),
-              );
-            }
-
             // no code fetched yet or failed
             if (controller.referralCode.value.isEmpty) {
               return Container(
@@ -596,11 +555,10 @@ class _ReferralScreenState extends State<ReferralScreen> {
         // Referral list / empty state / loading
         Obx(() {
           if (controller.isDashboardLoading.value) {
-            return SizedBox(
-              height: 40.h,
-              width: 150.w,
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 40),
               child: Center(
-                child: appLoader(),
+                child: CupertinoActivityIndicator(color: AppColors.grey),
               ),
             );
           }
@@ -708,7 +666,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          "₹${(referral.totalCommission).toStringAsFixed(0)}",
+                          "₹${controller.formatAmount(referral.totalCommission)}",
                           style: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.w600,
@@ -828,7 +786,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
                     onPressed: () {
                       showQRPicker((code) {
                         referralCtrl.text = code;
-                        log("🟢 Referral code updated in popup: $code"); // ← fill input
                       });
                     },
                   ),
@@ -862,8 +819,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
                             .applyReferral(referralCtrl.text.trim());
 
                         if (success) {
-                          log("✅ Referral Applied — Closing Input Popup...");
-
                           // CLOSE ONLY THE INPUT POPUP
                           Get.back();
 
@@ -965,7 +920,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
     Get.to(() => QRScannerScreen(
           onReferralDetected: (value) {
             final code = extractReferral(value);
-            log("📸 Camera scanned QR: $code");
 
             onCodeSelected(code);
             Get.back();
@@ -979,24 +933,16 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
     if (image == null) return;
 
-    try {
-      final MobileScannerController scanner = MobileScannerController();
+    final MobileScannerController scanner = MobileScannerController();
 
-      final BarcodeCapture? result = await scanner.analyzeImage(image.path);
+    final BarcodeCapture? result = await scanner.analyzeImage(image.path);
 
-      if (result != null && result.barcodes.isNotEmpty) {
-        final value = result.barcodes.first.rawValue ?? "";
-        final code = extractReferral(value);
+    if (result != null && result.barcodes.isNotEmpty) {
+      final value = result.barcodes.first.rawValue ?? "";
+      final code = extractReferral(value);
 
-        log("🖼 QR from image: $code");
-
-        onCodeSelected(code);
-      } else {
-        log("No QR found in image");
-      }
-    } catch (e) {
-      log("Failed to read QR: $e");
-    }
+      onCodeSelected(code);
+    } else {}
   }
 
   void showQRPicker(Function(String) onCodeSelected) {
@@ -1147,14 +1093,11 @@ Widget referredByCard(ReferrerInfoModel r) {
   return GestureDetector(
     onTap: () async {
       // LOGS (optional)
-      log("👆 ReferredBy Clicked → Opening Chat Directly");
-      log("📩 Friend UserId = ${r.userId}");
 
       // Create chat
       final chat = await ConversationService().createIndividualChat(r.userId);
 
       if (chat == null) {
-        log("❌ Chat creation failed");
         return;
       }
 
