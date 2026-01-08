@@ -66,6 +66,7 @@ jobs:
       - name: 🔑 Create .env file
         run: |
           cat > .env <<EOF
+          RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}
           IOS_API_KEY=${{ secrets.IOS_API_KEY }}
           IOS_APP_ID=${{ secrets.IOS_APP_ID }}
           IOS_MESSAGING_SENDER_ID=${{ secrets.IOS_MESSAGING_SENDER_ID }}
@@ -76,10 +77,10 @@ jobs:
           ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
           EOF
 
-      - name: 📋 Copy .env to iOS Runner
+      - name: ✅ Verify .env file
         run: |
-          mkdir -p ios/Runner
-          cp .env ios/Runner/.env
+          echo "✅ .env file created in project root"
+          ls -la .env
 
       - name: 🚀 Install Fastlane & CocoaPods
         run: |
@@ -133,8 +134,30 @@ jobs:
           cd ios
           pod install --repo-update
 
-      - name: 🔨 Prepare Flutter for Xcode 16
-        run: flutter build ios --release --no-codesign --config-only
+      - name: 🔨 Build Flutter iOS Release
+        run: |
+          echo "🚀 Starting Flutter build..."
+          flutter clean
+          flutter build ios --release --no-codesign
+          echo "✅ Flutter build completed!"
+
+      - name: ✅ Verify Flutter Build Output
+        run: |
+          echo "🔍 Checking Flutter build artifacts..."
+          ls -la ios/Flutter/
+
+          if [ ! -f "ios/Flutter/Generated.xcconfig" ]; then
+            echo "❌ ERROR: Generated.xcconfig not found!"
+            exit 1
+          fi
+
+          if [ ! -d "build/ios/iphoneos/Runner.app" ]; then
+            echo "❌ ERROR: Runner.app not built!"
+            exit 1
+          fi
+
+          echo "✅ Flutter build artifacts verified!"
+          cat ios/Flutter/Generated.xcconfig
 
       - name: 📝 Create ExportOptions.plist
         run: |
@@ -159,16 +182,13 @@ jobs:
           </plist>
           EOF
 
-      - name: 🩹 Disable Flutter ThinBinary
-        run: sed -i '' 's/Thin Binary/Thin Binary Disabled by CI/g' ios/Runner.xcodeproj/project.pbxproj
-
       - name: 🏗️ Archive Build
         run: |
           cd ios
           mkdir -p ../${ARCHIVE_DIR}
           mkdir -p ../${IPA_DIR}
 
-          xcodebuild archive \
+          xcodebuild clean archive \
             -workspace Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \

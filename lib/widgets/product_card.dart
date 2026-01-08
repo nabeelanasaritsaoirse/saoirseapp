@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -6,7 +7,7 @@ import '../constants/app_colors.dart';
 import '../screens/product_details/product_details_screen.dart';
 import 'app_text.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   const ProductCard({
     super.key,
     required this.productId,
@@ -33,15 +34,19 @@ class ProductCard extends StatelessWidget {
   final EdgeInsets? margin;
 
   @override
+  State<ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => Get.to(
-        () => ProductDetailsScreen(productId: productId, id: id),
+        () => ProductDetailsScreen(productId: widget.productId, id: widget.id),
       ),
       child: Container(
         width: 150.w,
-        height: 230.h, // 🔥 FIXED, RESPONSIVE SAFE HEIGHT
-        margin: margin ?? EdgeInsets.only(right: 10.w),
+        margin: widget.margin ?? EdgeInsets.only(right: 10.w),
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(12.r),
@@ -53,11 +58,11 @@ class ProductCard extends StatelessWidget {
             ),
           ],
         ),
-
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// ---------------- IMAGE AREA ----------------
+
             SizedBox(
               height: 110.h,
               child: Stack(
@@ -68,49 +73,47 @@ class ProductCard extends StatelessWidget {
                       color: AppColors.lightGrey,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
-                    child: Center(
-                      child: image.startsWith('http')
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10.r),
+                      child: widget.image.startsWith('http')
                           ? Image.network(
-                              image,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Icon(
-                                Icons.broken_image,
-                                size: 40.sp,
-                                color: AppColors.grey,
+                              widget.image,
+                              fit: BoxFit.contain,
+                              width: double.infinity,
+                              height: double.infinity,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+
+                                return Center(
+                                  child: CupertinoActivityIndicator(
+                                    radius: 10.0,
+                                    color: AppColors.textGray,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (_, __, ___) => Center(
+                                child: Icon(
+                                  Icons.broken_image,
+                                  size: 40.sp,
+                                  color: AppColors.grey,
+                                ),
                               ),
                             )
                           : Image.asset(
-                              image,
+                              widget.image,
                               fit: BoxFit.contain,
+                              width: double.infinity,
+                              height: double.infinity,
                             ),
                     ),
                   ),
-                  // Positioned(
-                  //   top: 8,
-                  //   right: 8,
-                  //   child: GestureDetector(
-                  //     onTap: onFavoriteTap,
-                  //     child: Container(
-                  //       width: 26.w,
-                  //       height: 26.w,
-                  //       decoration: const BoxDecoration(
-                  //         color: Colors.white,
-                  //         shape: BoxShape.circle,
-                  //       ),
-                  //       child: Icon(
-                  //         isFavorite ? Icons.favorite : Icons.favorite_border,
-                  //         size: 14.sp,
-                  //         color: isFavorite ? Colors.red : Colors.grey,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  if (showFavorite)
+                  if (widget.showFavorite)
                     Positioned(
                       top: 8,
                       right: 8,
                       child: GestureDetector(
-                        onTap: onFavoriteTap,
+                        onTap: widget.onFavoriteTap,
                         child: Container(
                           width: 26.w,
                           height: 26.w,
@@ -119,9 +122,11 @@ class ProductCard extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            widget.isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             size: 14.sp,
-                            color: isFavorite ? Colors.red : Colors.grey,
+                            color: widget.isFavorite ? Colors.red : Colors.grey,
                           ),
                         ),
                       ),
@@ -138,7 +143,7 @@ class ProductCard extends StatelessWidget {
                 children: [
                   SizedBox(height: 4.h),
                   appText(
-                    name,
+                    widget.name,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w700,
                     textAlign: TextAlign.left,
@@ -148,7 +153,7 @@ class ProductCard extends StatelessWidget {
                   ),
                   SizedBox(height: 2.h),
                   appText(
-                    brand,
+                    widget.brand,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     fontSize: 10.sp,
@@ -157,7 +162,7 @@ class ProductCard extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   appText(
-                    "₹ $price",
+                    "₹ ${widget.price}",
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textBlack,

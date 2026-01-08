@@ -3,7 +3,7 @@
 class AppURLs {
   //base api
   static String BASE_API = 'https://api.epielio.com/';
-//   static String BASE_API = 'http://13.127.15.87:8080/';
+  // static String BASE_API = 'http://13.127.15.87:8080/';
 
   //login api
   static String LOGIN_API = BASE_API + 'api/auth/login';
@@ -15,13 +15,7 @@ class AppURLs {
   static String USER_UPDATE_API = BASE_API + "api/auth/profiles/";
   static String PROFILE_UPDATE_API = BASE_API + "api/users/";
 
-  // home screen api
-  static String POPULAR_PRODUCT_API =
-      BASE_API + "api/products/featured/popular?";
-  static String BEST_SELLER_PRODUCT_API =
-      BASE_API + "api/products/featured/best-sellers?";
-  static String TRENDING_PRODUCT_API =
-      BASE_API + "api/products/featured/trending?";
+  static String FEATURED_LISTS_API = BASE_API + "api/featured-lists";
 
   //refferal api
   static String getRefferal_API = BASE_API + "api/referrals/generate-code";
@@ -31,6 +25,7 @@ class AppURLs {
   static String FETCH_REFERRAL = BASE_API + "api/referral/list/";
   static String APPLY_REFERRAL = BASE_API + "api/auth/applyReferralCode";
   static String REFERRAL_INFO = BASE_API + "api/referral/referrer-info";
+  static String REFERRAL_STATS = BASE_API + "api/referral/stats/";
 
   // Wishlist api
   static String GET_WISHLIST = BASE_API + "api/wishlist";
@@ -46,6 +41,7 @@ class AppURLs {
   static String Wallet = BASE_API + "api/wallet";
   static String WALLET_TRANSACTIONS = BASE_API + "api/wallet/transactions";
   static String ADD_MONEY_WALLET = BASE_API + "api/wallet/add-money";
+  static String VERIFY_PAYMENT = BASE_API + "api/wallet/verify-payment";
   static String WITHDRAWAL_API = BASE_API + "api/wallet/withdraw";
 
   // Category api
@@ -76,20 +72,26 @@ class AppURLs {
   static String KYC_UPLOAD_API = BASE_API + "api/kyc/upload";
 
   // Order api
-  static String CREATE_ORDER_API = BASE_API + "api/orders";
+  static String CREATE_ORDER_API = BASE_API + "api/installments/orders";
+  static String CREATE_BULK_ORDER_API =
+      BASE_API + "api/installments/orders/bulk";
 
   // Payment Api
-  static String PAYMENT_PROCESS_API = BASE_API + "api/payments/process";
+  static String PAYMENT_PROCESS_API =
+      BASE_API + "api/installments/payments/process";
+  static String PAYMENT_VERIFY_API =
+      BASE_API + "api/installments/orders/bulk/verify-payment";
 
   // Notifications
   static String NOTIFICATIONS = BASE_API + "api/notifications";
   static String UNREAD_NOTIFICATIONS =
       BASE_API + "api/notifications/unread-count";
+  static String ENABLE_AUTOPAY = BASE_API + "api/installments/autopay/enable";
 
   // Orders History
-  static String ORDER_HISTORY_API = BASE_API + "api/orders/user/history";
-  static String ORDER_DELIVERED_HISTORY_API =
-      BASE_API + "api/orders/user/delivered";
+  static String ORDER_HISTORY_API = BASE_API + "api/installments/orders";
+  static String ORDER_DELIVERED_HISTORY_API = BASE_API +
+      "api/installments/orders"; // same endpoint with different status filter only
 
   // Pending Transactions Api
   static String PENDING_TRANSACTIONS_API =

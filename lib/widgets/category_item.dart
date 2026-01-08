@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
@@ -24,47 +25,48 @@ class CategoryItem extends StatelessWidget {
       final category = controller.categoryGroups[index];
 
       return InkWell(
-        onTap: () => controller.selectCategory(index),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          height: 110.h, // FIXED HEIGHT = no flicker
-          padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 7.w),
-          decoration: BoxDecoration(
-            color: isSelected ? AppColors.lightGrey : AppColors.white,
-            border: Border(
-              left: BorderSide(
-                color: isSelected ? AppColors.primaryColor : Colors.transparent,
-                width: 4.w,
+          onTap: () => controller.selectCategory(index),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 7.w),
+            decoration: BoxDecoration(
+              color: isSelected ? AppColors.lightGrey : AppColors.white,
+              border: Border(
+                left: BorderSide(
+                  color:
+                      isSelected ? AppColors.primaryColor : Colors.transparent,
+                  width: 4.w,
+                ),
               ),
             ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // 🔥 KEY
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _CategoryImage(category: category),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // FIXED image size = no relayout
+                SizedBox(
+                  width: 50.w,
+                  height: 50.h,
+                  child: _CategoryImage(category: category),
+                ),
 
-              // Reduce spacing slightly
-              SizedBox(height: 4.h),
+                SizedBox(height: 6.h),
 
-              Flexible(
-                // 🔥 KEY
-                child: appText(
+                // FIXED text behavior = no relayout
+                appText(
                   category.name,
-                  textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  fontSize: 11.sp,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                  textAlign: TextAlign.center,
+                  fontSize: 10.sp,
+                  height: 1.2, // 🔥 IMPORTANT
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   color:
                       isSelected ? AppColors.primaryColor : AppColors.textBlack,
                 ),
-              ),
-            ],
-          ),
-        ),
-      );
+              ],
+            ),
+          ));
     });
   }
 }
@@ -92,6 +94,17 @@ class _CategoryImage extends StatelessWidget {
       height: 50.h,
       fit: BoxFit.cover,
       gaplessPlayback: true,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) {
+          return child;
+        }
+        return Center(
+          child: CupertinoActivityIndicator(
+            radius: 10.0,
+            color: AppColors.textGray,
+          ),
+        );
+      },
       errorBuilder: (_, __, ___) => Icon(
         Icons.image_outlined,
         size: 32.sp,

@@ -11,7 +11,7 @@ import 'add_money_controller.dart';
 class AddMoneyScreen extends StatelessWidget {
   AddMoneyScreen({super.key});
 
-  final AddMoneyController controller = Get.put(AddMoneyController());
+  final AddMoneyController controller = Get.find<AddMoneyController>();
 
   @override
   Widget build(BuildContext context) {

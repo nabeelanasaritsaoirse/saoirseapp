@@ -1,7 +1,3 @@
-// ignore_for_file: avoid_print
-
-import 'dart:developer';
-
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -32,52 +28,43 @@ class CartService {
 
       return CartResponse.fromJson(response);
     } catch (e) {
-      print("Fetch Cart Error: $e");
       return null;
     }
   }
 
   // Add item to cart
   Future<AddToCartResponse?> addToCart({
-  required String productId,
-  required String? variantId,
-  required int totalDays,
-  required double dailyAmount,
-  int quantity = 1,
-}) async {
-  try {
-    final url = "${AppURLs.ADD_TO_CART}$productId";
+    required String productId,
+    required String? variantId,
+    // required int totalDays,
+    // required double dailyAmount,
+    int quantity = 1,
+  }) async {
+    try {
+      final url = "${AppURLs.ADD_TO_CART}$productId";
 
-  final body = {
-  "quantity": quantity,
-  "variantId": variantId,
-  "installmentPlan": {
-    "totalDays": totalDays,
-    "dailyAmount": dailyAmount,
+      final body = {
+        "quantity": quantity,
+        "variantId": variantId,
+      };
+
+      final response = await APIService.postRequest(
+        url: url,
+        body: body,
+        onSuccess: (json) => json,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response == null) return null;
+
+      return AddToCartResponse.fromJson(response);
+    } catch (e) {
+      return null;
+    }
   }
-};
-    
-    log("Cart passing body ===. $body");
-
-    final response = await APIService.postRequest(
-      url: url,
-      body: body,
-      onSuccess: (json) => json,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-    );
-
-    if (response == null) return null;
-
-    return AddToCartResponse.fromJson(response);
-  } catch (e) {
-    print("Add to cart error: $e");
-    return null;
-  }
-}
-
 
   // Clear cart
   Future<bool> clearCart() async {
@@ -95,7 +82,6 @@ class CartService {
 
       return response['success'] ?? false;
     } catch (e) {
-      print("Clear cart error: $e");
       return false;
     }
   }
@@ -118,7 +104,6 @@ class CartService {
 
       return RemoveCartItemResponse.fromJson(response);
     } catch (e) {
-      print("Remove item error: $e");
       return null;
     }
   }
@@ -139,7 +124,6 @@ class CartService {
 
       return CartCountResponse.fromJson(response);
     } catch (e) {
-      print("Cart Count Error: $e");
       return null;
     }
   }
@@ -149,9 +133,6 @@ class CartService {
     final url = AppURLs.UPDATE_CART + productId;
 
     try {
-      print("=== UPDATE CART QTY API ===");
-      print("URL: $url");
-      print("Sending Quantity: $qty");
       final response = await APIService.putRequest(
         url: url,
         onSuccess: (json) => json,
@@ -163,10 +144,9 @@ class CartService {
           "Authorization": "Bearer $token",
         },
       );
-      print("Update Cart Response: $response");
+
       return response;
     } catch (e) {
-      print("Update cart qty error: $e");
       return null;
     }
   }

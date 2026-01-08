@@ -1,7 +1,4 @@
-// ignore_for_file: avoid_print
-
 import 'dart:async';
-import 'dart:developer';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
@@ -11,6 +8,7 @@ import '../models/friend_details_response.dart';
 import '../models/product_detiails_response.dart';
 import '../models/referral_response_model.dart';
 import '../models/refferal_info_model.dart';
+import '../models/refferal_limit.dart';
 import '../services/api_service.dart';
 
 class ReferralService {
@@ -77,12 +75,7 @@ class ReferralService {
       final token = storage.read(AppConst.ACCESS_TOKEN);
       final url = AppURLs.APPLY_REFERRAL;
 
-      print("APPLY REFERRAL");
-      print("URL: $url");
-      print("Token: $token");
-      print("Referral Code: $referralCode");
       if (token == null || token.isEmpty) {
-        print("❌ Token Missing - Cannot Apply Referral");
         return null;
       }
       final response = await APIService.postRequest(
@@ -101,7 +94,6 @@ class ReferralService {
 
       return ApplyReferralResponse.fromJson(response);
     } catch (e) {
-      print("Referral Error: $e");
       return null;
     }
   }
@@ -122,7 +114,30 @@ class ReferralService {
     if (response["success"] == true && response["referredBy"] != null) {
       return ReferrerInfoModel.fromJson(response["referredBy"]);
     } else {
-      log("Referrer Info Error: ${response["message"]}");
+      return null;
+    }
+  }
+
+  Future<ReferralStatsResponse?> fetchReferralStats() async {
+    try {
+      final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+      final response = await APIService.getRequest(
+        url: AppURLs.REFERRAL_STATS,
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+        onSuccess: (json) => json,
+      );
+
+      if (response == null) return null;
+
+      if (response["success"] == true && response["data"] != null) {
+        return ReferralStatsResponse.fromJson(response);
+      } else {
+        return null;
+      }
+    } catch (e) {
       return null;
     }
   }

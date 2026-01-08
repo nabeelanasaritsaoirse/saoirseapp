@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -26,6 +24,7 @@ class PendingTransactionService {
   Future<Map<String, dynamic>?> createCombinedRazorpayOrder(
       List<String> orderIds) async {
     final token = await _token();
+
     final String url = AppURLs.PENDING_TRANSACTION_PAYMENT_RESPONSE;
 
     return APIService.postRequest<Map<String, dynamic>>(
@@ -42,9 +41,6 @@ class PendingTransactionService {
       },
     );
   }
-
-
-
 
   //-------------------------------------DAILY INSTALLMENT PAYMENT FUNCTION AFTER PAYMENT PROCESS----------------------------------------------//
   static Future<Map<String, dynamic>?> payDailySelected(
@@ -65,11 +61,8 @@ class PendingTransactionService {
       );
 
       return response;
-    } catch (e, s) {
-      log("payDailySelected Error: $e\n$s");
+    } catch (e) {
       return null;
     }
   }
-
-  
 }

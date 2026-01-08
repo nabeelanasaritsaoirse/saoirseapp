@@ -8,6 +8,7 @@ import '../../constants/app_strings.dart';
 import '../../constants/app_colors.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
+import '../screens/kyc/kyc_screen.dart';
 
 class WarningDialog {
   static void show({
@@ -82,6 +83,87 @@ class WarningDialog {
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w600),
                   ))
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: true,
+    );
+  }
+}
+
+class KycRequiredDialog {
+  static void show() {
+    Get.dialog(
+      Dialog(
+        backgroundColor: AppColors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(20.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// ICON
+              Container(
+                width: 52.w,
+                height: 52.h,
+                decoration: BoxDecoration(
+                  color: AppColors.lightAmber.withOpacity(0.3),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.warning_amber_rounded,
+                    color: AppColors.mediumAmber,
+                    size: 26.sp,
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 15.h),
+
+              /// TITLE
+              appText(
+                AppStrings.kyc_required,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textBlack,
+                textAlign: TextAlign.center,
+              ),
+
+              SizedBox(height: 10.h),
+
+              /// MESSAGE
+              appText(
+                AppStrings.kyc_required_discription,
+                fontSize: 13.sp,
+                color: AppColors.grey,
+                textAlign: TextAlign.center,
+              ),
+
+              SizedBox(height: 20.h),
+
+              /// VERIFY BUTTON
+              appButton(
+                onTap: () {
+                  Get.back(); // close dialog
+                  Get.to(() => KycScreen());
+                },
+                width: double.infinity,
+                height: 40.h,
+                buttonColor: AppColors.primaryColor,
+                borderRadius: BorderRadius.circular(8.r),
+                child: Center(
+                  child: appText(
+                    "Verify",
+                    color: AppColors.white,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ],
           ),
         ),

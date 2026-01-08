@@ -1,13 +1,12 @@
-import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:saoirse_app/screens/transaction_succsess/transaction_succsess.dart';
 
 import '../../models/razorpay_payment_response.dart';
 import '../../services/payment_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_toast.dart';
+import '../transaction_succsess/transaction_succsess.dart';
 
 class RazorpayWalletController extends GetxController {
   late Razorpay razorpay;
@@ -24,8 +23,6 @@ class RazorpayWalletController extends GetxController {
     razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-
-    log("Wallet RazorpayController Initialized");
   }
 
   // ---------------------------------------------------------
@@ -37,7 +34,7 @@ class RazorpayWalletController extends GetxController {
     required int amount,
   }) {
     transactionId = internalOrderId;
-   log("Transaction id ===================> $internalOrderId");
+
     openCheckout(
       razorpayOrderId: rpOrderId,
       amount: amount,
@@ -59,11 +56,8 @@ class RazorpayWalletController extends GetxController {
         'currency': 'INR',
       };
 
-      log("Opening WALLET Razorpay Checkout => $options");
-
       razorpay.open(options);
-    } catch (e, s) {
-      log("ERROR Opening Razorpay Wallet: $e\n$s");
+    } catch (e) {
       appToast(error: true, content: "Could not open payment window");
     }
   }
@@ -73,11 +67,6 @@ class RazorpayWalletController extends GetxController {
   // ---------------------------------------------------------
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    log("WALLET PAYMENT SUCCESS");
-    log("Payment ID: ${response.paymentId}");
-    log("Order ID: ${response.orderId}");
-    log("Signature: ${response.signature}");
-
     appToast(content: "Wallet Payment Success!");
 
     final paymentData = RazorpayPaymentResponse(
@@ -90,12 +79,10 @@ class RazorpayWalletController extends GetxController {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    log("WALLET PAYMENT FAILED");
     appToast(error: true, content: "Wallet Payment Failed");
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    log("WALLET SELECTED: ${response.walletName}");
     appToast(content: "External Wallet: ${response.walletName}");
   }
 
@@ -108,14 +95,11 @@ class RazorpayWalletController extends GetxController {
       appLoader();
 
       final body = {
-        
         "razorpay_order_id": data.orderId,
         "razorpay_payment_id": data.paymentId,
         "razorpay_signature": data.signature,
         "transaction_id": transactionId,
       };
-
-      log("Verify Wallet Payment Body => $body");
 
       final response = await PaymentService.verifyWalletPayment(body);
 
@@ -135,9 +119,9 @@ class RazorpayWalletController extends GetxController {
               response?["message"] ?? "Wallet Payment Verification Failed!",
         );
       }
-    } catch (e, s) {
+    } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
-      log("Wallet Verify Error: $e\n$s");
+
       appToast(error: true, content: "Unexpected Wallet Payment Error!");
     }
   }
@@ -145,7 +129,7 @@ class RazorpayWalletController extends GetxController {
   @override
   void onClose() {
     razorpay.clear();
-    log("Wallet RazorpayController Closed");
+
     super.onClose();
   }
 }

@@ -1,13 +1,13 @@
-// ignore_for_file: unused_local_variable, deprecated_member_use
+// ignore_for_file: prefer_const_constructors_in_immutables, deprecated_member_use
 
-import 'dart:developer';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../../constants/payment_methods.dart';
 import '../../models/address_response.dart';
 import '../../models/product_details_model.dart';
 import '../../widgets/app_button.dart';
@@ -19,7 +19,7 @@ import '../my_wallet/my_wallet_controller.dart';
 import '../razorpay/razorpay_controller.dart';
 import 'order_details_controller.dart';
 
-class OrderDetailsScreen extends StatelessWidget {
+class OrderDetailsScreen extends StatefulWidget {
   final Address addresses;
   final ProductDetailsData? product;
   final String? selectVarientId;
@@ -36,31 +36,46 @@ class OrderDetailsScreen extends StatelessWidget {
     this.selectVarientId,
     this.quantity,
   });
+
+  @override
+  State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
+}
+
+class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   final orderController = Get.find<OrderDetailsController>();
-  final razorpayController = Get.put(RazorpayController());
-  final walletController = Get.put(MyWalletController());
+
+  final razorpayController = Get.find<RazorpayController>();
+
+  final walletController = Get.find<MyWalletController>();
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 🔥 THIS IS MANDATORY
+      orderController.initProductPricing(
+        finalPrice: widget.product!.pricing.finalPrice,
+        dailyAmount: widget.selectedAmount,
+        days: widget.selectedDays,
+      );
+
+      // also sync initial quantity if passed
+      if (widget.quantity != null && widget.quantity! > 1) {
+        orderController.quantity.value = widget.quantity!;
+        orderController.recalculatePricing();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    log("DEBUG → incoming selectVarientId: $selectVarientId");
-
     if (orderController.originalAmount == 0.0) {
-      orderController.originalAmount = selectedAmount;
-      orderController.originalDays = selectedDays;
+      orderController.originalAmount = widget.selectedAmount;
+      orderController.originalDays = widget.selectedDays;
     }
 
     final couponController = TextEditingController();
-    final pricing = product!.pricing;
-
-    final String? productImageUrl =
-        product != null && product!.images.isNotEmpty
-            ? product!.images
-                .firstWhere(
-                  (img) => img.isPrimary,
-                  orElse: () => product!.images.first,
-                )
-                .url
-            : null;
+    final pricing = widget.product!.pricing;
 
     return Scaffold(
       backgroundColor: AppColors.paperColor,
@@ -104,7 +119,7 @@ class OrderDetailsScreen extends StatelessWidget {
                             fontSize: 11.sp, fontWeight: FontWeight.w600),
                       ),
                       appText(
-                        addresses.name,
+                        widget.addresses.name,
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w700,
                       )
@@ -114,49 +129,54 @@ class OrderDetailsScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 2.h,
-                        children: [
-                          appText(addresses.addressLine1,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 2.h,
+                          children: [
+                            appText(
+                              widget.addresses.addressLine1,
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w600,
-                              height: 1.3.h,
-                              textAlign: TextAlign.left),
-                          Row(
-                            spacing: 5.w,
-                            children: [
-                              appText("${addresses.city},",
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.3.h,
-                                  textAlign: TextAlign.left),
-                              appText(addresses.pincode,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.3.h,
-                                  textAlign: TextAlign.left),
-                            ],
-                          ),
-                          appText(addresses.country,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                              height: 1.3.h,
-                              textAlign: TextAlign.left),
-                          Row(
-                            children: [
-                              appText(AppStrings.phone,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.grey),
-                              appText(
-                                addresses.phoneNumber,
+                              textAlign: TextAlign.left,
+                              softWrap: true,
+                              maxLines: null,
+                            ),
+                            Row(
+                              spacing: 5.w,
+                              children: [
+                                appText("${widget.addresses.city},",
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.3.h,
+                                    textAlign: TextAlign.left),
+                                appText(widget.addresses.pincode,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.3.h,
+                                    textAlign: TextAlign.left),
+                              ],
+                            ),
+                            appText(widget.addresses.country,
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w600,
-                              ),
-                            ],
-                          )
-                        ],
+                                height: 1.3.h,
+                                textAlign: TextAlign.left),
+                            Row(
+                              children: [
+                                appText(AppStrings.phone,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.grey),
+                                appText(
+                                  widget.addresses.phoneNumber,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
                       ),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -183,161 +203,6 @@ class OrderDetailsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            // -------------------- PRODUCT DETAILS -----------------------
-            // Container(
-            //   width: double.infinity,
-            //   padding: EdgeInsets.all(15.w),
-            //   constraints: BoxConstraints(
-            //     minHeight: 130.h, // ⬅️ instead of fixed height
-            //   ),
-            //   decoration: BoxDecoration(
-            //     color: AppColors.white,
-            //     boxShadow: [
-            //       BoxShadow(
-            //         color: AppColors.shadowColor,
-            //         blurRadius: 6.r,
-            //         offset: Offset(0, 2),
-            //       )
-            //     ],
-            //     borderRadius: BorderRadius.circular(8.r),
-            //   ),
-            //   child: Column(
-            //     spacing: 6.h,
-            //     crossAxisAlignment: CrossAxisAlignment.start,
-            //     children: [
-            //       appText(
-            //         AppStrings.item,
-            //         fontSize: 13.sp,
-            //         fontWeight: FontWeight.w700,
-            //       ),
-            //       Container(
-            //         width: double.infinity,
-            //         padding:
-            //             EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
-            //         constraints: BoxConstraints(
-            //           minHeight: 80.h, // ⬅️ instead of fixed height
-            //         ),
-            //         decoration: BoxDecoration(
-            //           borderRadius: BorderRadius.circular(8.r),
-            //           border: Border.all(color: AppColors.grey),
-            //         ),
-            //         child: Row(
-            //           spacing: 15.w,
-            //           children: [
-            //             SizedBox(
-            //                 width: 55.w,
-            //                 height: 55.h,
-            //                 child: ClipRRect(
-            //                   borderRadius: BorderRadius.circular(8.r),
-            //                   child: Image.network(
-            //                     product!.images.isNotEmpty
-            //                         ? product!.images
-            //                             .firstWhere(
-            //                               (img) => img.isPrimary,
-            //                               orElse: () => product!.images.first,
-            //                             )
-            //                             .url
-            //                         : "", // empty triggers errorBuilder
-            //                     width: 70.w,
-            //                     height: 70.w,
-            //                     fit: BoxFit.cover,
-            //                     errorBuilder: (_, __, ___) {
-            //                       return Container(
-            //                         width: 70.w,
-            //                         height: 70.w,
-            //                         color: Colors.grey.shade200,
-            //                         child: Icon(
-            //                           Icons.broken_image,
-            //                           size: 28.sp,
-            //                           color: Colors.grey,
-            //                         ),
-            //                       );
-            //                     },
-            //                     loadingBuilder:
-            //                         (context, child, loadingProgress) {
-            //                       if (loadingProgress == null) return child;
-
-            //                       return Center(
-            //                         child: SizedBox(
-            //                           width: 24.w,
-            //                           height: 24.w,
-            //                           child: CircularProgressIndicator(
-            //                             strokeWidth: 2,
-            //                             color: Colors.grey,
-            //                           ),
-            //                         ),
-            //                       );
-            //                     },
-            //                   ),
-            //                 )),
-            //             Expanded(
-            //               child: Column(
-            //                 crossAxisAlignment: CrossAxisAlignment.start,
-            //                 mainAxisAlignment: MainAxisAlignment.center,
-            //                 children: [
-            //                   Row(
-            //                     mainAxisAlignment:
-            //                         MainAxisAlignment.spaceBetween,
-            //                     children: [
-            //                       Expanded(
-            //                         child: appText(
-            //                           product!.name,
-            //                           fontSize: 12.sp,
-            //                           textAlign: TextAlign.left,
-            //                           fontWeight: FontWeight.w600,
-            //                           maxLines: 2,
-            //                           overflow: TextOverflow.ellipsis,
-            //                         ),
-            //                       ),
-            //                       appText(
-            //                         "${AppStrings.qty} 1",
-            //                         fontSize: 13.sp,
-            //                         fontWeight: FontWeight.w700,
-            //                       ),
-            //                     ],
-            //                   ),
-            //                   // if (product!.hasVariants)
-            //                   //   Obx(() {
-            //                   //     final productCtrl = Get.find<ProductDetailsController>();
-            //                   //     final selectedVariant = productCtrl.getSelectedVariant();
-
-            //                   //     if (selectedVariant == null) {
-            //                   //       return SizedBox.shrink();
-            //                   //     }
-
-            //                   //     return appText(
-            //                   //       selectedVariant.attributes.color,
-            //                   //       fontSize: 12.sp,
-            //                   //       fontWeight: FontWeight.w600,
-            //                   //     );
-            //                   //   }),
-            //                   if (product!.hasVariants)
-            //                     appText(
-            //                       product!.variantId.isNotEmpty
-            //                           ? "Variant: $selectVarientId"
-            //                           : "",
-            //                       fontSize: 12.sp,
-            //                       fontWeight: FontWeight.w600,
-            //                     ),
-
-            //                   appText("₹ ${product!.pricing.finalPrice}",
-            //                       fontSize: 12.sp, fontWeight: FontWeight.w600),
-            //                   Obx(() {
-            //                     return appText(
-            //                       "Plan - ₹${orderController.selectedAmount.value} / ${orderController.selectedDays.value} Days",
-            //                       fontSize: 12.sp,
-            //                       fontWeight: FontWeight.w600,
-            //                     );
-            //                   }),
-            //                 ],
-            //               ),
-            //             ),
-            //           ],
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
 
             // -------------------- PRODUCT DETAILS -----------------------
             Container(
@@ -388,17 +253,30 @@ class OrderDetailsScreen extends StatelessWidget {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8.r),
                             child: Image.network(
-                              product!.images.isNotEmpty
-                                  ? product!.images
+                              widget.product!.images.isNotEmpty
+                                  ? widget.product!.images
                                       .firstWhere(
                                         (img) => img.isPrimary,
-                                        orElse: () => product!.images.first,
+                                        orElse: () =>
+                                            widget.product!.images.first,
                                       )
                                       .url
                                   : "",
                               width: 55.w,
                               height: 55.h,
                               fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) {
+                                  return child;
+                                }
+                                return Center(
+                                  child: CupertinoActivityIndicator(
+                                    radius: 10.0,
+                                    color: AppColors.textGray,
+                                  ),
+                                );
+                              },
                               errorBuilder: (_, __, ___) => Container(
                                 color: Colors.grey.shade200,
                                 child: Icon(Icons.broken_image, size: 28.sp),
@@ -419,7 +297,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: appText(
-                                      product!.name,
+                                      widget.product!.name,
                                       fontSize: 12.sp,
                                       fontWeight: FontWeight.w600,
                                       textAlign: TextAlign.left,
@@ -436,11 +314,11 @@ class OrderDetailsScreen extends StatelessWidget {
                               ),
 
                               // ----------- VARIANT (COLOR / SIZE) --------------
-                              if (product!.hasVariants)
+                              if (widget.product!.hasVariants)
                                 appText(
-                                  selectVarientId != null &&
-                                          selectVarientId!.isNotEmpty
-                                      ? "Variant: $selectVarientId"
+                                  widget.selectVarientId != null &&
+                                          widget.selectVarientId!.isNotEmpty
+                                      ? "Variant: ${widget.selectVarientId}"
                                       : "",
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w600,
@@ -448,7 +326,7 @@ class OrderDetailsScreen extends StatelessWidget {
 
                               // ----------- PRICE --------------
                               appText(
-                                "₹ ${product!.pricing.finalPrice}",
+                                "₹ ${widget.product!.pricing.finalPrice}",
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -461,6 +339,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                 );
                               }),
+
                               SizedBox(height: 2.h),
                               // ----------- QUANTITY SELECTOR ----------
                               Row(
@@ -597,11 +476,11 @@ class OrderDetailsScreen extends StatelessWidget {
                                 //added coupon edit
                                 orderController.applyCouponApi(
                                   couponCode: couponController.text.trim(),
-                                  productId: product!.id,
+                                  productId: widget.product!.id,
                                   totalDays: orderController.selectedDays.value,
                                   dailyAmount:
                                       orderController.selectedAmount.value,
-                                  variantId: selectVarientId ?? "",
+                                  variantId: widget.selectVarientId ?? "",
                                   quantity: 1,
                                 );
                               },
@@ -680,7 +559,6 @@ class OrderDetailsScreen extends StatelessWidget {
                               final p = v.pricing;
                               final ins = v.installment;
                               final b = v.benefits;
-                              final type = v.coupon.type;
 
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -832,7 +710,7 @@ class OrderDetailsScreen extends StatelessWidget {
                         spacing: 5.h,
                         children: [
                           buildPriceInfo(
-                              label: product!.name,
+                              label: widget.product!.name,
                               content:
                                   "₹ ${p.originalPrice.toStringAsFixed(0)}"),
                           buildPriceInfo(
@@ -857,14 +735,17 @@ class OrderDetailsScreen extends StatelessWidget {
                       spacing: 5.h,
                       children: [
                         buildPriceInfo(
-                            label: product!.name,
+                            label: widget.product!.name,
                             content: "₹ ${pricing.finalPrice}"),
                         buildPriceInfo(
                             label: AppStrings.shipping_charge, content: "Free"),
                         Divider(color: AppColors.grey),
-                        buildPriceInfo(
+                        Obx(() {
+                          return buildPriceInfo(
                             label: AppStrings.total_amount,
-                            content: "₹ ${pricing.finalPrice}"),
+                            content: "₹ ${orderController.totalAmount.value}",
+                          );
+                        }),
                       ],
                     );
                   }),
@@ -878,9 +759,10 @@ class OrderDetailsScreen extends StatelessWidget {
                   }),
                   Obx(() {
                     return buildPriceInfo(
-                        label: AppStrings.pay_now,
-                        content: "₹${orderController.selectedAmount.value}");
-                  }),
+                      label: AppStrings.pay_now,
+                      content: "₹${orderController.selectedAmount.value}",
+                    );
+                  })
                 ],
               ),
             ),
@@ -890,41 +772,6 @@ class OrderDetailsScreen extends StatelessWidget {
           ],
         ),
       )),
-      // bottomNavigationBar: Container(
-      //   padding: EdgeInsets.all(12.w),
-      //   color: AppColors.transparent,
-      //   child: appButton(
-      //     onTap: () {
-      //       orderController.placeOrder(
-      //         productId: product!.id,
-      //         variantId: selectVarientId ?? "",
-      //         paymentOption: "daily",
-      //         totalDays: orderController.selectedDays.value,
-      //         couponCode: orderController.appliedCouponCode.value,
-      //         deliveryAddress: {
-      //           "name": addresses.name,
-      //           "phoneNumber": addresses.phoneNumber,
-      //           "addressLine1": addresses.addressLine1,
-      //           "city": addresses.city,
-      //           "state": addresses.state,
-      //           "pincode": addresses.pincode,
-      //         },
-      //       );
-      //     },
-      //     width: double.infinity,
-      //     height: 45.h,
-      //     buttonColor: AppColors.lightAmber,
-      //     borderRadius: BorderRadius.circular(20.r),
-      //     child: Center(
-      //       child: appText(
-      //         AppStrings.pay_now,
-      //         fontSize: 15.sp,
-      //         color: AppColors.white,
-      //         fontWeight: FontWeight.w600,
-      //       ),
-      //     ),
-      //   ),
-      // ),
       bottomNavigationBar: _buildBottomBar(),
     );
   }
@@ -965,7 +812,8 @@ class OrderDetailsScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     appText(
-                      orderController.selectedPaymentMethod.value == "razorpay"
+                      orderController.selectedPaymentMethod.value ==
+                              PaymentMethod.razorpay
                           ? "Razorpay"
                           : "Wallet",
                       color: AppColors.textBlack,
@@ -993,38 +841,19 @@ class OrderDetailsScreen extends StatelessWidget {
                 ),
                 padding: EdgeInsets.symmetric(vertical: 10.h),
               ),
-              // onPressed: () {
-              //   orderController.placeOrder(
-              //     productId: product!.id,
-              //     variantId: selectVarientId ?? "",
-              //     // paymentOption: orderController.selectedPaymentMethod.value,
-              //         paymentOption: "daily",
-              //     totalDays: orderController.selectedDays.value,
-              //     couponCode: orderController.appliedCouponCode.value,
-              //     deliveryAddress: {
-              //       "name": addresses.name,
-              //       "phoneNumber": addresses.phoneNumber,
-              //       "addressLine1": addresses.addressLine1,
-              //       "city": addresses.city,
-              //       "state": addresses.state,
-              //       "pincode": addresses.pincode,
-              //     },
-              //   );
-              // },
               onPressed: () {
                 orderController.placeOrder(
-                  productId: product!.id,
-                  variantId: selectVarientId ?? "",
-                  paymentOption: "daily",
+                  productId: widget.product!.id,
+                  variantId: widget.selectVarientId ?? "",
                   totalDays: orderController.selectedDays.value,
                   couponCode: orderController.appliedCouponCode.value,
                   deliveryAddress: {
-                    "name": addresses.name,
-                    "phoneNumber": addresses.phoneNumber,
-                    "addressLine1": addresses.addressLine1,
-                    "city": addresses.city,
-                    "state": addresses.state,
-                    "pincode": addresses.pincode,
+                    "name": widget.addresses.name,
+                    "phoneNumber": widget.addresses.phoneNumber,
+                    "addressLine1": widget.addresses.addressLine1,
+                    "city": widget.addresses.city,
+                    "state": widget.addresses.state,
+                    "pincode": widget.addresses.pincode,
                   },
                 );
               },
@@ -1042,7 +871,12 @@ class OrderDetailsScreen extends StatelessWidget {
   }
 
   void _showPaymentMethodSheet() {
-    final walletBalance = walletController.wallet.value?.walletBalance ?? 0.0;
+    walletController.fetchWallet();
+
+    // 🔹 TEMP state (does NOT affect order until confirmed)
+    final RxString tempPaymentMethod =
+        orderController.selectedPaymentMethod.value.obs;
+    final RxBool tempEnableAutoPay = orderController.enableAutoPay.value.obs;
 
     Get.bottomSheet(
       Container(
@@ -1058,7 +892,7 @@ class OrderDetailsScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with close button
+            // ---------------- HEADER ----------------
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1072,231 +906,289 @@ class OrderDetailsScreen extends StatelessWidget {
                   onPressed: () => Get.back(),
                   icon: Icon(Icons.close, size: 24.sp),
                   padding: EdgeInsets.zero,
-                  constraints: BoxConstraints(),
+                  constraints: const BoxConstraints(),
                 ),
               ],
             ),
 
             SizedBox(height: 15.h),
 
-            // ================= WALLET OPTION =================
-            Obx(() => GestureDetector(
-                  onTap: () {
-                    if (walletBalance < orderController.selectedAmount.value) {
-                      appToaster(
-                        content: "Insufficient wallet balance",
-                        error: true,
-                      );
-                      return; // stop here, do not select wallet
-                    }
+            // ---------------- WALLET OPTION ----------------
+            Obx(() {
+              final walletData = walletController.wallet.value;
+              final walletBalance = walletData?.walletBalance ?? 0.0;
+              final isSelected =
+                  tempPaymentMethod.value == PaymentMethod.wallet;
 
-                    // If enough balance → allow selection
-                    orderController.selectPaymentMethod("wallet");
-                    Get.back();
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: orderController.selectedPaymentMethod.value ==
-                              "wallet"
+              return GestureDetector(
+                onTap: () {
+                  if (walletBalance < orderController.selectedAmount.value) {
+                    appToaster(
+                      content: "Insufficient wallet balance",
+                      error: true,
+                    );
+                    return;
+                  }
+
+                  // ✅ TEMP selection only
+                  tempPaymentMethod.value = PaymentMethod.wallet;
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primaryColor.withOpacity(0.08)
+                        : AppColors.white,
+                    border: Border.all(
+                      color: isSelected
                           ? AppColors.primaryColor
-                          : AppColors.white,
-                      border: Border.all(
-                        color: orderController.selectedPaymentMethod.value ==
-                                "wallet"
-                            ? AppColors.primaryColor
-                            : AppColors.grey,
-                        width: 1.5,
-                      ),
-                      borderRadius: BorderRadius.circular(12.r),
+                          : AppColors.grey.withOpacity(0.4),
+                      width: isSelected ? 2 : 1.5,
                     ),
-                    child: Row(
-                      children: [
-                        // Icon Container
-                        Container(
-                          padding: EdgeInsets.all(10.w),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          child: Icon(
-                            Icons.account_balance_wallet_rounded,
-                            color: AppColors.primaryColor,
-                            size: 24.sp,
-                          ),
-                        ),
-
-                        SizedBox(width: 12.w),
-
-                        // Text Content
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Wallet Payment",
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                "Balance: ₹${walletBalance.toStringAsFixed(1)}",
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: AppColors.grey,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Radio Button
-                        Container(
-                          width: 24.w,
-                          height: 24.w,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color:
-                                  orderController.selectedPaymentMethod.value ==
-                                          "wallet"
-                                      ? AppColors.primaryColor
-                                      : AppColors.grey.withOpacity(0.5),
-                              width: 2,
-                            ),
-                            color:
-                                orderController.selectedPaymentMethod.value ==
-                                        "wallet"
-                                    ? AppColors.primaryColor
-                                    : Colors.transparent,
-                          ),
-                          child: orderController.selectedPaymentMethod.value ==
-                                  "wallet"
-                              ? Icon(
-                                  Icons.check,
-                                  size: 16.sp,
-                                  color: Colors.white,
-                                )
-                              : null,
-                        ),
-                      ],
-                    ),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
-                )),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(10.w),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            child: Icon(
+                              Icons.account_balance_wallet_rounded,
+                              color: AppColors.primaryColor,
+                              size: 24.sp,
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Wallet Payment",
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  "Balance: ₹${walletBalance.toStringAsFixed(1)}",
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    color: AppColors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          _buildRadio(isSelected),
+                        ],
+                      ),
+                      SizedBox(height: 6.h),
+                      Padding(
+                        padding: EdgeInsets.only(left: 3.w),
+                        child: Obx(() {
+                          final show =
+                              tempPaymentMethod.value == PaymentMethod.wallet;
+
+                          return AnimatedOpacity(
+                            duration: const Duration(milliseconds: 250),
+                            opacity: show ? 1 : 0,
+                            child: AnimatedSlide(
+                              duration: const Duration(milliseconds: 250),
+                              offset:
+                                  show ? Offset.zero : const Offset(0, -0.1),
+                              child: show
+                                  ? Padding(
+                                      padding:
+                                          EdgeInsets.only(left: 3.w, top: 6.h),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 18.w,
+                                            height: 18.w,
+                                            child: Checkbox(
+                                              value: tempEnableAutoPay.value,
+                                              onChanged: (val) {
+                                                tempEnableAutoPay.value =
+                                                    val ?? true;
+                                              },
+                                              activeColor:
+                                                  AppColors.primaryColor,
+                                              materialTapTargetSize:
+                                                  MaterialTapTargetSize
+                                                      .shrinkWrap,
+                                            ),
+                                          ),
+                                          SizedBox(width: 8.w),
+                                          Text(
+                                            "Enable AutoPay for future payments",
+                                            style: TextStyle(
+                                              fontSize: 12.5.sp,
+                                              color: AppColors.grey,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
 
             SizedBox(height: 12.h),
 
-            // ================= RAZORPAY OPTION =================
-            Obx(() => GestureDetector(
-                  onTap: () {
-                    orderController.selectPaymentMethod("razorpay");
-                    Get.back();
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: orderController.selectedPaymentMethod.value ==
-                              "razorpay"
-                          ? AppColors.primaryColor.withOpacity(0.08)
-                          : AppColors.white,
-                      border: Border.all(
-                        color: orderController.selectedPaymentMethod.value ==
-                                "razorpay"
-                            ? AppColors.primaryColor
-                            : AppColors.grey.withOpacity(0.3),
-                        width: 1.5,
-                      ),
-                      borderRadius: BorderRadius.circular(12.r),
+            // ---------------- RAZORPAY OPTION ----------------
+            Obx(() {
+              final isSelected =
+                  tempPaymentMethod.value == PaymentMethod.razorpay;
+
+              return GestureDetector(
+                onTap: () {
+                  // ✅ TEMP selection only
+                  tempPaymentMethod.value = PaymentMethod.razorpay;
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primaryColor.withOpacity(0.08)
+                        : AppColors.white,
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.primaryColor
+                          : AppColors.grey.withOpacity(0.4),
+                      width: isSelected ? 2 : 1.5,
                     ),
-                    child: Row(
-                      children: [
-                        // Icon Container
-                        Container(
-                          padding: EdgeInsets.all(10.w),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          child: Icon(
-                            Icons.payment_rounded,
-                            color: AppColors.primaryColor,
-                            size: 24.sp,
-                          ),
-                        ),
-
-                        SizedBox(width: 12.w),
-
-                        // Text Content
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Razorpay Payment",
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                "UPI, Card, Net Banking & More",
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: AppColors.grey,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Radio Button
-                        Container(
-                          width: 24.w,
-                          height: 24.w,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color:
-                                  orderController.selectedPaymentMethod.value ==
-                                          "razorpay"
-                                      ? AppColors.primaryColor
-                                      : AppColors.grey.withOpacity(0.5),
-                              width: 2,
-                            ),
-                            color:
-                                orderController.selectedPaymentMethod.value ==
-                                        "razorpay"
-                                    ? AppColors.primaryColor
-                                    : Colors.transparent,
-                          ),
-                          child: orderController.selectedPaymentMethod.value ==
-                                  "razorpay"
-                              ? Icon(
-                                  Icons.check,
-                                  size: 16.sp,
-                                  color: Colors.white,
-                                )
-                              : null,
-                        ),
-                      ],
-                    ),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
-                )),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(10.w),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: Icon(
+                          Icons.payment_rounded,
+                          color: AppColors.primaryColor,
+                          size: 24.sp,
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Razorpay Payment",
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              "UPI, Card, Net Banking & More",
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                color: AppColors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      _buildRadio(isSelected),
+                    ],
+                  ),
+                ),
+              );
+            }),
 
             SizedBox(height: 20.h),
+
+            // ---------------- CONFIRM BUTTON ----------------
+            Obx(() {
+              final canConfirm = tempPaymentMethod.value.isNotEmpty;
+
+              return SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: canConfirm
+                      ? () {
+                          // ✅ FINAL COMMIT
+                          orderController.selectPaymentMethod(
+                            tempPaymentMethod.value,
+                          );
+
+                          orderController.enableAutoPay.value =
+                              tempEnableAutoPay.value;
+
+                          Get.back();
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor,
+                    disabledBackgroundColor: AppColors.grey.withOpacity(0.4),
+                    padding: EdgeInsets.symmetric(vertical: 14.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  child: Text(
+                    "Confirm Payment Method",
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              );
+            }),
           ],
         ),
       ),
       isScrollControlled: true,
-      isDismissible: true,
       enableDrag: true,
+    );
+  }
+
+// ---------------- RADIO HELPER ----------------
+  Widget _buildRadio(bool isSelected) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      width: 24.w,
+      height: 24.w,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isSelected ? AppColors.primaryColor : Colors.transparent,
+        border: Border.all(
+          color: isSelected
+              ? AppColors.primaryColor
+              : AppColors.grey.withOpacity(0.5),
+          width: 2,
+        ),
+      ),
+      child: isSelected
+          ? Icon(Icons.check, size: 16.sp, color: Colors.white)
+          : null,
     );
   }
 

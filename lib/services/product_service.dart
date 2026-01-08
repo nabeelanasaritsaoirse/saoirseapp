@@ -1,7 +1,3 @@
-// ignore_for_file: avoid_print
-
-import 'dart:developer';
-
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -38,8 +34,6 @@ class ProductService {
   //         search != null && search.isNotEmpty ? "&search=$search" : "";
   //     final url = "${AppURLs.PRODUCTS_LISTING}?page=$page&limit=$limit$query";
 
-  //     print("GET PRODUCTS: $url");
-
   //     final response = await APIService.getRequest(
   //       url: url,
   //       onSuccess: (data) => data,
@@ -49,10 +43,10 @@ class ProductService {
   //     );
 
   //     if (response == null) return null;
-  //     log("Product List response ====> $response");
+
   //     return ProductListResponse.fromJson(response);
   //   } catch (e) {
-  //     print("Product fetch error: $e");
+
   //     return null;
   //   }
   // }
@@ -69,12 +63,9 @@ class ProductService {
       query.add('limit=$limit');
       if (search != null && search.isNotEmpty) query.add('search=$search');
 
-    
       final url = (categoryId != null && categoryId.isNotEmpty)
           ? "${AppURLs.PRODUCT_LISTING_SUBCATEGORY}$categoryId?${query.join('&')}"
           : "${AppURLs.PRODUCTS_LISTING}?${query.join('&')}";
-
-      print("GET PRODUCTS: $url");
 
       final response = await APIService.getRequest(
         url: url,
@@ -85,10 +76,9 @@ class ProductService {
       );
 
       if (response == null) return null;
-      log("Product List response ====> $response");
+
       return ProductListResponse.fromJson(response);
     } catch (e) {
-      print("Product fetch error: $e");
       return null;
     }
   }
@@ -97,8 +87,6 @@ class ProductService {
   Future<List<PlanModel>> fetchProductPlans(String productId) async {
     try {
       final url = "${AppURLs.PRODUCT_PLAN_API}$productId/plans";
-
-      print("GET PRODUCT PLANS: $url");
 
       final response = await APIService.getRequest(
         url: url,
@@ -116,7 +104,6 @@ class ProductService {
       // ✅ Return list of plans
       return planResponse.data.plans;
     } catch (e) {
-      print("Plan fetch error: $e");
       return [];
     }
   }

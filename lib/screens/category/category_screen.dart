@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -6,7 +7,6 @@ import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../models/category_model.dart';
-import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/category_item.dart';
 import '../../widgets/custom_appbar.dart';
@@ -14,6 +14,7 @@ import '../productListing/product_listing.dart';
 import '../profile/profile_controller.dart';
 import '../wishlist/wishlist_screen.dart';
 import 'category_controller.dart';
+import 'category_shimmer.dart';
 
 class CategoryScreen extends StatefulWidget {
   final int initialIndex;
@@ -24,8 +25,8 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  final CategoryController controller = Get.put(CategoryController());
-  final ProfileController profileController = Get.put(ProfileController());
+  final CategoryController controller = Get.find<CategoryController>();
+  final ProfileController profileController = Get.find<ProfileController>();
 
   @override
   void initState() {
@@ -97,13 +98,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
         ),
         body: Obx(() {
           if (controller.isLoading.value) {
-            return Center(child: appLoader());
+            return Center(child: CategoryScreenShimmer());
           }
-          if (controller.errorMessage.value.isNotEmpty) {
-            return Center(
-              child: appText(controller.errorMessage.value),
-            );
-          }
+
           if (controller.categoryGroups.isEmpty) {
             return Center(
               child: appText(
@@ -117,7 +114,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           return Row(
             children: [
               Container(
-                width: 80.h,
+                width: 85.h,
                 color: AppColors.white,
                 child: Column(
                   children: [
@@ -230,7 +227,8 @@ class SubCategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => const ProductListing(), arguments: {'categoryId': id.id});
+        Get.to(() => const ProductListing(),
+            arguments: {'categoryId': subCategory.id});
       },
       child: Container(
         decoration: BoxDecoration(
@@ -270,13 +268,24 @@ class SubCategoryCard extends StatelessWidget {
                     );
                   }
 
-                  // Image available: show network image, fallback to icon on errorreturn Image.
+                  // Image available: show network image, fallback to icon on error
                   return Center(
                     child: Image.network(
                       imageUrl,
                       height: 75.h,
                       width: 80.w,
                       fit: BoxFit.contain,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        }
+                        return Center(
+                          child: CupertinoActivityIndicator(
+                            radius: 10.0,
+                            color: AppColors.textGray,
+                          ),
+                        );
+                      },
                       errorBuilder: (context, error, stackTrace) {
                         return Center(
                           child: Icon(

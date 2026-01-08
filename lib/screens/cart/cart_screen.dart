@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,7 +10,9 @@ import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_text.dart';
+import '../../widgets/cart_product_plan_sheet.dart';
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/warning_dialog.dart';
 import '../select_address/select_address.dart';
 import 'cart_controller.dart';
 
@@ -25,16 +28,27 @@ class CartScreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: AppStrings.carttitle,
         actions: [
-          IconBox(
-            image: AppAssets.delete,
-            padding: 5.w,
-            onTap: () {
-              controller.clearCartItems();
-            },
-          ),
-          SizedBox(
-            width: 12.w,
-          )
+          Obx(() {
+            final hasItems = controller.cartData.value != null &&
+                controller.cartData.value!.products.isNotEmpty;
+
+            if (!hasItems) {
+              return const SizedBox.shrink(); // hide delete icon
+            }
+
+            return Row(
+              children: [
+                IconBox(
+                  image: AppAssets.delete,
+                  padding: 5.w,
+                  onTap: () {
+                    controller.clearCartItems();
+                  },
+                ),
+                SizedBox(width: 12.w),
+              ],
+            );
+          }),
         ],
       ),
       body: Column(
@@ -85,6 +99,7 @@ class CartScreen extends StatelessWidget {
                       ],
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,33 +107,54 @@ class CartScreen extends StatelessWidget {
                             /// IMAGE
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10.r),
-                              child: item.images.isNotEmpty
-                                  ? item.images.first.url.startsWith('http')
-                                      ? Image.network(
-                                          item.images.first.url,
-                                          width: 80.w,
-                                          height: 80.h,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Icon(
-                                              Icons.broken_image,
-                                              size: 80.sp,
-                                              color: AppColors.grey,
-                                            );
-                                          },
-                                        )
-                                      : Image.asset(
-                                          item.images.first.url,
-                                          width: 80.w,
-                                          height: 80.h,
-                                          fit: BoxFit.cover,
-                                        )
-                                  : Icon(
-                                      Icons.broken_image,
-                                      size: 80.sp,
-                                      color: AppColors.grey,
-                                    ),
+                              child: SizedBox(
+                                width: 80.w,
+                                height: 80.h,
+                                child: item.images.isNotEmpty
+                                    ? item.images.first.url.startsWith('http')
+                                        ? Image.network(
+                                            item.images.first.url,
+                                            width: 80.w,
+                                            height: 80.h,
+                                            fit: BoxFit.cover,
+                                            loadingBuilder: (context, child,
+                                                loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return Center(
+                                                child:
+                                                    CupertinoActivityIndicator(
+                                                  radius: 10.0,
+                                                  color: AppColors.textGray,
+                                                ),
+                                              );
+                                            },
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Center(
+                                                child: Icon(
+                                                  Icons.broken_image,
+                                                  size: 80.sp,
+                                                  color: AppColors.grey,
+                                                ),
+                                              );
+                                            },
+                                          )
+                                        : Image.asset(
+                                            item.images.first.url,
+                                            width: 80.w,
+                                            height: 80.h,
+                                            fit: BoxFit.cover,
+                                          )
+                                    : Center(
+                                        child: Icon(
+                                          Icons.broken_image,
+                                          size: 80.sp,
+                                          color: AppColors.grey,
+                                        ),
+                                      ),
+                              ),
                             ),
 
                             SizedBox(width: 12.w),
@@ -144,10 +180,19 @@ class CartScreen extends StatelessWidget {
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.bold),
                                   SizedBox(height: 3.h),
-                                  appText(
-                                      "Plan - ₹${item.installmentPlan.dailyAmount}/${item.installmentPlan.totalDays} Days",
+                                  Obx(() {
+                                    if (!controller.isCartPlanApplied.value ||
+                                        item.installmentPlan.totalDays == 0) {
+                                      return const SizedBox.shrink();
+                                    }
+
+                                    return appText(
+                                      "Plan: ₹${item.installmentPlan.dailyAmount.toStringAsFixed(2)} / "
+                                      "${item.installmentPlan.totalDays} days",
                                       fontSize: 12.sp,
-                                      color: AppColors.black87)
+                                      color: AppColors.primaryColor,
+                                    );
+                                  }),
                                 ],
                               ),
                             ),
@@ -205,38 +250,38 @@ class CartScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Align(
-                          alignment: AlignmentGeometry.centerRight,
-                          child: GestureDetector(
-                            onTap: () {
-                              final productDetails =
-                                  controller.convertCartToProductDetails(item);
+                        // Align(
+                        //   alignment: AlignmentGeometry.centerRight,
+                        //   child: GestureDetector(
+                        //     onTap: () {
+                        //       final productDetails =
+                        //           controller.convertCartToProductDetails(item);
 
-                              Get.to(() => SelectAddress(
-                                    product: productDetails,
-                                    selectVarientId:
-                                        item.variant?.variantId ?? "",
-                                    selectedDays:
-                                        item.installmentPlan.totalDays,
-                                    selectedAmount:
-                                        item.installmentPlan.dailyAmount,
-                                    quantity: item.quantity,
-                                  ));
-                            },
-                            child: Container(
-                              width: 120.w,
-                              height: 30.h,
-                              decoration: BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  borderRadius: BorderRadius.circular(10.r)),
-                              child: Center(
-                                child: appText("Buy Now",
-                                    color: AppColors.white,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          ),
-                        )
+                        //       Get.to(() => SelectAddress(
+                        //             product: productDetails,
+                        //             selectVarientId:
+                        //                 item.variant?.variantId ?? "",
+                        //             selectedDays:
+                        //                 item.installmentPlan.totalDays,
+                        //             selectedAmount:
+                        //                 item.installmentPlan.dailyAmount,
+                        //             quantity: item.quantity,
+                        //           ));
+                        //     },
+                        //     child: Container(
+                        //       width: 120.w,
+                        //       height: 30.h,
+                        //       decoration: BoxDecoration(
+                        //           color: AppColors.primaryColor,
+                        //           borderRadius: BorderRadius.circular(10.r)),
+                        //       child: Center(
+                        //         child: appText("Buy Now",
+                        //             color: AppColors.white,
+                        //             fontWeight: FontWeight.w600),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // )
                       ],
                     ),
                   );
@@ -248,7 +293,126 @@ class CartScreen extends StatelessWidget {
           Divider(
             height: 2.h,
             color: AppColors.grey.withOpacity(0.1),
-          )
+          ),
+          Obx(() {
+            final cart = controller.cartData.value;
+
+            if (cart == null || cart.products.isEmpty) {
+              return const SizedBox.shrink(); // 🔥 Hide when empty
+            }
+
+            return Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  /// TOTAL AMOUNT
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      appText(
+                        "Total Amount",
+                        fontSize: 12.sp,
+                        color: AppColors.grey,
+                      ),
+                      SizedBox(height: 4.h),
+                      appText(
+                        "₹ ${controller.totalAmount.toStringAsFixed(0)}",
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ],
+                  ),
+
+                  /// SELECT PLAN BUTTON (Small)
+                  GestureDetector(
+                    onTap: () {
+                      Get.bottomSheet(
+                        const CartProductPlanSheet(),
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                      );
+                    },
+                    child: Container(
+                      width: 95.w,
+                      height: 40.h,
+                      decoration: BoxDecoration(
+                          color: AppColors.lightGrey,
+                          borderRadius: BorderRadius.circular(10.r),
+                          border: Border.all(color: AppColors.shadowColor)),
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        spacing: 2.w,
+                        children: [
+                          appText(
+                            "Plan",
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textBlack,
+                          ),
+                          Icon(Icons.arrow_drop_down)
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  /// CHECKOUT BUTTON
+                  SizedBox(
+                    height: 40.h,
+                    width: 130.w,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                      ),
+                      onPressed: () {
+                        final hasPlan = controller.isCartPlanApplied.value;
+
+                        if (!hasPlan) {
+                          WarningDialog.show(
+                            title: AppStrings.warning_label,
+                            message: AppStrings.checkout_warning_body,
+                          );
+                          return;
+                        }
+
+                        // ✅ Continue checkout if plan is applied
+                        Get.to(
+                          () => SelectAddress(
+                            product: null,
+                            cartData: controller.cartData.value,
+                            quantity: 1,
+                            selectedDays: controller.customDays.value,
+                            selectedAmount: controller.customAmount.value,
+                            checkoutSource: CheckoutSource.cart,
+                          ),
+                        );
+                      },
+                      child: appText(
+                        "Check Out",
+                        color: AppColors.white,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
         ],
       ),
     );

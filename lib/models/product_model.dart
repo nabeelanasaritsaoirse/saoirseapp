@@ -1,62 +1,99 @@
-// models/product_model.dart
-class Product {
-  final String id;
-  final String productId;
-  final String name;
-  final String brand;
-  final String sku;
-  final List<ProductImage> images;
-  final Description description;
-  final Category category;
-  final Pricing pricing;
-  final Availability availability;
-  final bool isPopular;
-  final bool isBestSeller;
-  final bool isTrending;
-  final String status;
+class FeaturedList {
+  final String listId;
+  final String listName;
+  final String slug;
+  final String description;
+  final int displayOrder;
+  final int design;
+  final int totalProducts;
+  final List<FeaturedProduct> products;
 
-  Product({
-    required this.id,
-    required this.productId,
-    required this.name,
-    required this.brand,
-    required this.sku,
-    required this.images,
+  FeaturedList({
+    required this.listId,
+    required this.listName,
+    required this.slug,
     required this.description,
-    required this.category,
-    required this.pricing,
-    required this.availability,
-    required this.isPopular,
-    required this.isBestSeller,
-    required this.isTrending,
-    required this.status,
+    required this.displayOrder,
+    required this.design,
+    required this.totalProducts,
+    required this.products,
   });
 
-  // For backward compatibility with your existing UI
-  String get image => images.isNotEmpty ? images.first.url : '';
-  double get price => pricing.finalPrice;
-  bool get hasDiscount => pricing.regularPrice > pricing.salePrice;
-  bool isFavorite = false; // You can manage this separately
+  factory FeaturedList.fromJson(Map<String, dynamic> json) {
+    return FeaturedList(
+      listId: json['listId'] ?? '',
+      listName: json['listName'] ?? '',
+      slug: json['slug'] ?? '',
+      description: json['description'] ?? '',
+      displayOrder: json['displayOrder'] ?? 0,
+      design: json['design'] ?? 0,
+      totalProducts: json['totalProducts'] ?? 0,
+      products: (json['products'] as List? ?? [])
+          .map((e) => FeaturedProduct.fromJson(e))
+          .toList(),
+    );
+  }
+}
 
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['_id'] ?? '',
+class FeaturedListsResponse {
+  final List<FeaturedList> lists;
+  final String region;
+
+  FeaturedListsResponse({
+    required this.lists,
+    required this.region,
+  });
+
+  factory FeaturedListsResponse.fromJson(Map<String, dynamic> json) {
+    return FeaturedListsResponse(
+      lists:
+          (json['data'] as List).map((e) => FeaturedList.fromJson(e)).toList()
+            ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder)),
+      region: json['region'] ?? '',
+    );
+  }
+}
+
+class FeaturedProduct {
+  final String productId;
+  final String? productMongoId;
+  final String name;
+  final String? brand;
+  final String image;
+  final double price;
+  final double finalPrice;
+  final int order;
+
+  FeaturedProduct({
+    required this.productId,
+    this.productMongoId,
+    required this.name,
+    required this.brand,
+    required this.image,
+    required this.price,
+    required this.finalPrice,
+    required this.order,
+  });
+
+  bool get hasDiscount => price > finalPrice;
+  bool isFavorite = false;
+
+  static const String placeholderImage =
+      'https://via.placeholder.com/300x300.png?text=No+Image';
+
+  factory FeaturedProduct.fromJson(Map<String, dynamic> json) {
+    return FeaturedProduct(
       productId: json['productId'] ?? '',
-      name: json['name'] ?? '',
-      brand: json['brand'] ?? '',
-      sku: json['sku'] ?? '',
-      images: (json['images'] as List?)
-              ?.map((img) => ProductImage.fromJson(img))
-              .toList() ??
-          [],
-      description: Description.fromJson(json['description'] ?? {}),
-      category: Category.fromJson(json['category'] ?? {}),
-      pricing: Pricing.fromJson(json['pricing'] ?? {}),
-      availability: Availability.fromJson(json['availability'] ?? {}),
-      isPopular: json['isPopular'] ?? false,
-      isBestSeller: json['isBestSeller'] ?? false,
-      isTrending: json['isTrending'] ?? false,
-      status: json['status'] ?? '',
+      productMongoId: json['productMongoId'],
+      name: json['productName'] ?? '',
+      brand: json['brand'],
+      image: (json['productImage'] != null &&
+              json['productImage'].toString().isNotEmpty)
+          ? json['productImage']
+          : placeholderImage,
+      price: (json['price'] ?? 0).toDouble(),
+      finalPrice: (json['finalPrice'] ?? 0).toDouble(),
+      order: json['order'] ?? 0,
     );
   }
 }

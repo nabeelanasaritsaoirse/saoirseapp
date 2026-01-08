@@ -1,11 +1,10 @@
-import 'dart:developer';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/edit_profile/edit_profile_screen.dart';
 
-import 'package:saoirse_app/screens/kyc/kyc_controller.dart';
+import '../edit_profile/edit_profile_screen.dart';
+import '../kyc/kyc_controller.dart';
 import '../kyc/kyc_screen.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -14,9 +13,12 @@ import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/profile_menu_card.dart';
+import '../manage_address/manage_address_screen.dart';
 import '../order_delivered/order_delivered_screen.dart';
 import '../order_history/order_history_screen.dart';
+import '../orders_active/orders_active_screen.dart';
 import '../pending_transaction/pending_transaction_screen.dart';
+import '../select_account/managa_account.dart';
 import '../terms_and_privacy/privacy_policy.dart';
 import '../terms_and_privacy/terms_conditions.dart';
 import '../transaction_history/transaction_history.dart';
@@ -32,11 +34,11 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late final ProfileController controller;
-  final kyccontroller = Get.put(KycController());
+  final kyccontroller = Get.find<KycController>();
 
   @override
   void initState() {
-    controller = Get.put(ProfileController());
+    controller = Get.find<ProfileController>();
     super.initState();
   }
 
@@ -99,10 +101,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             CircleAvatar(
                               radius: 42,
                               backgroundColor: Colors.grey.shade300,
-                              backgroundImage: user.profilePicture.isNotEmpty
-                                  ? NetworkImage(user.profilePicture)
-                                  : AssetImage(AppAssets.user_img)
-                                      as ImageProvider,
+                              child: user.profilePicture.isNotEmpty
+                                  ? ClipOval(
+                                      child: Image.network(
+                                        user.profilePicture,
+                                        fit: BoxFit.cover,
+                                        width: 84,
+                                        height: 84,
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
+                                          return Center(
+                                            child: CupertinoActivityIndicator(
+                                              radius: 10.0,
+                                              color: AppColors.textGray,
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (_, __, ___) => ClipOval(
+                                          child: Image.asset(
+                                            AppAssets.user_img,
+                                            fit: BoxFit.cover,
+                                            width: 84,
+                                            height: 84,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : ClipOval(
+                                      child: Image.asset(
+                                        AppAssets.user_img,
+                                        fit: BoxFit.cover,
+                                        width: 84,
+                                        height: 84,
+                                      ),
+                                    ),
                             ),
 
                             Positioned(
@@ -202,15 +237,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: controller.myOrders[index]["title"]!,
                       onTap: () {
                         if (index == 0) {
-                          Get.to(PendingTransaction());
+                          Get.to(() => PendingTransaction());
                         } else if (index == 1) {
-                          Get.to(OrderHistoryScreen());
+                          Get.to(() => OrderHistoryScreen());
                         } else if (index == 2) {
-                          Get.to(WishlistScreen());
+                          Get.to(() => WishlistScreen());
                         } else if (index == 3) {
-                          Get.to(TransactionHistory());
+                          Get.to(() => OrdersActiveScreen());
                         } else if (index == 4) {
-                          Get.to(OrderDeliveredScreen());
+                          Get.to(() => TransactionHistory());
+                        } else if (index == 5) {
+                          Get.to(() => OrderDeliveredScreen());
                         } else {}
                       },
                     );
@@ -258,7 +295,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         case "KYC":
                           Get.to(() => KycScreen());
                           break;
-
+                        case "Manage Account":
+                          Get.to(() => ManageAccountScreen());
+                          break;
                         case "Privacy Policy":
                           Get.to(() => PrivacyPolicyScreen());
                           break;
@@ -269,9 +308,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         case "Log Out":
                           controller.confirmLogout();
                           break;
+                        case "Manage Address":
+                          Get.to(() => ManageAddressScreen());
 
                         default:
-                          log("Clicked $title");
                       }
                     },
                   );

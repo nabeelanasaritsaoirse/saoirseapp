@@ -178,7 +178,7 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                                         fontWeight: FontWeight.w600,
                                       ),
                                       appText(
-                                        "₹${user.totalCommission}",
+                                        "₹${controller.formatAmount(user.totalCommission)}",
                                         fontSize: 15.sp,
                                         fontWeight: FontWeight.w700,
                                       ),
@@ -254,16 +254,36 @@ class InviteFriendDetailsScreen extends StatelessWidget {
               SizedBox(height: 10.h),
 
               // ---------------- PRODUCT LIST ----------------
-              ListView.separated(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: user.products.length,
-                separatorBuilder: (_, __) => SizedBox(height: 10.h),
-                itemBuilder: (context, index) {
-                  final product = user.products[index];
-                  return _buildProductCard(context, product, controller);
-                },
-              ),
+              if (user.products.isEmpty)
+                Column(
+                  children: [
+                    SizedBox(
+                      height: 60.h,
+                    ),
+                    Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 30.h),
+                        child: appText(
+                          "No products purchased yet",
+                          fontSize: 14.sp,
+                          color: AppColors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              else
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: user.products.length,
+                  separatorBuilder: (_, __) => SizedBox(height: 10.h),
+                  itemBuilder: (context, index) {
+                    final product = user.products[index];
+                    return _buildProductCard(context, product, controller);
+                  },
+                ),
             ],
           ),
         );
@@ -302,18 +322,30 @@ Widget _buildProductCard(BuildContext context, FriendProduct product,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ---------------- Title + Date ----------------
+
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            appText(
-              product.productName,
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w700,
+            // PRODUCT NAME (takes remaining space)
+            Expanded(
+              child: appText(
+                product.productName,
+                textAlign: TextAlign.left,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w700,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+
+            SizedBox(width: 8.w),
+
+            // DATE (fixed width, never overflows)
             appText(
-              "${AppStrings.dp}$formattedDate",
+              "${AppStrings.dp}: $formattedDate",
               fontSize: 12.sp,
               color: AppColors.darkGray,
+              textAlign: TextAlign.right,
             ),
           ],
         ),
@@ -330,7 +362,7 @@ Widget _buildProductCard(BuildContext context, FriendProduct product,
                 appText(
                   AppStrings.productId,
                   fontSize: 13.sp,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.grey,
                 ),
                 appText(
@@ -361,11 +393,12 @@ Widget _buildProductCard(BuildContext context, FriendProduct product,
           ],
         ),
 
-        SizedBox(height: 6.h),
+        SizedBox(height: 4.h),
 
         // ---------------- Pending Status + View Button ----------------
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               spacing: 5.w,
@@ -374,7 +407,7 @@ Widget _buildProductCard(BuildContext context, FriendProduct product,
                   AppStrings.pending_status,
                   fontSize: 13.sp,
                   color: AppColors.grey,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
                 appText(
                   "${product.pendingDays} days",

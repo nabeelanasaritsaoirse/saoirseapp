@@ -18,7 +18,7 @@ class TransactionHistory extends StatefulWidget {
 }
 
 class _TransactionHistoryState extends State<TransactionHistory> {
-  final MyWalletController controller = Get.put(MyWalletController());
+  final MyWalletController controller = Get.find<MyWalletController>();
 
   @override
   Widget build(BuildContext context) {
@@ -52,11 +52,23 @@ class _TransactionHistoryState extends State<TransactionHistory> {
   }
 
   Widget _transactionCard(WalletTransaction item) {
-    final String productName = item.product?.name ?? "Unknown Product";
-    final String status = item.status;
-    final bool isFailed = status.toLowerCase() == "failed";
-    final String amount = "₹${item.amount.toStringAsFixed(2)}";
+    final String productName = item.product?.name ??
+        (item.description.isNotEmpty ? item.description : "Unknown Product");
 
+    final String status = item.status;
+
+    Color statusColor;
+    if (status.toLowerCase() == "pending") {
+      statusColor = AppColors.orange;
+    } else if (status.toLowerCase() == "completed") {
+      statusColor = AppColors.green;
+    } else if (status.toLowerCase() == "failed") {
+      statusColor = AppColors.red;
+    } else {
+      statusColor = AppColors.yellow;
+    }
+
+    final String amount = "₹${item.amount.toStringAsFixed(2)}";
     final String date =
         "${item.createdAt.day}/${item.createdAt.month}/${item.createdAt.year}";
 
@@ -80,69 +92,73 @@ class _TransactionHistoryState extends State<TransactionHistory> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: appText(
-                  productName,
-                  textAlign: TextAlign.start,
-                  maxLines: 2,
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w600,
-                ),
+                child: appText(productName,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.start),
               ),
+              SizedBox(width: 15.w),
               appText(
                 date,
                 color: AppColors.grey,
-                fontSize: 13.sp,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.w600,
               ),
             ],
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 10.h),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              /// STATUS
-              Row(
-                children: [
-                  appText(
-                    "Status ",
-                    color: AppColors.mediumGray,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  SizedBox(
-                    width: 2.w,
-                  ),
-                  appText(
-                    status.capitalizeFirst!,
-                    color: isFailed ? AppColors.red : AppColors.green,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ],
+              // STATUS
+              Expanded(
+                child: Row(
+                  children: [
+                    appText(
+                      "Status : ",
+                      color: AppColors.mediumGray,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    Flexible(
+                      child: appText(
+                        status.capitalizeFirst!,
+                        color: statusColor,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
-              /// AMOUNT
-              Row(
-                children: [
-                  appText(
-                    "Amount ",
-                    color: AppColors.black54,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  SizedBox(
-                    width: 2,
-                  ),
-                  appText(
-                    amount,
-                    color: AppColors.primaryColor,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ],
+              // AMOUNT
+              Flexible(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    appText(
+                      "Amount : ",
+                      color: AppColors.black54,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    Flexible(
+                      child: appText(
+                        amount,
+                        color: AppColors.primaryColor,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           )
