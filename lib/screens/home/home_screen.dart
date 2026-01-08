@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(12.r),
                               child: Image.network(
                                 imagePath,
-                                fit: BoxFit.cover,
+                                fit: BoxFit.fill,
                                 width: double.infinity,
                                 loadingBuilder:
                                     (context, child, loadingProgress) {
