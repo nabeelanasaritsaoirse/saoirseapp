@@ -56,8 +56,8 @@ class OrderService {
       final token = await storage.read(AppConst.ACCESS_TOKEN);
 
       return await APIService.postRequest<Map<String, dynamic>>(
-        // url: AppURLs.CREATE_BULK_ORDER_API,
-        url: "http://13.127.15.87:8080/api/installments/orders/bulk",
+        url: AppURLs.CREATE_BULK_ORDER_API,
+        
         body: body,
         headers: {
           "Authorization": "Bearer $token",

@@ -74,7 +74,8 @@ class AppURLs {
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/installments/orders";
   static String CREATE_BULK_ORDER_API =
-      BASE_API + "/api/installments/orders/bulk";
+      BASE_API + "api/installments/orders/bulk";
+  
 
   // Payment Api
   static String PAYMENT_PROCESS_API =
