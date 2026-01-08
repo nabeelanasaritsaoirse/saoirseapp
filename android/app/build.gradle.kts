@@ -78,12 +78,17 @@ android {
     }
 }
 
+}
+
 flutter {
     source = "../.."
 }
 
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
+
+    // 🔥 Razorpay Android SDK (FORCED – FIXES CRASH)
+    implementation("com.razorpay:checkout:1.6.33")
 
      coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

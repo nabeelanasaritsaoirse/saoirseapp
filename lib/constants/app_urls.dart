@@ -2,8 +2,8 @@
 
 class AppURLs {
   //base api
-  // static String BASE_API = 'https://api.epielio.com/';
-  static String BASE_API = 'http://13.127.15.87:8080/';
+  static String BASE_API = 'https://api.epielio.com/';
+  // static String BASE_API = 'http://13.127.15.87:8080/';
 
   //login api
   static String LOGIN_API = BASE_API + 'api/auth/login';
@@ -73,10 +73,14 @@ class AppURLs {
 
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/installments/orders";
+  static String CREATE_BULK_ORDER_API =
+      BASE_API + "/api/installments/orders/bulk";
 
   // Payment Api
   static String PAYMENT_PROCESS_API =
       BASE_API + "api/installments/payments/process";
+  static String PAYMENT_VERIFY_API =
+      BASE_API + "api/installments/orders/bulk/verify-payment";
 
   // Notifications
   static String NOTIFICATIONS = BASE_API + "api/notifications";

@@ -186,7 +186,7 @@ class OrderDetailsController extends GetxController {
     controller.clear();
   }
 
-  // ------------------------- PLACE ORDER -------------------------------------
+  // ------------------------- PLACE ORDER FOR SINGLE PRODUCT-------------------------------------
   Future<void> placeOrder({
     required String productId,
     String variantId = "",

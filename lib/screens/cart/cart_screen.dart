@@ -10,7 +10,9 @@ import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_text.dart';
+import '../../widgets/cart_product_plan_sheet.dart';
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/warning_dialog.dart';
 import '../select_address/select_address.dart';
 import 'cart_controller.dart';
 
@@ -97,6 +99,7 @@ class CartScreen extends StatelessWidget {
                       ],
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,10 +180,19 @@ class CartScreen extends StatelessWidget {
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.bold),
                                   SizedBox(height: 3.h),
-                                  appText(
-                                      "Plan - ₹${item.installmentPlan.dailyAmount}/${item.installmentPlan.totalDays} Days",
+                                  Obx(() {
+                                    if (!controller.isCartPlanApplied.value ||
+                                        item.installmentPlan.totalDays == 0) {
+                                      return const SizedBox.shrink();
+                                    }
+
+                                    return appText(
+                                      "Plan: ₹${item.installmentPlan.dailyAmount.toStringAsFixed(2)} / "
+                                      "${item.installmentPlan.totalDays} days",
                                       fontSize: 12.sp,
-                                      color: AppColors.black87)
+                                      color: AppColors.primaryColor,
+                                    );
+                                  }),
                                 ],
                               ),
                             ),
@@ -238,38 +250,38 @@ class CartScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Align(
-                          alignment: AlignmentGeometry.centerRight,
-                          child: GestureDetector(
-                            onTap: () {
-                              final productDetails =
-                                  controller.convertCartToProductDetails(item);
+                        // Align(
+                        //   alignment: AlignmentGeometry.centerRight,
+                        //   child: GestureDetector(
+                        //     onTap: () {
+                        //       final productDetails =
+                        //           controller.convertCartToProductDetails(item);
 
-                              Get.to(() => SelectAddress(
-                                    product: productDetails,
-                                    selectVarientId:
-                                        item.variant?.variantId ?? "",
-                                    selectedDays:
-                                        item.installmentPlan.totalDays,
-                                    selectedAmount:
-                                        item.installmentPlan.dailyAmount,
-                                    quantity: item.quantity,
-                                  ));
-                            },
-                            child: Container(
-                              width: 120.w,
-                              height: 30.h,
-                              decoration: BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  borderRadius: BorderRadius.circular(10.r)),
-                              child: Center(
-                                child: appText("Buy Now",
-                                    color: AppColors.white,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          ),
-                        )
+                        //       Get.to(() => SelectAddress(
+                        //             product: productDetails,
+                        //             selectVarientId:
+                        //                 item.variant?.variantId ?? "",
+                        //             selectedDays:
+                        //                 item.installmentPlan.totalDays,
+                        //             selectedAmount:
+                        //                 item.installmentPlan.dailyAmount,
+                        //             quantity: item.quantity,
+                        //           ));
+                        //     },
+                        //     child: Container(
+                        //       width: 120.w,
+                        //       height: 30.h,
+                        //       decoration: BoxDecoration(
+                        //           color: AppColors.primaryColor,
+                        //           borderRadius: BorderRadius.circular(10.r)),
+                        //       child: Center(
+                        //         child: appText("Buy Now",
+                        //             color: AppColors.white,
+                        //             fontWeight: FontWeight.w600),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // )
                       ],
                     ),
                   );
@@ -322,10 +334,43 @@ class CartScreen extends StatelessWidget {
                     ],
                   ),
 
+                  /// SELECT PLAN BUTTON (Small)
+                  GestureDetector(
+                    onTap: () {
+                      Get.bottomSheet(
+                        const CartProductPlanSheet(),
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                      );
+                    },
+                    child: Container(
+                      width: 95.w,
+                      height: 40.h,
+                      decoration: BoxDecoration(
+                          color: AppColors.lightGrey,
+                          borderRadius: BorderRadius.circular(10.r),
+                          border: Border.all(color: AppColors.shadowColor)),
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        spacing: 2.w,
+                        children: [
+                          appText(
+                            "Plan",
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textBlack,
+                          ),
+                          Icon(Icons.arrow_drop_down)
+                        ],
+                      ),
+                    ),
+                  ),
+
                   /// CHECKOUT BUTTON
                   SizedBox(
-                    height: 45.h,
-                    width: 140.w,
+                    height: 40.h,
+                    width: 130.w,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryColor,
@@ -334,13 +379,27 @@ class CartScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        // 👉 Navigate to checkout / address screen
-                        Get.to(() => SelectAddress(
-                              product: null, // or pass cart summary
-                              quantity: 1,
-                              selectedDays: 0,
-                              selectedAmount: controller.totalAmount,
-                            ));
+                        final hasPlan = controller.isCartPlanApplied.value;
+
+                        if (!hasPlan) {
+                          WarningDialog.show(
+                            title: AppStrings.warning_label,
+                            message: AppStrings.checkout_warning_body,
+                          );
+                          return;
+                        }
+
+                        // ✅ Continue checkout if plan is applied
+                        Get.to(
+                          () => SelectAddress(
+                            product: null,
+                            cartData: controller.cartData.value,
+                            quantity: 1,
+                            selectedDays: controller.customDays.value,
+                            selectedAmount: controller.customAmount.value,
+                            checkoutSource: CheckoutSource.cart,
+                          ),
+                        );
                       },
                       child: appText(
                         "Check Out",

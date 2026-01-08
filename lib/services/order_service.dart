@@ -48,4 +48,27 @@ class OrderService {
       return null;
     }
   }
+
+  // ---------------- CREATE BULK ORDER ----------------
+  static Future<Map<String, dynamic>?> createBulkOrder(
+      Map<String, dynamic> body) async {
+    try {
+      final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+      return await APIService.postRequest<Map<String, dynamic>>(
+        // url: AppURLs.CREATE_BULK_ORDER_API,
+        url: "http://13.127.15.87:8080/api/installments/orders/bulk",
+        body: body,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        onSuccess: (data) {
+          return data;
+        },
+      );
+    } catch (e) {
+      return null;
+    }
+  }
 }

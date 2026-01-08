@@ -68,4 +68,19 @@ class PaymentService {
       return null;
     }
   }
+
+  static Future<Map<String, dynamic>?> verifyBulkOrderPayment(
+      Map<String, dynamic> body) async {
+    final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+    return await APIService.postRequest<Map<String, dynamic>>(
+      url: AppURLs.PAYMENT_VERIFY_API,
+      body: body,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (data) => data,
+    );
+  }
 }
