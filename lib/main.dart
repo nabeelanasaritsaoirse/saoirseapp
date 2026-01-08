@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -26,7 +25,6 @@ import 'services/notification_service_helper.dart';
 GetStorage storage = GetStorage();
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  log("🟡 Background Message Received: ${message.notification?.title}");
   NotificationServiceHelper.showFlutterNotification(message);
 }
 
@@ -79,20 +77,17 @@ Future<void> main() async {
 
   // 🟢 Foreground message listener
   FirebaseMessaging.onMessage.listen((message) {
-    log("🟢 Foreground Msg Received: ${message.notification?.title}");
     NotificationServiceHelper.showFlutterNotification(message);
   });
 
   // 🔵 User taps notification (when app is in background)
   FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    log("🔵 Notification clicked: ${message.data}");
     NotificationServiceHelper.handleNotificationTap(message.data);
   });
 
   // 🔴 Terminated → user taps notification
   final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
   if (initialMessage != null) {
-    log("🟥 Terminated state → Notification tapped");
     NotificationServiceHelper.handleNotificationTap(initialMessage.data);
   }
 
@@ -132,8 +127,6 @@ class MyApp extends StatelessWidget {
               scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
               textTheme: GoogleFonts.poppinsTextTheme(),
               highlightColor: AppColors.transparent,
-
-              
               splashColor: AppColors.transparent,
               useMaterial3: true,
             ),

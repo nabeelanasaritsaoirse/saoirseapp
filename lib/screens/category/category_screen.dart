@@ -44,57 +44,59 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.paperColor,
-      appBar: CustomAppBar(
-        title: AppStrings.category_title,
-        actions: [
-          IconBox(
-            image: AppAssets.search,
-            padding: 9.w,
-            onTap: () {
-              Get.to(() => const ProductListing());
-            },
-          ),
-          SizedBox(width: 8.w),
-          Obx(() {
-            final count = profileController.wishlistCount.value;
-            return Stack(
-              clipBehavior: Clip.none,
-              children: [
-                IconBox(
-                  image: AppAssets.wish,
-                  padding: 8.w,
-                  onTap: () {
-                    Get.to(() => const WishlistScreen());
-                  },
-                ),
-                if (count > 0)
-                  Positioned(
-                    right: -2,
-                    top: -2,
-                    child: Container(
-                      padding: EdgeInsets.all(4.r),
-                      decoration: const BoxDecoration(
-                        color: AppColors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        count > 9 ? "9+" : count.toString(),
-                        style: TextStyle(
-                          color: AppColors.white,
-                          fontSize: 9.sp,
-                          fontWeight: FontWeight.bold,
+        backgroundColor: AppColors.paperColor,
+        appBar: CustomAppBar(
+          title: AppStrings.category_title,
+          actions: [
+            IconBox(
+                image: AppAssets.search,
+                padding: 9.w,
+                onTap: () {
+                  Get.to(() => const ProductListing());
+                }),
+            SizedBox(width: 8.w),
+            Obx(() {
+              final count = Get.find<ProfileController>().wishlistCount.value;
+
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconBox(
+                    image: AppAssets.wish,
+                    padding: 8.w,
+                    onTap: () {
+                      Get.to(() => const WishlistScreen());
+                    },
+                  ),
+
+                  // Show badge only if count > 0
+                  if (count > 0)
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: Container(
+                        padding: EdgeInsets.all(4.r),
+                        decoration: BoxDecoration(
+                          color: AppColors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          count > 9 ? "9+" : count.toString(),
+                          style: TextStyle(
+                            color: AppColors.white,
+                            fontSize: 9.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-              ],
-            );
-          }),
-          SizedBox(width: 12.w),
-        ],
-      ),
-      body: Obx(() {
+                ],
+              );
+            }),
+            SizedBox(width: 12.w),
+          ],
+        ),
+         body: Obx(() {
         if (controller.isLoading.value) {
           return const CategoryScreenShimmer();
         }
@@ -176,7 +178,96 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   ],
                 ),
               );
-            },
+            }
+//------------------ Left Sidebar Categories------------------//
+          return Row(
+            children: [
+              Container(
+                width: 85.h,
+                color: AppColors.white,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.separated(
+                        controller: controller.scrollController.value,
+                        physics: const ClampingScrollPhysics(), // IMPORTANT
+                        padding: EdgeInsets.zero,
+                        itemCount: controller.categoryGroups.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 0),
+                        itemBuilder: (context, index) {
+                          return CategoryItem(
+                            index: index,
+                            controller: controller,
+                          );
+                        },
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Get.to(() => const ProductListing());
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 15.h,
+                          horizontal: 7.w,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          border: Border(
+                            top: BorderSide(
+                              color: AppColors.lightGrey,
+                              width: 1.w,
+                            ),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.grid_view_rounded,
+                              size: 24.sp,
+                              color: AppColors.primaryColor,
+                            ),
+                            SizedBox(height: 7.h),
+                            appText(
+                              'See All',
+                              textAlign: TextAlign.center,
+                              fontSize: 11.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textBlack,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (count > 0)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      padding: EdgeInsets.all(4.r),
+                      decoration: const BoxDecoration(
+                        color: AppColors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        count > 9 ? "9+" : count.toString(),
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 9.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          }),
+          SizedBox(width: 12.w),
+        ],
+      ),
+     ,
           ),
         );
       }),

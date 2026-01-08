@@ -1,8 +1,11 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '/models/LoginAuth/kyc_model.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -63,7 +66,6 @@ class KycScreen extends StatelessWidget {
           appBar: CustomAppBar(
             title: AppStrings.KycTitle,
             showBack: true,
-             
           ),
           body: Obx(() {
             if (controller.isLoading.value) return appLoader();
@@ -243,7 +245,6 @@ Widget aadhaarSection(KycController controller) {
         validator: aadhaarValidator,
       ),
       SizedBox(height: 10.h),
-      
       Obx(() => Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.r),
@@ -263,7 +264,6 @@ Widget aadhaarSection(KycController controller) {
             ),
           )),
       SizedBox(height: 10.h),
-     
       Obx(() => Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.r),

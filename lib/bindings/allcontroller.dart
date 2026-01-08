@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 
-// ---------------- AUTH & USER ----------------
 import '../screens/add_address/add_address_controller.dart';
 import '../screens/add_money/add_money_controller.dart';
 import '../screens/home/investment_status_controller.dart';
@@ -13,7 +12,9 @@ import '../screens/orders_active/orders_active_controller.dart';
 import '../screens/pending_transaction/pending_transaction_controller.dart';
 import '../screens/profile/profile_controller.dart';
 import '../screens/kyc/kyc_controller.dart';
+import '../screens/razorpay/razorpay_cart_controller.dart';
 import '../screens/razorpay/razorpay_controller.dart';
+import '../screens/select_account/select_account_controller.dart';
 import '../screens/select_address/select_address_controller.dart';
 import '../screens/wishlist/wishlist_controller.dart';
 import '../screens/refferal/referral_controller.dart';
@@ -75,6 +76,11 @@ class AllController extends Bindings {
       fenix: true,
     );
 
+    Get.lazyPut<SelectAccountController>(
+      () => SelectAccountController(),
+      fenix: true,
+    );
+
     // 🛍 PRODUCT
     Get.lazyPut<ProductlistingController>(
       () => ProductlistingController(),
@@ -115,6 +121,10 @@ class AllController extends Bindings {
     Get.lazyPut<RazorpayController>(
       () => RazorpayController(),
       fenix: true,
+    );
+    Get.put<RazorpayCartController>(
+      RazorpayCartController(),
+      permanent: true,
     );
     Get.lazyPut<PendingTransactionController>(
       () => PendingTransactionController(),

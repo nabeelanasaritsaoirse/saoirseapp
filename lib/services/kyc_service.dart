@@ -1,15 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
+
 import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
+
 import '../constants/app_urls.dart';
 import '../constants/app_constant.dart';
 import '../models/LoginAuth/kyc_model.dart';
+
 import 'package:path/path.dart' as path;
-import 'package:http_parser/http_parser.dart';
-import 'package:mime/mime.dart';
+import 'package:http/http.dart' as http;
 
 class KycServices {
   final box = GetStorage();
@@ -29,10 +31,6 @@ class KycServices {
             "image/jpeg";
     final mimeParts = mime.split('/');
 
-    log(' Uploading file: ${imageFile.path}');
-    log(' File size bytes: ${bytes.length}');
-    log(' type field: $type, side field: $side');
-
     final request = http.MultipartRequest("PUT", uri);
     request.headers["Authorization"] = "Bearer $token";
     request.fields["type"] = type;
@@ -49,8 +47,6 @@ class KycServices {
 
     final streamed = await request.send();
     final response = await http.Response.fromStream(streamed);
-
-    log("UPLOAD ${response.statusCode} → ${response.body}");
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(response.body);
@@ -88,8 +84,7 @@ class KycServices {
       },
       body: jsonEncode(body),
     );
-    log(" SUBMIT DOCS → ${jsonEncode({"documents": documents})}");
-    log(" SUBMIT RESPONSE (${response.statusCode}) → ${response.body}");
+
     if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(response.body);
     } else {
@@ -109,8 +104,6 @@ class KycServices {
         "Accept": "application/json",
       },
     );
-    log("📥 GET KYC STATUS → ${response.statusCode}");
-    log("📥 ${response.body}");
 
     if (response.statusCode == 200) {
       return kycModelFromJson(response.body);

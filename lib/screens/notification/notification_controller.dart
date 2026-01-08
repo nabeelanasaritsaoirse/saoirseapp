@@ -1,6 +1,3 @@
-// ignore_for_file: avoid_print
-
-import 'dart:developer';
 import 'package:get/get.dart';
 
 import '../../models/notification_details_response_model.dart';
@@ -28,19 +25,12 @@ class NotificationController extends GetxController {
   final int limit = 20;
   var hasMore = true.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    log("🔔 NotificationController initialized — waiting for token…");
-  }
-
   // ------------------------------------------------------------
   // 🔑 Update token after login
   // ------------------------------------------------------------
   void updateToken(String newToken) {
     token = newToken;
     service.updateToken(newToken);
-    log("🔑 NotificationController token updated");
 
     page = 1;
     notifications.clear();
@@ -72,8 +62,6 @@ class NotificationController extends GetxController {
           page++;
         }
       }
-    } catch (e) {
-      log("❌ Notification fetch error: $e");
     } finally {
       isLoading(false);
     }
@@ -84,7 +72,6 @@ class NotificationController extends GetxController {
   // ------------------------------------------------------------
   Future<void> getNotificationDetails(String id) async {
     if (!hasToken) {
-      log("🚫 No token → getNotificationDetails skipped");
       return;
     }
 
@@ -97,8 +84,6 @@ class NotificationController extends GetxController {
         notificationDetails.value = response.data!.notification;
         comments.value = response.data!.comments;
       }
-    } catch (e) {
-      log("❌ Error fetching notification details: $e");
     } finally {
       isDetailsLoading(false);
     }
@@ -109,7 +94,6 @@ class NotificationController extends GetxController {
   // ------------------------------------------------------------
   Future<void> toggleLike(String notificationId) async {
     if (!hasToken) {
-      log("🚫 No token → toggleLike skipped");
       return;
     }
 
@@ -139,9 +123,8 @@ class NotificationController extends GetxController {
           notifications.refresh();
         }
       }
-    } catch (e) {
-      log("❌ Like toggle failed: $e");
-    }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   // ------------------------------------------------------------
@@ -166,9 +149,8 @@ class NotificationController extends GetxController {
           notifications.refresh();
         }
       }
-    } catch (e) {
-      log("❌ Mark as read failed: $e");
-    }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   // ------------------------------------------------------------
@@ -180,16 +162,13 @@ class NotificationController extends GetxController {
     final trimmed = text.trim();
 
     if (trimmed.isEmpty) {
-      log("⚠️ Empty comment");
       return;
     }
     if (trimmed.length > 1000) {
-      log("⚠️ Comment too long");
       return;
     }
     final urlRegex = RegExp(r'(https?:\/\/|www\.)');
     if (urlRegex.hasMatch(trimmed)) {
-      log("⚠️ URLs not allowed in comments");
       return;
     }
 
@@ -214,8 +193,6 @@ class NotificationController extends GetxController {
 
         comments.refresh();
       }
-    } catch (e) {
-      log("❌ Add comment failed: $e");
     } finally {
       isLoading(false);
     }
@@ -226,19 +203,13 @@ class NotificationController extends GetxController {
   // ------------------------------------------------------------
   Future<void> registerFCM(String fcmToken) async {
     if (!hasToken) {
-      log("🚫 No token → registerFCM skipped");
       return;
     }
-
-    log("🔥 Registering FCM → $fcmToken");
 
     final success = await service.registerFCMToken(fcmToken);
 
     if (success) {
-      log("✅ FCM token registered");
-    } else {
-      log("❌ Failed to register FCM token");
-    }
+    } else {}
   }
 
   // ------------------------------------------------------------
@@ -250,10 +221,7 @@ class NotificationController extends GetxController {
     final success = await service.removeFCMToken();
 
     if (success) {
-      log("🧹 FCM token removed");
-    } else {
-      log("❌ Failed to remove FCM token");
-    }
+    } else {}
   }
 
   Future<void> refreshNotifications() async {
@@ -268,7 +236,6 @@ class NotificationController extends GetxController {
   // ------------------------------------------------------------
   Future<void> fetchUnreadCount() async {
     if (!hasToken) {
-      log("🚫 No token → unread count skipped");
       return;
     }
 
@@ -281,11 +248,8 @@ class NotificationController extends GetxController {
   // ------------------------------------------------------------
   Future<void> sendWelcomeNotification(String userName) async {
     if (!hasToken) {
-      log("🚫 No token → sendWelcomeNotification skipped");
       return;
     }
-
-    log("📩 Sending welcome notification for: $userName");
 
     final success = await service.sendInAppWelcomeNotification(
       userName: userName,
@@ -293,20 +257,14 @@ class NotificationController extends GetxController {
     );
 
     if (success) {
-      log("🎉 Welcome notification sent!");
-    } else {
-      log("❌ Failed to send welcome notification");
-    }
+    } else {}
   }
 
   // FOR ORDER CONFIRMATION
   Future<void> sendOrderConfirmation(String userName) async {
     if (!hasToken) {
-      log("🚫 No token → sendOrderConfirmation skipped");
       return;
     }
-
-    log("📦 Sending Order Confirmation Notification → $userName");
 
     final success = await service.sendCustomNotification(
       title: "Thank you, $userName!",
@@ -316,24 +274,17 @@ class NotificationController extends GetxController {
     );
 
     if (success) {
-      log("🎉 Order Confirmation Notification Sent Successfully");
-
       /// refresh notifications
       refreshNotifications();
       fetchUnreadCount();
-    } else {
-      log("❌ Failed to send order confirmation notification");
-    }
+    } else {}
   }
 
   /// 🚨 Send Only Push Notification (Urgent Alert)
   Future<void> sendUrgentAlert() async {
     if (!hasToken) {
-      log("🚫 No token → sendUrgentAlert skipped");
       return;
     }
-
-    log("🚨 Sending Urgent Push Notification");
 
     final success = await service.sendCustomNotification(
       title: "⚡ Flash Sale Alert!",
@@ -343,9 +294,6 @@ class NotificationController extends GetxController {
     );
 
     if (success) {
-      log("🎉 Urgent Push Notification Sent Successfully");
-    } else {
-      log("❌ Failed to send urgent push notification");
-    }
+    } else {}
   }
 }

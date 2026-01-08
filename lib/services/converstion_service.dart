@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -13,12 +11,6 @@ class ConversationService {
     final token = await storage.read(AppConst.ACCESS_TOKEN);
     final body = {'withUserId': userId};
 
-    log("\n================ CREATE INDIVIDUAL CHAT API ================");
-    log("URL: ${AppURLs.CREATE_INDIVIDUAL_CHAT_FROM_REFFERAL}");
-    log("TOKEN: $token");
-    log("REQUEST BODY: $body");
-    log("============================================================");
-
     try {
       final response = await APIService.postRequest(
         url: AppURLs.CREATE_INDIVIDUAL_CHAT_FROM_REFFERAL,
@@ -30,25 +22,17 @@ class ConversationService {
         onSuccess: (json) => json,
       );
 
-      log("\n------ API RAW RESPONSE ------");
-      log("RESPONSE: $response");
-      log("------------------------------\n");
-
       if (response == null) {
-        log("❌ Response is NULL");
         return null;
       }
 
       if (response['success'] == true) {
-        log("✅ SUCCESS → Creating ConversationModel");
         return ConversationModel.fromJson(response['data']);
       }
 
-      log("❌ API Error: ${response['message']}");
       appToast(error: true, content: response['message']);
       return null;
     } catch (e) {
-      log("⚠️ Chat Error Exception: $e");
       return null;
     }
   }
@@ -64,11 +48,6 @@ class ConversationService {
       "text": text,
     };
 
-    log("\n========== SEND MESSAGE ==========");
-    log("URL: ${AppURLs.BASE_API}conversations/$conversationId/messages");
-    log("BODY: $body");
-    log("=================================");
-
     try {
       final response = await APIService.postRequest(
         url:
@@ -81,8 +60,6 @@ class ConversationService {
         onSuccess: (json) => json,
       );
 
-      log("RAW RESPONSE: $response");
-
       if (response == null) return null;
 
       if (response['success'] == true) {
@@ -92,7 +69,6 @@ class ConversationService {
       appToast(error: true, content: response['message']);
       return null;
     } catch (e) {
-      log("Send Message Error: $e");
       return null;
     }
   }
@@ -107,8 +83,6 @@ class ConversationService {
     final url =
         "${AppURLs.BASE_API}api/chat/conversations/$conversationId/messages?page=$page&limit=$limit";
 
-    log("📩 Fetching messages => $url");
-
     final response = await APIService.getRequest(
       url: url,
       headers: {
@@ -118,8 +92,6 @@ class ConversationService {
     );
 
     if (response == null) return [];
-
-    log("📬 Messages Loaded = ${response['data']['messages'].length}");
 
     return (response["data"]["messages"] as List)
         .map((m) => ChatMessage.fromJson(m))
@@ -135,8 +107,6 @@ class ConversationService {
     final url =
         "${AppURLs.BASE_API}api/chat/poll?lastPollTime=${lastPollTime.toIso8601String()}"
         "${conversationId != null ? "&conversationId=$conversationId" : ""}";
-
-    log("🔁 POLLING => $url");
 
     final response = await APIService.getRequest(
       url: url,

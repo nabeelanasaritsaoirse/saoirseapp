@@ -1,7 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
-import 'dart:developer';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,14 +6,10 @@ import 'package:get/get.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
-import '../../constants/app_gradient.dart';
-import '../../models/product_model.dart';
-import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/investment_status_card.dart';
-import '../../widgets/product_card.dart';
 import '../category/category_controller.dart';
 import '../dashboard/dashboard_controller.dart';
 import '../my_wallet/my_wallet.dart';
@@ -25,10 +17,10 @@ import '../notification/notification_controller.dart';
 import '../notification/notification_screen.dart';
 import '../pending_transaction/pending_transaction_screen.dart';
 import '../productListing/product_listing.dart';
-import '../product_details/product_details_screen.dart';
 import 'home_controller.dart';
 import 'home_shimmer.dart';
 import 'investment_status_controller.dart';
+import 'render.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -49,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.didChangeDependencies();
     Future.delayed(Duration(milliseconds: 200), () {
       Get.find<InvestmentStatusController>().fetchInvestmentStatus();
-      debugPrint("👍Investment Status Refreshed");
     });
   }
 
@@ -111,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconBox(
               image: AppAssets.wallet,
               padding: 5.w,
-              onTap: () => Get.to(WalletScreen())),
+              onTap: () => Get.to(() => WalletScreen())),
           SizedBox(width: 12.w),
         ],
       ),
@@ -336,9 +327,6 @@ class _HomeScreenState extends State<HomeScreen> {
 //--------------------------------------------------------
             // Most Popular Product Section
             Obx(() {
-              log(' UI → FEATURED LIST COUNT: ${homeController.featuredLists.length}');
-              log(' UI → FEATURED LOADING: ${homeController.featuredLoading.value}');
-
               //Loading state
               if (homeController.featuredLoading.value) {
                 return Column(
@@ -368,53 +356,43 @@ class _HomeScreenState extends State<HomeScreen> {
                   homeController.featuredLists.length,
                   (index) {
                     final list = homeController.featuredLists[index];
-                    final isBigLayout = index % 2 == 0;
-
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              /// LIST TITLE
-                              appText(
-                                list.listName,
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.06,
-                              ),
-
-                              /// SEE ALL
-                              InkWell(
-                                onTap: () {
-                                  Get.to(
-                                    () => const ProductListing(),
-                                    arguments: {
-                                      'slug': list.slug,
-                                      'listId': list.listId,
-                                      'title': list.listName,
-                                    },
-                                  );
-                                },
-                                child: appText(
-                                  AppStrings.see_all,
-                                  fontSize: 14.sp,
+                        if (list.design != 5)
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                appText(
+                                  list.listName,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.primaryColor,
                                 ),
-                              ),
-                            ],
+                                InkWell(
+                                  onTap: () {
+                                    Get.to(
+                                      () => const ProductListing(),
+                                      arguments: {
+                                        'slug': list.slug,
+                                        'listId': list.listId,
+                                        'title': list.listName,
+                                      },
+                                    );
+                                  },
+                                  child: appText(
+                                    AppStrings.see_all,
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 8.h),
-                        SizedBox(
-                          height: isBigLayout ? 205.h : 85.h,
-                          child: isBigLayout
-                              ? _bigProductList(list)
-                              : _compactProductList(list),
-                        ),
+                        if (list.design != 5) SizedBox(height: 8.h),
+                        FeatureListRenderer(feature: list),
                         SizedBox(height: 14.h),
                       ],
                     );
@@ -423,237 +401,140 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             }),
 
-            SizedBox(height: 10.h),
-
-            // Adverticement Section
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                width: double.infinity,
-                height: 153.h,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15.r),
-                    image: DecorationImage(
-                        image: AssetImage(AppAssets.add_banner),
-                        fit: BoxFit.contain)),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: 75.h,
-                      ),
-                      appButton(
-                          onTap: () {
-                            Get.to(() => ProductListing());
-                          },
-                          buttonColor: AppColors.white,
-                          borderRadius: BorderRadius.circular(5.r),
-                          padding: EdgeInsets.all(0),
-                          width: 120.w,
-                          height: 30.h,
-                          child: Center(
-                            child: appText(AppStrings.purchase,
-                                fontSize: 10.sp,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.red),
-                          ))
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            // // Adverticement Section
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: Container(
+            //     width: double.infinity,
+            //     height: 153.h,
+            //     decoration: BoxDecoration(
+            //         borderRadius: BorderRadius.circular(15.r),
+            //         image: DecorationImage(
+            //             image: AssetImage(AppAssets.add_banner),
+            //             fit: BoxFit.contain)),
+            //     child: Padding(
+            //       padding: EdgeInsets.symmetric(horizontal: 15.w),
+            //       child: Column(
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: [
+            //           SizedBox(
+            //             height: 75.h,
+            //           ),
+            //           appButton(
+            //               onTap: () {
+            //                 Get.to(() => ProductListing());
+            //               },
+            //               buttonColor: AppColors.white,
+            //               borderRadius: BorderRadius.circular(5.r),
+            //               padding: EdgeInsets.all(0),
+            //               width: 120.w,
+            //               height: 30.h,
+            //               child: Center(
+            //                 child: appText(AppStrings.purchase,
+            //                     fontSize: 10.sp,
+            //                     fontWeight: FontWeight.w600,
+            //                     color: AppColors.red),
+            //               ))
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
 //-------------- Success  Story Section---------------------
-            Container(
-              width: double.infinity,
-              height: 420.h,
-              decoration: BoxDecoration(
-                gradient: AppGradients.succesGradient,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(height: 10.h),
-                    Obx(
-                      () {
-                        return Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: [
-                            CarouselSlider(
-                              items: homeController.successStories.map((story) {
-                                return Builder(
-                                  builder: (BuildContext context) {
-                                    return Container(
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 8.w),
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(20.r),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: AppColors.lightBlack,
-                                            blurRadius: 8.r,
-                                            offset: const Offset(0, 4),
-                                          ),
-                                        ],
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(20.r),
-                                        child: Image.network(
-                                          story.imageUrl,
-                                          fit: BoxFit.cover,
-                                          width: MediaQuery.of(context)
-                                              .size
-                                              .width
-                                              .w,
-
-                                          // 👇 Loading indicator
-                                          loadingBuilder: (context, child,
-                                              loadingProgress) {
-                                            if (loadingProgress == null) {
-                                              return child;
-                                            }
-                                            return Center(
-                                              child: CupertinoActivityIndicator(
-                                                radius: 10.0,
-                                                color: AppColors.textGray,
-                                              ),
-                                            );
-                                          },
-
-                                          // 👇 If image not found → show simple grey container with icon
-                                          errorBuilder: (_, __, ___) =>
-                                              Container(
-                                            color: Colors.grey.shade300,
-                                            child: Icon(
-                                              Icons.broken_image,
-                                              size: 40.sp,
-                                              color: Colors.grey.shade600,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              }).toList(),
-                              options: CarouselOptions(
-                                autoPlay: true,
-                                autoPlayInterval: const Duration(seconds: 5),
-                                enlargeCenterPage: true,
-                                viewportFraction: 1.0,
-                                height: 170.h,
-                                onPageChanged: (index, reason) {
-                                  homeController
-                                      .currentBottomCarouselIndex.value = index;
-                                },
-                              ),
+            SizedBox(
+              height: 190.h, // total carousel height
+              child: Obx(
+                () {
+                  return Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      CarouselSlider(
+                        items: homeController.successStories.map((story) {
+                          return Container(
+                            margin: EdgeInsets.symmetric(horizontal: 8.w),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.lightBlack,
+                                  blurRadius: 8.r,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
-                            Positioned(
-                              bottom: 10.h,
-                              child: Obx(
-                                () => Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: homeController.successStories
-                                      .asMap()
-                                      .entries
-                                      .map((entry) {
-                                    return Container(
-                                      width: homeController
-                                                  .currentBottomCarouselIndex
-                                                  .value ==
-                                              entry.key
-                                          ? 24.w
-                                          : 8.w,
-                                      height: 8.h,
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 4.w),
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(4.r),
-                                        color: homeController
-                                                    .currentBottomCarouselIndex
-                                                    .value ==
-                                                entry.key
-                                            ? AppColors.white
-                                            : AppColors.transparentWhite,
-                                      ),
-                                    );
-                                  }).toList(),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20.r),
+                              child: Image.network(
+                                story.imageUrl,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+
+                                // loading
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return const Center(
+                                    child: CupertinoActivityIndicator(),
+                                  );
+                                },
+
+                                // error
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: Colors.grey.shade300,
+                                  child: const Icon(
+                                    Icons.broken_image,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
                             ),
-                          ],
-                        );
-                      },
-                    ),
-                    SizedBox(height: 10.h),
-
-                    // Refer Section
-                    Container(
-                      width: double.infinity,
-                      height: 200.h,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage(AppAssets.refer_image),
-                          fit: BoxFit.fill,
+                          );
+                        }).toList(),
+                        options: CarouselOptions(
+                          height: 170.h,
+                          autoPlay: true,
+                          autoPlayInterval: const Duration(seconds: 5),
+                          enlargeCenterPage: true,
+                          viewportFraction: 1.0,
+                          onPageChanged: (index, reason) {
+                            homeController.currentBottomCarouselIndex.value =
+                                index;
+                          },
                         ),
                       ),
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            right: 30.w,
-                            top: 37.h,
-                            child: appText(
-                              AppStrings.refer,
-                              fontSize: 25.sp,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.skyBlue,
-                              fontFamily: "jakarta",
-                            ),
-                          ),
-                          Positioned(
-                            right: 40.w,
-                            top: 75.h,
-                            child: appText(
-                              AppStrings.refer_heding,
-                              fontSize: 28.sp,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.white,
-                              fontFamily: "jakarta",
-                              textAlign: TextAlign.start,
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 5.h,
-                            right: 35.w,
-                            child: appButton(
-                              onTap: () {
-                                final dashboard =
-                                    Get.find<DashboardController>();
-                                dashboard.changeTab(2);
-                              },
-                              width: 195.w,
-                              height: 45.h,
-                              buttonColor: AppColors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              padding: EdgeInsets.symmetric(),
-                              child: appText(
-                                AppStrings.refer_button_lebel,
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.gradientDarkBlue,
-                                fontFamily: "jakarta",
+
+                      /// INDICATOR
+                      Positioned(
+                        bottom: 10.h,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: homeController.successStories
+                              .asMap()
+                              .entries
+                              .map((entry) {
+                            final isActive = homeController
+                                    .currentBottomCarouselIndex.value ==
+                                entry.key;
+
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              width: isActive ? 24.w : 8.w,
+                              height: 8.h,
+                              margin: EdgeInsets.symmetric(horizontal: 4.w),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4.r),
+                                color: isActive
+                                    ? AppColors.white
+                                    : AppColors.transparentWhite,
                               ),
-                            ),
-                          ),
-                        ],
+                            );
+                          }).toList(),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  );
+                },
               ),
             ),
             SizedBox(height: 10.h),
@@ -663,103 +544,103 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _bigProductList(FeaturedList list) {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
-      itemCount: list.products.length,
-      itemBuilder: (context, index) {
-        final product = list.products[index];
+  // Widget _bigProductList(FeaturedList list) {
+  //   return ListView.builder(
+  //     scrollDirection: Axis.horizontal,
+  //     padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
+  //     itemCount: list.products.length,
+  //     itemBuilder: (context, index) {
+  //       final product = list.products[index];
 
-        return ProductCard(
-          productId: product.productId,
-          id: product.productMongoId,
-          name: product.name,
-          image: product.image,
-          brand: product.brand ?? "",
-          price: product.finalPrice.toStringAsFixed(0),
-          isFavorite: product.isFavorite,
-          showFavorite: false,
-          margin: EdgeInsets.only(right: 12.w),
-        );
-      },
-    );
-  }
+  //       return ProductCard(
+  //         productId: product.productId,
+  //         id: product.productMongoId,
+  //         name: product.name,
+  //         image: product.image,
+  //         brand: product.brand ?? "",
+  //         price: product.finalPrice.toStringAsFixed(0),
+  //         isFavorite: product.isFavorite,
+  //         showFavorite: false,
+  //         margin: EdgeInsets.only(right: 12.w),
+  //       );
+  //     },
+  //   );
+  // }
 
-  Widget _compactProductList(FeaturedList list) {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      itemCount: list.products.length,
-      itemBuilder: (context, index) {
-        final product = list.products[index];
+  // Widget _compactProductList(FeaturedList list) {
+  //   return ListView.builder(
+  //     scrollDirection: Axis.horizontal,
+  //     padding: EdgeInsets.symmetric(horizontal: 16.w),
+  //     itemCount: list.products.length,
+  //     itemBuilder: (context, index) {
+  //       final product = list.products[index];
 
-        return Padding(
-          padding: EdgeInsets.all(8.0.w),
-          child: InkWell(
-            onTap: () => Get.to(
-              ProductDetailsScreen(
-                productId: product.productId,
-                id: product.productMongoId,
-              ),
-            ),
-            child: Container(
-              width: 220.w,
-              padding: EdgeInsets.all(6.sp),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(12.sp),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.shadowColor,
-                    blurRadius: 6.r,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8.r),
-                    child: Image.network(
-                      product.image,
-                      width: 70.w,
-                      height: 70.w,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Icon(
-                        Icons.broken_image,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        appText(
-                          product.name,
-                          fontSize: 13.sp,
-                          maxLines: 2,
-                          textAlign: TextAlign.left,
-                          overflow: TextOverflow.ellipsis,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        SizedBox(height: 4.h),
-                        appText(
-                          "₹ ${product.finalPrice.toStringAsFixed(0)}",
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+  //       return Padding(
+  //         padding: EdgeInsets.all(8.0.w),
+  //         child: InkWell(
+  //           onTap: () => Get.to(
+  //             ProductDetailsScreen(
+  //               productId: product.productId,
+  //               id: product.productMongoId,
+  //             ),
+  //           ),
+  //           child: Container(
+  //             width: 220.w,
+  //             padding: EdgeInsets.all(6.sp),
+  //             decoration: BoxDecoration(
+  //               color: AppColors.white,
+  //               borderRadius: BorderRadius.circular(12.sp),
+  //               boxShadow: [
+  //                 BoxShadow(
+  //                   color: AppColors.shadowColor,
+  //                   blurRadius: 6.r,
+  //                   offset: Offset(0, 2),
+  //                 ),
+  //               ],
+  //             ),
+  //             child: Row(
+  //               children: [
+  //                 ClipRRect(
+  //                   borderRadius: BorderRadius.circular(8.r),
+  //                   child: Image.network(
+  //                     product.image,
+  //                     width: 70.w,
+  //                     height: 70.w,
+  //                     fit: BoxFit.cover,
+  //                     errorBuilder: (_, __, ___) => Icon(
+  //                       Icons.broken_image,
+  //                       color: Colors.grey,
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 SizedBox(width: 12.w),
+  //                 Expanded(
+  //                   child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       appText(
+  //                         product.name,
+  //                         fontSize: 13.sp,
+  //                         maxLines: 2,
+  //                         textAlign: TextAlign.left,
+  //                         overflow: TextOverflow.ellipsis,
+  //                         fontWeight: FontWeight.w600,
+  //                       ),
+  //                       SizedBox(height: 4.h),
+  //                       appText(
+  //                         "₹ ${product.finalPrice.toStringAsFixed(0)}",
+  //                         fontSize: 13.sp,
+  //                         fontWeight: FontWeight.w800,
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 }

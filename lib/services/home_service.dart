@@ -1,6 +1,5 @@
 // ignore_for_file: unnecessary_type_check
 
-import 'dart:developer';
 import 'package:get_storage/get_storage.dart';
 
 import '../constants/app_constant.dart';
@@ -18,26 +17,17 @@ class HomeService {
     final token = storage.read(AppConst.ACCESS_TOKEN);
     final url = AppURLs.FEATURED_LISTS_API;
 
-    log(' SERVICE → FEATURED LISTS URL: $url');
-    log(' SERVICE → TOKEN PRESENT: ${token != null}');
-
     final response = await APIService.getRequest(
       url: url,
       headers: {
         if (token != null) 'Authorization': 'Bearer $token',
       },
       onSuccess: (data) {
-        log(' SERVICE → onSuccess CALLED');
-        log(' SERVICE → DATA TYPE: ${data.runtimeType}');
         return data;
       },
     );
 
-    log(' SERVICE → RESPONSE FROM APIService: $response');
-    log(' SERVICE → RESPONSE TYPE: ${response.runtimeType}');
-
     if (response == null) {
-      log('SERVICE → RESPONSE IS NULL');
       return [];
     }
 
@@ -49,11 +39,9 @@ class HomeService {
           .toList()
         ..sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
 
-      log('✅ SERVICE → FEATURED LIST COUNT: ${lists.length}');
       return lists;
     }
 
-    log('⚠️ SERVICE → INVALID RESPONSE STRUCTURE');
     return [];
   }
 
@@ -68,23 +56,19 @@ class HomeService {
   //   final token = storage.read(AppConst.ACCESS_TOKEN);
   //   final url = '${AppURLs.POPULAR_PRODUCT_API}page=$page&limit=$limit';
 
-  //   log(' POPULAR LIST URL: $url');
-
   //   return await APIService.getRequest<FeaturedList?>(
   //     url: url,
   //     headers: {
   //       if (token != null) 'Authorization': 'Bearer $token',
   //     },
   //     onSuccess: (data) {
-  //       log(' POPULAR LIST RAW RESPONSE: $data');
 
   //       if (data['success'] == true && data['data'] != null) {
   //         final list = FeaturedList.fromJson(data['data']);
-  //         log(' POPULAR LIST LOADED: ${list.products.length} products');
+
   //         return list;
   //       }
 
-  //       log(' POPULAR LIST NOT FOUND');
   //       return null;
   //     },
   //   );
@@ -101,23 +85,19 @@ class HomeService {
   //   final token = storage.read(AppConst.ACCESS_TOKEN);
   //   final url = '${AppURLs.BEST_SELLER_PRODUCT_API}page=$page&limit=$limit';
 
-  //   log(' BEST SELLER LIST URL: $url');
-
   //   return await APIService.getRequest<FeaturedList?>(
   //     url: url,
   //     headers: {
   //       if (token != null) 'Authorization': 'Bearer $token',
   //     },
   //     onSuccess: (data) {
-  //       log(' BEST SELLER RAW RESPONSE: $data');
 
   //       if (data['success'] == true && data['data'] != null) {
   //         final list = FeaturedList.fromJson(data['data']);
-  //         log(' BEST SELLER LIST LOADED: ${list.products.length} products');
+
   //         return list;
   //       }
 
-  //       log(' BEST SELLER LIST NOT FOUND');
   //       return null;
   //     },
   //   );
@@ -134,23 +114,19 @@ class HomeService {
   //   final token = storage.read(AppConst.ACCESS_TOKEN);
   //   final url = '${AppURLs.TRENDING_PRODUCT_API}page=$page&limit=$limit';
 
-  //   log(' TRENDING LIST URL: $url');
-
   //   return await APIService.getRequest<FeaturedList?>(
   //     url: url,
   //     headers: {
   //       if (token != null) 'Authorization': 'Bearer $token',
   //     },
   //     onSuccess: (data) {
-  //       log(' TRENDING RAW RESPONSE: $data');
 
   //       if (data['success'] == true && data['data'] != null) {
   //         final list = FeaturedList.fromJson(data['data']);
-  //         log(' TRENDING LIST LOADED: ${list.products.length} products');
+
   //         return list;
   //       }
 
-  //       log(' TRENDING LIST NOT FOUND');
   //       return null;
   //     },
   //   );

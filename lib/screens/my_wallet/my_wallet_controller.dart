@@ -1,6 +1,3 @@
-// ignore_for_file: avoid_print
-
-import 'dart:developer';
 import 'package:get/get.dart';
 
 import '../../models/wallet_transcation_model.dart';
@@ -40,12 +37,8 @@ class MyWalletController extends GetxController {
         fetchWallet(forceRefresh: true),
         fetchWalletTransactions(),
       ]);
-
-      log("✅ Wallet refreshed successfully");
-    } catch (e, s) {
+    } catch (e) {
       errorMessage.value = "Failed to refresh wallet";
-      log("❌ Wallet refresh error: $e");
-      log("StackTrace: $s");
     } finally {
       isLoading.value = false;
     }
@@ -56,34 +49,25 @@ class MyWalletController extends GetxController {
     try {
       // Avoid unnecessary API calls
       if (!forceRefresh && wallet.value != null) {
-        log("✅ Wallet already available. Skipping API call.");
         return;
       }
 
       _startLoading();
       errorMessage.value = '';
 
-      log("📡 Calling wallet API");
-
       final data = await serviceData.fetchWallet();
 
       if (data == null) {
         errorMessage.value = 'Unable to load wallet data';
-        log("❌ Wallet API returned null");
+
         return;
       }
 
       wallet.value = data;
 
       // Debug logs
-      log("✅ Wallet API Parsed Successfully");
-      log("Wallet Balance: ${data.walletBalance}");
-      log("Total Earnings: ${data.totalEarnings}");
-      log("Transactions Count: ${data.transactions.length}");
-    } catch (e, s) {
+    } catch (e) {
       errorMessage.value = 'Something went wrong while fetching wallet';
-      log("❌ Wallet API Exception: $e");
-      log("StackTrace: $s");
     } finally {
       _stopLoading();
     }
@@ -95,24 +79,17 @@ class MyWalletController extends GetxController {
       _startLoading();
       errorMessage.value = '';
 
-      log("📡 Fetching wallet transactions...");
-
       final response = await serviceData.fetchTransactions();
 
       if (response == null || response.success != true) {
         errorMessage.value = 'Failed to load transactions';
-        log("❌ Transactions API failed");
         return;
       }
 
       transactions.assignAll(response.transactions);
       summary.value = response.summary;
-
-      log("✅ Transactions loaded: ${transactions.length}");
-    } catch (e, s) {
+    } catch (e) {
       errorMessage.value = 'Something went wrong while fetching transactions';
-      log("❌ Wallet transaction error: $e");
-      log("StackTrace: $s");
     } finally {
       _stopLoading();
     }

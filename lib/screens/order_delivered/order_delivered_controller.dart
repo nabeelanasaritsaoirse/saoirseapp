@@ -23,7 +23,8 @@ class OrderDeliveredController extends GetxController {
     fetchDeliveredOrders();
 
     scrollController.addListener(() {
-      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 100) {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 100) {
         fetchDeliveredOrders(loadMore: true);
       }
     });
@@ -63,8 +64,6 @@ class OrderDeliveredController extends GetxController {
           _page++;
         }
       }
-    } catch (e) {
-      debugPrint("Error fetching order delivered: $e");
     } finally {
       isLoading.value = false;
       isPageLoading.value = false;

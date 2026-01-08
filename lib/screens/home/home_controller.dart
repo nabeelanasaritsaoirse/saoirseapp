@@ -1,5 +1,3 @@
-// home_controller.dart
-import 'dart:developer';
 import 'package:get/get.dart';
 
 import '../../models/category_model.dart';
@@ -60,24 +58,14 @@ class HomeController extends GetxController {
   Future<void> fetchFeaturedLists() async {
     try {
       featuredLoading.value = true;
-      log('CONTROLLER → FETCH FEATURED LISTS START');
 
       final lists = await HomeService.fetchFeaturedLists();
 
-      log(' CONTROLLER → LISTS RECEIVED: $lists');
-      log(' CONTROLLER → LIST COUNT: ${lists.length}');
-
       if (lists.isNotEmpty) {
         featuredLists.assignAll(lists);
-        log(' FINAL FEATURED LISTS IN CONTROLLER: ${featuredLists.length}');
-      } else {
-        log(' CONTROLLER → LIST EMPTY');
-      }
-    } catch (e) {
-      log(' CONTROLLER → ERROR: $e');
+      } else {}
     } finally {
       featuredLoading.value = false;
-      log(' CONTROLLER → LOADING FALSE');
     }
   }
 
@@ -101,7 +89,7 @@ class HomeController extends GetxController {
   //       popularList.value = list;
   //     }
   //   } catch (e) {
-  //     log('Error fetching popular products: $e');
+
   //   } finally {
   //     popularLoading.value = false;
   //   }
@@ -117,7 +105,7 @@ class HomeController extends GetxController {
   //       bestSellerList.value = list;
   //     }
   //   } catch (e) {
-  //     log('Error fetching best seller products: $e');
+
   //   } finally {
   //     bestSellerLoading.value = false;
   //   }
@@ -133,7 +121,7 @@ class HomeController extends GetxController {
   //       trendingList.value = list;
   //     }
   //   } catch (e) {
-  //     log('Error fetching trending products: $e');
+
   //   } finally {
   //     trendingLoading.value = false;
   //   }
@@ -149,8 +137,6 @@ class HomeController extends GetxController {
       result.sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
 
       successStories.value = result;
-    } catch (e) {
-      log("Error fetching success story: $e");
     } finally {
       successLoading.value = false;
     }
@@ -168,8 +154,6 @@ class HomeController extends GetxController {
 
         carouselImages.value = banners.map((e) => e.imageUrl).toList();
       }
-    } catch (e) {
-      log("Error fetching home banners: $e");
     } finally {
       bannerLoading.value = false;
     }

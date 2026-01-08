@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 import 'dart:io';
 
@@ -60,7 +59,6 @@ class KycController extends GetxController {
   Rxn<KycModel> kyc = Rxn<KycModel>();
   RxString errorMessage = ''.obs;
 
-
   @override
   void onInit() {
     fetchKycData();
@@ -77,34 +75,33 @@ class KycController extends GetxController {
   // RESET FORM (To reset when we cick backbutton from KYC screen)
   // ==========================================================
   void resetKycForm() {
-  log("Resetting KYC form...");
+    log("Resetting KYC form...");
 
-  // Text fields
-  aadhaarNumberController.clear();
-  panNumberController.clear();
+    // Text fields
+    aadhaarNumberController.clear();
+    panNumberController.clear();
 
-  // Images
-  selfieImage.value = null;
-  aadhaarFront.value = null;
-  aadhaarBack.value = null;
-  panFront.value = null;
+    // Images
+    selfieImage.value = null;
+    aadhaarFront.value = null;
+    aadhaarBack.value = null;
+    panFront.value = null;
 
-  // Selections
-  aadhaarSelected.value = false;
-  panSelected.value = false;
+    // Selections
+    aadhaarSelected.value = false;
+    panSelected.value = false;
 
-  // Error flags 
-  selfieError.value = false;
-  aadhaarError.value = false;
-  aadhaarFrontError.value = false;
-  aadhaarBackError.value = false;
-  aadhaarNumberError.value = false;
+    // Error flags
+    selfieError.value = false;
+    aadhaarError.value = false;
+    aadhaarFrontError.value = false;
+    aadhaarBackError.value = false;
+    aadhaarNumberError.value = false;
 
-  panError.value = false;
-  panFrontError.value = false;
-  panNumberError.value = false;
-}
-
+    panError.value = false;
+    panFrontError.value = false;
+    panNumberError.value = false;
+  }
 
   // ==========================================================
   // FETCH KYC DATA
@@ -266,16 +263,15 @@ class KycController extends GetxController {
         aadhaarNumber: aadhaarSelected.value
             ? aadhaarNumberController.text.replaceAll(" ", "")
             : null,
-        panNumber: panSelected.value
-            ? panNumberController.text.toUpperCase()
-            : null,
+        panNumber:
+            panSelected.value ? panNumberController.text.toUpperCase() : null,
         documents: documents,
       );
 // Get.snackbar("Success", "KYC submitted");
       fetchKycData();
     } catch (e) {
       log(e.toString());
-   //   appToast(content: "KYC submission failed", error: true);
+      //   appToast(content: "KYC submission failed", error: true);
     } finally {
       isLoading(false);
     }
@@ -298,4 +294,3 @@ class KycController extends GetxController {
     return File(result!.path);
   }
 }
-

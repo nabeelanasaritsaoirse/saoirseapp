@@ -113,6 +113,9 @@ class AppStrings {
 
   // KYC page
   static String KycTitle = "KYC Status";
+  static String kyc_required_discription =
+      "You must complete your KYC before processing withdrawal.";
+  static String kyc_required = "KYC Required";
 
   //Cart page
   static String carttitle = "Cart";
@@ -122,6 +125,7 @@ class AppStrings {
 
   // select address screen
   static String select_address = "Select Address";
+  static String manage_address = "Manage Address";
 
   //snackbars
   static String no_internet = 'No internet connection';

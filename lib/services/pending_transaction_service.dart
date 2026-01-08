@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -43,9 +41,6 @@ class PendingTransactionService {
     );
   }
 
-
-
-
   //-------------------------------------DAILY INSTALLMENT PAYMENT FUNCTION AFTER PAYMENT PROCESS----------------------------------------------//
   static Future<Map<String, dynamic>?> payDailySelected(
       Map<String, dynamic> body) async {
@@ -65,11 +60,8 @@ class PendingTransactionService {
       );
 
       return response;
-    } catch (e, s) {
-      log("payDailySelected Error: $e\n$s");
+    } catch (e) {
       return null;
     }
   }
-
-  
 }

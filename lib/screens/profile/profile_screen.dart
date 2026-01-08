@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,10 +13,12 @@ import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/profile_menu_card.dart';
+import '../manage_address/manage_address_screen.dart';
 import '../order_delivered/order_delivered_screen.dart';
 import '../order_history/order_history_screen.dart';
 import '../orders_active/orders_active_screen.dart';
 import '../pending_transaction/pending_transaction_screen.dart';
+import '../select_account/managa_account.dart';
 import '../terms_and_privacy/privacy_policy.dart';
 import '../terms_and_privacy/terms_conditions.dart';
 import '../transaction_history/transaction_history.dart';
@@ -295,7 +295,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         case "KYC":
                           Get.to(() => KycScreen());
                           break;
-
+                        case "Manage Account":
+                          Get.to(() => ManageAccountScreen());
+                          break;
                         case "Privacy Policy":
                           Get.to(() => PrivacyPolicyScreen());
                           break;
@@ -306,9 +308,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         case "Log Out":
                           controller.confirmLogout();
                           break;
+                        case "Manage Address":
+                          Get.to(() => ManageAddressScreen());
 
                         default:
-                          log("Clicked $title");
                       }
                     },
                   );

@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use, avoid_print
-
 import 'dart:developer';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -24,7 +22,7 @@ class ReferralController extends GetxController {
 
   // Observables
   final referralCode = ''.obs;
-  final isLoading = false.obs;
+
   final isDashboardLoading = false.obs;
 
   final referrals = <Referral>[].obs;
@@ -46,46 +44,22 @@ class ReferralController extends GetxController {
   }
 
   Future<void> refreshAll() async {
-    log("🔄 REFRESH STARTED");
-    if (isLoading.value) return;
-
     try {
-      isLoading.value = true;
-
       await Future.wait([
         fetchReferralStats(),
         fetchReferralData(),
         fetchReferrerInfo(),
       ]);
-    } catch (e) {
-      log("🔴 Refresh failed: $e");
-    } finally {
-      isLoading.value = false;
-    }
+    } finally {}
   }
 
   Future<void> fetchReferrerInfo() async {
-    log("\n================ FETCH REFERRER INFO ================");
-    log("📡 Calling API: /api/referral/referrer-info");
-    isLoading.value = true;
-
     final result = await _referralService.getReferrerInfo();
 
     if (result != null) {
-      log("✅ Referrer found:");
-      log("ID     : ${result.userId}");
-      log("Name   : ${result.name}");
-      log("Email  : ${result.email}");
-      log("Photo  : ${result.profilePicture}");
-      log("Code   : ${result.referralCode}");
-    } else {
-      log("❌ No referrer data / null received");
-    }
+    } else {}
 
     referrer.value = result;
-
-    isLoading.value = false;
-    log("=====================================================\n");
   }
 
   // ---------------------------------------------------------------------------
@@ -93,14 +67,10 @@ class ReferralController extends GetxController {
   // ---------------------------------------------------------------------------
 
   Future<void> loadReferralFromStorage() async {
-    try {
-      final storedCode = await storage.read(AppConst.REFERRAL_CODE);
+    final storedCode = await storage.read(AppConst.REFERRAL_CODE);
 
-      if (storedCode != null && storedCode.toString().isNotEmpty) {
-        referralCode.value = storedCode.toString();
-      }
-    } catch (e) {
-      log("Error reading referral code from storage: $e");
+    if (storedCode != null && storedCode.toString().isNotEmpty) {
+      referralCode.value = storedCode.toString();
     }
   }
 
@@ -121,7 +91,7 @@ class ReferralController extends GetxController {
 
   Future<void> fetchReferralData() async {
     try {
-      isDashboardLoading(true);
+      isDashboardLoading.value = true;
 
       final response = await _referralService.fetchReferralResponseFromServer();
 
@@ -137,7 +107,7 @@ class ReferralController extends GetxController {
     } catch (e) {
       appToast(error: true, content: e.toString());
     } finally {
-      isDashboardLoading(false);
+      isDashboardLoading.value = false;
     }
   }
 
@@ -162,8 +132,6 @@ class ReferralController extends GetxController {
 
   Future<void> fetchReferralStats() async {
     try {
-      isLoading(true);
-
       final response = await _referralService.fetchReferralStats();
 
       if (response != null && response.success) {
@@ -172,9 +140,7 @@ class ReferralController extends GetxController {
         referralLimit.value = data.referralLimit;
       }
     } catch (e) {
-      print("Controller Error: $e");
-    } finally {
-      isLoading(false);
+      log(e.toString());
     }
   }
   // ---------------------------------------------------------------------------
@@ -272,9 +238,7 @@ class ReferralController extends GetxController {
         error: false,
         content: "Referral link copied. Paste it or add Link sticker.",
       );
-    } catch (e, st) {
-      log("Instagram Story Error: $e\n$st");
-
+    } catch (e) {
       appToast(
         error: true,
         content: "Failed to open Instagram Story",
@@ -361,36 +325,30 @@ class ReferralController extends GetxController {
     required GlobalKey qrKey,
     String? message,
   }) async {
-    try {
-      final renderObject = qrKey.currentContext?.findRenderObject();
-      if (renderObject == null || renderObject is! RenderRepaintBoundary) {
-        log("❌ QR RenderRepaintBoundary not found");
-        return;
-      }
-
-      final ui.Image image = await renderObject.toImage(pixelRatio: 3.0);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      if (byteData == null) {
-        log("❌ QR ByteData is null");
-        return;
-      }
-
-      final Uint8List pngBytes = byteData.buffer.asUint8List();
-
-      final tempDir = await getTemporaryDirectory();
-      final file = File("${tempDir.path}/referral_qr.png");
-      await file.writeAsBytes(pngBytes);
-
-      final params = ShareParams(
-        files: [XFile(file.path)],
-        text: message ??
-            "Join this app & earn rewards! Use my referral link: $referralLink",
-      );
-
-      await SharePlus.instance.share(params);
-    } catch (e, st) {
-      log("QR Image Share Error: $e\n$st");
+    final renderObject = qrKey.currentContext?.findRenderObject();
+    if (renderObject == null || renderObject is! RenderRepaintBoundary) {
+      return;
     }
+
+    final ui.Image image = await renderObject.toImage(pixelRatio: 3.0);
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    if (byteData == null) {
+      return;
+    }
+
+    final Uint8List pngBytes = byteData.buffer.asUint8List();
+
+    final tempDir = await getTemporaryDirectory();
+    final file = File("${tempDir.path}/referral_qr.png");
+    await file.writeAsBytes(pngBytes);
+
+    final params = ShareParams(
+      files: [XFile(file.path)],
+      text: message ??
+          "Join this app & earn rewards! Use my referral link: $referralLink",
+    );
+
+    await SharePlus.instance.share(params);
   }
 
   // ---------------------------------------------------------------------------
