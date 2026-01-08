@@ -20,7 +20,7 @@ import '../razorpay/pending_transaction_razorpay_controller.dart';
 class PendingTransactionController extends GetxController {
   final PendingTransactionService service = PendingTransactionService();
   NotificationService notificationService = NotificationService();
-  MyWalletController walletController = MyWalletController();
+  late MyWalletController walletController;
   RxBool isLoading = false.obs;
 
   // API payments
@@ -44,6 +44,7 @@ class PendingTransactionController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    walletController = Get.find<MyWalletController>();
     getPendingTransactions();
   }
 
@@ -99,15 +100,23 @@ class PendingTransactionController extends GetxController {
 
   //------------------------------------Tranaction API Methods and All---------------------------------------------------
 
+  
+
   Future<void> payNow() async {
+  
+
     if (selectedOrderIds.isEmpty) {
       appToast(
-          error: true, content: "Please select at least one order to pay.");
+        error: true,
+        content: "Please select at least one order to pay.",
+      );
       return;
     }
 
+    final String method = selectedPaymentMethod.value;
+
     // ================= WALLET FLOW =================
-    if (selectedPaymentMethod.value == "WALLET") {
+    if (method == "WALLET") {
       final walletBalance =
           Get.find<MyWalletController>().wallet.value?.walletBalance ?? 0;
 
@@ -126,20 +135,12 @@ class PendingTransactionController extends GetxController {
       if (Get.isDialogOpen ?? false) Get.back();
 
       if (response != null && response['success'] == true) {
-        // ✅ Enable AutoPay (same as Order flow)
-        if (enableAutoPay.value == true) {
+        if (enableAutoPay.value) {
           await _enableAutoPayForOrders(selectedOrderIds.toList());
         }
 
-        // ✅ Show loader briefly (same UX as order screen)
-        Get.dialog(appLoader(), barrierDismissible: false);
-        await Future.delayed(const Duration(seconds: 2));
-        if (Get.isDialogOpen ?? false) Get.back();
-
-        // ✅ Refresh wallet
         await walletController.fetchWallet(forceRefresh: true);
 
-        // ✅ Navigate to Booking Confirmation
         Get.offAll(() => BookingConfirmationScreen());
       } else {
         appToast(
@@ -147,7 +148,6 @@ class PendingTransactionController extends GetxController {
           content: response?['message'] ?? "Wallet payment failed",
         );
       }
-
       return;
     }
 
@@ -157,11 +157,15 @@ class PendingTransactionController extends GetxController {
     );
 
     if (response == null || response['success'] != true) {
-      appToast(error: true, content: "Failed to create order");
+      appToast(error: true, content: "Failed to create Razorpay order");
       return;
     }
 
-    final razorController = Get.find<PendingTransactionRazorpayController>();
+    // ✅ SAFE CONTROLLER RESOLUTION (FIX)
+    final PendingTransactionRazorpayController razorController =
+        Get.isRegistered<PendingTransactionRazorpayController>()
+            ? Get.find<PendingTransactionRazorpayController>()
+            : Get.put(PendingTransactionRazorpayController());
 
     razorController.startCombinedPayment(
       createResponse: response['data'],
@@ -458,9 +462,18 @@ class PendingTransactionController extends GetxController {
             // ---------------- PAY NOW ----------------
             appButton(
               onTap: () {
-                Get.back();
+                debugPrint("🟢 Bottom sheet Pay Now tapped");
+
                 enableAutoPay.value = tempEnableAutoPay.value;
-                payNow();
+
+                if (Get.isBottomSheetOpen ?? false) {
+                  Get.back();
+                }
+
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  debugPrint("🟡 Executing payNow()");
+                  payNow();
+                });
               },
               width: double.infinity,
               height: 45.h,

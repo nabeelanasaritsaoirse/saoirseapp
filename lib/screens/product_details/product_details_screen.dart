@@ -53,7 +53,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       body: SafeArea(
         child: Obx(() {
           /// LOADING
-          if (controller.isLoading.value) {
+          if (controller.isProductLoading.value) {
             return Center(child: appLoader());
           }
 
@@ -391,44 +391,43 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       child: Row(
         children: [
           /// Add to Cart
-          appButton(
-            onTap: () {
-              // bool hasPlan = controller.selectedPlanIndex.value != -1 ||
-              //     (controller.customDays.value > 0 &&
-              //         controller.customAmount.value > 0);
+        Obx(() => appButton(
+      onTap: () {
+        if (cartController.isAddToCartLoading.value) return; // ⛔ block tap
 
-              // if (!hasPlan) {
-              //   WarningDialog.show(
-              //       title: AppStrings.warning_label,
-              //       message: AppStrings.warning_body);
-              //   return;
-              // }
+        debugPrint("ADD TO CART BUTTON TAPPED");
 
-              // final selectedPlan = controller.getSelectedPlan();
-              final selectedVariantId =
-                  controller.selectedVariantId.value.isEmpty
-                      ? null
-                      : controller.selectedVariantId.value;
+        final selectedVariantId =
+            controller.selectedVariantId.value.isEmpty
+                ? null
+                : controller.selectedVariantId.value;
 
-              cartController.addProductToCart(
-                productId: controller.product.value!.id,
-                variantId: selectedVariantId,
-                // days: selectedPlan["days"],
-                // dailyAmount: selectedPlan["amount"],
-              );
-            },
-            width: 50.w,
-            height: 35.h,
-            padding: EdgeInsets.all(0),
-            borderRadius: BorderRadius.circular(10.r),
-            borderColor: AppColors.shadowColor,
-            child: Center(
-              child: Icon(
+        cartController.addProductToCart(
+          productId: controller.product.value!.id,
+          variantId: selectedVariantId,
+        );
+      },
+      width: 50.w,
+      height: 35.h,
+      padding: EdgeInsets.all(0),
+      borderRadius: BorderRadius.circular(10.r),
+      borderColor: AppColors.shadowColor,
+      child: Center(
+        child: cartController.isAddToCartLoading.value
+            ? SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : Icon(
                 Icons.shopping_cart_checkout,
                 color: AppColors.textBlack,
               ),
-            ),
-          ),
+      ),
+    )),
+
+
+
 
           SizedBox(width: 8.w),
 

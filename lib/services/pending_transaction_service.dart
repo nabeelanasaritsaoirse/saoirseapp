@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -13,6 +16,7 @@ class PendingTransactionService {
     final String url = AppURLs.PENDING_TRANSACTIONS_API;
     final token = await _token();
 
+
     return APIService.getRequest<PendingTransactionResponse>(
       url: url,
       headers: {"Authorization": "Bearer $token"},
@@ -20,10 +24,13 @@ class PendingTransactionService {
     );
   }
 
+  
+
   // ------------------ CREATE COMBINED RAZORPAY ORDER --------------------
   Future<Map<String, dynamic>?> createCombinedRazorpayOrder(
       List<String> orderIds) async {
     final token = await _token();
+   
     final String url = AppURLs.PENDING_TRANSACTION_PAYMENT_RESPONSE;
 
     return APIService.postRequest<Map<String, dynamic>>(
@@ -46,6 +53,9 @@ class PendingTransactionService {
       Map<String, dynamic> body) async {
     try {
       final token = await storage.read(AppConst.ACCESS_TOKEN);
+      
+
+      log("Passing body ===> ${jsonEncode(body)}");
 
       final url = AppURLs.PENDING_TRANSACTION_PAY_DAILY_SELECTED;
 
@@ -59,8 +69,12 @@ class PendingTransactionService {
         onSuccess: (data) => data,
       );
 
+      log("Response ===> ${jsonEncode(response)}");
+
       return response;
-    } catch (e) {
+    } catch (e, s) {
+      log("❌ payDailySelected error: $e");
+      log("📌 stackTrace: $s");
       return null;
     }
   }
