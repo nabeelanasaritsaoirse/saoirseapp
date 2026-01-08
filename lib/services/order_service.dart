@@ -57,7 +57,6 @@ class OrderService {
 
       return await APIService.postRequest<Map<String, dynamic>>(
         url: AppURLs.CREATE_BULK_ORDER_API,
-        
         body: body,
         headers: {
           "Authorization": "Bearer $token",
