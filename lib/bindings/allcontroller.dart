@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/razorpay/razorpay_cart_controller.dart';
 
 // ---------------- AUTH & USER ----------------
 import '../screens/add_address/add_address_controller.dart';
@@ -121,6 +122,10 @@ class AllController extends Bindings {
     Get.lazyPut<RazorpayController>(
       () => RazorpayController(),
       fenix: true,
+    );
+    Get.put<RazorpayCartController>(
+      RazorpayCartController(),
+      permanent: true,
     );
     Get.lazyPut<PendingTransactionController>(
       () => PendingTransactionController(),

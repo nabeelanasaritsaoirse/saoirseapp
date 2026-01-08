@@ -110,6 +110,7 @@ class AppStrings {
       "You haven’t selected a plan yet. Please choose a plan before proceeding to Add to Cart.";
   static String checkout_warning_body =
       "You haven’t selected a plan yet. Please choose a plan before proceeding to Check out.";
+  
 
   // KYC page
   static String KycTitle = "KYC Status";

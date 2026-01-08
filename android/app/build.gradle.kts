@@ -70,11 +70,17 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = true
-        }
+    getByName("release") {
+        signingConfig = signingConfigs.getByName("release")
+        isMinifyEnabled = true
+
+        proguardFiles(
+            getDefaultProguardFile("proguard-android-optimize.txt"),
+            "proguard-rules.pro"
+        )
     }
+}
+
 }
 
 flutter {
@@ -83,6 +89,9 @@ flutter {
 
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
+
+    // 🔥 Razorpay Android SDK (FORCED – FIXES CRASH)
+    implementation("com.razorpay:checkout:1.6.33")
 
      coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

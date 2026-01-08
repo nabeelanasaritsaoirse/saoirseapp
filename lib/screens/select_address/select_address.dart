@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/cart_response_model.dart';
+import 'package:saoirse_app/screens/multiple_order_details_screen/multiple_order_details_controller.dart';
+import 'package:saoirse_app/screens/multiple_order_details_screen/multiple_order_details_screen.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -16,8 +19,15 @@ import '../order_details/order_details_screen.dart';
 import 'select_address_controller.dart';
 import '../../models/product_details_model.dart';
 
+enum CheckoutSource {
+  product,
+  cart,
+}
+
 class SelectAddress extends StatelessWidget {
+  final CheckoutSource checkoutSource; //
   final ProductDetailsData? product;
+  final CartData? cartData;
   final String? selectVarientId;
   final int selectedDays; // NEW
   final double selectedAmount;
@@ -26,7 +36,9 @@ class SelectAddress extends StatelessWidget {
   SelectAddress({
     super.key,
     this.product,
+    this.cartData,
     this.selectVarientId,
+    required this.checkoutSource,
     required this.selectedDays,
     required this.selectedAmount,
     this.quantity,
@@ -110,25 +122,42 @@ class SelectAddress extends StatelessWidget {
                   final selectedAddress =
                       controller.addressList[controller.selectedIndex.value];
 
-                  if (!Get.isRegistered<OrderDetailsController>()) {
-                    Get.put(OrderDetailsController());
-                  }
+                  if (checkoutSource == CheckoutSource.product) {
+                    if (!Get.isRegistered<OrderDetailsController>()) {
+                      Get.put(OrderDetailsController());
+                    }
 
-                  final orderCtrl = Get.find<OrderDetailsController>();
+                    final orderCtrl = Get.find<OrderDetailsController>();
 
-                  // Save selected data
-                  orderCtrl.selectedDays.value = selectedDays;
-                  orderCtrl.selectedAmount.value = selectedAmount;
+                    // Save selected data
+                    orderCtrl.selectedDays.value = selectedDays;
+                    orderCtrl.selectedAmount.value = selectedAmount;
 
-                  // Navigate to Order Details
-                  Get.to(() => OrderDetailsScreen(
+                    // Navigate to Order Details
+                    Get.to(() => OrderDetailsScreen(
+                          addresses: selectedAddress,
+                          product: product,
+                          selectedDays: selectedDays,
+                          selectVarientId: selectVarientId ?? "",
+                          selectedAmount: selectedAmount,
+                          quantity: quantity,
+                        ));
+                  } else {
+                    Get.to(
+                      () => MultipleOrderDetailsScreen(
                         addresses: selectedAddress,
                         product: product,
+                        cartData: cartData!,
                         selectedDays: selectedDays,
                         selectVarientId: selectVarientId ?? "",
                         selectedAmount: selectedAmount,
                         quantity: quantity,
-                      ));
+                      ),
+                      binding: BindingsBuilder(() {
+                        Get.put(MultipleOrderDetailsController());
+                      }),
+                    );
+                  }
                 },
               ),
             ),

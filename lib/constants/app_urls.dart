@@ -72,10 +72,13 @@ class AppURLs {
 
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/installments/orders";
+  static String CREATE_BULK_ORDER_API = BASE_API + "/api/installments/orders/bulk";
 
   // Payment Api
   static String PAYMENT_PROCESS_API =
       BASE_API + "api/installments/payments/process";
+  static String PAYMENT_VERIFY_API = BASE_API + "api/installments/orders/bulk/verify-payment";
+  static String WALLET_pAYMENT_VARIFY_API = BASE_API + "api/wallet/verify-payment";
 
   // Notifications
   static String NOTIFICATIONS = BASE_API + "api/notifications";

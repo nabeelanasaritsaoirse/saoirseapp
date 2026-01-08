@@ -33,7 +33,6 @@ class RazorpayController extends GetxController {
     try {
       final options = {
         'key': dotenv.env['RAZORPAY_KEY_ID'],
-        'amount': amount,
         'order_id': razorpayOrderId,
         'currency': 'INR',
       };

@@ -36,8 +36,8 @@ class CartService {
   Future<AddToCartResponse?> addToCart({
     required String productId,
     required String? variantId,
-    required int totalDays,
-    required double dailyAmount,
+    // required int totalDays,
+    // required double dailyAmount,
     int quantity = 1,
   }) async {
     try {
@@ -46,10 +46,7 @@ class CartService {
       final body = {
         "quantity": quantity,
         "variantId": variantId,
-        "installmentPlan": {
-          "totalDays": totalDays,
-          "dailyAmount": dailyAmount,
-        }
+       
       };
 
       final response = await APIService.postRequest(

@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -38,7 +39,7 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-
+         log(response.body);
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -120,6 +121,7 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
+        log(response.body);
 
         switch (response.statusCode) {
           case 200:

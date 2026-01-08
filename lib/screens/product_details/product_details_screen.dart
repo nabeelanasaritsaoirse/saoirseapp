@@ -393,18 +393,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           /// Add to Cart
           appButton(
             onTap: () {
-              bool hasPlan = controller.selectedPlanIndex.value != -1 ||
-                  (controller.customDays.value > 0 &&
-                      controller.customAmount.value > 0);
+              // bool hasPlan = controller.selectedPlanIndex.value != -1 ||
+              //     (controller.customDays.value > 0 &&
+              //         controller.customAmount.value > 0);
 
-              if (!hasPlan) {
-                WarningDialog.show(
-                    title: AppStrings.warning_label,
-                    message: AppStrings.warning_body);
-                return;
-              }
+              // if (!hasPlan) {
+              //   WarningDialog.show(
+              //       title: AppStrings.warning_label,
+              //       message: AppStrings.warning_body);
+              //   return;
+              // }
 
-              final selectedPlan = controller.getSelectedPlan();
+              // final selectedPlan = controller.getSelectedPlan();
               final selectedVariantId =
                   controller.selectedVariantId.value.isEmpty
                       ? null
@@ -413,8 +413,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               cartController.addProductToCart(
                 productId: controller.product.value!.id,
                 variantId: selectedVariantId,
-                days: selectedPlan["days"],
-                dailyAmount: selectedPlan["amount"],
+                // days: selectedPlan["days"],
+                // dailyAmount: selectedPlan["amount"],
               );
             },
             width: 50.w,
@@ -509,6 +509,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     selectVarientId: controller.selectedVariantId.value,
                     selectedDays: selectedDays,
                     selectedAmount: selectedAmount,
+                    checkoutSource: CheckoutSource.product,
                   ),
                 );
               },
