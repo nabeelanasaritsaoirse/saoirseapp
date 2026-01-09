@@ -98,19 +98,17 @@ class ManageAccountScreen extends StatelessWidget {
   Widget _editDelete(int index) {
     return Column(
       children: [
-        _circleIcon(
+        _actionIconButton(
           icon: Icons.edit,
-          color: AppColors.primaryColor,
-          // ignore: deprecated_member_use
-          bg: AppColors.primaryColor.withOpacity(0.12),
+          iconColor: AppColors.primaryColor,
+          backgroundColor: const Color(0xFFEFF1FF),
           onTap: () => controller.startEdit(index),
         ),
         SizedBox(height: 10.h),
-        _circleIcon(
+        _actionIconButton(
           icon: Icons.delete,
-          color: AppColors.red,
-          // ignore: deprecated_member_use
-          bg: AppColors.red.withOpacity(0.12),
+          iconColor: AppColors.red,
+          backgroundColor: const Color(0xFFFFECEC),
           onTap: () {
             DeleteAccountDialog.show(
               onDelete: () => controller.deleteAccount(index),
@@ -121,19 +119,33 @@ class ManageAccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _circleIcon({
+  Widget _actionIconButton({
     required IconData icon,
-    required Color color,
-    required Color bg,
+    required Color iconColor,
+    required Color backgroundColor,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 34.w,
-        height: 34.w,
-        decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-        child: Icon(icon, size: 16.sp, color: color),
+        width: 35.w,
+        height: 35.h,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowColor,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(
+          icon,
+          size: 18.sp,
+          color: iconColor,
+        ),
       ),
     );
   }
