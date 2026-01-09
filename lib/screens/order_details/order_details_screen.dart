@@ -833,37 +833,50 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
           // ---------------- PAY NOW BUTTON ----------------
           Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.lightAmber,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                padding: EdgeInsets.symmetric(vertical: 10.h),
-              ),
-              onPressed: () {
-                orderController.placeOrder(
-                  productId: widget.product!.id,
-                  variantId: widget.selectVarientId ?? "",
-                  totalDays: orderController.selectedDays.value,
-                  couponCode: orderController.appliedCouponCode.value,
-                  deliveryAddress: {
-                    "name": widget.addresses.name,
-                    "phoneNumber": widget.addresses.phoneNumber,
-                    "addressLine1": widget.addresses.addressLine1,
-                    "city": widget.addresses.city,
-                    "state": widget.addresses.state,
-                    "pincode": widget.addresses.pincode,
-                  },
-                );
-              },
-              child: appText(
-                AppStrings.pay_now,
-                color: AppColors.white,
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            child: Obx(() => ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: orderController.isPlacingOrder.value
+                        ? AppColors.grey
+                        : AppColors.lightAmber,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 10.h),
+                  ),
+                  onPressed: orderController.isPlacingOrder.value
+                      ? null // 🚫 disable
+                      : () {
+                          orderController.placeOrder(
+                            productId: widget.product!.id,
+                            variantId: widget.selectVarientId ?? "",
+                            totalDays: orderController.selectedDays.value,
+                            couponCode: orderController.appliedCouponCode.value,
+                            deliveryAddress: {
+                              "name": widget.addresses.name,
+                              "phoneNumber": widget.addresses.phoneNumber,
+                              "addressLine1": widget.addresses.addressLine1,
+                              "city": widget.addresses.city,
+                              "state": widget.addresses.state,
+                              "pincode": widget.addresses.pincode,
+                            },
+                          );
+                        },
+                  child: orderController.isPlacingOrder.value
+                      ? SizedBox(
+                          height: 18.h,
+                          width: 18.w,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.white,
+                          ),
+                        )
+                      : appText(
+                          AppStrings.pay_now,
+                          color: AppColors.white,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                )),
           ),
         ],
       ),

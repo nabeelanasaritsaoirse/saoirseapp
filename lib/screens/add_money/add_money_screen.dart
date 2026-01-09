@@ -107,28 +107,41 @@ class AddMoneyScreen extends StatelessWidget {
           ),
           Padding(
             padding: EdgeInsets.all(20.w),
-            child: SizedBox(
-              width: double.infinity,
-              height: 45.h,
-              child: ElevatedButton(
-                onPressed: controller.addMoney,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.lightAmber,
-                  foregroundColor: AppColors.black87,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
+            child: Obx(() => SizedBox(
+                  width: double.infinity,
+                  height: 45.h,
+                  child: ElevatedButton(
+                    onPressed: controller.isAddingMoney.value
+                        ? null
+                        : controller.addMoney,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: controller.isAddingMoney.value
+                          ? AppColors.grey
+                          : AppColors.lightAmber,
+                      foregroundColor: AppColors.black87,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                    ),
+                    child: controller.isAddingMoney.value
+                        ? SizedBox(
+                            height: 18.h,
+                            width: 18.w,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.white,
+                            ),
+                          )
+                        : appText(
+                            "Add Money",
+                            fontSize: 16.sp,
+                            color: AppColors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
                   ),
-                ),
-                child: appText(
-                  "Add Money",
-                  fontSize: 16.sp,
-                  color: AppColors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
+                )),
+          )
         ],
       ),
     );
