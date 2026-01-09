@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/product_details/product_details_binding.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -122,7 +123,11 @@ class Design2CompactList extends StatelessWidget {
             padding: EdgeInsets.all(8.0.w),
             child: InkWell(
               onTap: () => Get.to(
-                ProductDetailsScreen(
+                () => ProductDetailsScreen(
+                  productId: product.productId,
+                  id: product.productMongoId,
+                ),
+                binding: ProductDetailsBinding(
                   productId: product.productId,
                   id: product.productMongoId,
                 ),
@@ -206,8 +211,14 @@ class Design3Widget extends StatelessWidget {
           final product = feature.products[index];
 
           return InkWell(
-            onTap: () => Get.to(
-              ProductDetailsScreen(
+            onTap: () =>
+             
+                Get.to(
+              () => ProductDetailsScreen(
+                productId: product.productId,
+                id: product.productMongoId,
+              ),
+              binding: ProductDetailsBinding(
                 productId: product.productId,
                 id: product.productMongoId,
               ),
@@ -321,8 +332,14 @@ Widget _productCard(FeaturedProduct p) {
     width: 150.w,
     height: 170.h,
     child: InkWell(
-      onTap: () => Get.to(
-        ProductDetailsScreen(
+      onTap: () =>
+          
+          Get.to(
+        () => ProductDetailsScreen(
+          productId: p.productId,
+          id: p.productMongoId,
+        ),
+        binding: ProductDetailsBinding(
           productId: p.productId,
           id: p.productMongoId,
         ),
@@ -478,8 +495,14 @@ class Design5Widget extends StatelessWidget {
 
 Widget _design5ProductCard(FeaturedProduct p) {
   return InkWell(
-    onTap: () => Get.to(
-      ProductDetailsScreen(
+    onTap: () =>
+     
+        Get.to(
+      () => ProductDetailsScreen(
+        productId: p.productId,
+        id: p.productMongoId,
+      ),
+      binding: ProductDetailsBinding(
         productId: p.productId,
         id: p.productMongoId,
       ),
