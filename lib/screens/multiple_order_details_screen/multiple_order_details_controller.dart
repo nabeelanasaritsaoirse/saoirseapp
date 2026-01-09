@@ -30,7 +30,7 @@ class MultipleOrderDetailsController extends GetxController {
   RxDouble selectedAmount = 0.0.obs;
   RxBool enableAutoPay = true.obs;
   RxBool showWalletAutoPay = false.obs;
-
+  RxBool isPlacingOrder = false.obs;
   var quantity = 1.obs;
   String orderid = "";
 
@@ -229,72 +229,93 @@ class MultipleOrderDetailsController extends GetxController {
   Future<void> applyCouponLoopWiseForAllProducts({
     required String couponCode,
   }) async {
+    debugPrint("🟡 [COUPON] Apply clicked");
+
     if (couponCode.trim().isEmpty) {
-      appToast(error: true, content: "Please enter a coupon code");
+      appToaster(error: true, content: "Please enter a coupon code");
       return;
     }
 
-    appLoader();
-
-    /// TEMP list to store updated products
-    final List<CartProduct> updatedProducts = [];
-
-    for (final item in products) {
-      final body = {
-        "couponCode": couponCode.trim(),
-        "productId": item.productId,
-        "dailyAmount": item.installmentPlan.dailyAmount,
-        "totalDays": item.installmentPlan.totalDays,
-        "quantity": item.quantity,
-      };
-
-      final response = await CouponService.validateCoupon(body);
-
-      /// ❌ If coupon fails for ANY product → STOP EVERYTHING
-      if (response == null) {
-        if (Get.isDialogOpen ?? false) Get.back();
-
-        appToast(
-          error: true,
-          content: "Coupon not applicable for ${item.name}",
-        );
-        return;
-      }
-
-      /// ✅ Coupon valid → prepare updated product
-      final inst = response.installment;
-
-      final updatedPlan = item.installmentPlan.copyWith(
-        dailyAmount: inst.dailyAmount,
-        totalDays: inst.totalDays,
-        totalAmount: inst.dailyAmount * inst.totalDays,
-      );
-
-      final updatedItem = item.copyWith(
-        installmentPlan: updatedPlan,
-        itemTotal: inst.dailyAmount * inst.totalDays * item.quantity,
-      );
-
-      updatedProducts.add(updatedItem);
+    if (products.isEmpty) {
+      debugPrint("🔴 [COUPON] Cart is empty");
+      appToaster(error: true, content: "No products in cart");
+      return;
     }
 
-    /// 🔥 APPLY CHANGES ONLY AFTER ALL PRODUCTS PASS
-    products.assignAll(updatedProducts);
+    debugPrint("📦 [COUPON] Applying coupon to ${products.length} products");
+    debugPrint("🎟️ [COUPON] Code: $couponCode");
 
-    /// 🔥 RECALCULATE CART TOTAL
-    totalAmount.value = products.fold(
-      0.0,
-      (sum, item) => sum + item.itemTotal,
-    );
+    Get.dialog(appLoader(), barrierDismissible: false);
 
-    appliedCouponCode.value = couponCode.trim();
+    final List<CartProduct> updatedProducts = [];
 
-    if (Get.isDialogOpen ?? false) Get.back();
+    try {
+      for (final item in products) {
+        debugPrint("➡️ [COUPON] Validating for product: ${item.productId}");
 
-    appToast(
-      title: "Coupon Applied",
-      content: "Coupon applied to all products",
-    );
+        final body = {
+          "couponCode": couponCode.trim(),
+          "productId": item.productId,
+          "dailyAmount": item.installmentPlan.dailyAmount,
+          "totalDays": item.installmentPlan.totalDays,
+          "quantity": item.quantity,
+        };
+
+        debugPrint("📤 [COUPON] Request body: $body");
+
+        final response = await CouponService.validateCoupon(body);
+
+        debugPrint("📥 [COUPON] Response: $response");
+
+        final inst = response.installment;
+
+        final updatedPlan = item.installmentPlan.copyWith(
+          dailyAmount: inst.dailyAmount,
+          totalDays: inst.totalDays,
+          totalAmount: inst.dailyAmount * inst.totalDays,
+        );
+
+        final updatedItem = item.copyWith(
+          installmentPlan: updatedPlan,
+          itemTotal: inst.dailyAmount * inst.totalDays * item.quantity,
+        );
+
+        updatedProducts.add(updatedItem);
+      }
+
+      // ✅ APPLY ONLY AFTER ALL PASS
+      products.assignAll(updatedProducts);
+
+      totalAmount.value = products.fold(
+        0.0,
+        (sum, item) => sum + item.itemTotal,
+      );
+
+      appliedCouponCode.value = couponCode.trim();
+
+      debugPrint("✅ [COUPON] Applied successfully");
+      debugPrint("💰 [COUPON] New total: ${totalAmount.value}");
+
+      appToaster(
+        error: true,
+        content: "Coupon applied to all products",
+      );
+    } catch (e) {
+      debugPrint("❌ [COUPON] Failed: $e");
+
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+
+      Future.delayed(const Duration(milliseconds: 100), () {
+        appToaster(
+          error: true,
+          content: e.toString().replaceAll("Exception:", "").trim(),
+        );
+      });
+    } finally {
+      debugPrint("🔵 [COUPON] Finished");
+    }
   }
 
   void removeCoupon(TextEditingController controller) {
@@ -418,19 +439,28 @@ class MultipleOrderDetailsController extends GetxController {
   Future<void> placeBulkOrder({
     required Map<String, dynamic> deliveryAddress,
   }) async {
+    // 🔒 PREVENT MULTIPLE CALLS
+    if (isPlacingOrder.value) {
+      log("⛔ [BULK ORDER] Already processing, ignored");
+      return;
+    }
+
+    isPlacingOrder.value = true;
+    log("🔒 [BULK ORDER] LOCKED");
+
     final body = {
       "items": buildBulkItems(),
       "paymentMethod": selectedPaymentMethod.value,
       "deliveryAddress": deliveryAddress,
     };
-    log("Body ===> : $body");
 
-    appLoader();
+    log("📤 [BULK ORDER] Request body: $body");
+
+    Get.dialog(appLoader(), barrierDismissible: false);
 
     try {
       final response = await OrderService.createBulkOrder(body);
-
-      if (Get.isDialogOpen ?? false) Get.back();
+      log("📥 [BULK ORDER] API response: $response");
 
       if (response == null || response["success"] != true) {
         appToast(error: true, content: "Bulk order failed");
@@ -442,12 +472,12 @@ class MultipleOrderDetailsController extends GetxController {
 
       // ================= WALLET FLOW =================
       if (data.summary.paymentMethod == PaymentMethod.wallet) {
-        // 🔥 ENABLE AUTOPAY FOR EACH ORDER (if user opted in)
+        log("💰 [BULK ORDER] Wallet flow");
+
         if (showWalletAutoPay.value == true) {
           for (final order in data.orders) {
-            final String orderId = order.orderId;
-            if (orderId.isNotEmpty) {
-              await enableAutoPayForOrder(orderId);
+            if (order.orderId.isNotEmpty) {
+              await enableAutoPayForOrder(order.orderId);
             }
           }
 
@@ -460,44 +490,36 @@ class MultipleOrderDetailsController extends GetxController {
           );
         }
 
-        // ✅ CLEAR CART AFTER SUCCESS
         await cartController.clearCartItems();
-
-        // ✅ REFRESH WALLET
         await walletController.fetchWallet(forceRefresh: true);
 
-        // ✅ NAVIGATE
         Get.off(() => BookingConfirmationScreen());
         return;
       }
 
       // ================= RAZORPAY FLOW =================
-      final razorpay = data.razorpayOrder;
+      final razorpayOrderId = data.payment?.razorpayOrderId ?? "";
+      log("🟣 [BULK RAZORPAY] OrderId: $razorpayOrderId");
 
-      if (razorpay == null || razorpay.id.isEmpty) {
+      if (razorpayOrderId.isEmpty) {
         appToast(error: true, content: "Invalid Razorpay order");
         return;
       }
 
-      final resposnseData = bulkResponse.data;
-
-      if (resposnseData.razorpayOrder == null) {
-        // handle error / show toast
-        log("Razorpay order not found");
-        return;
-      }
-      log("Passed payement id is : ====== > ${data.payment!.razorpayOrderId}");
       Get.find<RazorpayCartController>().openCheckout(
         bulkOrderId: data.bulkOrderId,
-        razorpayOrderId: data.payment!.razorpayOrderId,
+        razorpayOrderId: razorpayOrderId,
       );
-    } catch (e) {
-      if (Get.isDialogOpen ?? false) Get.back();
+    } catch (e, stack) {
+      log("❌ [BULK ORDER] Exception: $e");
+      log("📌 [BULK ORDER] StackTrace: $stack");
 
-      appToast(
-        error: true,
-        content: "Payment initialization failed",
-      );
+      appToast(error: true, content: "Payment initialization failed");
+    } finally {
+      isPlacingOrder.value = false; // 🔓 UNLOCK
+      log("🔓 [BULK ORDER] UNLOCKED");
+
+      if (Get.isDialogOpen ?? false) Get.back();
     }
   }
 
