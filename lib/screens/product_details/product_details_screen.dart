@@ -36,13 +36,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   void initState() {
-    controller = Get.put(
-      ProductDetailsController(
-        productId: widget.productId,
-        id: widget.id,
-      ),
-    );
+   
     super.initState();
+    controller = Get.find<ProductDetailsController>();
     controller.checkIfInWishlist(widget.productId);
   }
 

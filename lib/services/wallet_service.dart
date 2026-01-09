@@ -7,6 +7,7 @@ import '/services/api_service.dart';
 
 class WalletService {
   final token = storage.read(AppConst.ACCESS_TOKEN);
+ 
   Future<WalletModels?> fetchWallet() async {
     try {
       final url = AppURLs.Wallet;
