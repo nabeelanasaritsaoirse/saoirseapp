@@ -162,7 +162,13 @@ class ManageAddressScreen extends StatelessWidget {
                   icon: Icons.delete,
                   iconColor: AppColors.red,
                   backgroundColor: const Color(0xFFFFECEC),
-                  onTap: () => _showDeleteDialog(context, address.id),
+                  onTap: () {
+                    DeleteAccountDialog.show(
+                      onDelete: () async {
+                        await controller.deleteAddress(address.id);
+                      },
+                    );
+                  },
                 ),
               ],
             )
@@ -173,115 +179,119 @@ class ManageAddressScreen extends StatelessWidget {
   }
 }
 
-void _showDeleteDialog(BuildContext context, String addressId) {
-  final controller = Get.find<ManageAddressController>();
-  showDialog(
-    context: context,
-    barrierColor: Colors.black54,
-    builder: (BuildContext context) {
-      return Dialog(
+class DeleteAccountDialog {
+  static void show({
+    required VoidCallback onDelete,
+  }) {
+    Get.dialog(
+      Dialog(
+        backgroundColor: AppColors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.r),
+          borderRadius: BorderRadius.circular(16.r),
         ),
         child: Padding(
-          padding: EdgeInsets.all(24.0.w),
+          padding: EdgeInsets.all(20.w),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Delete Icon
+              ///  DELETE ICON
               Container(
-                width: 70.w,
-                height: 70.h,
-                decoration: BoxDecoration(
-                  color: AppColors.red,
+                width: 56.w,
+                height: 56.w,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFE6E6),
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                        color: AppColors.shadowColor,
-                        blurRadius: 20.r,
-                        spreadRadius: 5,
-                        offset: const Offset(0, 2)),
-                  ],
                 ),
-                child: Icon(
-                  Icons.delete_outline,
-                  color: AppColors.white,
-                  size: 40,
+                child: Center(
+                  child: Icon(
+                    Icons.delete,
+                    color: AppColors.red,
+                    size: 26.sp,
+                  ),
                 ),
               ),
-              SizedBox(height: 20.h),
 
-              // Title
+              SizedBox(height: 14.h),
+
+              /// TITLE
               appText(
-                'Delete Address',
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+                "Delete Address",
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w700,
                 color: AppColors.black,
+                textAlign: TextAlign.center,
               ),
-              SizedBox(height: 10.h),
 
-              // Description
+              SizedBox(height: 8.h),
 
+              /// DESCRIPTION
               appText(
-                'Are you sure you want to delete this address?',
-                fontSize: 14,
-                color: AppColors.grey,
-                height: 1.5,
+                "Are you sure you want to delete this address?",
+                fontSize: 13.sp,
+                color: AppColors.black54,
+                textAlign: TextAlign.center,
               ),
+
               SizedBox(height: 20.h),
 
-              // Buttons Row
+              /// ACTION BUTTONS
               Row(
                 children: [
-                  // Cancel Button
+                  /// CANCEL
                   Expanded(
-                    child: TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                    child: GestureDetector(
+                      onTap: () => Get.back(),
+                      child: Container(
+                        height: 42.h,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: AppColors.lightGrey,
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: appText(
                           "Cancel",
-                          fontSize: 16,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.grey,
-                        )),
+                          color: AppColors.black,
+                        ),
+                      ),
+                    ),
                   ),
-                  SizedBox(width: 10.w),
 
-                  // Delete Button
+                  SizedBox(width: 12.w),
+
+                  /// DELETE
                   Expanded(
-                    child: ElevatedButton(
-                        onPressed: () async {
-                          Get.back();
-                          await controller.deleteAddress(addressId);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.red,
-                          foregroundColor: AppColors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          elevation: 1,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.back();
+                        onDelete();
+                      },
+                      child: Container(
+                        height: 42.h,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: AppColors.red,
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: appText(
                           "Delete",
-                          fontSize: 16,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
-                        )),
+                          color: AppColors.white,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ],
           ),
         ),
-      );
-    },
-  );
+      ),
+      barrierDismissible: true,
+    );
+  }
 }
 
 Widget _actionIconButton({
