@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/product_details/product_details_binding.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -9,6 +8,7 @@ import '../../models/product_model.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/product_card.dart';
 import '../productListing/product_listing.dart';
+import '../product_details/product_details_binding.dart';
 import '../product_details/product_details_screen.dart';
 
 class FeatureListRenderer extends StatelessWidget {
@@ -211,9 +211,7 @@ class Design3Widget extends StatelessWidget {
           final product = feature.products[index];
 
           return InkWell(
-            onTap: () =>
-             
-                Get.to(
+            onTap: () => Get.to(
               () => ProductDetailsScreen(
                 productId: product.productId,
                 id: product.productMongoId,
@@ -332,9 +330,7 @@ Widget _productCard(FeaturedProduct p) {
     width: 150.w,
     height: 170.h,
     child: InkWell(
-      onTap: () =>
-          
-          Get.to(
+      onTap: () => Get.to(
         () => ProductDetailsScreen(
           productId: p.productId,
           id: p.productMongoId,
@@ -495,9 +491,7 @@ class Design5Widget extends StatelessWidget {
 
 Widget _design5ProductCard(FeaturedProduct p) {
   return InkWell(
-    onTap: () =>
-     
-        Get.to(
+    onTap: () => Get.to(
       () => ProductDetailsScreen(
         productId: p.productId,
         id: p.productMongoId,
