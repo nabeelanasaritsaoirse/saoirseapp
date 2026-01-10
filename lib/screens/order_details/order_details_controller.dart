@@ -125,6 +125,59 @@ class OrderDetailsController extends GetxController {
   }
 
   // ------------------------- APPLY COUPON ------------------------------------
+  // Future<void> applyCouponApi({
+  //   required String couponCode,
+  //   required String productId,
+  //   required int totalDays,
+  //   required double dailyAmount,
+  //   String variantId = "",
+  //   int quantity = 1,
+  // }) async {
+  //   if (couponCode.trim().isEmpty) {
+  //     appToast(error: true, content: "Please enter a coupon code");
+  //     return;
+  //   }
+
+  //   final body = {
+  //     "couponCode": couponCode.trim(),
+  //     "productId": productId,
+  //     "totalDays": totalDays,
+  //     "dailyAmount": dailyAmount,
+  //     if (variantId.isNotEmpty) "variantId": variantId,
+  //     if (quantity > 0) "quantity": quantity,
+  //   };
+
+  //   appLoader();
+
+  //   final response = await CouponService.validateCoupon(body);
+
+  //   if (Get.isDialogOpen ?? false) Get.back();
+
+  //   if (response == null) {
+  //     appToast(error: true, content: "Invalid coupon");
+  //     return;
+  //   }
+
+  //   couponValidation.value = response;
+  //   appliedCouponCode.value = couponCode.trim();
+
+  //   final inst = response.installment;
+  //   final pricing = response.pricing;
+
+  //   selectedAmount.value = roundToInt(inst.dailyAmount * this.quantity.value);
+
+  //   selectedDays.value = inst.totalDays;
+
+  //   totalAmount.value = roundToInt(pricing.finalPrice * this.quantity.value);
+
+  //   if (response.benefits.savingsMessage.isNotEmpty) {
+  //     appToast(
+  //         title: "Coupon Applied", content: response.benefits.savingsMessage);
+  //   } else {
+  //     appToast(title: "Coupon Applied", content: "Coupon applied successfully");
+  //   }
+  // }
+
   Future<void> applyCouponApi({
     required String couponCode,
     required String productId,
@@ -149,32 +202,36 @@ class OrderDetailsController extends GetxController {
 
     appLoader();
 
-    final response = await CouponService.validateCoupon(body);
+    try {
+      final response = await CouponService.validateCoupon(body);
 
-    if (Get.isDialogOpen ?? false) Get.back();
+      if (Get.isDialogOpen ?? false) Get.back();
 
-    if (response == null) {
-      appToast(error: true, content: "Invalid coupon");
-      return;
-    }
+      couponValidation.value = response;
+      appliedCouponCode.value = couponCode.trim();
 
-    couponValidation.value = response;
-    appliedCouponCode.value = couponCode.trim();
+      final inst = response.installment;
+      final pricing = response.pricing;
 
-    final inst = response.installment;
-    final pricing = response.pricing;
+      selectedAmount.value = roundToInt(inst.dailyAmount * this.quantity.value);
 
-    selectedAmount.value = roundToInt(inst.dailyAmount * this.quantity.value);
+      selectedDays.value = inst.totalDays;
 
-    selectedDays.value = inst.totalDays;
+      totalAmount.value = roundToInt(pricing.finalPrice * this.quantity.value);
 
-    totalAmount.value = roundToInt(pricing.finalPrice * this.quantity.value);
+      appToaster(
+        content: response.benefits.savingsMessage.isNotEmpty
+            ? response.benefits.savingsMessage
+            : "Coupon applied successfully",
+      );
+    } catch (e) {
+      if (Get.isDialogOpen ?? false) Get.back();
 
-    if (response.benefits.savingsMessage.isNotEmpty) {
-      appToast(
-          title: "Coupon Applied", content: response.benefits.savingsMessage);
-    } else {
-      appToast(title: "Coupon Applied", content: "Coupon applied successfully");
+      /// 🔥 SHOW BACKEND MESSAGE HERE
+      appToaster(
+        error: true,
+        content: e.toString().replaceAll("Exception:", "").trim(),
+      );
     }
   }
 

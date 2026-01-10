@@ -237,22 +237,14 @@ class MultipleOrderDetailsController extends GetxController {
     }
 
     if (products.isEmpty) {
-      debugPrint("🔴 [COUPON] Cart is empty");
       appToaster(error: true, content: "No products in cart");
       return;
     }
-
-    debugPrint("📦 [COUPON] Applying coupon to ${products.length} products");
-    debugPrint("🎟️ [COUPON] Code: $couponCode");
-
-    Get.dialog(appLoader(), barrierDismissible: false);
 
     final List<CartProduct> updatedProducts = [];
 
     try {
       for (final item in products) {
-        debugPrint("➡️ [COUPON] Validating for product: ${item.productId}");
-
         final body = {
           "couponCode": couponCode.trim(),
           "productId": item.productId,
@@ -261,11 +253,7 @@ class MultipleOrderDetailsController extends GetxController {
           "quantity": item.quantity,
         };
 
-        debugPrint("📤 [COUPON] Request body: $body");
-
         final response = await CouponService.validateCoupon(body);
-
-        debugPrint("📥 [COUPON] Response: $response");
 
         final inst = response.installment;
 
@@ -283,7 +271,7 @@ class MultipleOrderDetailsController extends GetxController {
         updatedProducts.add(updatedItem);
       }
 
-      // ✅ APPLY ONLY AFTER ALL PASS
+      // ✅ APPLY ONLY IF ALL PRODUCTS ARE VALID
       products.assignAll(updatedProducts);
 
       totalAmount.value = products.fold(
@@ -292,29 +280,12 @@ class MultipleOrderDetailsController extends GetxController {
       );
 
       appliedCouponCode.value = couponCode.trim();
-
-      debugPrint("✅ [COUPON] Applied successfully");
-      debugPrint("💰 [COUPON] New total: ${totalAmount.value}");
-
+    } catch (e) {
+      // ✅ ONLY SHOW ERROR MESSAGE
       appToaster(
         error: true,
-        content: "Coupon applied to all products",
+        content: e.toString().replaceAll("Exception:", "").trim(),
       );
-    } catch (e) {
-      debugPrint("❌ [COUPON] Failed: $e");
-
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-      }
-
-      Future.delayed(const Duration(milliseconds: 100), () {
-        appToaster(
-          error: true,
-          content: e.toString().replaceAll("Exception:", "").trim(),
-        );
-      });
-    } finally {
-      debugPrint("🔵 [COUPON] Finished");
     }
   }
 
@@ -448,6 +419,8 @@ class MultipleOrderDetailsController extends GetxController {
     isPlacingOrder.value = true;
     log("🔒 [BULK ORDER] LOCKED");
 
+    final bool shouldEnableAutoPay = enableAutoPay.value;
+
     final body = {
       "items": buildBulkItems(),
       "paymentMethod": selectedPaymentMethod.value,
@@ -474,7 +447,7 @@ class MultipleOrderDetailsController extends GetxController {
       if (data.summary.paymentMethod == PaymentMethod.wallet) {
         log("💰 [BULK ORDER] Wallet flow");
 
-        if (showWalletAutoPay.value == true) {
+        if (shouldEnableAutoPay) {
           for (final order in data.orders) {
             if (order.orderId.isNotEmpty) {
               await enableAutoPayForOrder(order.orderId);
@@ -489,6 +462,8 @@ class MultipleOrderDetailsController extends GetxController {
             sendInApp: true,
           );
         }
+
+        enableAutoPay.value = false;
 
         await cartController.clearCartItems();
         await walletController.fetchWallet(forceRefresh: true);
