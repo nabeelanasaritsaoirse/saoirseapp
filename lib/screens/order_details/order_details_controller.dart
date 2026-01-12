@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -21,7 +23,7 @@ class OrderDetailsController extends GetxController {
   RxDouble selectedAmount = 0.0.obs;
   RxBool enableAutoPay = true.obs;
   RxBool showWalletAutoPay = false.obs;
-
+  RxBool isPlacingOrder = false.obs;
   var quantity = 1.obs;
   String orderid = "";
 
@@ -123,6 +125,59 @@ class OrderDetailsController extends GetxController {
   }
 
   // ------------------------- APPLY COUPON ------------------------------------
+  // Future<void> applyCouponApi({
+  //   required String couponCode,
+  //   required String productId,
+  //   required int totalDays,
+  //   required double dailyAmount,
+  //   String variantId = "",
+  //   int quantity = 1,
+  // }) async {
+  //   if (couponCode.trim().isEmpty) {
+  //     appToast(error: true, content: "Please enter a coupon code");
+  //     return;
+  //   }
+
+  //   final body = {
+  //     "couponCode": couponCode.trim(),
+  //     "productId": productId,
+  //     "totalDays": totalDays,
+  //     "dailyAmount": dailyAmount,
+  //     if (variantId.isNotEmpty) "variantId": variantId,
+  //     if (quantity > 0) "quantity": quantity,
+  //   };
+
+  //   appLoader();
+
+  //   final response = await CouponService.validateCoupon(body);
+
+  //   if (Get.isDialogOpen ?? false) Get.back();
+
+  //   if (response == null) {
+  //     appToast(error: true, content: "Invalid coupon");
+  //     return;
+  //   }
+
+  //   couponValidation.value = response;
+  //   appliedCouponCode.value = couponCode.trim();
+
+  //   final inst = response.installment;
+  //   final pricing = response.pricing;
+
+  //   selectedAmount.value = roundToInt(inst.dailyAmount * this.quantity.value);
+
+  //   selectedDays.value = inst.totalDays;
+
+  //   totalAmount.value = roundToInt(pricing.finalPrice * this.quantity.value);
+
+  //   if (response.benefits.savingsMessage.isNotEmpty) {
+  //     appToast(
+  //         title: "Coupon Applied", content: response.benefits.savingsMessage);
+  //   } else {
+  //     appToast(title: "Coupon Applied", content: "Coupon applied successfully");
+  //   }
+  // }
+
   Future<void> applyCouponApi({
     required String couponCode,
     required String productId,
@@ -147,32 +202,36 @@ class OrderDetailsController extends GetxController {
 
     appLoader();
 
-    final response = await CouponService.validateCoupon(body);
+    try {
+      final response = await CouponService.validateCoupon(body);
 
-    if (Get.isDialogOpen ?? false) Get.back();
+      if (Get.isDialogOpen ?? false) Get.back();
 
-    if (response == null) {
-      appToast(error: true, content: "Invalid coupon");
-      return;
-    }
+      couponValidation.value = response;
+      appliedCouponCode.value = couponCode.trim();
 
-    couponValidation.value = response;
-    appliedCouponCode.value = couponCode.trim();
+      final inst = response.installment;
+      final pricing = response.pricing;
 
-    final inst = response.installment;
-    final pricing = response.pricing;
+      selectedAmount.value = roundToInt(inst.dailyAmount * this.quantity.value);
 
-    selectedAmount.value = roundToInt(inst.dailyAmount * this.quantity.value);
+      selectedDays.value = inst.totalDays;
 
-    selectedDays.value = inst.totalDays;
+      totalAmount.value = roundToInt(pricing.finalPrice * this.quantity.value);
 
-    totalAmount.value = roundToInt(pricing.finalPrice * this.quantity.value);
+      appToaster(
+        content: response.benefits.savingsMessage.isNotEmpty
+            ? response.benefits.savingsMessage
+            : "Coupon applied successfully",
+      );
+    } catch (e) {
+      if (Get.isDialogOpen ?? false) Get.back();
 
-    if (response.benefits.savingsMessage.isNotEmpty) {
-      appToast(
-          title: "Coupon Applied", content: response.benefits.savingsMessage);
-    } else {
-      appToast(title: "Coupon Applied", content: "Coupon applied successfully");
+      /// 🔥 SHOW BACKEND MESSAGE HERE
+      appToaster(
+        error: true,
+        content: e.toString().replaceAll("Exception:", "").trim(),
+      );
     }
   }
 
@@ -194,6 +253,15 @@ class OrderDetailsController extends GetxController {
     String couponCode = "",
     required Map<String, dynamic> deliveryAddress,
   }) async {
+    // 🔒 PREVENT MULTIPLE CALLS
+    if (isPlacingOrder.value) {
+      debugPrint("⛔ [ORDER] placeOrder ignored (already in progress)");
+      return;
+    }
+
+    isPlacingOrder.value = true;
+    debugPrint("🔒 [ORDER] placeOrder LOCKED");
+
     final delivery = {
       "name": (deliveryAddress["name"] ?? "").toString().trim(),
       "phoneNumber": (deliveryAddress["phoneNumber"] ?? "").toString().trim(),
@@ -219,26 +287,22 @@ class OrderDetailsController extends GetxController {
       body["couponCode"] = couponCode.trim();
     }
 
-    appLoader();
+    debugPrint("📤 [ORDER] Request body: $body");
+
+    Get.dialog(appLoader(), barrierDismissible: false);
 
     try {
       final response = await OrderService.createOrder(body);
+      debugPrint("📥 [ORDER] API response: $response");
 
       if (response == null) {
-        appToast(
-          error: true,
-          content: "Failed to place order. Please try again!",
-        );
+        appToast(error: true, content: "Failed to place order");
         return;
       }
 
       final data = response['data'];
-
       if (data == null || data is! Map<String, dynamic>) {
-        appToast(
-          error: true,
-          content: "Invalid payment response from server",
-        );
+        appToast(error: true, content: "Invalid payment response");
         return;
       }
 
@@ -246,13 +310,15 @@ class OrderDetailsController extends GetxController {
 
       // ---------------- WALLET FLOW ----------------
       if (selectedPaymentMethod.value == PaymentMethod.wallet) {
+        debugPrint("💰 [ORDER] Wallet flow");
+
         final String orderId = payment.order.id;
 
-        if (enableAutoPay.value == true && orderId.isNotEmpty) {
+        if (enableAutoPay.value && orderId.isNotEmpty) {
           final autoPayResponse =
               await OrderService.enableAutoPay(orderId: orderId);
 
-          if (autoPayResponse != null && autoPayResponse.success) {
+          if (autoPayResponse?.success == true) {
             await notificationService.sendCustomNotification(
               title: "Autopay Enabled",
               message:
@@ -263,41 +329,35 @@ class OrderDetailsController extends GetxController {
           }
         }
 
-        Get.dialog(
-          appLoader(),
-          barrierDismissible: false,
-        );
-
-        await Future.delayed(const Duration(seconds: 2));
-
-        if (Get.isDialogOpen ?? false) Get.back();
-
         await walletController.fetchWallet(forceRefresh: true);
-
         Get.off(() => BookingConfirmationScreen());
-
         return;
       }
 
-      if (payment.payment.razorpayOrderId.isEmpty) {
-        appToast(
-          error: true,
-          content: "Invalid Razorpay Order ID!",
-        );
+      // ---------------- RAZORPAY FLOW ----------------
+      final razorpayOrderId = payment.payment.razorpayOrderId;
+
+      debugPrint("🟣 [RAZORPAY] OrderId: $razorpayOrderId");
+
+      if (razorpayOrderId.isEmpty) {
+        appToast(error: true, content: "Invalid Razorpay Order ID");
         return;
       }
 
       Get.find<RazorpayController>().openCheckout(
-        razorpayOrderId: payment.payment.razorpayOrderId,
+        razorpayOrderId: razorpayOrderId,
         orderId: payment.order.id,
         amount: payment.payment.amount,
       );
-    } catch (e) {
-      appToast(
-        error: true,
-        content: "Payment initialization failed",
-      );
+    } catch (e, stack) {
+      debugPrint("❌ [ORDER] Exception: $e");
+      debugPrint("📌 [ORDER] StackTrace: $stack");
+
+      appToast(error: true, content: "Payment initialization failed");
     } finally {
+      isPlacingOrder.value = false; // 🔓 UNLOCK
+      debugPrint("🔓 [ORDER] placeOrder UNLOCKED");
+
       if (Get.isDialogOpen ?? false) Get.back();
     }
   }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/address_response.dart';
-import 'package:saoirse_app/screens/manage_address/manage_address_controller.dart';
 
+import '../../models/address_response.dart';
 import '../../widgets/app_toast.dart';
+import '../manage_address/manage_address_controller.dart';
+import '../select_address/select_address_controller.dart';
 
 class AddAddressController extends GetxController {
   // Text controllers
@@ -145,6 +146,10 @@ class AddAddressController extends GetxController {
           Get.isRegistered<ManageAddressController>()
               ? Get.find<ManageAddressController>()
               : Get.put(ManageAddressController());
+      final SelectAddressController selectAddressController =
+          Get.isRegistered<SelectAddressController>()
+              ? Get.find<SelectAddressController>()
+              : Get.put(SelectAddressController());
 
       bool success;
 
@@ -154,10 +159,12 @@ class AddAddressController extends GetxController {
           addressId: addressId!,
           body: body,
         );
+        await manageController.fetchAddresses();
       }
       // ---------- ADD ----------
       else {
         success = await manageController.addAddress(body);
+        await selectAddressController.fetchAddresses();
       }
 
       if (success) {

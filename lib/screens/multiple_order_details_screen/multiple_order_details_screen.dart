@@ -594,77 +594,88 @@ class _MultipleOrderDetailsScreenState
           ),
         ],
       ),
-      child: Row(
-        children: [
-          // ---------------- PAYMENT METHOD BUTTON ----------------
-          Expanded(
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                backgroundColor: AppColors.white,
-                side: BorderSide(color: AppColors.shadowColor),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                padding: EdgeInsets.symmetric(vertical: 10.h),
+      child: Row(children: [
+        // ---------------- PAYMENT METHOD BUTTON ----------------
+        Expanded(
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              backgroundColor: AppColors.white,
+              side: BorderSide(color: AppColors.shadowColor),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.r),
               ),
-              onPressed: () => _showPaymentMethodSheet(),
-              child: Obx(() {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    appText(
-                      orderController.selectedPaymentMethod.value ==
-                              PaymentMethod.razorpay
-                          ? "Razorpay"
-                          : "Wallet",
-                      color: AppColors.textBlack,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    SizedBox(width: 6.w),
-                    Icon(Icons.keyboard_arrow_up,
-                        size: 20.sp, color: AppColors.textBlack),
-                  ],
-                );
-              }),
+              padding: EdgeInsets.symmetric(vertical: 10.h),
             ),
+            onPressed: () => _showPaymentMethodSheet(),
+            child: Obx(() {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  appText(
+                    orderController.selectedPaymentMethod.value ==
+                            PaymentMethod.razorpay
+                        ? "Razorpay"
+                        : "Wallet",
+                    color: AppColors.textBlack,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  SizedBox(width: 6.w),
+                  Icon(Icons.keyboard_arrow_up,
+                      size: 20.sp, color: AppColors.textBlack),
+                ],
+              );
+            }),
           ),
+        ),
 
-          SizedBox(width: 10.w),
+        SizedBox(width: 10.w),
 
-          // ---------------- PAY NOW BUTTON ----------------
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.lightAmber,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
+        // ---------------- PAY NOW BUTTON ----------------
+        Expanded(
+          child: Obx(() => ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: orderController.isPlacingOrder.value
+                      ? AppColors.grey
+                      : AppColors.lightAmber,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 10.h),
                 ),
-                padding: EdgeInsets.symmetric(vertical: 10.h),
-              ),
-              onPressed: () {
-                orderController.placeBulkOrder(
-                  deliveryAddress: {
-                    "name": widget.addresses.name,
-                    "phoneNumber": widget.addresses.phoneNumber,
-                    "addressLine1": widget.addresses.addressLine1,
-                    "city": widget.addresses.city,
-                    "state": widget.addresses.state,
-                    "pincode": widget.addresses.pincode,
-                    "country": widget.addresses.country, // optional
-                  },
-                );
-              },
-              child: appText(
-                AppStrings.pay_now,
-                color: AppColors.white,
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
+                onPressed: orderController.isPlacingOrder.value
+                    ? null
+                    : () {
+                        orderController.placeBulkOrder(
+                          deliveryAddress: {
+                            "name": widget.addresses.name,
+                            "phoneNumber": widget.addresses.phoneNumber,
+                            "addressLine1": widget.addresses.addressLine1,
+                            "city": widget.addresses.city,
+                            "state": widget.addresses.state,
+                            "pincode": widget.addresses.pincode,
+                            "country": widget.addresses.country,
+                          },
+                        );
+                      },
+                child: orderController.isPlacingOrder.value
+                    ? SizedBox(
+                        height: 18.h,
+                        width: 18.w,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.white,
+                        ),
+                      )
+                    : appText(
+                        AppStrings.pay_now,
+                        color: AppColors.white,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+              )),
+        ),
+      ]),
     );
   }
 

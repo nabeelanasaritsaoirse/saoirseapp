@@ -13,11 +13,13 @@ class CartController extends GetxController {
 
   var cartData = Rxn<CartData>();
   var isLoading = false.obs;
+
   var errorMessage = ''.obs;
   // double get totalAmount => cartData.value?.totalPrice ?? 0;
   var cartCount = 0.obs;
   // inside CartController
   RxBool isCartPlanApplied = false.obs;
+  RxBool isAddToCartLoading = false.obs;
 
   /// Custom plan values
   RxInt customDays = 0.obs;
@@ -115,20 +117,57 @@ class CartController extends GetxController {
   }
 
   // -------------------- ADD TO CART --------------------
+  // Future<void> addProductToCart({
+  //   required String productId,
+  //   required String? variantId,
+  //   // required int days,
+  //   // required double dailyAmount,
+  // }) async {
+  //    if (isAddToCartLoading.value) return;
+  //   try {
+  //         isAddToCartLoading(true);
+
+  //     final response = await service.addToCart(
+  //       productId: productId,
+  //       variantId: variantId,
+  //       // totalDays: days,
+  //       // dailyAmount: dailyAmount,
+  //       quantity: 1,
+  //     );
+
+  //     if (response == null) {
+  //       appToast(content: "Failed to add to cart", error: true);
+  //       return;
+  //     }
+
+  //     if (response.success) {
+  //       appToaster(content: response.message);
+  //       fetchCart();
+  //       fetchCartCount();
+  //     } else {
+  //       appToast(content: response.message, error: true);
+  //     }
+  //   } catch (e) {
+  //     appToast(content: "Error: $e", error: true);
+  //   } finally {
+  //      isAddToCartLoading(false);
+  //   }
+  // }
+
   Future<void> addProductToCart({
     required String productId,
     required String? variantId,
-    // required int days,
-    // required double dailyAmount,
   }) async {
+    if (isAddToCartLoading.value) return;
+
     try {
-      isLoading(true);
+      isAddToCartLoading(true);
+
+      debugPrint("ADD TO CART API CALLING...");
 
       final response = await service.addToCart(
         productId: productId,
         variantId: variantId,
-        // totalDays: days,
-        // dailyAmount: dailyAmount,
         quantity: 1,
       );
 
@@ -139,15 +178,15 @@ class CartController extends GetxController {
 
       if (response.success) {
         appToaster(content: response.message);
-        fetchCart();
-        fetchCartCount();
+        await fetchCart();
+        await fetchCartCount();
       } else {
         appToast(content: response.message, error: true);
       }
     } catch (e) {
       appToast(content: "Error: $e", error: true);
     } finally {
-      isLoading(false);
+      isAddToCartLoading(false);
     }
   }
 

@@ -8,6 +8,7 @@ import '../../models/product_model.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/product_card.dart';
 import '../productListing/product_listing.dart';
+import '../product_details/product_details_binding.dart';
 import '../product_details/product_details_screen.dart';
 
 class FeatureListRenderer extends StatelessWidget {
@@ -122,7 +123,11 @@ class Design2CompactList extends StatelessWidget {
             padding: EdgeInsets.all(8.0.w),
             child: InkWell(
               onTap: () => Get.to(
-                ProductDetailsScreen(
+                () => ProductDetailsScreen(
+                  productId: product.productId,
+                  id: product.productMongoId,
+                ),
+                binding: ProductDetailsBinding(
                   productId: product.productId,
                   id: product.productMongoId,
                 ),
@@ -207,7 +212,11 @@ class Design3Widget extends StatelessWidget {
 
           return InkWell(
             onTap: () => Get.to(
-              ProductDetailsScreen(
+              () => ProductDetailsScreen(
+                productId: product.productId,
+                id: product.productMongoId,
+              ),
+              binding: ProductDetailsBinding(
                 productId: product.productId,
                 id: product.productMongoId,
               ),
@@ -322,7 +331,11 @@ Widget _productCard(FeaturedProduct p) {
     height: 170.h,
     child: InkWell(
       onTap: () => Get.to(
-        ProductDetailsScreen(
+        () => ProductDetailsScreen(
+          productId: p.productId,
+          id: p.productMongoId,
+        ),
+        binding: ProductDetailsBinding(
           productId: p.productId,
           id: p.productMongoId,
         ),
@@ -479,7 +492,11 @@ class Design5Widget extends StatelessWidget {
 Widget _design5ProductCard(FeaturedProduct p) {
   return InkWell(
     onTap: () => Get.to(
-      ProductDetailsScreen(
+      () => ProductDetailsScreen(
+        productId: p.productId,
+        id: p.productMongoId,
+      ),
+      binding: ProductDetailsBinding(
         productId: p.productId,
         id: p.productMongoId,
       ),

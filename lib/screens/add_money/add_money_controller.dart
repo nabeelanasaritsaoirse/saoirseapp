@@ -8,7 +8,7 @@ import '../razorpay/razorpay_wallet_controller.dart';
 class AddMoneyController extends GetxController {
   final TextEditingController amountController = TextEditingController();
   var showSuffix = false.obs;
-
+  RxBool isAddingMoney = false.obs;
   void onAmountChanged(String value) {
     showSuffix.value = value.isNotEmpty;
   }
@@ -25,13 +25,20 @@ class AddMoneyController extends GetxController {
   }
 
   void addMoney() async {
+    // 🔒 PREVENT MULTIPLE TAPS
+    if (isAddingMoney.value) {
+      debugPrint("⛔ [ADD MONEY] Already in progress, ignored");
+      return;
+    }
+
     if (!validateAmount()) return;
+
+    isAddingMoney.value = true;
+    debugPrint("🔒 [ADD MONEY] LOCKED");
 
     try {
       final rawText = amountController.text.trim();
       final enteredAmount = double.tryParse(rawText) ?? 0;
-
-      // final amountInPaise = (enteredAmount * 100).round();
 
       final body = {
         "amount": enteredAmount,
@@ -45,8 +52,7 @@ class AddMoneyController extends GetxController {
       /// API CALL
       final order = await PaymentService.addMoney(body);
 
-      /// NULL response validation
-      if (order == null) {
+      if (order == null || !order.success) {
         appToast(
           title: "Error",
           content: "Unable to create order. Please try again.",
@@ -55,17 +61,6 @@ class AddMoneyController extends GetxController {
         return;
       }
 
-      /// SUCCESS validation
-      if (!order.success) {
-        appToast(
-          title: "Failed",
-          content: "Server could not process your request.",
-          error: true,
-        );
-        return;
-      }
-
-      /// MISSING FIELDS validation
       if (order.orderId.isEmpty ||
           order.transactionId.isEmpty ||
           order.amount == 0) {
@@ -77,21 +72,30 @@ class AddMoneyController extends GetxController {
         return;
       }
 
-      /// Start Razorpay Payment
-      final razorWallet = Get.put(RazorpayWalletController());
+      /// ✅ OPEN RAZORPAY ONCE
+      final razorWallet = Get.put(
+        RazorpayWalletController(),
+        permanent: true,
+      );
+
       razorWallet.startWalletPayment(
         internalOrderId: order.transactionId,
         rpOrderId: order.orderId,
         amount: order.amount,
       );
-    } catch (e) {
-      /// Catch unexpected exceptions
+    } catch (e, stack) {
+      debugPrint("❌ [ADD MONEY] Error: $e");
+      debugPrint("📌 StackTrace: $stack");
 
       appToast(
         title: "Error",
         content: "Unexpected error occurred. Please try again.",
         error: true,
       );
+    } finally {
+      // ❗ DO NOT UNLOCK HERE
+      // Unlock ONLY after Razorpay success / failure
+      debugPrint("🟡 [ADD MONEY] Waiting for Razorpay callback");
     }
   }
 

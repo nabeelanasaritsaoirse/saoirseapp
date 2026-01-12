@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/product_details/product_details_binding.dart';
 
 import '../../constants/app_assets.dart';
 import '../../widgets/app_text_field.dart';
@@ -192,10 +193,15 @@ class _ProductListingState extends State<ProductListing> {
                   final product = productlistingController.products[index];
                   return GestureDetector(
                       onTap: () {
-                        Get.to(() => ProductDetailsScreen(
-                              productId: product.productId,
-                              id: product.id,
-                            ));
+                    
+                        Get.to((
+                          ProductDetailsScreen(
+                            productId: product.productId,
+                            id: product.id,
+                          ),
+                        ),
+                            binding: ProductDetailsBinding(
+                                productId: product.productId, id: product.id));
                       },
                       child: ProductCard(
                           margin: EdgeInsets.all(0),

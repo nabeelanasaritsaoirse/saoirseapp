@@ -10,6 +10,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final bool showLogo;
   final bool showBack;
+  final bool showGreeting; // ✅ NEW
+  final String? userName; // ✅ NEW
   final List<Widget>? actions;
   final double height;
 
@@ -18,6 +20,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.title,
     this.showLogo = false,
     this.showBack = false,
+    this.showGreeting = false,
+    this.userName,
     this.actions,
     this.height = 48,
   });
@@ -32,6 +36,41 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         height: 26.h,
         width: 26.w,
       ),
+    );
+  }
+
+  String formatUserName(String? name, {int maxLength = 12}) {
+    if (name == null || name.trim().isEmpty) return "User";
+
+    final trimmed = name.trim();
+    if (trimmed.length <= maxLength) return trimmed;
+
+    return "${trimmed.substring(0, maxLength)}…";
+  }
+
+  Widget _buildGreeting() {
+    final displayName = formatUserName(userName);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        appText(
+          "Hello $displayName",
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w600,
+          color: AppColors.white,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        SizedBox(height: 2.h),
+        appText(
+          "Welcome to EPI",
+          fontSize: 12.sp,
+          fontWeight: FontWeight.w400,
+          // ignore: deprecated_member_use
+          color: AppColors.white.withOpacity(0.9),
+        ),
+      ],
     );
   }
 
@@ -60,14 +99,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ? _buildLogo()
                 : null,
         titleSpacing: 20,
-        title: title != null
-            ? appText(
-                title!,
-                fontSize: 19.sp,
-                color: AppColors.white,
-                fontWeight: FontWeight.w600,
-              )
-            : null,
+        title: showGreeting
+            ? _buildGreeting()
+            : title != null
+                ? appText(
+                    title!,
+                    fontSize: 19.sp,
+                    color: AppColors.white,
+                    fontWeight: FontWeight.w600,
+                  )
+                : null,
         actions: actions,
       ),
     );

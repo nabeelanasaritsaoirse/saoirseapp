@@ -215,7 +215,7 @@ class SelectPlanSheet extends StatelessWidget {
               SizedBox(height: 10.h),
 
               Obx(() {
-                if (controller.isLoading.value) {
+                if (controller.isProductLoading.value) {
                   return Center(child: appLoader());
                 }
 

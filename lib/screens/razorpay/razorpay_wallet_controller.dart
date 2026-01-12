@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -6,6 +7,7 @@ import '../../models/razorpay_payment_response.dart';
 import '../../services/payment_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_toast.dart';
+import '../add_money/add_money_controller.dart';
 import '../transaction_succsess/transaction_succsess.dart';
 
 class RazorpayWalletController extends GetxController {
@@ -68,6 +70,9 @@ class RazorpayWalletController extends GetxController {
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
     appToast(content: "Wallet Payment Success!");
+    final addMoneyController = Get.find<AddMoneyController>();
+    addMoneyController.isAddingMoney.value = false; // 🔓 UNLOCK
+    debugPrint("🔓 [ADD MONEY] UNLOCKED (SUCCESS)");
 
     final paymentData = RazorpayPaymentResponse(
       orderId: response.orderId ?? "",
@@ -79,13 +84,20 @@ class RazorpayWalletController extends GetxController {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
+    final addMoneyController = Get.find<AddMoneyController>();
+    addMoneyController.isAddingMoney.value = false; // 🔓 UNLOCK
+    debugPrint("🔓 [ADD MONEY] UNLOCKED (FAILED)");
+
     appToast(error: true, content: "Wallet Payment Failed");
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
+    final addMoneyController = Get.find<AddMoneyController>();
+    addMoneyController.isAddingMoney.value = false; // 🔓 UNLOCK
+    debugPrint("🔓 [ADD MONEY] UNLOCKED (EXTERNAL)");
+
     appToast(content: "External Wallet: ${response.walletName}");
   }
-
   // ---------------------------------------------------------
   // 🔥 VERIFY WALLET PAYMENT
   // ---------------------------------------------------------

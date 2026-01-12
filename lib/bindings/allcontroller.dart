@@ -12,6 +12,7 @@ import '../screens/orders_active/orders_active_controller.dart';
 import '../screens/pending_transaction/pending_transaction_controller.dart';
 import '../screens/profile/profile_controller.dart';
 import '../screens/kyc/kyc_controller.dart';
+import '../screens/razorpay/pending_transaction_razorpay_controller.dart';
 import '../screens/razorpay/razorpay_cart_controller.dart';
 import '../screens/razorpay/razorpay_controller.dart';
 import '../screens/select_account/select_account_controller.dart';
@@ -126,9 +127,14 @@ class AllController extends Bindings {
       RazorpayCartController(),
       permanent: true,
     );
-    Get.lazyPut<PendingTransactionController>(
-      () => PendingTransactionController(),
+    Get.lazyPut<PendingTransactionRazorpayController>(
+      () => PendingTransactionRazorpayController(),
       fenix: true,
+    );
+
+    Get.put<PendingTransactionController>(
+      PendingTransactionController(),
+      permanent: true,
     );
 
     // 📍 ADDRESS & MONEY
