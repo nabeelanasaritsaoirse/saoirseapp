@@ -11,6 +11,7 @@ import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_screen.dart';
+import '../home/home_controller.dart';
 import '../login/login_controller.dart';
 import '../notification/notification_controller.dart';
 import '../refferal/referral_controller.dart';
@@ -86,6 +87,9 @@ class VerifyOtpController extends GetxController {
     storage.write(AppConst.REFRESH_TOKEN, data.refreshToken);
     storage.write(AppConst.REFERRAL_CODE, data.referralCode);
     storage.write(AppConst.USER_NAME, data.name);
+    if (Get.isRegistered<HomeController>()) {
+      Get.find<HomeController>().loadUserName();
+    }
 
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
     final notif = Get.find<NotificationController>();

@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../../constants/app_constant.dart';
+import '../../main.dart';
 import '../../models/category_model.dart';
 import '../../models/product_model.dart';
 import '../../models/success_story_banner_model.dart';
@@ -34,12 +36,17 @@ class HomeController extends GetxController {
   final RxList<FeaturedList> featuredLists = <FeaturedList>[].obs;
   RxList<SuccessStoryItem> successStories = <SuccessStoryItem>[].obs;
   RxList<CategoryGroup> parentCategories = <CategoryGroup>[].obs;
-
+  RxString userName = "".obs;
   @override
   void onInit() {
     super.onInit();
+    loadUserName();
     fetchFeaturedLists();
     fetchAllProducts();
+  }
+
+  void loadUserName() {
+    userName.value = storage.read(AppConst.USER_NAME) ?? "";
   }
 
   // Fetch all products

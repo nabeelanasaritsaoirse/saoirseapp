@@ -32,6 +32,7 @@ class PendingTransactionController extends GetxController {
   // For bottom "Total Amount"
   RxInt totalAmount = 0.obs;
 
+  RxInt pendingCount = 0.obs;
   // Selected Order IDs
   RxList<String> selectedOrderIds = <String>[].obs;
 
@@ -53,10 +54,11 @@ class PendingTransactionController extends GetxController {
     isLoading.value = true;
 
     final response = await service.fetchPendingTransactions();
-
+    debugPrint("📦 [PENDING] Pending count from API: ${response?.data.count}");
     if (response != null && response.success) {
       transactions.value = response.data.payments;
-
+      pendingCount.value = response.data.count;
+      debugPrint("🟢 [PENDING] pendingCount set to: ${pendingCount.value}");
       // default: all selected (static data)
       selectedList.value =
           List<RxBool>.generate(transactions.length, (_) => true.obs);
