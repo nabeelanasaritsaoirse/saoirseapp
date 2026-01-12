@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
+import '../../constants/app_constant.dart';
 import '../../models/category_model.dart';
 import '../../models/product_model.dart';
 import '../../models/success_story_banner_model.dart';
@@ -9,6 +11,7 @@ import '../../services/home_service.dart';
 import '../../services/success_story_banner_service.dart';
 
 class HomeController extends GetxController {
+  final storage = GetStorage();
   RxBool loading = false.obs;
   // RxBool popularLoading = false.obs;
   // RxBool bestSellerLoading = false.obs;
@@ -34,12 +37,17 @@ class HomeController extends GetxController {
   final RxList<FeaturedList> featuredLists = <FeaturedList>[].obs;
   RxList<SuccessStoryItem> successStories = <SuccessStoryItem>[].obs;
   RxList<CategoryGroup> parentCategories = <CategoryGroup>[].obs;
-
+  RxString userName = "".obs;
   @override
   void onInit() {
     super.onInit();
+    loadUserName();
     fetchFeaturedLists();
     fetchAllProducts();
+  }
+
+  void loadUserName() {
+    userName.value = storage.read(AppConst.USER_NAME) ?? "";
   }
 
   // Fetch all products

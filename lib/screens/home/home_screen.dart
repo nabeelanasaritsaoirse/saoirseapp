@@ -15,6 +15,7 @@ import '../dashboard/dashboard_controller.dart';
 import '../my_wallet/my_wallet.dart';
 import '../notification/notification_controller.dart';
 import '../notification/notification_screen.dart';
+import '../pending_transaction/pending_transaction_controller.dart';
 import '../pending_transaction/pending_transaction_screen.dart';
 import '../productListing/product_listing.dart';
 import 'home_controller.dart';
@@ -51,6 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
       // Header Section (app-bar)
       appBar: CustomAppBar(
         showLogo: true,
+        showGreeting: true,
+        userName: homeController.userName.value,
         actions: [
           Stack(
             clipBehavior: Clip.none,
@@ -302,22 +305,54 @@ class _HomeScreenState extends State<HomeScreen> {
 
             SizedBox(height: 10.h),
 //----------------Progress Card Section----------------//
-            Obx(() {
-              final data = investmentController.overview.value;
+            // Obx(() {
+            //   final data = investmentController.overview.value;
 
-              if (data.remainingDays <= 0) {
+            //   if (data.remainingDays <= 0) {
+            //     return const SizedBox.shrink();
+            //   }
+
+            //   return Padding(
+            //     padding: const EdgeInsets.all(8.0),
+            //     child: Column(
+            //       children: [
+            //         InvestmentStatusCard(
+            //           balanceAmount: data.totalRemainingAmount.toInt(),
+            //           daysLeft: data.remainingDays,
+            //           progress: data.progressPercent / 100,
+            //           onPayNow: () => Get.to(PendingTransaction()),
+            //         ),
+            //         SizedBox(height: 10.h),
+            //       ],
+            //     ),
+            //   );
+            // }),
+            Obx(() {
+              final pendingCtrl = Get.find<PendingTransactionController>();
+              final pendingCount = pendingCtrl.pendingCount.value;
+              debugPrint("🏠 [HOME] Checking blue box visibility");
+              debugPrint("🏠 [HOME] pendingCount = $pendingCount");
+              //SHOW ONLY WHEN PENDING INSTALLMENTS EXIST
+              if (pendingCount <= 0) {
+                debugPrint(
+                    "🚫 [HOME] No pending installments → hiding blue box");
                 return const SizedBox.shrink();
               }
 
+              final data = investmentController.overview.value;
+              debugPrint(
+                  "✅ [HOME] Pending installment exists → showing blue box");
+              debugPrint("📊 [HOME] remainingDays = ${data.remainingDays}");
+              debugPrint("📊 [HOME] progressPercent = ${data.progressPercent}");
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
                     InvestmentStatusCard(
-                      balanceAmount: data.totalRemainingAmount.toInt(),
+                      balanceAmount: pendingCtrl.totalAmount.value,
                       daysLeft: data.remainingDays,
                       progress: data.progressPercent / 100,
-                      onPayNow: () => Get.to(PendingTransaction()),
+                      onPayNow: () => Get.to(() => PendingTransaction()),
                     ),
                     SizedBox(height: 10.h),
                   ],
