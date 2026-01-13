@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/main.dart';
 
 import '../../constants/app_constant.dart';
+import '../../main.dart';
 import '../../models/cart_response_model.dart';
 import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
