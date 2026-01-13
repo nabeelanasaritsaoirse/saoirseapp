@@ -39,7 +39,9 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-        log(response.body);
+        // log("request Url =====> : $url");
+        // log("BODY ====> $body");
+        // log(response.body);
         switch (response.statusCode) {
           case 200:
           case 201:

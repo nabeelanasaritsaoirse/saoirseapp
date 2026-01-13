@@ -1,6 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:saoirse_app/screens/pending_transaction/pending_transaction_controller.dart';
 
 import '../../services/pending_transaction_service.dart';
 import '../../widgets/app_loader.dart';
@@ -114,15 +115,16 @@ class PendingTransactionRazorpayController extends GetxController {
       if (Get.isDialogOpen ?? false) Get.back();
 
       if (response != null &&
-          (response['success'] == true || response['status'] == 'success')) {
-        appToast(content: "Payment processed successfully");
-        // navigate to confirmation or refresh orders
-        Get.to(() => BookingConfirmationScreen());
-      } else {
-        final msg = response?['message'] ??
-            'Payment verification failed. Contact support.';
-        appToast(error: true, content: msg);
-      }
+    (response['success'] == true || response['status'] == 'success')) {
+
+  final pendingController = Get.find<PendingTransactionController>();
+  pendingController.removePaidOrders(selectedOrders);
+
+  appToast(content: "Payment processed successfully");
+
+  Get.to(() => BookingConfirmationScreen());
+}
+
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
       appToast(error: true, content: "Payment verification error!");

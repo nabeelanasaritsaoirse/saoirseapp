@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
@@ -18,6 +20,8 @@ class SelectAccountController extends GetxController {
   final RxInt selectedIndex = 0.obs;
   final RxBool isLoading = false.obs;
   final RxBool isEditMode = false.obs;
+  Completer<void>? _saveAccountLock;
+
   int? editingIndex;
   @override
   void onInit() {
@@ -49,54 +53,64 @@ class SelectAccountController extends GetxController {
     }
   }
 
-  Future<void> saveAccount() async {
-    try {
-      isLoading.value = true;
+  
 
-      final account = BankAccountModel(
-        id: editingIndex != null ? accountList[editingIndex!].id : null,
-        accountHolderName: nameController.text.trim(),
-        accountNumber: accController.text.trim(),
-        ifscCode: ifscController.text.trim(),
-        bankName: bankNameController.text.trim(),
-        branchName: branchNameController.text.trim(),
-        isDefault: false,
+  Future<void> saveAccount() async {
+
+  if (_saveAccountLock != null) {
+    debugPrint("⛔ saveAccount already running, ignored");
+    return;
+  }
+
+  _saveAccountLock = Completer<void>();
+
+  try {
+    final account = BankAccountModel(
+      id: editingIndex != null ? accountList[editingIndex!].id : null,
+      accountHolderName: nameController.text.trim(),
+      accountNumber: accController.text.trim(),
+      ifscCode: ifscController.text.trim(),
+      bankName: bankNameController.text.trim(),
+      branchName: branchNameController.text.trim(),
+      isDefault: false,
+    );
+
+    if (editingIndex != null) {
+      final updated = await BankAccountService.updateBankAccount(
+        bankId: account.id!,
+        account: account,
       );
 
-      if (editingIndex != null) {
-        final updated = await BankAccountService.updateBankAccount(
-          bankId: account.id!,
-          account: account,
-        );
-
-        if (updated != null) {
-          accountList[editingIndex!] = updated;
-
-          // 🔥 FORCE UI UPDATE
-          accountList.refresh();
-        }
-
-        editingIndex = null;
-      } else {
-        // ➕ ADD (POST)
-
-        final created =
-            await BankAccountService.addBankAccount(account: account);
-
-        if (created != null) {
-          accountList.add(created);
-          await fetchAccounts();
-        } else {}
+      if (updated != null) {
+        accountList[editingIndex!] = updated;
+        accountList.refresh();
       }
 
-      clearForm();
-      Get.back();
-    } catch (e) {
-      appToast(title: "Error", content: "Failed to save account");
-    } finally {
-      isLoading.value = false;
+      editingIndex = null;
+    } else {
+      final created =
+          await BankAccountService.addBankAccount(account: account);
+
+      if (created != null) {
+        accountList.add(created);
+      }
     }
+
+    clearForm();
+
+   
+    await fetchAccounts();
+
+  
+    Get.back();
+  } catch (e) {
+    appToast(title: "Error", content: "Failed to save account");
+  } finally {
+    _saveAccountLock?.complete();
+    _saveAccountLock = null;
   }
+}
+
 
   // ---------------- EDIT
   void startEdit(int index) {

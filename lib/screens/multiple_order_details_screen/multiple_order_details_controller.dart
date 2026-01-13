@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/address_response.dart';
+import 'package:saoirse_app/models/bulk_order_preview_response.dart';
 
 import '../../constants/payment_methods.dart';
 import '../../models/bulk_order_response.dart';
@@ -59,12 +62,121 @@ class MultipleOrderDetailsController extends GetxController {
   double originalAmount = 0.0;
   int originalDays = 0;
 
+  Rx<BulkOrderPreviewData?> previewData = Rx<BulkOrderPreviewData?>(null);
+
+  RxBool isPreviewLoading = false.obs;
+
+// ---------------- PREVIEW COUPON STATE ----------------
+  RxBool isCouponApplied = false.obs;
+  RxString previewCouponCode = "".obs;
+
+  RxBool isInitialized = false.obs;
+
+  Completer<void>? _placeOrderLock;
+
   @override
   void onInit() {
     super.onInit();
     selectedPaymentMethod.value = PaymentMethod.razorpay;
     enableAutoPay.value = true;
+    initFromCartController();
     fetchCoupons();
+  }
+
+  void initCartOnce(List<CartProduct> initialProducts) {
+    if (isInitialized.value) return;
+
+    products.assignAll(initialProducts);
+
+    for (final item in products) {
+      originalPlans[item.productId] = item.installmentPlan;
+    }
+
+    isInitialized.value = true;
+  }
+
+  void initFromCartController() {
+    if (products.isNotEmpty) return;
+
+    products.assignAll(cartController.cartData.value!.products);
+
+    for (final item in products) {
+      originalPlans[item.productId] = item.installmentPlan;
+    }
+  }
+
+// ---------------- PREVIEW ITEMS ----------------
+  List<PreviewItem> get previewItems {
+    return previewData.value?.items ?? [];
+  }
+
+// ---------------- PREVIEW ADDRESS (SAFE MAPPING) ----------------
+  Address? get previewAddress {
+    final data = previewData.value;
+    if (data == null) return null;
+
+    final a = data.deliveryAddress;
+
+    return Address(
+      id: "", // preview does not return id
+      name: a.name,
+      phoneNumber: a.phoneNumber,
+      addressLine1: a.addressLine1,
+      addressLine2: "", // not provided by preview
+      city: a.city,
+      state: a.state,
+      pincode: a.pincode,
+      country: a.country,
+      landmark: "", // optional in preview
+      isDefault: false, // preview address is not default
+      addressType: "", // HOME / WORK not sent by preview
+      createdAt: DateTime.now(), // safe fallback
+      updatedAt: DateTime.now(), // safe fallback
+    );
+  }
+
+  /* ===============================================================
+     BULK ORDER PREVIEW
+     =============================================================== */
+
+  Future<void> fetchBulkOrderPreview({
+    required Address deliveryAddress,
+  }) async {
+    isPreviewLoading.value = true;
+
+    try {
+      final body = {
+        "items": buildBulkItems(),
+        "deliveryAddress": {
+          "name": deliveryAddress.name,
+          "phoneNumber": deliveryAddress.phoneNumber,
+          "addressLine1": deliveryAddress.addressLine1,
+          "city": deliveryAddress.city,
+          "state": deliveryAddress.state,
+          "pincode": deliveryAddress.pincode,
+          "country": deliveryAddress.country,
+        },
+      };
+
+      log("📤 [PREVIEW] Request: $body");
+
+      final response = await OrderService.bulkOrderPreview(body);
+
+      if (response == null) {
+        appToast(error: true, content: "Failed to load order preview");
+        return;
+      }
+
+      final preview = BulkOrderPreviewResponse.fromJson(response);
+      previewData.value = preview.data;
+
+      log("📥 [PREVIEW] Loaded successfully");
+    } catch (e) {
+      log("❌ [PREVIEW] Error: $e");
+      appToast(error: true, content: "Unable to load order preview");
+    } finally {
+      isPreviewLoading.value = false;
+    }
   }
 
   void updatePlan({
@@ -108,12 +220,26 @@ class MultipleOrderDetailsController extends GetxController {
         initialDays: item.installmentPlan.totalDays,
         initialAmount: item.installmentPlan.dailyAmount,
         totalProductAmount: item.installmentPlan.totalAmount,
-        onPlanSelected: (days, amount) {
+        onPlanSelected: (days, amount) async {
+          // 🔥 1. UPDATE CART (SOURCE OF TRUTH)
+          cartController.updateProductPlan(
+            productId: item.productId,
+            days: days,
+            dailyAmount: amount,
+          );
+
+          // 🔥 2. SYNC LOCAL PRODUCTS LIST
           updatePlan(
             productId: item.productId,
             days: days,
             dailyAmount: amount,
           );
+
+          // 🔥 3. REFRESH PREVIEW
+          final address = previewAddress;
+          if (address != null) {
+            await fetchBulkOrderPreview(deliveryAddress: address);
+          }
         },
       ),
       isScrollControlled: true,
@@ -211,6 +337,73 @@ class MultipleOrderDetailsController extends GetxController {
     products[index] = updatedItem; // 🔥 UI updates
   }
 
+// ---------------- PREVIEW → CART QTY BRIDGE ----------------
+
+  void increasePreviewQty(PreviewItem item, Address address) {
+    final index = item.itemIndex;
+    if (index < 0 || index >= products.length) return;
+
+    final cartItem = products[index];
+    final newQty = cartItem.quantity + 1;
+
+    // 🔥 base per-day amount for 1 qty
+    final basePerDay = cartItem.installmentPlan.dailyAmount / cartItem.quantity;
+
+    final updatedPlan = cartItem.installmentPlan.copyWith(
+      dailyAmount: basePerDay * newQty, // 🔥 SCALE
+      totalAmount: basePerDay * newQty * cartItem.installmentPlan.totalDays,
+    );
+
+    // 🔥 UPDATE CART (SOURCE OF TRUTH)
+    cartController.updateProductWithPlan(
+      productId: cartItem.productId,
+      quantity: newQty,
+      plan: updatedPlan,
+    );
+
+    // 🔥 UPDATE LOCAL LIST
+    products[index] = cartItem.copyWith(
+      quantity: newQty,
+      installmentPlan: updatedPlan,
+    );
+
+    // 🔁 REFRESH PREVIEW
+    fetchBulkOrderPreview(deliveryAddress: address);
+  }
+
+  void decreasePreviewQty(PreviewItem item, Address address) {
+    final index = item.itemIndex;
+    if (index < 0 || index >= products.length) return;
+
+    final cartItem = products[index];
+    if (cartItem.quantity <= 1) {
+      appToaster(content: "Minimum quantity should be 1", error: true);
+      return;
+    }
+
+    final newQty = cartItem.quantity - 1;
+
+    final basePerDay = cartItem.installmentPlan.dailyAmount / cartItem.quantity;
+
+    final updatedPlan = cartItem.installmentPlan.copyWith(
+      dailyAmount: basePerDay * newQty,
+      totalAmount: basePerDay * newQty * cartItem.installmentPlan.totalDays,
+    );
+
+    cartController.updateProductWithPlan(
+      productId: cartItem.productId,
+      quantity: newQty,
+      plan: updatedPlan,
+    );
+
+    products[index] = cartItem.copyWith(
+      quantity: newQty,
+      installmentPlan: updatedPlan,
+    );
+
+    fetchBulkOrderPreview(deliveryAddress: address);
+  }
+
   // ------------------------- FETCH COUPONS -----------------------------------
   Future<void> fetchCoupons() async {
     final all = await CouponService.fetchCoupons();
@@ -228,9 +421,8 @@ class MultipleOrderDetailsController extends GetxController {
 
   Future<void> applyCouponLoopWiseForAllProducts({
     required String couponCode,
+    required Address deliveryAddress,
   }) async {
-    debugPrint("🟡 [COUPON] Apply clicked");
-
     if (couponCode.trim().isEmpty) {
       appToaster(error: true, content: "Please enter a coupon code");
       return;
@@ -240,8 +432,6 @@ class MultipleOrderDetailsController extends GetxController {
       appToaster(error: true, content: "No products in cart");
       return;
     }
-
-    final List<CartProduct> updatedProducts = [];
 
     try {
       for (final item in products) {
@@ -253,35 +443,21 @@ class MultipleOrderDetailsController extends GetxController {
           "quantity": item.quantity,
         };
 
-        final response = await CouponService.validateCoupon(body);
-
-        final inst = response.installment;
-
-        final updatedPlan = item.installmentPlan.copyWith(
-          dailyAmount: inst.dailyAmount,
-          totalDays: inst.totalDays,
-          totalAmount: inst.dailyAmount * inst.totalDays,
-        );
-
-        final updatedItem = item.copyWith(
-          installmentPlan: updatedPlan,
-          itemTotal: inst.dailyAmount * inst.totalDays * item.quantity,
-        );
-
-        updatedProducts.add(updatedItem);
+        await CouponService.validateCoupon(body);
       }
 
-      // ✅ APPLY ONLY IF ALL PRODUCTS ARE VALID
-      products.assignAll(updatedProducts);
+      previewCouponCode.value = couponCode.trim();
+      isCouponApplied.value = true;
 
-      totalAmount.value = products.fold(
-        0.0,
-        (sum, item) => sum + item.itemTotal,
+      await fetchBulkOrderPreview(
+        deliveryAddress: deliveryAddress,
       );
 
-      appliedCouponCode.value = couponCode.trim();
+      appToast(content: "Coupon applied successfully");
     } catch (e) {
-      // ✅ ONLY SHOW ERROR MESSAGE
+      previewCouponCode.value = "";
+      isCouponApplied.value = false;
+
       appToaster(
         error: true,
         content: e.toString().replaceAll("Exception:", "").trim(),
@@ -289,43 +465,26 @@ class MultipleOrderDetailsController extends GetxController {
     }
   }
 
-  void removeCoupon(TextEditingController controller) {
-    final List<CartProduct> restoredProducts = [];
+  // ---------------- REMOVE COUPON (PREVIEW FLOW) ----------------
+  Future<void> removePreviewCoupon({
+    required Address deliveryAddress,
+    TextEditingController? controller,
+  }) async {
+    //  Clear preview coupon state
+    previewCouponCode.value = "";
+    isCouponApplied.value = false;
 
-    for (final item in products) {
-      final originalPlan = originalPlans[item.productId];
-
-      if (originalPlan == null) continue;
-
-      restoredProducts.add(
-        item.copyWith(
-          installmentPlan: originalPlan,
-          itemTotal:
-              originalPlan.dailyAmount * originalPlan.totalDays * item.quantity,
-        ),
-      );
-    }
-
-    // 🔥 Restore all products
-    products.assignAll(restoredProducts);
-
-    // 🔥 Clear coupon state
-    couponValidation.value = null;
-    appliedCouponCode.value = "";
-    selectedCoupon.value = null;
-
-    // 🔥 Recalculate total amount
-    totalAmount.value = products.fold(
-      0.0,
-      (sum, item) => sum + item.itemTotal,
+    //  Reload preview WITHOUT coupon
+    await fetchBulkOrderPreview(
+      deliveryAddress: deliveryAddress,
     );
 
-    // 🔥 Clear input
-    controller.clear();
+    //  Clear input if provided
+    controller?.clear();
 
     appToast(
       title: "Coupon Removed",
-      content: "Coupon removed from all products",
+      content: "Coupon removed from order preview",
     );
   }
 
@@ -350,7 +509,7 @@ class MultipleOrderDetailsController extends GetxController {
     return subTotal;
   }
 
-  /// 🧮 FULL ORDER TOTAL (after coupon if applied)
+  /// FULL ORDER TOTAL (after coupon if applied)
   double get orderTotalAmount {
     final v = couponValidation.value;
     if (v != null) {
@@ -360,14 +519,6 @@ class MultipleOrderDetailsController extends GetxController {
     return products.fold(
       0.0,
       (sum, item) => sum + (item.finalPrice * item.quantity),
-    );
-  }
-
-  /// 💳 PAY NOW (TOTAL DAILY AMOUNT FOR ALL PRODUCTS)
-  double get totalPayNowAmount {
-    return products.fold(
-      0.0,
-      (sum, item) => sum + (item.installmentPlan.dailyAmount * item.quantity),
     );
   }
 
@@ -385,21 +536,19 @@ class MultipleOrderDetailsController extends GetxController {
 
   List<Map<String, dynamic>> buildBulkItems() {
     return products.map((item) {
-      final Map<String, dynamic> map = {
+      final map = {
         "productId": item.productId,
         "quantity": item.quantity,
         "totalDays": item.installmentPlan.totalDays,
       };
 
-      // ✅ Variant (only if exists)
-      final variantId = item.variant?.variantId;
-      if (variantId != null && variantId.isNotEmpty) {
-        map["variantId"] = variantId;
+      if (item.variant?.variantId.isNotEmpty == true) {
+        map["variantId"] = item.variant!.variantId;
       }
 
-      // ✅ Coupon (optional)
-      if (appliedCouponCode.value.isNotEmpty) {
-        map["couponCode"] = appliedCouponCode.value;
+      // ONLY add coupon if valid
+      if (isCouponApplied.value && previewCouponCode.value.isNotEmpty) {
+        map["couponCode"] = previewCouponCode.value;
       }
 
       return map;
@@ -411,15 +560,16 @@ class MultipleOrderDetailsController extends GetxController {
     required Map<String, dynamic> deliveryAddress,
   }) async {
     // 🔒 PREVENT MULTIPLE CALLS
-    if (isPlacingOrder.value) {
-      log("⛔ [BULK ORDER] Already processing, ignored");
+    if (_placeOrderLock != null) {
+      log("⛔ [BULK ORDER] Already running — ignored");
       return;
     }
+    _placeOrderLock = Completer<void>();
 
     isPlacingOrder.value = true;
     log("🔒 [BULK ORDER] LOCKED");
 
-     final bool shouldEnableAutoPay = enableAutoPay.value;
+    final bool shouldEnableAutoPay = enableAutoPay.value;
 
     final body = {
       "items": buildBulkItems(),
@@ -448,11 +598,11 @@ class MultipleOrderDetailsController extends GetxController {
         log("💰 [BULK ORDER] Wallet flow");
 
         if (shouldEnableAutoPay) {
-        for (final order in data.orders) {
-          if (order.orderId.isNotEmpty) {
-            await enableAutoPayForOrder(order.orderId);
+          for (final order in data.orders) {
+            if (order.orderId.isNotEmpty) {
+              await enableAutoPayForOrder(order.orderId);
+            }
           }
-        }
 
           await notificationService.sendCustomNotification(
             title: "Autopay Enabled",
@@ -463,7 +613,7 @@ class MultipleOrderDetailsController extends GetxController {
           );
         }
 
-         enableAutoPay.value = false;
+        enableAutoPay.value = false;
 
         await cartController.clearCartItems();
         await walletController.fetchWallet(forceRefresh: true);
@@ -486,12 +636,15 @@ class MultipleOrderDetailsController extends GetxController {
         razorpayOrderId: razorpayOrderId,
       );
     } catch (e, stack) {
-      log("❌ [BULK ORDER] Exception: $e");
-      log("📌 [BULK ORDER] StackTrace: $stack");
+      log(" [BULK ORDER] Exception: $e");
+      log(" [BULK ORDER] StackTrace: $stack");
 
       appToast(error: true, content: "Payment initialization failed");
     } finally {
-      isPlacingOrder.value = false; // 🔓 UNLOCK
+      _placeOrderLock?.complete();
+      _placeOrderLock = null;
+
+      isPlacingOrder.value = false;
       log("🔓 [BULK ORDER] UNLOCKED");
 
       if (Get.isDialogOpen ?? false) Get.back();

@@ -117,42 +117,7 @@ class CartController extends GetxController {
   }
 
   // -------------------- ADD TO CART --------------------
-  // Future<void> addProductToCart({
-  //   required String productId,
-  //   required String? variantId,
-  //   // required int days,
-  //   // required double dailyAmount,
-  // }) async {
-  //    if (isAddToCartLoading.value) return;
-  //   try {
-  //         isAddToCartLoading(true);
-
-  //     final response = await service.addToCart(
-  //       productId: productId,
-  //       variantId: variantId,
-  //       // totalDays: days,
-  //       // dailyAmount: dailyAmount,
-  //       quantity: 1,
-  //     );
-
-  //     if (response == null) {
-  //       appToast(content: "Failed to add to cart", error: true);
-  //       return;
-  //     }
-
-  //     if (response.success) {
-  //       appToaster(content: response.message);
-  //       fetchCart();
-  //       fetchCartCount();
-  //     } else {
-  //       appToast(content: response.message, error: true);
-  //     }
-  //   } catch (e) {
-  //     appToast(content: "Error: $e", error: true);
-  //   } finally {
-  //      isAddToCartLoading(false);
-  //   }
-  // }
+  
 
   Future<void> addProductToCart({
     required String productId,
@@ -256,6 +221,54 @@ class CartController extends GetxController {
       isLoading(false);
     }
   }
+
+ void updateProductWithPlan({
+  required String productId,
+  required int quantity,
+  required InstallmentPlan plan,
+}) {
+  final index = cartData.value!.products.indexWhere(
+    (p) => p.productId == productId,
+  );
+
+  if (index == -1) return;
+
+  final product = cartData.value!.products[index];
+
+  cartData.value!.products[index] = product.copyWith(
+    quantity: quantity,
+    installmentPlan: plan,
+  );
+
+  cartData.refresh();
+}
+
+
+  void updateProductPlan({
+  required String productId,
+  required int days,
+  required double dailyAmount,
+}) {
+  final index = cartData.value!.products.indexWhere(
+    (p) => p.productId == productId,
+  );
+
+  if (index == -1) return;
+
+  final product = cartData.value!.products[index];
+
+  final updatedPlan = product.installmentPlan.copyWith(
+    totalDays: days,
+    dailyAmount: dailyAmount,
+    totalAmount: days * dailyAmount,
+  );
+
+  cartData.value!.products[index] =
+      product.copyWith(installmentPlan: updatedPlan);
+
+  cartData.refresh(); // 🔥 important
+}
+
 
   // -------------------- CART COUNT --------------------//
   Future<void> fetchCartCount() async {
