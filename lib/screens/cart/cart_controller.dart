@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/main.dart';
 
+import '../../constants/app_constant.dart';
 import '../../models/cart_response_model.dart';
 import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
@@ -161,6 +163,13 @@ class CartController extends GetxController {
     if (isAddToCartLoading.value) return;
 
     try {
+      final token = storage.read(AppConst.ACCESS_TOKEN);
+
+      if (token == null || token.isEmpty) {
+        appToast(content: "Please login to add items to cart", error: true);
+        return;
+      }
+
       isAddToCartLoading(true);
 
       debugPrint("ADD TO CART API CALLING...");
