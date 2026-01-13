@@ -178,7 +178,7 @@ class AppStrings {
   static String address = "ADDRESS";
   static String phone = "Phone :";
   static String change = "CHANGE";
-  static String item = "ITEMS 1";
+  static String item = "ITEMS";
   static String qty = "QTY :";
   static String apply = "Apply";
   static String premoCode = "Available Promo Code";

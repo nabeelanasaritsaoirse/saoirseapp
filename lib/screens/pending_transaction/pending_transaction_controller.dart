@@ -23,6 +23,7 @@ class PendingTransactionController extends GetxController {
   late MyWalletController walletController;
   RxBool isLoading = false.obs;
   RxBool isPlacingOrder = false.obs;
+
   // API payments
   RxList<PendingPayment> transactions = <PendingPayment>[].obs;
 
@@ -102,102 +103,6 @@ class PendingTransactionController extends GetxController {
 
   //------------------------------------Tranaction API Methods and All---------------------------------------------------
 
-  // Future<void> payNow() async {
-  //   // 🔒 PREVENT MULTIPLE CALLS
-  //   if (isPlacingOrder.value) {
-  //     debugPrint("⛔ [PAY NOW] Already in progress, ignored");
-  //     return;
-  //   }
-
-  //   isPlacingOrder.value = true;
-  //   debugPrint("🔒 [PAY NOW] LOCKED");
-
-  //   try {
-  //     if (selectedOrderIds.isEmpty) {
-  //       appToast(
-  //         error: true,
-  //         content: "Please select at least one order to pay.",
-  //       );
-  //       return;
-  //     }
-
-  //     final String method = selectedPaymentMethod.value;
-  //     debugPrint("🟡 [PAY NOW] Payment method: $method");
-
-  //     // ================= WALLET FLOW =================
-  //     if (method == "WALLET") {
-  //       final walletBalance =
-  //           Get.find<MyWalletController>().wallet.value?.walletBalance ?? 0;
-
-  //       if (walletBalance < totalAmount.value) {
-  //         appToast(error: true, content: "Insufficient wallet balance");
-  //         return;
-  //       }
-
-  //       Get.dialog(appLoader(), barrierDismissible: false);
-
-  //       final response = await PendingTransactionService.payDailySelected({
-  //         "selectedOrders": selectedOrderIds.toList(),
-  //         "paymentMethod": "WALLET",
-  //       });
-
-  //       if (Get.isDialogOpen ?? false) Get.back();
-
-  //       if (response != null && response['success'] == true) {
-  //         if (enableAutoPay.value) {
-  //           await _enableAutoPayForOrders(selectedOrderIds.toList());
-  //         }
-
-  //         await walletController.fetchWallet(forceRefresh: true);
-  //         Get.offAll(() => BookingConfirmationScreen());
-  //       } else {
-  //         appToast(
-  //           error: true,
-  //           content: response?['message'] ?? "Wallet payment failed",
-  //         );
-  //       }
-  //       return;
-  //     }
-
-  //     // ================= RAZORPAY FLOW =================
-  //     debugPrint("🟣 [PAY NOW] Creating Razorpay order");
-
-  //     final response = await service.createCombinedRazorpayOrder(
-  //       selectedOrderIds.toList(),
-  //     );
-
-  //     debugPrint("📥 [PAY NOW] Razorpay create response: $response");
-
-  //     if (response == null || response['success'] != true) {
-  //       appToast(error: true, content: "Failed to create Razorpay order");
-  //       return;
-  //     }
-
-  //     final PendingTransactionRazorpayController razorController =
-  //         Get.isRegistered<PendingTransactionRazorpayController>()
-  //             ? Get.find<PendingTransactionRazorpayController>()
-  //             : Get.put(PendingTransactionRazorpayController());
-
-  //     debugPrint("🟣 [PAY NOW] Opening Razorpay checkout");
-
-  //     razorController.startCombinedPayment(
-  //       createResponse: response['data'],
-  //       selectedOrders: selectedOrderIds.toList(),
-  //     );
-  //   } catch (e, stack) {
-  //     debugPrint("❌ [PAY NOW] Exception: $e");
-  //     debugPrint("📌 [PAY NOW] StackTrace: $stack");
-
-  //     appToast(
-  //       error: true,
-  //       content: "Payment initialization failed",
-  //     );
-  //   } finally {
-  //     isPlacingOrder.value = false; // 🔓 UNLOCK
-  //     debugPrint("🔓 [PAY NOW] UNLOCKED");
-  //   }
-  // }
-
   Future<void> payNow() async {
     // 🔒 PREVENT MULTIPLE CALLS
     if (isPlacingOrder.value) {
@@ -243,16 +148,22 @@ class PendingTransactionController extends GetxController {
         if (Get.isDialogOpen ?? false) Get.back();
 
         if (response != null && response['success'] == true) {
-          // ✅ AutoPay ONLY if user selected it
+          // 🔒 STILL LOCKED — DO NOT UNLOCK YET
+
           if (shouldEnableAutoPay) {
             await _enableAutoPayForOrders(selectedOrderIds.toList());
           }
 
-          // ✅ Reset after use to avoid future leakage
+          removePaidOrders(selectedOrderIds.toList());
+
           enableAutoPay.value = false;
 
           await walletController.fetchWallet(forceRefresh: true);
+
+          // 🚫 DO NOT unlock here
           Get.offAll(() => BookingConfirmationScreen());
+
+          return; // ⛔ EXIT payNow() COMPLETELY
         } else {
           appToast(
             error: true,
@@ -296,9 +207,29 @@ class PendingTransactionController extends GetxController {
         content: "Payment initialization failed",
       );
     } finally {
-      isPlacingOrder.value = false; // 🔓 UNLOCK
-      debugPrint("🔓 [PAY NOW] UNLOCKED");
+      // 🔓 unlock ONLY if still on this screen
+      if (Get.currentRoute.contains("PendingTransaction")) {
+        isPlacingOrder.value = false;
+        debugPrint("🔓 [PAY NOW] UNLOCKED");
+      }
     }
+  }
+
+  void removePaidOrders(List<String> paidOrderIds) {
+    // Remove from transactions
+    transactions.removeWhere(
+      (t) => paidOrderIds.contains(t.orderId),
+    );
+
+    // Rebuild selected list
+    selectedList.value =
+        List<RxBool>.generate(transactions.length, (_) => false.obs);
+
+    // Clear selected order ids
+    selectedOrderIds.clear();
+
+    // Reset total
+    totalAmount.value = 0;
   }
 
   Future<void> _enableAutoPayForOrders(List<String> orderIds) async {

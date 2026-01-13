@@ -7,6 +7,7 @@ import '../../widgets/app_loader.dart';
 import '../../widgets/app_toast.dart';
 import '../booking_confirmation/booking_confirmation_screen.dart';
 import '../../models/razorpay_payment_response.dart';
+import '../pending_transaction/pending_transaction_controller.dart';
 
 class PendingTransactionRazorpayController extends GetxController {
   late Razorpay razorpay;
@@ -115,13 +116,12 @@ class PendingTransactionRazorpayController extends GetxController {
 
       if (response != null &&
           (response['success'] == true || response['status'] == 'success')) {
+        final pendingController = Get.find<PendingTransactionController>();
+        pendingController.removePaidOrders(selectedOrders);
+
         appToast(content: "Payment processed successfully");
-        // navigate to confirmation or refresh orders
+
         Get.to(() => BookingConfirmationScreen());
-      } else {
-        final msg = response?['message'] ??
-            'Payment verification failed. Contact support.';
-        appToast(error: true, content: msg);
       }
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();

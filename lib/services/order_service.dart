@@ -70,4 +70,51 @@ class OrderService {
       return null;
     }
   }
+
+  // ---------------- ORDER PREVIEW (INSTALLMENT) ----------------
+
+  static Future<Map<String, dynamic>?> previewInstallmentOrder(
+      Map<String, dynamic> body) async {
+    try {
+      final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+      return await APIService.postRequest<Map<String, dynamic>>(
+        url: AppURLs.INSTALLMENT_ORDER_PREVIEW_API,
+        body: body,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        onSuccess: (data) {
+          return data;
+        },
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+// ---------------- BULK ORDER PREVIEW ----------------
+
+  static Future<Map<String, dynamic>?> bulkOrderPreview(
+    Map<String, dynamic> body,
+  ) async {
+    try {
+      final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+      return await APIService.postRequest<Map<String, dynamic>>(
+        url: AppURLs.BULK_ORDER_PREVIEW,
+        body: body,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        onSuccess: (data) {
+          return data;
+        },
+      );
+    } catch (e) {
+      return null;
+    }
+  }
 }
