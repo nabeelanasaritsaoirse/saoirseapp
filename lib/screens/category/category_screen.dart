@@ -114,7 +114,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         return Padding(
           padding: EdgeInsets.all(12.w),
           child: GridView.builder(
-            itemCount: controller.categoryGroups.length,
+            itemCount: controller.categoryGroups.length + 1,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               mainAxisSpacing: 14.h,
@@ -122,6 +122,46 @@ class _CategoryScreenState extends State<CategoryScreen> {
               childAspectRatio: 0.78,
             ),
             itemBuilder: (context, index) {
+              if (index == controller.categoryGroups.length) {
+                return GestureDetector(
+                  onTap: () {
+                    Get.to(() => const ProductListing());
+                  },
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 80.h,
+                        width: 80.h,
+                        decoration: BoxDecoration(
+                          color: AppColors.lightGrey,
+                          borderRadius: BorderRadius.circular(14.r),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.shadowColor,
+                              blurRadius: 6.r,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.grid_view_rounded,
+                          size: 24.sp,
+                          color: AppColors.primaryColor,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      appText(
+                        "See All",
+                        textAlign: TextAlign.center,
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              //  CATEGORY TILE
               final category = controller.categoryGroups[index];
 
               return GestureDetector(
