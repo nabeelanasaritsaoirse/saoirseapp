@@ -122,7 +122,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
               childAspectRatio: 0.78,
             ),
             itemBuilder: (context, index) {
-            
               if (index == controller.categoryGroups.length) {
                 return GestureDetector(
                   onTap: () {
@@ -145,8 +144,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           ],
                         ),
                         child: Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 30.sp,
+                          Icons.grid_view_rounded,
+                          size: 24.sp,
                           color: AppColors.primaryColor,
                         ),
                       ),
@@ -210,8 +209,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 ),
               );
             },
-
-         
           ),
         );
       }),
