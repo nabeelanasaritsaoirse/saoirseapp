@@ -29,7 +29,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildLogo() {
     return Padding(
       padding: EdgeInsets.only(
-        left: 12.w,
+        left: 16.w,
       ),
       child: Image.asset(
         AppAssets.app_logo,
@@ -92,13 +92,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         backgroundColor: AppColors.primaryColor,
         elevation: 0,
-        leadingWidth: showLogo ? 56.w : 45.w,
+        leadingWidth: showLogo ? 55.w : 45.w,
         leading: showBack
             ? _buildBackButton()
             : showLogo
                 ? _buildLogo()
                 : null,
-        titleSpacing: 20,
+        titleSpacing: showLogo ? 6.w : 20.w,
         title: showGreeting
             ? _buildGreeting()
             : title != null

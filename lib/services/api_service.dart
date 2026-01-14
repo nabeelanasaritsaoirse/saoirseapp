@@ -2,7 +2,6 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -10,9 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-import 'package:http/http.dart' as http;
-
 import '../screens/onboard/onboard_screen.dart';
+
+import 'package:http/http.dart' as http;
 
 class APIService {
   static bool internet = false;
@@ -39,7 +38,9 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-        log(response.body);
+        // log("request Url =====> : $url");
+        // log("BODY ====> $body");
+        // log(response.body);
         switch (response.statusCode) {
           case 200:
           case 201:

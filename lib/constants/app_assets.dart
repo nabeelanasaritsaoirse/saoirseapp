@@ -65,13 +65,13 @@ class AppAssets {
   // static String manage_accounts = "assets/icons/manage_account.png";
   // static String address = "assets/icons/address.png";
 
-  static String pending_payment = "assets/svg/pending_payment.svg";
-  static String order_history = "assets/svg/order_history.svg";
+  static String pending_payment = "assets/svg/pending_transactionn.svg";
+  static String order_history = "assets/svg/order_historyy.svg";
   static String wishlist = "assets/svg/wishlist.svg";
   static String active_oders = "assets/svg/active_orders.svg";
   static String transactions = "assets/svg/transaction.svg";
-  static String delivered = "assets/svg/deliverd.svg";
-  static String privacy_policy = "assets/svg/privacy_policy.svg";
+  static String delivered = "assets/svg/deliverdd.svg";
+  static String privacy_policy = "assets/svg/privacy_policyy.svg";
   static String terms_condition = "assets/svg/terms_condition.svg";
   static String logout = "assets/svg/logout.svg";
   static String kyc = "assets/svg/kyc.svg";

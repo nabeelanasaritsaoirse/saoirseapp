@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../../constants/payment_methods.dart';
 import '../../models/coupon_model.dart';
 import '../../models/coupon_validation_model.dart';
+import '../../models/order_preview_model.dart';
 import '../../models/order_response_model.dart';
 import '../../services/coupon_service.dart';
 import '../../services/notification_service.dart';
@@ -39,6 +40,7 @@ class OrderDetailsController extends GetxController {
 
   Rx<CouponValidationResponse?> couponValidation =
       Rx<CouponValidationResponse?>(null);
+  RxBool isLoading = false.obs;
 
   RxString appliedCouponCode = "".obs;
 
@@ -49,6 +51,15 @@ class OrderDetailsController extends GetxController {
   double originalAmount = 0.0;
   int originalDays = 0;
 
+  // ORDER PREVIEW STATE
+  Rx<OrderPreviewData?> orderPreview = Rx<OrderPreviewData?>(null);
+  RxBool isPreviewLoading = false.obs;
+
+// -------- ORDER PREVIEW CONTEXT (CACHED) --------
+  String _previewProductId = '';
+  String _previewVariantId = '';
+  Map<String, dynamic> _previewAddress = {};
+
   @override
   void onInit() {
     super.onInit();
@@ -56,6 +67,19 @@ class OrderDetailsController extends GetxController {
     enableAutoPay.value = true;
     fetchCoupons();
   }
+
+  void startLoading() {
+    isLoading.value = true;
+  }
+
+  void stopLoading() {
+    isLoading.value = false;
+  }
+
+  // -------- PUBLIC GETTERS FOR PREVIEW CONTEXT --------
+  Map<String, dynamic> get previewAddress => _previewAddress;
+  String get previewProductId => _previewProductId;
+  String get previewVariantId => _previewVariantId;
 
   // ------------------------- INITIAL PRODUCT PRICING -------------------------
   void initProductPricing({
@@ -74,6 +98,67 @@ class OrderDetailsController extends GetxController {
     selectedDays.value = days;
 
     totalAmount.value = finalPrice;
+  }
+
+  void initPreviewContext({
+    required String productId,
+    String variantId = "",
+    required Map<String, dynamic> deliveryAddress,
+  }) {
+    _previewProductId = productId;
+    _previewVariantId = variantId;
+    _previewAddress = deliveryAddress;
+  }
+
+  Future<void> fetchOrderPreview({
+    required String productId,
+    String variantId = "",
+    required int quantity,
+    required int totalDays,
+    String couponCode = "",
+    required Map<String, dynamic> deliveryAddress,
+  }) async {
+    startLoading();
+
+    try {
+      final body = {
+        "productId": productId,
+        "quantity": quantity,
+        "totalDays": totalDays,
+        if (variantId.isNotEmpty) "variantId": variantId,
+        if (couponCode.isNotEmpty) "couponCode": couponCode,
+        "deliveryAddress": deliveryAddress,
+      };
+
+      final response = await OrderService.previewInstallmentOrder(body);
+
+      final model = OrderPreviewModel.fromJson(response!);
+
+      orderPreview.value = model.data;
+
+      // 🔥 SYNC EXISTING CONTROLLER VALUES
+      selectedAmount.value = model.data.installment.dailyAmount;
+      selectedDays.value = model.data.installment.totalDays;
+      totalAmount.value = model.data.pricing.finalProductPrice;
+    } catch (e) {
+      appToaster(
+        error: true,
+        content: e.toString().replaceAll("Exception:", "").trim(),
+      );
+    } finally {
+      stopLoading();
+    }
+  }
+
+  Future<void> refreshOrderPreview() async {
+    await fetchOrderPreview(
+      productId: _previewProductId,
+      variantId: _previewVariantId,
+      quantity: quantity.value,
+      totalDays: selectedDays.value,
+      couponCode: appliedCouponCode.value,
+      deliveryAddress: _previewAddress,
+    );
   }
 
   // ------------------------- CENTRAL RECALCULATION ---------------------------
@@ -125,58 +210,6 @@ class OrderDetailsController extends GetxController {
   }
 
   // ------------------------- APPLY COUPON ------------------------------------
-  // Future<void> applyCouponApi({
-  //   required String couponCode,
-  //   required String productId,
-  //   required int totalDays,
-  //   required double dailyAmount,
-  //   String variantId = "",
-  //   int quantity = 1,
-  // }) async {
-  //   if (couponCode.trim().isEmpty) {
-  //     appToast(error: true, content: "Please enter a coupon code");
-  //     return;
-  //   }
-
-  //   final body = {
-  //     "couponCode": couponCode.trim(),
-  //     "productId": productId,
-  //     "totalDays": totalDays,
-  //     "dailyAmount": dailyAmount,
-  //     if (variantId.isNotEmpty) "variantId": variantId,
-  //     if (quantity > 0) "quantity": quantity,
-  //   };
-
-  //   appLoader();
-
-  //   final response = await CouponService.validateCoupon(body);
-
-  //   if (Get.isDialogOpen ?? false) Get.back();
-
-  //   if (response == null) {
-  //     appToast(error: true, content: "Invalid coupon");
-  //     return;
-  //   }
-
-  //   couponValidation.value = response;
-  //   appliedCouponCode.value = couponCode.trim();
-
-  //   final inst = response.installment;
-  //   final pricing = response.pricing;
-
-  //   selectedAmount.value = roundToInt(inst.dailyAmount * this.quantity.value);
-
-  //   selectedDays.value = inst.totalDays;
-
-  //   totalAmount.value = roundToInt(pricing.finalPrice * this.quantity.value);
-
-  //   if (response.benefits.savingsMessage.isNotEmpty) {
-  //     appToast(
-  //         title: "Coupon Applied", content: response.benefits.savingsMessage);
-  //   } else {
-  //     appToast(title: "Coupon Applied", content: "Coupon applied successfully");
-  //   }
-  // }
 
   Future<void> applyCouponApi({
     required String couponCode,
@@ -190,6 +223,7 @@ class OrderDetailsController extends GetxController {
       appToast(error: true, content: "Please enter a coupon code");
       return;
     }
+    startLoading();
 
     final body = {
       "couponCode": couponCode.trim(),
@@ -200,49 +234,51 @@ class OrderDetailsController extends GetxController {
       if (quantity > 0) "quantity": quantity,
     };
 
-    appLoader();
-
     try {
       final response = await CouponService.validateCoupon(body);
 
       if (Get.isDialogOpen ?? false) Get.back();
 
-      couponValidation.value = response;
       appliedCouponCode.value = couponCode.trim();
-
-      final inst = response.installment;
-      final pricing = response.pricing;
-
-      selectedAmount.value = roundToInt(inst.dailyAmount * this.quantity.value);
-
-      selectedDays.value = inst.totalDays;
-
-      totalAmount.value = roundToInt(pricing.finalPrice * this.quantity.value);
 
       appToaster(
         content: response.benefits.savingsMessage.isNotEmpty
             ? response.benefits.savingsMessage
             : "Coupon applied successfully",
       );
+
+      await fetchOrderPreview(
+        productId: productId,
+        variantId: variantId,
+        quantity: quantity,
+        totalDays: totalDays,
+        couponCode: couponCode.trim(),
+        deliveryAddress: _previewAddress,
+      );
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
 
-      /// 🔥 SHOW BACKEND MESSAGE HERE
       appToaster(
         error: true,
         content: e.toString().replaceAll("Exception:", "").trim(),
       );
+    } finally {
+      stopLoading();
     }
   }
 
-  void removeCoupon(TextEditingController controller) {
-    couponValidation.value = null;
-    appliedCouponCode.value = "";
-    selectedCoupon.value = null;
+  Future<void> removeCoupon(TextEditingController controller) async {
+    startLoading();
 
-    recalculatePricing();
-    recalculatePricing();
-    controller.clear();
+    try {
+      appliedCouponCode.value = "";
+      selectedCoupon.value = null;
+      controller.clear();
+
+      await refreshOrderPreview();
+    } finally {
+      stopLoading();
+    }
   }
 
   // ------------------------- PLACE ORDER FOR SINGLE PRODUCT-------------------------------------
@@ -368,10 +404,6 @@ class OrderDetailsController extends GetxController {
     selectedAmount.value = amount;
   }
 
-  // void selectPaymentMethod(String method) {
-  //   selectedPaymentMethod.value = method;
-  // }
-
   void selectPaymentMethod(String method) {
     selectedPaymentMethod.value = method;
 
@@ -385,7 +417,7 @@ class OrderDetailsController extends GetxController {
   // ------------------------- QUANTITY ----------------------------------------
   void increaseQty() {
     quantity.value++;
-    recalculatePricing();
+    refreshOrderPreview();
   }
 
   void decreaseQty() {
@@ -394,6 +426,6 @@ class OrderDetailsController extends GetxController {
       return;
     }
     quantity.value--;
-    recalculatePricing();
+    refreshOrderPreview();
   }
 }

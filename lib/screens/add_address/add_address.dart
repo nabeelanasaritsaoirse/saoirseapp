@@ -195,16 +195,32 @@ class _AddAddressState extends State<AddAddress> {
               ),
               SizedBox(height: 25.h),
               appButton(
-                child: appText(AppStrings.Save,
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.white),
                 buttonColor: AppColors.primaryColor,
                 onTap: () {
                   if (_formKey.currentState!.validate()) {
                     addAddressController.saveAddress();
                   }
                 },
+                child: Obx(() {
+                  // ✅ Rx is READ here
+                  if (addAddressController.isLoading.value) {
+                    return SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    );
+                  }
+
+                  return appText(
+                    AppStrings.Save,
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.white,
+                  );
+                }),
               ),
             ],
           ),
