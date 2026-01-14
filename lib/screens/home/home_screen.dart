@@ -10,8 +10,7 @@ import '../../widgets/app_text.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/investment_status_card.dart';
-import '../category/category_controller.dart';
-import '../dashboard/dashboard_controller.dart';
+import '../category/sub_category_screen.dart';
 import '../my_wallet/my_wallet.dart';
 import '../notification/notification_controller.dart';
 import '../notification/notification_screen.dart';
@@ -269,16 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: categories.map((cat) {
                       return GestureDetector(
                         onTap: () {
-                          //---------Navigate to Category Screen with selected category---------//
-                          int index =
-                              homeController.parentCategories.indexOf(cat);
-                          Get.find<DashboardController>().selectedIndex.value =
-                              1;
-                          Future.delayed(Duration(milliseconds: 100), () {
-                            Get.find<CategoryController>().selectedIndex.value =
-                                index;
-                          });
-                          //---------------------------------------------------------------//
+                          Get.to(() => SubCategoryScreen(category: cat));
                         },
                         child: Container(
                           margin: EdgeInsets.only(right: 8.w),

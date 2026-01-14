@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:get/get.dart';
 
 import '../constants/app_colors.dart';
 import '../models/category_model.dart';
@@ -59,7 +59,7 @@ class CategoryItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   fontSize: 10.sp,
-                  height: 1.2, // 🔥 IMPORTANT
+                  height: 1.2,
                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   color:
                       isSelected ? AppColors.primaryColor : AppColors.textBlack,
