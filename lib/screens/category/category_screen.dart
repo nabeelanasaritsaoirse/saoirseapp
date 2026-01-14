@@ -155,7 +155,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         textAlign: TextAlign.center,
                         fontSize: 11.sp,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primaryColor,
                       ),
                     ],
                   ),
