@@ -35,9 +35,15 @@ class CartController extends GetxController {
 
   @override
   void onInit() {
-    fetchCart();
-    fetchCartCount();
     super.onInit();
+
+    storage.listenKey(AppConst.ACCESS_TOKEN, (value) {
+      if (value != null && value.toString().isNotEmpty) {
+        debugPrint("🟢 [CART] Token available → refetching cart");
+        fetchCart();
+        fetchCartCount();
+      }
+    });
   }
 
   // Fetch cart from API

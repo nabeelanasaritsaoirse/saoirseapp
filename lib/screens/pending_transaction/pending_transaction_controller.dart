@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_colors.dart';
+import '../../constants/app_constant.dart';
+import '../../main.dart';
 import '../../models/pending_transaction_model.dart';
 import '../../services/notification_service.dart';
 import '../../services/order_service.dart';
@@ -47,7 +49,28 @@ class PendingTransactionController extends GetxController {
   void onInit() {
     super.onInit();
     walletController = Get.find<MyWalletController>();
-    getPendingTransactions();
+    _initWhenTokenReady();
+  }
+
+  Future<void> _initWhenTokenReady() async {
+    debugPrint("⏳ [PENDING] Waiting for token...");
+
+    String? token;
+    int retry = 0;
+
+    while (
+        (token = storage.read(AppConst.ACCESS_TOKEN)) == null && retry < 10) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      retry++;
+    }
+
+    if (token == null) {
+      debugPrint(" [PENDING] Token not found after wait");
+      return;
+    }
+
+    debugPrint(" [PENDING] Token found, fetching data");
+    await getPendingTransactions();
   }
 
   // ----------------------- fetch pending transactions -----------------------------------

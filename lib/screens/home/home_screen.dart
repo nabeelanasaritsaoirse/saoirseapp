@@ -318,7 +318,10 @@ class _HomeScreenState extends State<HomeScreen> {
             //   );
             // }),
             Obx(() {
-              final pendingCtrl = Get.find<PendingTransactionController>();
+              final PendingTransactionController pendingCtrl =
+                  Get.isRegistered<PendingTransactionController>()
+                      ? Get.find<PendingTransactionController>()
+                      : Get.put(PendingTransactionController());
               final pendingCount = pendingCtrl.pendingCount.value;
               debugPrint("🏠 [HOME] Checking blue box visibility");
               debugPrint("🏠 [HOME] pendingCount = $pendingCount");
