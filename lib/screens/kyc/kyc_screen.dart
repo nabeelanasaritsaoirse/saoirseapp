@@ -215,25 +215,41 @@ class NotSubmittedUI extends StatelessWidget {
           SizedBox(height: 10.h),
 
 // ================= CONSENT CHECKBOXES =================
+
           Obx(() => Column(
                 children: [
-                  consentTile(
+                  consentCkeckBox(
                     "I declare that the information and documents provided are true and correct.",
                     controller.consentInfoCorrect,
                     controller.consentError.value,
                   ),
-                  consentTile(
+                  consentCkeckBox(
                     "I consent to the use of my PAN and Aadhaar details for KYC verification.",
                     controller.consentUsePanAadhaar,
                     controller.consentError.value,
                   ),
-                  consentTile(
-                    "I have read and agree to the Terms and Conditions for KYC.",
-                    controller.consentTerms,
-                    controller.consentError.value,
-                  ),
                 ],
               )),
+
+          // Obx(() => Column(
+          //       children: [
+          //         consentTile(
+          //           "I declare that the information and documents provided are true and correct.",
+          //           controller.consentInfoCorrect,
+          //           controller.consentError.value,
+          //         ),
+          //         consentTile(
+          //           "I consent to the use of my PAN and Aadhaar details for KYC verification.",
+          //           controller.consentUsePanAadhaar,
+          //           controller.consentError.value,
+          //         ),
+          //         consentTile(
+          //           "I have read and agree to the Terms and Conditions for KYC.",
+          //           controller.consentTerms,
+          //           controller.consentError.value,
+          //         ),
+          //       ],
+          //     )),
 
           SizedBox(height: 20.h),
 
@@ -244,7 +260,7 @@ class NotSubmittedUI extends StatelessWidget {
                     controller.isLoading.value ? "Uploading..." : "Submit KYC",
                 buttonColor: AppColors.primaryColor,
                 onTap: () {
-                  if (!controller.validateConsents()) return;
+                  // if (!controller.validateConsents()) return;
                   controller.uploadDocuments();
                 },
               )),
@@ -609,18 +625,38 @@ String? panValidator(String? value) {
 // ==========================================================
 // CONSENT CHECKBOX TILE WITH ERROR HIGHLIGHT
 // ==========================================================
+Widget consentCkeckBox(
+  String text,
+  RxBool value,
+  bool showError,
+) {
+  return Obx(() => Padding(
+        padding: EdgeInsets.symmetric(vertical: 6.h),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            // CHECKBOX
+            Checkbox(
+              value: value.value,
+              onChanged: (_) => value.toggle(),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
+            ),
 
-Widget consentTile(String text, RxBool value, bool showError) {
-  return Obx(() => CheckboxListTile(
-        value: value.value,
-        onChanged: (_) => value.toggle(),
-        title: appText(
-          text,
-          fontSize: 13.sp,
-          color: showError && !value.value ? Colors.red : AppColors.black,
+            SizedBox(width: 10.w),
+
+            // TEXT
+            Expanded(
+              child: appText(
+                text,
+                textAlign: TextAlign.left,
+                fontSize: 13.sp,
+                height: 1.4,
+                color: showError && !value.value ? Colors.red : AppColors.black,
+              ),
+            ),
+          ],
         ),
-        controlAffinity: ListTileControlAffinity.leading,
-        contentPadding: EdgeInsets.zero,
-        dense: true,
       ));
 }
