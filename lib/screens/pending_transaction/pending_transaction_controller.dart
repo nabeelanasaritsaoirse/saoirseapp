@@ -13,7 +13,7 @@ import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_toast.dart';
-import '../booking_confirmation/booking_confirmation_screen.dart';
+import '../booking_confirmation/pending_payment_confirmation_screen.dart';
 import '../my_wallet/my_wallet_controller.dart';
 import '../razorpay/pending_transaction_razorpay_controller.dart';
 
@@ -160,8 +160,7 @@ class PendingTransactionController extends GetxController {
 
           await walletController.fetchWallet(forceRefresh: true);
 
-          // 🚫 DO NOT unlock here
-          Get.offAll(() => BookingConfirmationScreen());
+          Get.offAll(() => PendingPaymentConfirmationScreen());
 
           return; // ⛔ EXIT payNow() COMPLETELY
         } else {

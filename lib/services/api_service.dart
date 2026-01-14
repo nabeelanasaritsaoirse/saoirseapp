@@ -48,7 +48,7 @@ class APIService {
             if (data is! Map<String, dynamic>) {
               return null;
             }
-            return onSuccess(data); // ✅ stop retry on success
+            return onSuccess(data);
 
           case 204:
             return null;

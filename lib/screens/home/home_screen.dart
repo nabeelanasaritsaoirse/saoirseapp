@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
               image: AppAssets.wallet,
               padding: 5.w,
               onTap: () => Get.to(() => WalletScreen())),
-          SizedBox(width: 12.w),
+          SizedBox(width: 12.w)
         ],
       ),
 

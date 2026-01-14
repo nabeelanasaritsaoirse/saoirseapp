@@ -5,8 +5,8 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import '../../services/pending_transaction_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_toast.dart';
-import '../booking_confirmation/booking_confirmation_screen.dart';
 import '../../models/razorpay_payment_response.dart';
+import '../booking_confirmation/pending_payment_confirmation_screen.dart';
 import '../pending_transaction/pending_transaction_controller.dart';
 
 class PendingTransactionRazorpayController extends GetxController {
@@ -121,7 +121,7 @@ class PendingTransactionRazorpayController extends GetxController {
 
         appToast(content: "Payment processed successfully");
 
-        Get.to(() => BookingConfirmationScreen());
+        Get.to(() => PendingPaymentConfirmationScreen());
       }
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
