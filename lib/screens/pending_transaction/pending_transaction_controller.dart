@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/booking_confirmation/pending_payment_confirmation_screen.dart';
 
 import '../../constants/app_colors.dart';
 import '../../models/pending_transaction_model.dart';
@@ -160,8 +161,8 @@ class PendingTransactionController extends GetxController {
 
           await walletController.fetchWallet(forceRefresh: true);
 
-          // 🚫 DO NOT unlock here
-          Get.offAll(() => BookingConfirmationScreen());
+          
+          Get.offAll(() => PendingPaymentConfirmationScreen());
 
           return; // ⛔ EXIT payNow() COMPLETELY
         } else {

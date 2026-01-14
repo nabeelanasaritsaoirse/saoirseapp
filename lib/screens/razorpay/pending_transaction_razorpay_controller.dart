@@ -1,6 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:saoirse_app/screens/booking_confirmation/pending_payment_confirmation_screen.dart';
 
 import '../../services/pending_transaction_service.dart';
 import '../../widgets/app_loader.dart';
@@ -121,7 +122,7 @@ class PendingTransactionRazorpayController extends GetxController {
 
         appToast(content: "Payment processed successfully");
 
-        Get.to(() => BookingConfirmationScreen());
+        Get.to(() => PendingPaymentConfirmationScreen());
       }
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
