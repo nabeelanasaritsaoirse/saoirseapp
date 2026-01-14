@@ -231,26 +231,6 @@ class NotSubmittedUI extends StatelessWidget {
                 ],
               )),
 
-          // Obx(() => Column(
-          //       children: [
-          //         consentTile(
-          //           "I declare that the information and documents provided are true and correct.",
-          //           controller.consentInfoCorrect,
-          //           controller.consentError.value,
-          //         ),
-          //         consentTile(
-          //           "I consent to the use of my PAN and Aadhaar details for KYC verification.",
-          //           controller.consentUsePanAadhaar,
-          //           controller.consentError.value,
-          //         ),
-          //         consentTile(
-          //           "I have read and agree to the Terms and Conditions for KYC.",
-          //           controller.consentTerms,
-          //           controller.consentError.value,
-          //         ),
-          //       ],
-          //     )),
-
           SizedBox(height: 20.h),
 
           // ---------------- SUBMIT BUTTON ----------------
@@ -260,7 +240,7 @@ class NotSubmittedUI extends StatelessWidget {
                     controller.isLoading.value ? "Uploading..." : "Submit KYC",
                 buttonColor: AppColors.primaryColor,
                 onTap: () {
-                  // if (!controller.validateConsents()) return;
+                  if (!controller.validateConsents()) return;
                   controller.uploadDocuments();
                 },
               )),
@@ -653,7 +633,7 @@ Widget consentCkeckBox(
                 textAlign: TextAlign.left,
                 fontSize: 13.sp,
                 height: 1.4,
-                color: showError && !value.value ? Colors.red : AppColors.black,
+                color: AppColors.black,
               ),
             ),
           ],

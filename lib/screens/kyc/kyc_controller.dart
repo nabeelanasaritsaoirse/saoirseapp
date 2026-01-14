@@ -1,12 +1,3 @@
-
-
-
-
-
-
-
-
-
 import 'dart:developer';
 import 'dart:io';
 
@@ -15,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-
 
 import '../../models/LoginAuth/kyc_model.dart';
 import '../../services/kyc_service.dart';
@@ -62,13 +52,12 @@ class KycController extends GetxController {
   RxBool panFrontError = false.obs;
   RxBool panNumberError = false.obs;
   // Consents
-RxBool consentInfoCorrect = false.obs;
-RxBool consentUsePanAadhaar = false.obs;
-RxBool consentTerms = false.obs;
+  RxBool consentInfoCorrect = false.obs;
+  RxBool consentUsePanAadhaar = false.obs;
+  RxBool consentTerms = false.obs;
 
 // Error flag (optional – for red highlight)
-RxBool consentError = false.obs;
-
+  RxBool consentError = false.obs;
 
   // ==========================================================
   // STATE
@@ -311,23 +300,21 @@ RxBool consentError = false.obs;
 
     return File(result!.path);
   }
+
   bool validateConsents() {
-  if (!consentInfoCorrect.value ||
-      !consentUsePanAadhaar.value ||
-      !consentTerms.value) {
-    consentError.value = true;
-log(    "Need to  accept all declarations to submit KYC");
-    // Get.snackbar(
-    //   "Consent Required",
-    //   "Please accept all declarations to submit KYC",
-    //   backgroundColor: AppColors.red,
-    //   colorText: AppColors.white,
-    // );
-    return false;
+    if (!consentInfoCorrect.value || !consentUsePanAadhaar.value) {
+      consentError.value = true;
+      log("Need to  accept all declarations to submit KYC");
+      // Get.snackbar(
+      //   "Consent Required",
+      //   "Please accept all declarations to submit KYC",
+      //   backgroundColor: AppColors.red,
+      //   colorText: AppColors.white,
+      // );
+      return false;
+    }
+
+    consentError.value = false;
+    return true;
   }
-
-  consentError.value = false;
-  return true;
-}
-
 }
