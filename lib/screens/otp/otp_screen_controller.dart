@@ -87,6 +87,7 @@ class VerifyOtpController extends GetxController {
     storage.write(AppConst.REFRESH_TOKEN, data.refreshToken);
     storage.write(AppConst.REFERRAL_CODE, data.referralCode);
     storage.write(AppConst.USER_NAME, username);
+    storage.write(AppConst.CACHE_CLEANUP, true);
 
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
     final notif = Get.find<NotificationController>();

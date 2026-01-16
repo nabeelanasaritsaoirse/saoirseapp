@@ -128,6 +128,7 @@ class LoginController extends GetxController {
       storage.write(AppConst.REFRESH_TOKEN, data.refreshToken);
       storage.write(AppConst.REFERRAL_CODE, data.referralCode);
       storage.write(AppConst.USER_NAME, data.name);
+      storage.write(AppConst.CACHE_CLEANUP, true);
       if (Get.isRegistered<HomeController>()) {
         Get.find<HomeController>().loadUserName();
       }

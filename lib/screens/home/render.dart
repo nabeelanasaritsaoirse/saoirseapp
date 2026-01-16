@@ -55,14 +55,13 @@ class StaticPromoBanner extends StatelessWidget {
       padding: EdgeInsets.symmetric(
         horizontal: 16.w,
       ),
-      child: Container(
-        width: double.infinity,
-        height: 100.h,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16.r),
-          image: DecorationImage(
-            image: AssetImage(AppAssets.banner_refer),
-            fit: BoxFit.fill,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16.r),
+        child: AspectRatio(
+          aspectRatio: 1080 / 300,
+          child: Image.asset(
+            AppAssets.banner_refer,
+            fit: BoxFit.fitWidth,
           ),
         ),
       ),
