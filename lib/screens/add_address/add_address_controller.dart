@@ -41,38 +41,6 @@ class AddAddressController extends GetxController {
   //     "addressLine1": streetNameController.text.trim(),
   //     "city": cityController.text.trim(),
   //     "state": stateController.text.trim(),
-  //     "pincode": zipController.text.trim(),
-  //     "phoneNumber": phoneController.text.trim(),
-  //     "isDefault": true
-  //   };
-
-  //   bool result = await AddressService.addAddress(body);
-
-  //   isLoading.value = false;
-
-  //   if (result) {
-  //     try {
-  //       Get.find<SelectAddressController>().fetchAddresses();
-  //       Get.back();
-  //     } catch (e) {
-  //       log("SelectAddressController not found: $e");
-  //     }
-
-  //     appToast(title: "Success", content: "Address added successfully");
-
-  //   } else {
-  //     appToast(error: true, title: "Error", content: "Failed to add address");
-  //   }
-  // }
-
-  //   Future<void> saveAddress() async {
-  //   isLoading.value = true;
-
-  //   final body = {
-  //     "name": nameController.text.trim(),
-  //     "addressLine1": streetNameController.text.trim(),
-  //     "city": cityController.text.trim(),
-  //     "state": stateController.text.trim(),
   //     "country": countryController.text.trim(),
   //     "pincode": zipController.text.trim(),
   //     "phoneNumber": phoneController.text.trim(),
@@ -80,19 +48,30 @@ class AddAddressController extends GetxController {
   //   };
 
   //   try {
+  //     // ✅ SAFE CONTROLLER ACCESS (THIS FIXES THE ERROR)
+  //     final ManageAddressController manageController =
+  //         Get.isRegistered<ManageAddressController>()
+  //             ? Get.find<ManageAddressController>()
+  //             : Get.put(ManageAddressController());
+  //     final SelectAddressController selectAddressController =
+  //         Get.isRegistered<SelectAddressController>()
+  //             ? Get.find<SelectAddressController>()
+  //             : Get.put(SelectAddressController());
+
   //     bool success;
 
   //     // ---------- EDIT ----------
   //     if (isEdit.value && addressId != null) {
-  //       success = await Get.find<ManageAddressController>().editAddress(
+  //       success = await manageController.editAddress(
   //         addressId: addressId!,
   //         body: body,
   //       );
+  //       await manageController.fetchAddresses();
   //     }
   //     // ---------- ADD ----------
   //     else {
-  //       success = await Get.find<ManageAddressController>()
-  //           .addAddress(body);
+  //       success = await manageController.addAddress(body);
+  //       await selectAddressController.fetchAddresses();
   //     }
 
   //     if (success) {
@@ -115,7 +94,6 @@ class AddAddressController extends GetxController {
   //       );
   //     }
   //   } catch (e) {
-  //     log("❌ Save address error: $e");
   //     appToast(
   //       error: true,
   //       title: "Error",
@@ -127,6 +105,12 @@ class AddAddressController extends GetxController {
   // }
 
   Future<void> saveAddress() async {
+    // 🔒 PREVENT MULTIPLE CALLS
+    if (isLoading.value) {
+      debugPrint("⛔ Save address already in progress");
+      return;
+    }
+
     isLoading.value = true;
 
     final body = {
@@ -141,11 +125,11 @@ class AddAddressController extends GetxController {
     };
 
     try {
-      // ✅ SAFE CONTROLLER ACCESS (THIS FIXES THE ERROR)
       final ManageAddressController manageController =
           Get.isRegistered<ManageAddressController>()
               ? Get.find<ManageAddressController>()
               : Get.put(ManageAddressController());
+
       final SelectAddressController selectAddressController =
           Get.isRegistered<SelectAddressController>()
               ? Get.find<SelectAddressController>()
@@ -193,7 +177,7 @@ class AddAddressController extends GetxController {
         content: "Something went wrong",
       );
     } finally {
-      isLoading.value = false;
+      isLoading.value = false; // 🔓 UNLOCK
     }
   }
 

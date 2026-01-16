@@ -10,11 +10,11 @@ import '../../widgets/app_text.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/investment_status_card.dart';
-import '../category/category_controller.dart';
-import '../dashboard/dashboard_controller.dart';
+import '../category/sub_category_screen.dart';
 import '../my_wallet/my_wallet.dart';
 import '../notification/notification_controller.dart';
 import '../notification/notification_screen.dart';
+import '../pending_transaction/pending_transaction_controller.dart';
 import '../pending_transaction/pending_transaction_screen.dart';
 import '../productListing/product_listing.dart';
 import 'home_controller.dart';
@@ -51,6 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
       // Header Section (app-bar)
       appBar: CustomAppBar(
         showLogo: true,
+        showGreeting: true,
+        userName: homeController.userName.value,
         actions: [
           Stack(
             clipBehavior: Clip.none,
@@ -103,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
               image: AppAssets.wallet,
               padding: 5.w,
               onTap: () => Get.to(() => WalletScreen())),
-          SizedBox(width: 12.w),
+          SizedBox(width: 12.w)
         ],
       ),
 
@@ -266,16 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: categories.map((cat) {
                       return GestureDetector(
                         onTap: () {
-                          //---------Navigate to Category Screen with selected category---------//
-                          int index =
-                              homeController.parentCategories.indexOf(cat);
-                          Get.find<DashboardController>().selectedIndex.value =
-                              1;
-                          Future.delayed(Duration(milliseconds: 100), () {
-                            Get.find<CategoryController>().selectedIndex.value =
-                                index;
-                          });
-                          //---------------------------------------------------------------//
+                          Get.to(() => SubCategoryScreen(category: cat));
                         },
                         child: Container(
                           margin: EdgeInsets.only(right: 8.w),
@@ -302,22 +295,58 @@ class _HomeScreenState extends State<HomeScreen> {
 
             SizedBox(height: 10.h),
 //----------------Progress Card Section----------------//
-            Obx(() {
-              final data = investmentController.overview.value;
+            // Obx(() {
+            //   final data = investmentController.overview.value;
 
-              if (data.remainingDays <= 0) {
+            //   if (data.remainingDays <= 0) {
+            //     return const SizedBox.shrink();
+            //   }
+
+            //   return Padding(
+            //     padding: const EdgeInsets.all(8.0),
+            //     child: Column(
+            //       children: [
+            //         InvestmentStatusCard(
+            //           balanceAmount: data.totalRemainingAmount.toInt(),
+            //           daysLeft: data.remainingDays,
+            //           progress: data.progressPercent / 100,
+            //           onPayNow: () => Get.to(PendingTransaction()),
+            //         ),
+            //         SizedBox(height: 10.h),
+            //       ],
+            //     ),
+            //   );
+            // }),
+            Obx(() {
+              final PendingTransactionController pendingCtrl =
+                  Get.isRegistered<PendingTransactionController>()
+                      ? Get.find<PendingTransactionController>()
+                      : Get.put(PendingTransactionController());
+              pendingCtrl.getPendingTransactions();
+              final pendingCount = pendingCtrl.pendingCount.value;
+              debugPrint("🏠 [HOME] Checking blue box visibility");
+              debugPrint("🏠 [HOME] pendingCount = $pendingCount");
+              //SHOW ONLY WHEN PENDING INSTALLMENTS EXIST
+              if (pendingCount <= 0) {
+                debugPrint(
+                    "🚫 [HOME] No pending installments → hiding blue box");
                 return const SizedBox.shrink();
               }
 
+              final data = investmentController.overview.value;
+              debugPrint(
+                  "✅ [HOME] Pending installment exists → showing blue box");
+              debugPrint("📊 [HOME] remainingDays = ${data.remainingDays}");
+              debugPrint("📊 [HOME] progressPercent = ${data.progressPercent}");
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
                     InvestmentStatusCard(
-                      balanceAmount: data.totalRemainingAmount.toInt(),
+                      balanceAmount: pendingCtrl.totalAmount.value,
                       daysLeft: data.remainingDays,
                       progress: data.progressPercent / 100,
-                      onPayNow: () => Get.to(PendingTransaction()),
+                      onPayNow: () => Get.to(() => PendingTransaction()),
                     ),
                     SizedBox(height: 10.h),
                   ],

@@ -22,7 +22,7 @@ class PendingTransaction extends StatelessWidget {
     final PendingTransactionController controller =
         Get.find<PendingTransactionController>();
 
-    Get.find<MyWalletController>();
+    Get.find<MyWalletController>().fetchWallet();
 
     return Scaffold(
       backgroundColor: AppColors.paperColor,

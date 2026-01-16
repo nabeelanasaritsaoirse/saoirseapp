@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../constants/app_colors.dart';
+import '../screens/product_details/product_details_binding.dart';
 import '../screens/product_details/product_details_screen.dart';
 import 'app_text.dart';
 
@@ -42,8 +43,12 @@ class _ProductCardState extends State<ProductCard> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => Get.to(
-        () => ProductDetailsScreen(productId: widget.productId, id: widget.id),
-      ),
+          () => ProductDetailsScreen(
+                productId: widget.productId,
+                id: widget.id,
+              ),
+          binding: ProductDetailsBinding(
+              productId: widget.productId, id: widget.id)),
       child: Container(
         width: 150.w,
         margin: widget.margin ?? EdgeInsets.only(right: 10.w),

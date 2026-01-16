@@ -40,6 +40,11 @@ class AllController extends Bindings {
       () => LoginController(),
       fenix: true,
     );
+    // 💳 WALLET & PAYMENTS
+    Get.lazyPut<MyWalletController>(
+      () => MyWalletController(),
+      fenix: true,
+    );
     // Get.lazyPut<VerifyOtpController>(
     //     () => VerifyOtpController(phoneNumber: '', referral: '', username: ''));
     Get.lazyPut<ProfileController>(
@@ -110,11 +115,6 @@ class AllController extends Bindings {
       fenix: true,
     );
 
-    // 💳 WALLET & PAYMENTS
-    Get.lazyPut<MyWalletController>(
-      () => MyWalletController(),
-      fenix: true,
-    );
     Get.lazyPut<WithdrawController>(
       () => WithdrawController(),
       fenix: true,

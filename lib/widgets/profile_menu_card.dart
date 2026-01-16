@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../constants/app_colors.dart';
 import 'app_text.dart';
@@ -41,11 +42,11 @@ class ProfileMenuCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: 45.w,
-                  height: 45.h,
-                  child: Image.asset(
+                  width: 47.w,
+                  height: 47.h,
+                  child: SvgPicture.asset(
                     icon,
-                    fit: BoxFit.contain,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 SizedBox(height: 3.h),

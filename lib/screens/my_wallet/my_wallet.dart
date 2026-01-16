@@ -22,7 +22,15 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
-  final controller = Get.find<MyWalletController>();
+  final MyWalletController controller = Get.find<MyWalletController>();
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.refreshAll(); // ✅ SAFE
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

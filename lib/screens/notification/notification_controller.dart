@@ -280,6 +280,25 @@ class NotificationController extends GetxController {
     } else {}
   }
 
+  Future<void> sendPendingPaymentConfirmation(String userName) async {
+    if (!hasToken) {
+      return;
+    }
+
+    final success = await service.sendCustomNotification(
+      title: "Payment Received",
+      message: "Your installment has been paid.",
+      sendPush: true,
+      sendInApp: true,
+    );
+
+    if (success) {
+      /// refresh notifications
+      refreshNotifications();
+      fetchUnreadCount();
+    } else {}
+  }
+
   /// 🚨 Send Only Push Notification (Urgent Alert)
   Future<void> sendUrgentAlert() async {
     if (!hasToken) {

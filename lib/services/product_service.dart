@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -7,7 +9,9 @@ import '../models/product_list_response.dart';
 import 'api_service.dart';
 
 class ProductService {
-  final token = storage.read(AppConst.ACCESS_TOKEN);
+  Future<String?> _token() async {
+    return storage.read(AppConst.ACCESS_TOKEN);
+  }
 
   Future<ProductDetailsData?> fetchProductDetails(String productId) async {
     final url = "${AppURLs.PRODUCT_DETAILS_API}$productId";
@@ -58,6 +62,9 @@ class ProductService {
     String? categoryId, // new
   }) async {
     try {
+      final token = await _token();
+
+      debugPrint("🛒 [PRODUCT API] token = $token");
       final query = <String>[];
       query.add('page=$page');
       query.add('limit=$limit');
@@ -86,6 +93,9 @@ class ProductService {
   // Fetch investment plans for a product
   Future<List<PlanModel>> fetchProductPlans(String productId) async {
     try {
+      final token = await _token();
+
+      debugPrint("🛒 [PRODUCT API] token = $token");
       final url = "${AppURLs.PRODUCT_PLAN_API}$productId/plans";
 
       final response = await APIService.getRequest(
