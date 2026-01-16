@@ -19,24 +19,22 @@ class MyWalletController extends GetxController {
   /// Internal counters to avoid loader flicker
   int _apiCallCount = 0;
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchWallet();
-    fetchWalletTransactions();
-  }
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   fetchWallet();
+  //   fetchWalletTransactions();
+  // }
 
   Future<void> refreshAll() async {
-    if (isLoading.value) return; // prevent double refresh
+    if (isLoading.value) return;
+
+    errorMessage.value = '';
+    isLoading.value = true;
 
     try {
-      isLoading.value = true;
-      errorMessage.value = '';
-
-      await Future.wait([
-        fetchWallet(forceRefresh: true),
-        fetchWalletTransactions(),
-      ]);
+      await fetchWallet(forceRefresh: true);
+      await fetchWalletTransactions();
     } catch (e) {
       errorMessage.value = "Failed to refresh wallet";
     } finally {

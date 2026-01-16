@@ -10,11 +10,15 @@ import 'api_service.dart';
 class CartService {
   // Fetch cart details
 
-  final token = storage.read(AppConst.ACCESS_TOKEN);
+  Future<String?> _token() async {
+    return storage.read(AppConst.ACCESS_TOKEN);
+  }
 
   Future<CartResponse?> fetchCart() async {
     final url = AppURLs.GET_FULL_CART;
     try {
+      final token = await _token();
+      if (token == null || token.isEmpty) return null;
       final response = await APIService.getRequest(
         url: url,
         onSuccess: (json) => json,
@@ -41,6 +45,8 @@ class CartService {
     int quantity = 1,
   }) async {
     try {
+      final token = await _token();
+      if (token == null || token.isEmpty) return null;
       final url = "${AppURLs.ADD_TO_CART}$productId";
 
       final body = {
@@ -69,6 +75,8 @@ class CartService {
   // Clear cart
   Future<bool> clearCart() async {
     try {
+      final token = await _token();
+      if (token == null || token.isEmpty) return false;
       final response = await APIService.deleteRequest(
         url: AppURLs.CLEAR_CART,
         onSuccess: (json) => json,
@@ -89,6 +97,8 @@ class CartService {
   // Remove item from cart
   Future<RemoveCartItemResponse?> removeItemCart(String productId) async {
     try {
+      final token = await _token();
+      if (token == null || token.isEmpty) return null;
       final url = "${AppURLs.REMOVE_FROM_CART}$productId";
 
       final response = await APIService.deleteRequest(
@@ -111,6 +121,8 @@ class CartService {
   // Get cart item count
   Future<CartCountResponse?> getCartCount() async {
     try {
+      final token = await _token();
+      if (token == null || token.isEmpty) return null;
       final response = await APIService.getRequest(
         url: AppURLs.GET_CART_COUNT,
         onSuccess: (json) => json,
@@ -133,6 +145,8 @@ class CartService {
     final url = AppURLs.UPDATE_CART + productId;
 
     try {
+      final token = await _token();
+      if (token == null || token.isEmpty) return null;
       final response = await APIService.putRequest(
         url: url,
         onSuccess: (json) => json,

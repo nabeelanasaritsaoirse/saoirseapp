@@ -6,5 +6,5 @@ class AppConst {
   static String ACCESS_TOKEN = 'Access Token';
   static String REFRESH_TOKEN = 'Refresh Token';
   static String REFERRAL_CODE = 'Referral Code';
-  
+  static String CACHE_CLEANUP = 'Cache Cleanup';
 }

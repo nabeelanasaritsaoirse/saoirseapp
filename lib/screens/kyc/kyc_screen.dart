@@ -202,8 +202,6 @@ class NotSubmittedUI extends StatelessWidget {
               )),
           SizedBox(height: 20.h),
 
-          SizedBox(height: 20.h),
-
           // ---------------- AADHAAR ----------------
           Obx(() => controller.aadhaarSelected.value
               ? aadhaarSection(controller)
@@ -214,13 +212,37 @@ class NotSubmittedUI extends StatelessWidget {
               ? panSection(controller)
               : const SizedBox()),
 
+          SizedBox(height: 10.h),
+
+// ================= CONSENT CHECKBOXES =================
+
+          Obx(() => Column(
+                children: [
+                  consentCkeckBox(
+                    "I declare that the information and documents provided are true and correct.",
+                    controller.consentInfoCorrect,
+                    controller.consentError.value,
+                  ),
+                  consentCkeckBox(
+                    "I consent to the use of my PAN and Aadhaar details for KYC verification.",
+                    controller.consentUsePanAadhaar,
+                    controller.consentError.value,
+                  ),
+                ],
+              )),
+
           SizedBox(height: 20.h),
+
+          // ---------------- SUBMIT BUTTON ----------------
 
           Obx(() => appButton(
                 buttonText:
                     controller.isLoading.value ? "Uploading..." : "Submit KYC",
                 buttonColor: AppColors.primaryColor,
-                onTap: controller.uploadDocuments,
+                onTap: () {
+                  if (!controller.validateConsents()) return;
+                  controller.uploadDocuments();
+                },
               )),
         ],
       ),
@@ -306,11 +328,6 @@ Widget panSection(KycController controller) {
         ),
       ),
       SizedBox(height: 10.h),
-      // imagePicker(
-      //   label: "PAN Front",
-      //   image: controller.panFront,
-      //   onTap: () => controller.pickImage(ImageSource.gallery, controller.panFront),
-      // ),
       Obx(() => Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.r),
@@ -329,7 +346,6 @@ Widget panSection(KycController controller) {
               ),
             ),
           )),
-
       SizedBox(height: 20.h),
     ],
   );
@@ -584,4 +600,43 @@ String? panValidator(String? value) {
   }
 
   return null;
+}
+
+// ==========================================================
+// CONSENT CHECKBOX TILE WITH ERROR HIGHLIGHT
+// ==========================================================
+Widget consentCkeckBox(
+  String text,
+  RxBool value,
+  bool showError,
+) {
+  return Obx(() => Padding(
+        padding: EdgeInsets.symmetric(vertical: 6.h),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            // CHECKBOX
+            Checkbox(
+              value: value.value,
+              onChanged: (_) => value.toggle(),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
+            ),
+
+            SizedBox(width: 10.w),
+
+            // TEXT
+            Expanded(
+              child: appText(
+                text,
+                textAlign: TextAlign.left,
+                fontSize: 13.sp,
+                height: 1.4,
+                color: AppColors.black,
+              ),
+            ),
+          ],
+        ),
+      ));
 }

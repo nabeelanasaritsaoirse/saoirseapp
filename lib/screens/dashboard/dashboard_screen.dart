@@ -43,10 +43,7 @@ class DashboardScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
-        body: SafeArea(
-          bottom: false,
-          child: Obx(() => pages[controller.selectedIndex.value]),
-        ),
+        body: Obx(() => pages[controller.selectedIndex.value]),
         bottomNavigationBar: Obx(
           () => Container(
             decoration: BoxDecoration(

@@ -9,9 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-import 'package:http/http.dart' as http;
-
 import '../screens/onboard/onboard_screen.dart';
+
+import 'package:http/http.dart' as http;
 
 class APIService {
   static bool internet = false;
@@ -38,7 +38,9 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-
+        // log("request Url =====> : $url");
+        // log("BODY ====> $body");
+        // log(response.body);
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -46,7 +48,7 @@ class APIService {
             if (data is! Map<String, dynamic>) {
               return null;
             }
-            return onSuccess(data); // ✅ stop retry on success
+            return onSuccess(data);
 
           case 204:
             return null;
@@ -120,7 +122,8 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-
+        //    log("request Url =====> : $url");
+        // log("Response body :${response.body}");
         switch (response.statusCode) {
           case 200:
           case 201:

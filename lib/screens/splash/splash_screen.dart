@@ -20,7 +20,12 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   //navigation
-  void _splashScreen() {
+  Future<void> _splashScreen() async {
+    bool cacheCleanUp = storage.read(AppConst.CACHE_CLEANUP) ?? false;
+    if (!cacheCleanUp) {
+      await storage.erase();
+      await storage.write(AppConst.CACHE_CLEANUP, true);
+    }
     bool isLogin = !(storage.read(AppConst.USER_ID) == null);
 
     print("✔ SAVED userId: ${storage.read(AppConst.USER_ID)}");
@@ -46,16 +51,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: AppColors.primaryColor,
-        body: Center(
-          child: Image.asset(
-            AppAssets.app_logo,
-            height: 250.h,
-            width: Get.width,
-            fit: BoxFit.contain,
-          ),
+    return Scaffold(
+      backgroundColor: AppColors.primaryColor,
+      body: Center(
+        child: Image.asset(
+          AppAssets.app_logo,
+          height: 250.h,
+          width: Get.width,
+          fit: BoxFit.contain,
         ),
       ),
     );

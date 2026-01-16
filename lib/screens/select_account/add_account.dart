@@ -208,7 +208,6 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
                 onTap: () {
                   if (_formKey.currentState!.validate()) {
                     controller.saveAccount();
-                    controller.fetchAccounts();
                   }
                 },
               ),
