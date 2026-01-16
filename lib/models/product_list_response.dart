@@ -14,9 +14,7 @@ class ProductListResponse {
       success: json["success"] ?? false,
       data: json["data"] == null
           ? []
-          : (json["data"] as List)
-              .map((e) => Product.fromJson(e))
-              .toList(),
+          : (json["data"] as List).map((e) => Product.fromJson(e)).toList(),
       pagination: Pagination.fromJson(json["pagination"] ?? {}),
     );
   }
@@ -70,9 +68,7 @@ class Product {
       hasVariants: json["hasVariants"] ?? false,
       variants: json["variants"] == null
           ? []
-          : (json["variants"] as List)
-              .map((e) => Variant.fromJson(e))
-              .toList(),
+          : (json["variants"] as List).map((e) => Variant.fromJson(e)).toList(),
       images: json["images"] == null
           ? []
           : (json["images"] as List)
@@ -150,8 +146,9 @@ class Pricing {
   factory Pricing.fromJson(Map<String, dynamic> json) {
     return Pricing(
       // API sometimes sends double → convert safely to int
-      regularPrice:
-          (json["regularPrice"] is num) ? (json["regularPrice"] as num).round() : 0,
+      regularPrice: (json["regularPrice"] is num)
+          ? (json["regularPrice"] as num).round()
+          : 0,
       salePrice:
           (json["salePrice"] is num) ? (json["salePrice"] as num).round() : 0,
       finalPrice:
@@ -237,11 +234,3 @@ class Pagination {
     );
   }
 }
-
-
-
-
-
-
-
-
