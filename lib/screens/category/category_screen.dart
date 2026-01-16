@@ -166,7 +166,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
               return GestureDetector(
                 onTap: () {
-                  Get.to(() => SubCategoryScreen(category: category));
+                  category.subCategories.isEmpty
+                      ? Get.to(
+                          () => const ProductListing(),
+                          arguments: {'categoryId': category.id},
+                        )
+                      : Get.to(() => SubCategoryScreen(category: category));
                 },
                 child: Column(
                   children: [

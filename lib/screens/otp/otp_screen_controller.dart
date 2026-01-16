@@ -86,10 +86,7 @@ class VerifyOtpController extends GetxController {
     storage.write(AppConst.ACCESS_TOKEN, data.accessToken);
     storage.write(AppConst.REFRESH_TOKEN, data.refreshToken);
     storage.write(AppConst.REFERRAL_CODE, data.referralCode);
-    storage.write(AppConst.USER_NAME, data.name);
-    if (Get.isRegistered<HomeController>()) {
-      Get.find<HomeController>().loadUserName();
-    }
+    storage.write(AppConst.USER_NAME, username);
 
     /// STEP 3 — Update profile (deviceToken, referral, username, phone)
     final notif = Get.find<NotificationController>();
@@ -103,9 +100,15 @@ class VerifyOtpController extends GetxController {
     );
 
     if (!updated) {
+      storage.write(AppConst.USER_NAME, data.name);
       isLoading.value = false;
       return;
     }
+
+    if (Get.isRegistered<HomeController>()) {
+      Get.find<HomeController>().loadUserName();
+    }
+
     if (referral.isNotEmpty) {
       await Get.find<LoginController>().applyReferral(referral);
 
