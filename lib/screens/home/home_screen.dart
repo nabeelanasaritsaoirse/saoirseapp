@@ -322,6 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Get.isRegistered<PendingTransactionController>()
                       ? Get.find<PendingTransactionController>()
                       : Get.put(PendingTransactionController());
+              pendingCtrl.getPendingTransactions();
               final pendingCount = pendingCtrl.pendingCount.value;
               debugPrint("🏠 [HOME] Checking blue box visibility");
               debugPrint("🏠 [HOME] pendingCount = $pendingCount");

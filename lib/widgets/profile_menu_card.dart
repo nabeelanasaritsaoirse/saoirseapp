@@ -42,8 +42,8 @@ class ProfileMenuCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: 45.w,
-                  height: 45.h,
+                  width: 47.w,
+                  height: 47.h,
                   child: SvgPicture.asset(
                     icon,
                     fit: BoxFit.cover,
