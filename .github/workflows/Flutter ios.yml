@@ -729,18 +729,28 @@ jobs:
             exit 1
           fi
 
-      - name: 🚀 Upload to TestFlight
-        run: |
-          echo "🚀 Starting TestFlight upload..."
-          echo "   Version: ${{ needs.ios-ci.outputs.version_name }}"
-          echo "   Build: ${{ needs.ios-ci.outputs.build_number }}"
+      # - name: 🚀 Upload to TestFlight
+      #   run: |
+      #     echo "🚀 Starting TestFlight upload..."
+      #     echo "   Version: ${{ needs.ios-ci.outputs.version_name }}"
+      #     echo "   Build: ${{ needs.ios-ci.outputs.build_number }}"
           
-          fastlane pilot upload \
+      #     fastlane pilot upload \
+      #       --api_key_path api_key.json \
+      #       --ipa build/ios/ipa/*.ipa \
+      #       --skip_waiting_for_build_processing \
+      #       --changelog "Build ${{ needs.ios-ci.outputs.build_number }}: Automated CI/CD deployment" \
+      #       --distribute_external false
+
+      - name: 🚀 Upload to App Store (No TestFlight)
+        run: |
+          fastlane deliver \
             --api_key_path api_key.json \
             --ipa build/ios/ipa/*.ipa \
-            --skip_waiting_for_build_processing \
-            --changelog "Build ${{ needs.ios-ci.outputs.build_number }}: Automated CI/CD deployment" \
-            --distribute_external false
+            --skip_metadata \
+            --skip_screenshots \
+            --force \
+            --automatic_release false
 
       - name: ✅ Deployment Complete
         run: |
