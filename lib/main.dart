@@ -11,6 +11,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'bindings/allcontroller.dart';
@@ -95,6 +96,13 @@ class _BootstrapAppState extends State<BootstrapApp> {
       /// -----------------------------
       await Firebase.initializeApp();
       log("✅ Firebase initialized");
+
+      /// -----------------------------
+      /// CRASHLYTICS
+      /// -----------------------------
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+      log("✅ Crashlytics initialized");
 
       FirebaseMessaging.onBackgroundMessage(
         firebaseMessagingBackgroundHandler,
