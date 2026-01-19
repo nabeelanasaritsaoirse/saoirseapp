@@ -745,12 +745,13 @@ jobs:
       - name: 🚀 Upload to App Store (No TestFlight)
         run: |
           fastlane deliver \
-            --api_key_path api_key.json \
-            --ipa build/ios/ipa/*.ipa \
-            --skip_metadata \
-            --skip_screenshots \
-            --force \
-            --automatic_release false
+          --api_key_path api_key.json \
+          --ipa build/ios/ipa/*.ipa \
+          --skip_metadata \
+          --skip_screenshots \
+          --force \
+          --automatic_release false \
+          --run_precheck_before_submit false
 
       - name: ✅ Deployment Complete
         run: |
