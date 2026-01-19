@@ -12,7 +12,7 @@ class OrderDeliveredScreen extends StatelessWidget {
   OrderDeliveredScreen({super.key});
 
   final OrderDeliveredController controller =
-      Get.put(OrderDeliveredController());
+      Get.find<OrderDeliveredController>();
 
   @override
   Widget build(BuildContext context) {

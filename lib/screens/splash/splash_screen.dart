@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,13 +19,21 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  //navigation
+  Future<void> _splashScreen() async {
+    bool cacheCleanUp = storage.read(AppConst.CACHE_CLEANUP) ?? false;
+    if (!cacheCleanUp) {
+      await storage.erase();
+      await storage.write(AppConst.CACHE_CLEANUP, true);
+    }
+    bool isLogin = !(storage.read(AppConst.USER_ID) == null);
 
-  void _navigate() {
-    final bool isLogin = storage.read(AppConst.USER_ID) != null;
+    print("✔ SAVED userId: ${storage.read(AppConst.USER_ID)}");
+    print("✔ SAVED accessToken: ${storage.read(AppConst.ACCESS_TOKEN)}");
+    print("✔ SAVED refreshToken: ${storage.read(AppConst.REFRESH_TOKEN)}");
+    print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
 
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!mounted) return;
-
+    Future.delayed(const Duration(seconds: 2), () async {
       if (isLogin) {
         Get.offAll(() => DashboardScreen());
       } else {
@@ -38,37 +46,19 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    /// 🔑 CRITICAL FOR iOS
-    /// Wait until first frame is rendered
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _navigate();
-    });
+    _splashScreen();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
-      body: SafeArea(
-        child: Center(
-          child: Image.asset(
-            AppAssets.app_logo,
-            height: 250.h,
-            width: Get.width,
-            fit: BoxFit.contain,
-
-            /// 🛡 SAFETY: prevents crash if asset fails
-            errorBuilder: (_, __, ___) {
-              return const Text(
-                "EPI",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
-              );
-            },
-          ),
+      body: Center(
+        child: Image.asset(
+          AppAssets.app_logo,
+          height: 250.h,
+          width: Get.width,
+          fit: BoxFit.contain,
         ),
       ),
     );

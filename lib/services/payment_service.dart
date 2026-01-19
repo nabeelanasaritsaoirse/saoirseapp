@@ -1,8 +1,5 @@
-import 'dart:developer';
-
-import 'package:saoirse_app/models/add_money_order_model.dart';
-
 import '../constants/app_urls.dart';
+import '../models/add_money_order_model.dart';
 import '../services/api_service.dart';
 import '../main.dart';
 import '../constants/app_constant.dart';
@@ -12,8 +9,6 @@ class PaymentService {
       Map<String, dynamic> body) async {
     try {
       final token = await storage.read(AppConst.ACCESS_TOKEN);
-
-      log("Processing Payment => $body");
 
       final response = await APIService.postRequest<Map<String, dynamic>>(
         url: AppURLs.PAYMENT_PROCESS_API,
@@ -27,36 +22,32 @@ class PaymentService {
 
       return response;
     } catch (e) {
-      log("Payment Process Error: $e");
       return null;
     }
   }
 
   // For add money For Wallet
- static Future<AddMoneyOrderModel?> addMoney(Map<String, dynamic> body) async {
-  try {
-    final token = await storage.read(AppConst.ACCESS_TOKEN);
+  static Future<AddMoneyOrderModel?> addMoney(Map<String, dynamic> body) async {
+    try {
+      final token = await storage.read(AppConst.ACCESS_TOKEN);
 
-    final response = await APIService.postRequest<Map<String, dynamic>>(
-      url: AppURLs.ADD_MONEY_WALLET,
-      body: body,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      onSuccess: (data) => data,
-    );
+      final response = await APIService.postRequest<Map<String, dynamic>>(
+        url: AppURLs.ADD_MONEY_WALLET,
+        body: body,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        onSuccess: (data) => data,
+      );
 
-    if (response == null) return null;
+      if (response == null) return null;
 
-    return AddMoneyOrderModel.fromJson(response);
-
-  } catch (e) {
-    log("Add Money Error: $e");
-    return null;
+      return AddMoneyOrderModel.fromJson(response);
+    } catch (e) {
+      return null;
+    }
   }
-}
-
 
 // STEP 2: Verify Wallet Add Money Payment
   static Future<Map<String, dynamic>?> verifyWalletPayment(
@@ -65,7 +56,7 @@ class PaymentService {
       final token = await storage.read(AppConst.ACCESS_TOKEN);
 
       return await APIService.postRequest<Map<String, dynamic>>(
-        url: "https://api.epielio.com/api/wallet/verify-payment",
+        url: AppURLs.VERIFY_PAYMENT,
         body: body,
         headers: {
           "Authorization": "Bearer $token",
@@ -74,8 +65,22 @@ class PaymentService {
         onSuccess: (data) => data,
       );
     } catch (e) {
-      log("Wallet Verify Payment Error: $e");
       return null;
     }
+  }
+
+  static Future<Map<String, dynamic>?> verifyBulkOrderPayment(
+      Map<String, dynamic> body) async {
+    final token = await storage.read(AppConst.ACCESS_TOKEN);
+
+    return await APIService.postRequest<Map<String, dynamic>>(
+      url: AppURLs.PAYMENT_VERIFY_API,
+      body: body,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (data) => data,
+    );
   }
 }

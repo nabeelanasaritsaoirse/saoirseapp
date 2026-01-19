@@ -1,10 +1,13 @@
-// ignore_for_file: avoid_print
-
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../constants/app_constant.dart';
+import '../../main.dart';
 import '../../models/cart_response_model.dart';
+import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
 import '../../services/cart_service.dart';
+import '../../services/product_service.dart';
 import '../../widgets/app_toast.dart';
 
 class CartController extends GetxController {
@@ -12,15 +15,35 @@ class CartController extends GetxController {
 
   var cartData = Rxn<CartData>();
   var isLoading = false.obs;
+
   var errorMessage = ''.obs;
-  double get totalAmount => cartData.value?.totalPrice ?? 0;
+  // double get totalAmount => cartData.value?.totalPrice ?? 0;
   var cartCount = 0.obs;
+  // inside CartController
+  RxBool isCartPlanApplied = false.obs;
+  RxBool isAddToCartLoading = false.obs;
+
+  /// Custom plan values
+  RxInt customDays = 0.obs;
+  RxDouble customAmount = 0.0.obs;
+  RxList<PlanModel> plans = <PlanModel>[].obs;
+  RxInt selectedPlanIndex = (-1).obs;
+
+  /// Cart plan config
+  final int minimumDays = 5;
+  bool isUpdating = false;
 
   @override
   void onInit() {
-    fetchCart();
-    fetchCartCount();
     super.onInit();
+
+    storage.listenKey(AppConst.ACCESS_TOKEN, (value) {
+      if (value != null && value.toString().isNotEmpty) {
+        debugPrint("🟢 [CART] Token available → refetching cart");
+        fetchCart();
+        fetchCartCount();
+      }
+    });
   }
 
   // Fetch cart from API
@@ -38,9 +61,8 @@ class CartController extends GetxController {
 
       cartData.value = response.data;
 
-      print("=== CART LOADED ===");
-      print("Total Items: ${response.data.totalItems}");
-      print("Total Price: ${response.data.totalPrice}");
+      // 🔥 REAPPLY PLAN IF EXISTS
+      reapplyCartPlanIfNeeded();
     } catch (e) {
       errorMessage("Error: $e");
     } finally {
@@ -48,15 +70,14 @@ class CartController extends GetxController {
     }
   }
 
-  // Increase quantity and update API
+  // -------------------- QUANTITY --------------------
+
   void increaseQty(int index) async {
     final product = cartData.value!.products[index];
     final newQty = product.quantity + 1;
-    print("Increasing qty for: ${product.productId}");
-    print("Old qty: ${product.quantity}, New qty: $newQty");
 
     final response = await service.updateCartQty(product.productId, newQty);
-    print("API Response: $response");
+
     if (response == null) {
       appToast(content: "Unable to update quantity", error: true);
       return;
@@ -65,8 +86,10 @@ class CartController extends GetxController {
     if (response['success'] == true) {
       product.quantity = newQty;
       cartData.refresh();
-      fetchCart();
-      fetchCartCount(); // refresh total
+      fetchCartCount();
+
+      // 🔥 IMMEDIATELY RECALCULATE PLAN
+      reapplyCartPlanIfNeeded();
     } else {
       appToast(content: response["message"], error: true);
     }
@@ -76,18 +99,14 @@ class CartController extends GetxController {
   void decreaseQty(int index) async {
     final product = cartData.value!.products[index];
     final newQty = product.quantity - 1;
-    print("Decreasing qty for: ${product.productId}");
-    print("Old qty: ${product.quantity}, New qty: $newQty");
-    // If quantity becomes 0 → remove item
+
     if (newQty < 1) {
-      print("Quantity reached 0 → Removing product from cart");
-      // CALL REMOVE API
       await removeCartItem(product.productId);
       return;
     }
 
     final response = await service.updateCartQty(product.productId, newQty);
-    print("API Response: $response");
+
     if (response == null) {
       appToast(content: "Unable to update quantity", error: true);
       return;
@@ -96,28 +115,38 @@ class CartController extends GetxController {
     if (response['success'] == true) {
       product.quantity = newQty;
       cartData.refresh();
-      fetchCart();
       fetchCartCount();
+
+      // 🔥 IMMEDIATELY RECALCULATE PLAN
+      reapplyCartPlanIfNeeded();
     } else {
       appToast(content: response["message"], error: true);
     }
   }
 
   // -------------------- ADD TO CART --------------------
+
   Future<void> addProductToCart({
     required String productId,
     required String? variantId,
-    required int days,
-    required double dailyAmount,
   }) async {
+    if (isAddToCartLoading.value) return;
+
     try {
-      isLoading(true);
+      final token = storage.read(AppConst.ACCESS_TOKEN);
+
+      if (token == null || token.isEmpty) {
+        appToast(content: "Please login to add items to cart", error: true);
+        return;
+      }
+
+      isAddToCartLoading(true);
+
+      debugPrint("ADD TO CART API CALLING...");
 
       final response = await service.addToCart(
         productId: productId,
         variantId: variantId,
-        totalDays: days,
-        dailyAmount: dailyAmount,
         quantity: 1,
       );
 
@@ -128,19 +157,19 @@ class CartController extends GetxController {
 
       if (response.success) {
         appToaster(content: response.message);
-        fetchCart();
-        fetchCartCount();
+        await fetchCart();
+        await fetchCartCount();
       } else {
         appToast(content: response.message, error: true);
       }
     } catch (e) {
       appToast(content: "Error: $e", error: true);
     } finally {
-      isLoading(false);
+      isAddToCartLoading(false);
     }
   }
 
-  // Clear cart
+  // -------------------- CLEAR CART --------------------
   Future<void> clearCartItems() async {
     try {
       if (cartData.value == null || cartData.value!.products.isEmpty) {
@@ -175,7 +204,7 @@ class CartController extends GetxController {
     }
   }
 
-  // Remove item from cart
+  // -------------------- REMOVE ITEM --------------------
   Future<void> removeCartItem(String productId) async {
     try {
       isLoading(true);
@@ -207,23 +236,199 @@ class CartController extends GetxController {
     }
   }
 
-  // Fetch cart count
+  void updateProductWithPlan({
+    required String productId,
+    required int quantity,
+    required InstallmentPlan plan,
+  }) {
+    final index = cartData.value!.products.indexWhere(
+      (p) => p.productId == productId,
+    );
+
+    if (index == -1) return;
+
+    final product = cartData.value!.products[index];
+
+    cartData.value!.products[index] = product.copyWith(
+      quantity: quantity,
+      installmentPlan: plan,
+    );
+
+    cartData.refresh();
+  }
+
+  void updateProductPlan({
+    required String productId,
+    required int days,
+    required double dailyAmount,
+  }) {
+    final index = cartData.value!.products.indexWhere(
+      (p) => p.productId == productId,
+    );
+
+    if (index == -1) return;
+
+    final product = cartData.value!.products[index];
+
+    final updatedPlan = product.installmentPlan.copyWith(
+      totalDays: days,
+      dailyAmount: dailyAmount,
+      totalAmount: days * dailyAmount,
+    );
+
+    cartData.value!.products[index] =
+        product.copyWith(installmentPlan: updatedPlan);
+
+    cartData.refresh(); // 🔥 important
+  }
+
+  // -------------------- CART COUNT --------------------//
   Future<void> fetchCartCount() async {
-    try {
-      final response = await service.getCartCount();
+    final response = await service.getCartCount();
 
-      print("Fetching Cart Count...");
+    if (response != null && response.success) {
+      cartCount.value = response.count;
+    } else {}
+  }
 
-      if (response != null && response.success) {
-        cartCount.value = response.count;
+  // -------------------- TOTAL AMOUNT --------------------
+  double get totalAmount {
+    if (cartData.value == null) return 0;
 
-        print("Cart Count Updated: ${response.count}");
-      } else {
-        print(" Failed to fetch cart count!");
-      }
-    } catch (e) {
-      print("Count fetch error: $e");
+    return cartData.value!.products.fold(
+      0,
+      (sum, item) => sum + (item.finalPrice * item.quantity),
+    );
+  }
+
+  // -------------------- LOAD PRODUCT PLANS --------------------
+  Future loadPlans(String productId) async {
+    isLoading.value = true;
+    final result = await ProductService().fetchProductPlans(productId);
+    plans.assignAll(result);
+    isLoading.value = false;
+  }
+
+  void selectApiPlan(int index) {
+    selectedPlanIndex.value = index;
+    final plan = plans[index];
+    customDays.value = plan.days;
+    customAmount.value = plan.perDayAmount;
+  }
+
+  void resetPlanSelection() {
+    selectedPlanIndex.value = -1;
+    customDays.value = 0;
+    customAmount.value = 0.0;
+  }
+
+  Map<String, dynamic> getSelectedPlan() {
+    if (selectedPlanIndex.value != -1) {
+      final plan = plans[selectedPlanIndex.value];
+      return {
+        "days": plan.days,
+        "amount": plan.perDayAmount,
+      };
     }
+
+    return {
+      "days": customDays.value,
+      "amount": customAmount.value,
+    };
+  }
+
+  void setCustomPlan(int days, double amount) {
+    customDays.value = days;
+    customAmount.value = amount;
+    selectedPlanIndex.value = -1;
+  }
+
+  // ===================== CART PLAN CORE LOGIC =====================
+
+  void updateCartAmountFromDays(
+    TextEditingController daysController,
+    TextEditingController amountController,
+  ) {
+    if (isUpdating) return;
+    isUpdating = true;
+
+    final int days = int.tryParse(daysController.text.trim()) ?? 0;
+
+    if (days <= 0) {
+      amountController.text = "";
+      isUpdating = false;
+      return;
+    }
+
+    final double perDay = totalAmount / days;
+    amountController.text = perDay.toStringAsFixed(2);
+
+    isUpdating = false;
+  }
+
+  void updateCartDaysFromAmount(
+    TextEditingController daysController,
+    TextEditingController amountController,
+  ) {
+    if (isUpdating) return;
+    isUpdating = true;
+
+    final double perDay = double.tryParse(amountController.text.trim()) ?? 0;
+
+    if (perDay <= 0) {
+      daysController.text = "";
+      isUpdating = false;
+      return;
+    }
+
+    final int days = (totalAmount / perDay).round();
+    daysController.text = days.toString();
+
+    isUpdating = false;
+  }
+
+  void applyCartPlan(double perDayAmount) {
+    customAmount.value = perDayAmount;
+    isCartPlanApplied.value = true;
+
+    // ✅ CART-LEVEL DAYS (always ceil + minDays)
+    int cartDays = (totalAmount / perDayAmount).ceil();
+    if (cartDays < minimumDays) {
+      cartDays = minimumDays;
+    }
+    customDays.value = cartDays;
+
+    final products = cartData.value!.products;
+
+    for (int i = 0; i < products.length; i++) {
+      final product = products[i];
+
+      // 🔥 USE PRICE * QUANTITY
+      final double productTotal = product.finalPrice * product.quantity;
+
+      int days = (productTotal / perDayAmount).ceil();
+      if (days < minimumDays) {
+        days = minimumDays;
+      }
+
+      final double adjustedPerDay = productTotal / days;
+
+      products[i] = product.copyWith(
+        installmentPlan: InstallmentPlan(
+          totalDays: days,
+          dailyAmount: adjustedPerDay,
+          totalAmount: productTotal,
+        ),
+      );
+    }
+
+    cartData.refresh();
+  }
+
+  void reapplyCartPlanIfNeeded() {
+    if (!isCartPlanApplied.value || customAmount.value <= 0) return;
+
+    applyCartPlan(customAmount.value);
   }
 
   ProductDetailsData convertCartToProductDetails(CartProduct item) {

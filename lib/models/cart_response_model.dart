@@ -94,16 +94,36 @@ class CartProduct {
       stock: json['stock'] ?? 0,
       isActive: json['isActive'] ?? false,
       quantity: json['quantity'] ?? 1,
-
       variant:
           json['variant'] != null ? Variant.fromJson(json['variant']) : null,
-
-      installmentPlan:
-          InstallmentPlan.fromJson(json['installmentPlan'] ?? {}),
-
+      installmentPlan: InstallmentPlan.fromJson(json['installmentPlan'] ?? {}),
       addedAt: json['addedAt'] ?? "",
       updatedAt: json['updatedAt'] ?? "",
       itemTotal: (json['itemTotal'] ?? 0).toDouble(),
+    );
+  }
+
+  CartProduct copyWith({
+    InstallmentPlan? installmentPlan,
+    int? quantity,
+    double? itemTotal,
+  }) {
+    return CartProduct(
+      productId: productId,
+      name: name,
+      brand: brand,
+      price: price,
+      finalPrice: finalPrice,
+      discount: discount,
+      images: images,
+      stock: stock,
+      isActive: isActive,
+      quantity: quantity ?? this.quantity,
+      variant: variant,
+      installmentPlan: installmentPlan ?? this.installmentPlan,
+      addedAt: addedAt,
+      updatedAt: updatedAt,
+      itemTotal: itemTotal ?? this.itemTotal,
     );
   }
 }
@@ -157,6 +177,26 @@ class VariantAttributes {
   }
 }
 
+// class InstallmentPlan {
+//   final int totalDays;
+//   final double dailyAmount;
+//   final double totalAmount;
+
+//   InstallmentPlan({
+//     required this.totalDays,
+//     required this.dailyAmount,
+//     required this.totalAmount,
+//   });
+
+//   factory InstallmentPlan.fromJson(Map<String, dynamic> json) {
+//     return InstallmentPlan(
+//       totalDays: json['totalDays'] ?? 0,
+//       dailyAmount: (json['dailyAmount'] ?? 0).toDouble(),
+//       totalAmount: (json['totalAmount'] ?? 0).toDouble(),
+//     );
+//   }
+// }
+
 class InstallmentPlan {
   final int totalDays;
   final double dailyAmount;
@@ -167,6 +207,18 @@ class InstallmentPlan {
     required this.dailyAmount,
     required this.totalAmount,
   });
+
+  InstallmentPlan copyWith({
+    int? totalDays,
+    double? dailyAmount,
+    double? totalAmount,
+  }) {
+    return InstallmentPlan(
+      totalDays: totalDays ?? this.totalDays,
+      dailyAmount: dailyAmount ?? this.dailyAmount,
+      totalAmount: totalAmount ?? this.totalAmount,
+    );
+  }
 
   factory InstallmentPlan.fromJson(Map<String, dynamic> json) {
     return InstallmentPlan(
@@ -199,8 +251,3 @@ class ProductImage {
     );
   }
 }
-
-
-
-
-

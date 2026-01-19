@@ -1,11 +1,11 @@
-import 'package:flutter/widgets.dart';
-import 'package:saoirse_app/constants/app_urls.dart';
-import 'package:saoirse_app/models/coupon_validation_model.dart';
+import 'package:flutter/material.dart';
+
+import '../constants/app_urls.dart';
+import '../models/coupon_validation_model.dart';
 import '../services/api_service.dart';
 import '../models/coupon_model.dart';
 
 class CouponService {
-
   //---------------Get All Coupon------------------------//
   static Future<List<Coupon>> fetchCoupons() async {
     final url = AppURLs.GET_ALL_COUPONS;
@@ -23,29 +23,47 @@ class CouponService {
     return response ?? [];
   }
 
-
   //-------------send the request to the api so it will send the coupon validation response---------//
-static Future<CouponValidationResponse?> validateCoupon(Map<String, dynamic> body) async {
-  debugPrint("Validate Coupon Body => $body");
-  final url = AppURLs.POST_RQ_COUPONS_VALIDATION;
+  static Future<CouponValidationResponse> validateCoupon(
+    Map<String, dynamic> body,
+  ) async {
+    final url = AppURLs.POST_RQ_COUPONS_VALIDATION;
 
-  return await APIService.postRequest<CouponValidationResponse?>(
-    url: url,
-    body: body,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    onSuccess: (json) {
-      try {
-        final payload = json.containsKey("data") ? json["data"] : json;
-        if (payload == null) return null;
-        return CouponValidationResponse.fromJson(payload as Map<String, dynamic>);
-      } catch (e, st) {
-        debugPrint("Coupon parse error: $e\n$st");
-        return null;
+    try {
+      final result = await APIService.postRequest<CouponValidationResponse>(
+        url: url,
+        body: body,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        onSuccess: (json) {
+          debugPrint("🟡 [COUPON API] Raw response: $json");
+
+          // ❌ Coupon invalid / expired (BACKEND MESSAGE)
+          if (json["success"] == false) {
+            throw json["message"] ?? "Coupon is not valid anymore";
+          }
+
+          final payload = json["data"];
+          if (payload == null) {
+            throw "Invalid coupon response from server";
+          }
+
+          return CouponValidationResponse.fromJson(
+            payload as Map<String, dynamic>,
+          );
+        },
+      );
+
+      // ⚠️ IMPORTANT CHANGE HERE
+      if (result == null) {
+        throw "Coupon is not valid anymore";
       }
-    },
-  );
-}
 
+      return result;
+    } catch (e) {
+      debugPrint("❌ [COUPON API] Error: $e");
+      rethrow; // 🔥 message goes to UI
+    }
+  }
 }

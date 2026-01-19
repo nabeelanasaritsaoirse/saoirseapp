@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/my_wallet/my_wallet.dart';
-import 'package:saoirse_app/services/withdrawal_service.dart';
+
+import '../../services/withdrawal_service.dart';
 import '../../widgets/app_toast.dart';
+import '../../widgets/warning_dialog.dart';
+import '../my_wallet/my_wallet.dart';
 
 class WithdrawController extends GetxController {
   TextEditingController nameController = TextEditingController();
@@ -32,7 +34,9 @@ class WithdrawController extends GetxController {
       isLoading.value = false;
 
       if (res != null) {
-        appToast(title: "Success", content: "Withdrawal request submitted successfully!");
+        appToast(
+            title: "Success",
+            content: "Withdrawal request submitted successfully!");
         Get.off(WalletScreen());
       } else {
         appToast(title: "Error", content: "Something went wrong");
@@ -45,6 +49,48 @@ class WithdrawController extends GetxController {
 
   void onAmountChanged(String value) {
     showSuffix.value = value.isNotEmpty;
+  }
+
+  Future<bool> checkWithdrawalEligibility() async {
+    try {
+      debugPrint("🔵 [KYC] Checking withdrawal eligibility...");
+      isLoading.value = true;
+
+      final response = await WithdrawalService.getKycWithdrawalStatus();
+
+      debugPrint("🟡 [KYC] API response received: $response");
+
+      if (response == null) {
+        debugPrint("🔴 [KYC] Response is NULL");
+        return false;
+      }
+
+      debugPrint(
+        "🟢 [KYC] isEligibleForWithdrawal: ${response.isEligibleForWithdrawal}",
+      );
+
+      if (response.isEligibleForWithdrawal) {
+        debugPrint("✅ [KYC] User is eligible for withdrawal");
+        return true;
+      }
+
+      debugPrint("⚠️ [KYC] User NOT eligible → Showing KYC dialog");
+      KycRequiredDialog.show();
+
+      return false;
+    } catch (e, stack) {
+      debugPrint("❌ [KYC] Exception occurred: $e");
+      debugPrint("📌 StackTrace: $stack");
+
+      appToast(
+        title: "Error",
+        content: "Failed to verify KYC status",
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+      debugPrint("🔵 [KYC] Loading finished");
+    }
   }
 
   @override

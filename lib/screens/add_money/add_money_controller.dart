@@ -1,16 +1,14 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/razorpay/razorpay_wallet_controller.dart';
 
 import '../../services/payment_service.dart';
 import '../../widgets/app_toast.dart';
+import '../razorpay/razorpay_wallet_controller.dart';
 
 class AddMoneyController extends GetxController {
   final TextEditingController amountController = TextEditingController();
   var showSuffix = false.obs;
-
+  RxBool isAddingMoney = false.obs;
   void onAmountChanged(String value) {
     showSuffix.value = value.isNotEmpty;
   }
@@ -27,77 +25,79 @@ class AddMoneyController extends GetxController {
   }
 
   void addMoney() async {
-  if (!validateAmount()) return;
+    // 🔒 PREVENT MULTIPLE TAPS
+    if (isAddingMoney.value) {
+      debugPrint("⛔ [ADD MONEY] Already in progress, ignored");
+      return;
+    }
 
-  try {
-    final rawText = amountController.text.trim();
-    final enteredAmount = double.tryParse(rawText) ?? 0;
+    if (!validateAmount()) return;
 
-    // final amountInPaise = (enteredAmount * 100).round();
+    isAddingMoney.value = true;
+    debugPrint("🔒 [ADD MONEY] LOCKED");
 
-    final body = {
-      "amount": enteredAmount,
-    };
+    try {
+      final rawText = amountController.text.trim();
+      final enteredAmount = double.tryParse(rawText) ?? 0;
 
-    appToast(
-      title: "Processing",
-      content: "Sending ₹${enteredAmount.toStringAsFixed(2)}",
-    );
+      final body = {
+        "amount": enteredAmount,
+      };
 
-    /// API CALL
-    final order = await PaymentService.addMoney(body);
+      appToast(
+        title: "Processing",
+        content: "Sending ₹${enteredAmount.toStringAsFixed(2)}",
+      );
 
-    /// NULL response validation
-    if (order == null) {
+      /// API CALL
+      final order = await PaymentService.addMoney(body);
+
+      if (order == null || !order.success) {
+        appToast(
+          title: "Error",
+          content: "Unable to create order. Please try again.",
+          error: true,
+        );
+        return;
+      }
+
+      if (order.orderId.isEmpty ||
+          order.transactionId.isEmpty ||
+          order.amount == 0) {
+        appToast(
+          title: "Error",
+          content: "Invalid order details received. Please retry.",
+          error: true,
+        );
+        return;
+      }
+
+      /// ✅ OPEN RAZORPAY ONCE
+      final razorWallet = Get.put(
+        RazorpayWalletController(),
+        permanent: true,
+      );
+
+      razorWallet.startWalletPayment(
+        internalOrderId: order.transactionId,
+        rpOrderId: order.orderId,
+        amount: order.amount,
+      );
+    } catch (e, stack) {
+      debugPrint("❌ [ADD MONEY] Error: $e");
+      debugPrint("📌 StackTrace: $stack");
+
       appToast(
         title: "Error",
-        content: "Unable to create order. Please try again.",
+        content: "Unexpected error occurred. Please try again.",
         error: true,
       );
-      return;
+    } finally {
+      // ❗ DO NOT UNLOCK HERE
+      // Unlock ONLY after Razorpay success / failure
+      debugPrint("🟡 [ADD MONEY] Waiting for Razorpay callback");
     }
-
-    /// SUCCESS validation
-    if (!order.success) {
-      appToast(
-        title: "Failed",
-        content: "Server could not process your request.",
-        error: true,
-      );
-      return;
-    }
-
-    /// MISSING FIELDS validation
-    if (order.orderId.isEmpty ||
-        order.transactionId.isEmpty ||
-        order.amount == 0) {
-      appToast(
-        title: "Error",
-        content: "Invalid order details received. Please retry.",
-        error: true,
-      );
-      return;
-    }
-
-    /// Start Razorpay Payment
-    final razorWallet = Get.put(RazorpayWalletController());
-    razorWallet.startWalletPayment(
-      internalOrderId: order.transactionId,
-      rpOrderId: order.orderId,
-      amount: order.amount,
-    );
-  } catch (e, s) {
-    /// Catch unexpected exceptions
-    log("Add Money Exception → $e\n$s");
-
-    appToast(
-      title: "Error",
-      content: "Unexpected error occurred. Please try again.",
-      error: true,
-    );
   }
-}
-
 
   @override
   void onClose() {

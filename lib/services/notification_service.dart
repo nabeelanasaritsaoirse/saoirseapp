@@ -1,9 +1,7 @@
-// ignore_for_file: avoid_print
-
-import 'dart:developer';
-
-import 'package:saoirse_app/models/notification_details_response_model.dart';
+import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
+import '../main.dart';
+import '../models/notification_details_response_model.dart';
 import '../models/notification_response.dart';
 import '../services/api_service.dart';
 
@@ -12,7 +10,6 @@ class NotificationService {
 
   void updateToken(String newToken) {
     token = newToken;
-    log("🔑 NotificationService token updated: $token");
   }
 
   Map<String, String> get headers =>
@@ -22,8 +19,6 @@ class NotificationService {
   Future<NotificationResponse?> fetchNotifications(int page, int limit) async {
     try {
       final url = "${AppURLs.NOTIFICATIONS}?page=$page&limit=$limit";
-
-      print("🔔 Fetch Notifications URL: $url");
 
       final response = await APIService.getRequest(
         url: url,
@@ -35,7 +30,6 @@ class NotificationService {
 
       return NotificationResponse.fromJson(response);
     } catch (e) {
-      print("❌ Notification fetch error: $e");
       return null;
     }
   }
@@ -55,7 +49,6 @@ class NotificationService {
 
       return response["data"]["unreadCount"] ?? 0;
     } catch (e) {
-      print("Unread count error: $e");
       return null;
     }
   }
@@ -65,8 +58,6 @@ class NotificationService {
       String id) async {
     try {
       final url = "${AppURLs.NOTIFICATIONS}/$id";
-
-      print("🔎 Fetch Notification Details URL: $url");
 
       final response = await APIService.getRequest(
         url: url,
@@ -78,7 +69,6 @@ class NotificationService {
 
       return NotificationDetailsResponse.fromJson(response);
     } catch (e) {
-      print("❌ Notification details fetch error: $e");
       return null;
     }
   }
@@ -90,15 +80,12 @@ class NotificationService {
 
       final response = await APIService.postRequest(
         url: url,
-        headers: {
-          "Authorization": "Bearer $token"
-        },
+        headers: {"Authorization": "Bearer $token"},
         onSuccess: (data) => data,
       );
 
       return response;
     } catch (e) {
-      print("❌ Like toggle error: $e");
       return null;
     }
   }
@@ -115,15 +102,11 @@ class NotificationService {
       );
 
       if (response != null) {
-        print("✅ Mark as Read Success for ID: $notificationId");
         return true;
       } else {
-        print(
-            "⚠️ Mark as Read Failed (API returned null) for ID: $notificationId");
         return false;
       }
     } catch (e) {
-      log("❌ Mark as Read error: $e");
       return false;
     }
   }
@@ -135,9 +118,6 @@ class NotificationService {
     try {
       final url = "${AppURLs.NOTIFICATIONS}/$notificationId/comments";
 
-      print("📡 POST → $url");
-      log("📦 BODY SENT → $body");
-
       final response = await APIService.postRequest(
         url: url,
         body: body,
@@ -145,11 +125,8 @@ class NotificationService {
         onSuccess: (data) => data,
       );
 
-      print("📩 RESPONSE → $response");
-
       return response;
     } catch (e) {
-      log("❌ Add Comment Error: $e");
       return null;
     }
   }
@@ -163,8 +140,6 @@ class NotificationService {
         "fcmToken": fcmToken,
       };
 
-      log("📡 Registering FCM Token → $fcmToken");
-
       final response = await APIService.postRequest(
         url: url,
         body: body,
@@ -173,14 +148,11 @@ class NotificationService {
       );
 
       if (response != null) {
-        log("✅ FCM token registered successfully");
         return true;
       } else {
-        log("⚠️ Failed to register FCM token (NULL response)");
         return false;
       }
     } catch (e) {
-      log("❌ Register FCM Token Error → $e");
       return false;
     }
   }
@@ -190,8 +162,6 @@ class NotificationService {
     try {
       final url = "${AppURLs.NOTIFICATIONS}/remove-token";
 
-      log("🗑 Removing FCM token from server...");
-
       final response = await APIService.postRequest(
         url: url,
         body: {}, // empty body
@@ -200,14 +170,11 @@ class NotificationService {
       );
 
       if (response != null) {
-        log("✅ FCM token removed successfully");
         return true;
       } else {
-        log("⚠️ Failed to remove FCM token (null response)");
         return false;
       }
     } catch (e) {
-      log("❌ Remove FCM Token Error → $e");
       return false;
     }
   }
@@ -218,7 +185,6 @@ class NotificationService {
     required String userName,
     required String token,
   }) async {
-    log("tocken reached in sendInAppWelcomeNotification ###### :$token");
     return await APIService.postRequest<bool>(
       url: AppURLs.NOTIFICATION_API,
       headers: {
@@ -243,39 +209,38 @@ class NotificationService {
   }
 
   Future<bool> sendCustomNotification({
-  required String title,
-  required String message,
-  bool sendPush = true,
-  bool sendInApp = true,
-}) async {
-  try {
-    final body = {
-      "title": title,
-      "message": message,
-      "sendPush": sendPush,
-      "sendInApp": sendInApp,
-    };
+    required String title,
+    required String message,
+    bool sendPush = true,
+    bool sendInApp = true,
+  }) async {
+    try {
+      final token = await storage.read(AppConst.ACCESS_TOKEN);
 
-    final response = await APIService.postRequest(
-      url: AppURLs.NOTIFICATION_API,
-      body: body,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      onSuccess: (json) => json,
-    );
+      if (token == null || token.isEmpty) {
+        return false;
+      }
 
-    if (response != null) {
-      log("SERVER RESPONSE: $response");   // ✔ This is perfect
+      final body = {
+        "title": title,
+        "message": message,
+        "sendPush": sendPush,
+        "sendInApp": sendInApp,
+      };
+
+      final response = await APIService.postRequest(
+        url: AppURLs.NOTIFICATION_API,
+        body: body,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        onSuccess: (json) => json,
+      );
+
+      return response != null && response["success"] == true;
+    } catch (e) {
+      return false;
     }
-
-    return response != null && response["success"] == true;
-
-  } catch (e) {
-    log("❌ sendCustomNotification Error: $e");
-    return false;
   }
-}
-
 }

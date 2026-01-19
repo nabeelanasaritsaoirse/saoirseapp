@@ -1,43 +1,70 @@
 import 'dart:developer';
 import 'dart:io';
+
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:saoirse_app/widgets/app_toast.dart';
-import '../../models/LoginAuth/kyc_model.dart';
-import '/screens/kyc/document_type.dart';
-import '/services/kyc_service.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+
+import '../../models/LoginAuth/kyc_model.dart';
+import '../../services/kyc_service.dart';
+import '../../widgets/app_toast.dart';
 
 class KycController extends GetxController {
-  /// Storage & Services
-  final box = Get.put(GetStorage());
+  // ==========================================================
+  // SERVICES
+  // ==========================================================
   final KycServices kycServices = KycServices();
-
-  /// Observables
-  final Rxn<KycModel> kyc = Rxn<KycModel>();
-  final RxBool isLoading = false.obs;
-  final RxString errorMessage = ''.obs;
-
-  /// Document selection (Aadhaar / PAN only)
-  final Rxn<DocumentType> selectedDocType = Rxn<DocumentType>();
-
-  /// Selected images
-  final Rx<File?> frontImage = Rx<File?>(null);
-  final Rx<File?> backImage = Rx<File?>(null);
-  final Rx<File?> selfieImage = Rx<File?>(null);
-  final Rx<File?> panBack = Rx<File?>(null);
-
-  final RxBool aadhaarSelected = false.obs;
-  final RxBool panSelected = false.obs;
-
-  final Rx<File?> aadhaarFront = Rx<File?>(null);
-  final Rx<File?> aadhaarBack = Rx<File?>(null);
-
-  final Rx<File?> panFront = Rx<File?>(null);
-
   final ImagePicker picker = ImagePicker();
+
+  // ==========================================================
+  // TEXT CONTROLLERS
+  // ==========================================================
+  final aadhaarNumberController = TextEditingController();
+  final panNumberController = TextEditingController();
+
+  // ==========================================================
+  // SELECTION FLAGS
+  // ==========================================================
+  RxBool aadhaarSelected = false.obs;
+  RxBool panSelected = false.obs;
+
+  // ==========================================================
+  // IMAGE FILES
+  // ==========================================================
+  Rx<File?> selfieImage = Rx<File?>(null);
+  Rx<File?> aadhaarFront = Rx<File?>(null);
+  Rx<File?> aadhaarBack = Rx<File?>(null);
+  Rx<File?> panFront = Rx<File?>(null);
+
+  // ==========================================================
+  // ERROR FLAGS (FOR RED BORDERS)
+  // ==========================================================
+  RxBool selfieError = false.obs;
+
+  RxBool aadhaarError = false.obs;
+  RxBool aadhaarFrontError = false.obs;
+  RxBool aadhaarBackError = false.obs;
+  RxBool aadhaarNumberError = false.obs;
+
+  RxBool panError = false.obs;
+  RxBool panFrontError = false.obs;
+  RxBool panNumberError = false.obs;
+  // Consents
+  RxBool consentInfoCorrect = false.obs;
+  RxBool consentUsePanAadhaar = false.obs;
+  RxBool consentTerms = false.obs;
+
+// Error flag (optional – for red highlight)
+  RxBool consentError = false.obs;
+
+  // ==========================================================
+  // STATE
+  // ==========================================================
+  RxBool isLoading = false.obs;
+  Rxn<KycModel> kyc = Rxn<KycModel>();
+  RxString errorMessage = ''.obs;
 
   @override
   void onInit() {
@@ -45,9 +72,47 @@ class KycController extends GetxController {
     super.onInit();
   }
 
-  // =====================================================================
+  @override
+  void onClose() {
+    resetKycForm();
+    super.onClose();
+  }
+
+  // ==========================================================
+  // RESET FORM (To reset when we cick backbutton from KYC screen)
+  // ==========================================================
+  void resetKycForm() {
+    log("Resetting KYC form...");
+
+    // Text fields
+    aadhaarNumberController.clear();
+    panNumberController.clear();
+
+    // Images
+    selfieImage.value = null;
+    aadhaarFront.value = null;
+    aadhaarBack.value = null;
+    panFront.value = null;
+
+    // Selections
+    aadhaarSelected.value = false;
+    panSelected.value = false;
+
+    // Error flags
+    selfieError.value = false;
+    aadhaarError.value = false;
+    aadhaarFrontError.value = false;
+    aadhaarBackError.value = false;
+    aadhaarNumberError.value = false;
+
+    panError.value = false;
+    panFrontError.value = false;
+    panNumberError.value = false;
+  }
+
+  // ==========================================================
   // FETCH KYC DATA
-  // =====================================================================
+  // ==========================================================
   Future<void> fetchKycData() async {
     try {
       isLoading(true);
@@ -59,197 +124,197 @@ class KycController extends GetxController {
       isLoading(false);
     }
   }
-  
-  // ======================================================================
-  // IMAGE PICKERS
-  // ======================================================================
-  Future<void> pickSelfie() async {
-    final picked = await picker.pickImage(
-        source: ImageSource.camera, imageQuality: 70, maxWidth: 1280);
+
+  // ==========================================================
+  // IMAGE PICKER
+  // ==========================================================
+  Future<void> pickImage(
+    ImageSource source,
+    Rx<File?> target, {
+    RxBool? errorFlag,
+  }) async {
+    final picked = await picker.pickImage(source: source, imageQuality: 70);
     if (picked != null) {
-      final compressed = await compressImage(File(picked.path));
-      selfieImage.value = compressed ?? File(picked.path);
+      target.value = await compressImage(File(picked.path));
+      errorFlag?.value = false; // clear error once image selected
     }
   }
 
-  Future<void> pickAadhaarFront() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      final compressed = await compressImage(File(picked.path));
-      aadhaarFront.value = compressed ?? File(picked.path);
-    }
-  }
+  // ==========================================================
+  // VALIDATION (TEXT + IMAGE)
+  // ==========================================================
+  bool validateKyc() {
+    bool isValid = true;
 
-  Future<void> pickAadhaarBack() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      final compressed = await compressImage(File(picked.path));
-      aadhaarBack.value = compressed ?? File(picked.path);
-    }
-  }
+    // reset errors
+    selfieError.value = false;
+    aadhaarError.value = false;
+    aadhaarFrontError.value = false;
+    aadhaarBackError.value = false;
+    aadhaarNumberError.value = false;
+    panError.value = false;
+    panFrontError.value = false;
+    panNumberError.value = false;
 
-  Future<void> pickPanFront() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      final compressed = await compressImage(File(picked.path));
-      panFront.value = compressed ?? File(picked.path);
-    }
-  }
-
-  Future<void> pickPanBack() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      final compressed = await compressImage(File(picked.path));
-      panBack.value = compressed ?? File(picked.path);
-    }
-  }
-
-  // =====================================================================
-  // VALIDATION
-  // =====================================================================
-
-  bool validateDocuments() {
+    // ---------------- SELFIE ----------------
     if (selfieImage.value == null) {
-      appToast(content: "Please upload selfie", error: true);
-      return false;
+      selfieError.value = true;
+      appToast(content: "Upload selfie", error: true);
+      isValid = false;
     }
 
+    // ---------------- AT LEAST ONE DOC ----------------
     if (!aadhaarSelected.value && !panSelected.value) {
-      appToast(content: "Select at least one document", error: true);
-      return false;
+      aadhaarError.value = true;
+      panError.value = true;
+      appToast(content: "Select Aadhaar or PAN", error: true);
+      isValid = false;
     }
 
+    // ---------------- AADHAAR ----------------
     if (aadhaarSelected.value) {
-      if (aadhaarFront.value == null || aadhaarBack.value == null) {
-        appToast(content: "Please upload Aadhaar front and back", error: true);
-        return false;
+      if (aadhaarNumberController.text.trim().length != 12) {
+        aadhaarNumberError.value = true;
+        appToast(content: "Enter valid Aadhaar number", error: true);
+        isValid = false;
+      }
+
+      if (aadhaarFront.value == null) {
+        aadhaarFrontError.value = true;
+        appToast(content: "Upload Aadhaar front image", error: true);
+        isValid = false;
+      }
+
+      if (aadhaarBack.value == null) {
+        aadhaarBackError.value = true;
+        appToast(content: "Upload Aadhaar back image", error: true);
+        isValid = false;
       }
     }
 
+    // ---------------- PAN ----------------
     if (panSelected.value) {
-      if (panFront.value == null) {
-        appToast(content: "Please upload PAN front image", error: true);
-        return false;
+      final panRegex = RegExp(r'^[A-Z]{5}[0-9]{4}[A-Z]$');
+      if (!panRegex.hasMatch(panNumberController.text.trim().toUpperCase())) {
+        panNumberError.value = true;
+        appToast(content: "Enter valid PAN number", error: true);
+        isValid = false;
       }
-      if (panBack.value == null) {
-        appToast(content: "Please upload PAN back image", error: true);
-        return false;
+
+      if (panFront.value == null) {
+        panFrontError.value = true;
+        appToast(content: "Upload PAN image", error: true);
+        isValid = false;
       }
     }
 
-    return true;
+    return isValid;
   }
 
-  // =====================================================================
-  // UPLOAD DOCUMENTS – EXACTLY MATCHES BACKEND DOCUMENTATION
-  // =====================================================================
-
+  // ==========================================================
+  // SUBMIT KYC
+  // ==========================================================
   Future<void> uploadDocuments() async {
-    if (!validateDocuments()) return;
+    if (!validateKyc()) return;
 
     isLoading(true);
 
     try {
-      // --------------------------
-      // 1️⃣ Upload Selfie (required)
-      // --------------------------
-      final selfieResp = await kycServices.uploadKycImage(
+      final selfieUrl = (await kycServices.uploadKycImage(
         imageFile: selfieImage.value!,
         type: "selfie",
         side: "front",
-      );
+      ))["url"];
 
-      final selfieUrl = selfieResp["url"];
+      final List<Map<String, dynamic>> documents = [
+        {
+          "type": "selfie",
+          "frontUrl": selfieUrl,
+        }
+      ];
 
-      // Prepare the final documents array
-      List<Map<String, dynamic>> documents = [];
-
-      // Add selfie
-      documents.add({
-        "type": "selfie",
-        "frontUrl": selfieUrl,
-      });
-
-      // --------------------------
-      // 2️⃣ Aadhaar (if selected)
-      // --------------------------
       if (aadhaarSelected.value) {
-        final frontResp = await kycServices.uploadKycImage(
+        final frontUrl = (await kycServices.uploadKycImage(
           imageFile: aadhaarFront.value!,
           type: "aadhaar",
           side: "front",
-        );
-        final aadhaarFrontUrl = frontResp["url"];
+        ))["url"];
 
-        final backResp = await kycServices.uploadKycImage(
+        final backUrl = (await kycServices.uploadKycImage(
           imageFile: aadhaarBack.value!,
           type: "aadhaar",
           side: "back",
-        );
-        final aadhaarBackUrl = backResp["url"];
+        ))["url"];
 
         documents.add({
           "type": "aadhaar",
-          "frontUrl": aadhaarFrontUrl,
-          "backUrl": aadhaarBackUrl,
+          "frontUrl": frontUrl,
+          "backUrl": backUrl,
         });
       }
 
-      // --------------------------
-      // 3️⃣ PAN (if selected)
-      // --------------------------
       if (panSelected.value) {
-        final panFrontResp = await kycServices.uploadKycImage(
+        final panUrl = (await kycServices.uploadKycImage(
           imageFile: panFront.value!,
           type: "pan",
           side: "front",
-        );
-        final panFrontUrl = panFrontResp["url"];
-
-        final panBackResp = await kycServices.uploadKycImage(
-          imageFile: panBack.value!,
-          type: "pan",
-          side: "back",
-        );
-        final panBackUrl = panBackResp["url"];
+        ))["url"];
 
         documents.add({
           "type": "pan",
-          "frontUrl": panFrontUrl,
-          "backUrl": panBackUrl,
+          "frontUrl": panUrl,
         });
       }
 
-      final submitResponse = await kycServices.submitKyc(documents: documents);
-
-      log("📥 SUBMIT RESPONSE → $submitResponse");
-
-      Get.snackbar("Success", "KYC submitted successfully!");
-      await fetchKycData();
+      await kycServices.submitKyc(
+        aadhaarNumber: aadhaarSelected.value
+            ? aadhaarNumberController.text.replaceAll(" ", "")
+            : null,
+        panNumber:
+            panSelected.value ? panNumberController.text.toUpperCase() : null,
+        documents: documents,
+      );
+// Get.snackbar("Success", "KYC submitted");
+      fetchKycData();
     } catch (e) {
-      log("❌ KYC SUBMISSION ERROR: $e");
-      appToast(
-          content: "KYC submission failed...! Upload AADHAAR and PAN ",
-          error: true);
-  
+      log(e.toString());
+      //   appToast(content: "KYC submission failed", error: true);
     } finally {
       isLoading(false);
     }
   }
 
-  Future<File?> compressImage(File file) async {
+  // ==========================================================
+  // IMAGE COMPRESSION
+  // ==========================================================
+  Future<File> compressImage(File file) async {
     final dir = await getTemporaryDirectory();
     final targetPath =
-        '${dir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+        "${dir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
 
-    var result = await FlutterImageCompress.compressAndGetFile(
-      file.absolute.path,
+    final result = await FlutterImageCompress.compressAndGetFile(
+      file.path,
       targetPath,
       quality: 60,
-      minWidth: 800,
-      minHeight: 800,
     );
 
-    return result != null ? File(result.path) : null;
+    return File(result!.path);
+  }
+
+  bool validateConsents() {
+    if (!consentInfoCorrect.value || !consentUsePanAadhaar.value) {
+      consentError.value = true;
+      log("Need to  accept all declarations to submit KYC");
+      // Get.snackbar(
+      //   "Consent Required",
+      //   "Please accept all declarations to submit KYC",
+      //   backgroundColor: AppColors.red,
+      //   colorText: AppColors.white,
+      // );
+      return false;
+    }
+
+    consentError.value = false;
+    return true;
   }
 }

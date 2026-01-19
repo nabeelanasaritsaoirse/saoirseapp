@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
@@ -7,7 +5,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:saoirse_app/screens/notification/notification_controller.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -16,6 +13,8 @@ import '../../models/profile_response.dart';
 import '../../services/profile_service.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_toast.dart';
+import '../dashboard/dashboard_controller.dart';
+import '../notification/notification_controller.dart';
 import '../onboard/onboard_screen.dart';
 
 class ProfileController extends GetxController {
@@ -55,6 +54,7 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.pending_payment, "title": "Pending Payment"},
     {"icon": AppAssets.order_history, "title": "Order History"},
     {"icon": AppAssets.wishlist, "title": "Wishlist"},
+    {"icon": AppAssets.active_oders, "title": "Active Orders"},
     {"icon": AppAssets.transactions, "title": "Transactions"},
     {"icon": AppAssets.delivered, "title": "Delivered"},
     // {"icon": AppAssets.customer_care, "title": "Customer Care"},
@@ -63,10 +63,13 @@ class ProfileController extends GetxController {
   final settings = [
     // {"icon": AppAssets.password_security, "title": "Password & security"},
     {"icon": AppAssets.kyc, "title": "KYC"},
+    {"icon": AppAssets.manage_accounts, "title": "Manage Account"},
+    {"icon": AppAssets.address, "title": "Manage Address"},
     {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
     {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
     // {"icon": AppAssets.faq, "title": "FAQ"},
     // {"icon": AppAssets.about, "title": "About EPI"},
+
     {"icon": AppAssets.logout, "title": "Log Out"},
   ];
 
@@ -74,49 +77,6 @@ class ProfileController extends GetxController {
     final count = await _wishlistService.getWishlistCount();
     wishlistCount.value = count ?? 0;
   }
-
-  //Fetch Profile
-  // Future<void> fetchUserProfile() async {
-  //   try {
-  //     print("------------------------------------------");
-  //     print(" Fetching user profile...");
-  //     isLoading(true);
-
-  //     final response = await _profileService.fetchProfile();
-
-  //     if (response == null) {
-  //       print("ERROR: Unable to fetch profile");
-  //       errorMessage("Unable to fetch profile");
-  //     } else {
-  //       print(" PROFILE UPDATED IN CONTROLLER");
-  //       print("Name         : ${response.user.name}");
-  //       print("Email        : ${response.user.email}");
-  //       print("Phone        : ${response.user.phoneNumber}");
-  //       print("------------------------------------------");
-  //       // SET TEXT CONTROLLERS
-  //       profile.value = response;
-
-  //       fullNameController.text = response.user.name;
-  //       emailController.text = response.user.email;
-  //       phoneNumberController.text = response.user.phoneNumber;
-  //       // ------------ FIELD VISIBILITY LOGIC ------------
-  //       final email = response.user.email;
-  //       final phone = response.user.phoneNumber;
-
-  //       showEmailField.value = email.isNotEmpty;
-  //       showPhoneField.value = phone.isNotEmpty;
-
-  //       print("Show Email Field: ${showEmailField.value}");
-  //       print("Show Phone Field: ${showPhoneField.value}");
-  //     }
-  //   } catch (e) {
-  //     print(" Exception Occurred: $e");
-  //     errorMessage("Error: $e");
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
-
 
   Future<void> fetchUserProfile() async {
     try {
@@ -132,72 +92,24 @@ class ProfileController extends GetxController {
         emailController.text = result.user.email;
         phoneNumberController.text = result.user.phoneNumber;
       }
-    } catch (e) {
-      print("Profile exception: $e");
     } finally {
       isLoading(false);
     }
   }
 
-  // // ================== UPDATE USERNAME ONLY ==================
-  // Future<void> updateUserName() async {
-  //   if (fullNameController.text.trim().isEmpty) {
-  //     appToast(error: true, title: "Error", content: "Name cannot be empty");
-  //     return;
-  //   }
-
-  //   try {
-  //     isLoading(true);
-  //     final userId = profile.value?.user.id;
-  //     final token = storage.read(AppConst.ACCESS_TOKEN);
-
-  //     final response = await APIService.putRequest(
-  //       url: AppURLs.USER_UPDATE_API + userId!, //  CORRECT ENDPOINT
-  //       headers: {
-  //         "Authorization": "Bearer $token",
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: {
-  //         "name": fullNameController.text.trim(), // ONLY NAME
-  //       },
-  //       onSuccess: (data) => data,
-  //     );
-
-  //     print("Update Response => $response");
-
-  //     if (response != null && response["success"] == true) {
-  //       appToast(title: "Success", content: "Name updated");
-  //       await fetchUserProfile();
-
-  //       Get.back(); // Go back to Profile Screen
-  //     } else {
-  //       appToast(error: true, title: "Failed", content: "Update failed");
-  //     }
-  //   } catch (e) {
-  //     print("UPDATE NAME ERROR => $e");
-  //     appToast(error: true, title: "Error", content: "Something went wrong");
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
-
 // ================== PICK PROFILE IMAGE ==================
   Future<void> pickProfileImage() async {
-    try {
-      // bool granted = await _requestGalleryPermission();
-      // if (!granted) return;
+    // bool granted = await _requestGalleryPermission();
+    // if (!granted) return;
 
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 85,
-      );
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
 
-      if (image != null) {
-        profileImage.value = File(image.path);
-        // await uploadUserProfilePicture(image.path);
-      }
-    } catch (e) {
-      print("PICK IMAGE ERROR: $e");
+    if (image != null) {
+      profileImage.value = File(image.path);
+      // await uploadUserProfilePicture(image.path);
     }
   }
 
@@ -217,12 +129,10 @@ class ProfileController extends GetxController {
 //       final userId = profile.value?.user.id;
 
 //       if (userId == null) {
-//         print("UserID not found");
+
 //         appToast(error: true, title: "Error", content: "User not found");
 //         return;
 //       }
-
-//       print(" Uploading profile image for user: $userId");
 
 //       final success =
 //           await _profileService.updateProfilePicture(userId, imagePath);
@@ -233,7 +143,6 @@ class ProfileController extends GetxController {
 //           content: "Profile picture updated successfully",
 //         );
 
-//         print(" Refreshing user profile...");
 //         await fetchUserProfile();
 //       } else {
 //         appToast(
@@ -243,7 +152,7 @@ class ProfileController extends GetxController {
 //         );
 //       }
 //     } catch (e) {
-//       print(" Controller Error: $e");
+
 //       appToast(error: true, title: "Error", content: "Something went wrong");
 //     } finally {
 //       // hide loader after everything
@@ -435,6 +344,49 @@ class ProfileController extends GetxController {
     }
   }
 
+  // void confirmLogout() {
+  //   Get.defaultDialog(
+  //     title: "Logout",
+  //     middleText: "Are you sure you want to exit?",
+  //     textConfirm: "Yes",
+  //     textCancel: "No",
+  //     confirmTextColor: Colors.white,
+  //     buttonColor: AppColors.primaryColor,
+  //     cancelTextColor: AppColors.primaryColor,
+  //     onConfirm: () async {
+  //       await Get.find<NotificationController>().removeFCM();
+  //       await FirebaseMessaging.instance.deleteToken();
+
+  //       Get.back(); // close dialog
+  //       await logoutUser();
+  //     },
+  //   );
+  // }
+
+  // Future<void> logoutUser() async {
+  //   try {
+  //     isLoading(true);
+
+  //     bool success = await _profileService.logout();
+
+  //     if (success) {
+  //       // CLEAR STORAGE
+  //       await storage.erase();
+  //       appToast(content: "Logged out successfully!");
+
+  //       // GO TO ONBOARD SCREEN
+  //       Get.offAll(() => OnBoardScreen());
+  //     } else {
+  //       appToast(content: "Logout failed!", error: true);
+  //     }
+  //   } catch (e) {
+
+  //     appToast(content: "Something went wrong", error: true);
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
+
   void confirmLogout() {
     Get.defaultDialog(
       title: "Logout",
@@ -444,38 +396,42 @@ class ProfileController extends GetxController {
       confirmTextColor: Colors.white,
       buttonColor: AppColors.primaryColor,
       cancelTextColor: AppColors.primaryColor,
-      onConfirm: () async {
-        await Get.find<NotificationController>().removeFCM();
-        await FirebaseMessaging.instance.deleteToken();
-        print("🗑 Local FCM token deleted.");
+      onConfirm: () {
         Get.back(); // close dialog
-        await logoutUser();
+        if (Get.isRegistered<DashboardController>()) {
+          Get.find<DashboardController>().selectedIndex.value = 0;
+        }
+        // Navigate immediately
+        Get.offAll(() => OnBoardScreen());
+
+        // Perform logout in background
+        logoutUserInBackground();
       },
     );
   }
 
-  Future<void> logoutUser() async {
+  Future<void> logoutUserInBackground() async {
     try {
-      isLoading(true);
-
-      bool success = await _profileService.logout();
-
-      if (success) {
-        // CLEAR STORAGE
-        await storage.erase();
-        appToast(content: "Logged out successfully!");
-
-        // GO TO ONBOARD SCREEN
-        Get.offAll(() => OnBoardScreen());
-      } else {
-        appToast(content: "Logout failed!", error: true);
+      // Remove FCM from backend
+      if (Get.isRegistered<NotificationController>()) {
+        await Get.find<NotificationController>().removeFCM();
       }
-    } catch (e) {
-      print("Logout Error: $e");
-      appToast(content: "Something went wrong", error: true);
-    } finally {
-      isLoading(false);
-    }
+
+      // Delete local FCM token
+      await FirebaseMessaging.instance.deleteToken();
+
+      // Call logout API (optional but recommended)
+
+      await _profileService.logout();
+
+      // Clear storage
+      await storage.erase();
+
+      // // Clear controllers
+      // Get.deleteAll(force: true);
+
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
 //-------------------------------------------------------------------------------------------------------------------------------------

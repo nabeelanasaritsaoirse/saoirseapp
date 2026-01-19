@@ -205,13 +205,12 @@ class MyApp extends StatelessWidget {
       useInheritedMediaQuery: true,
       builder: (context, child) {
         return GetMaterialApp(
-          initialBinding: Allcontroller(),
+          initialBinding: AllController(),
           locale: locale,
           debugShowCheckedModeBanner: false,
           title: AppStrings.app_name,
           theme: ThemeData(
-            scaffoldBackgroundColor:
-                const Color.fromARGB(255, 235, 230, 230),
+            scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
             textTheme: GoogleFonts.poppinsTextTheme(),
             highlightColor: AppColors.transparent,
             splashColor: AppColors.transparent,

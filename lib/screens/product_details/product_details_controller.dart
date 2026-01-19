@@ -1,6 +1,3 @@
-// FILE: lib/controllers/product_details_controller.dart
-
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
@@ -26,12 +23,16 @@ class ProductDetailsController extends GetxController {
 
   final WishlistService wishlistService = WishlistService();
   final ProductService productService = ProductService();
-  bool isUpdating = false;
 
-  RxBool isLoading = true.obs;
+  bool isUpdating = false;
+  RxBool isPageLoading = false.obs;
+  RxBool isCartLoading = false.obs;
+
+  RxBool isProductLoading = true.obs;
   Rx<ProductDetailsData?> product = Rx<ProductDetailsData?>(null);
   RxList<ImageData> mergedImages = <ImageData>[].obs;
-  final PageController pageController = PageController();
+  late final PageController pageController;
+
   RxInt currentImageIndex = 0.obs;
   RxBool isFavorite = false.obs;
   RxInt selectedPlanIndex = (-1).obs;
@@ -47,6 +48,7 @@ class ProductDetailsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    pageController = PageController();
     scrollController.addListener(_scrollListener);
     fetchProductDetails();
     checkIfInWishlist(productId);
@@ -62,10 +64,10 @@ class ProductDetailsController extends GetxController {
 
   //     if (result != null && result.hasVariants && result.variants.isNotEmpty) {
   //       selectedVariantId.value = result.variants.first.variantId;
-  //       log("Default Variant Selected: ${selectedVariantId.value}");
+
   //     }
   //   } catch (e) {
-  //     log("ERROR FETCHING PRODUCT DETAILS: $e");
+
   //     appToast(content: "Failed to load product details");
   //   } finally {
   //     isLoading(false);
@@ -74,7 +76,7 @@ class ProductDetailsController extends GetxController {
 
   Future<void> fetchProductDetails() async {
     try {
-      isLoading(true);
+      isProductLoading(true);
 
       final result = await productService.fetchProductDetails(productId);
       product.value = result;
@@ -96,21 +98,15 @@ class ProductDetailsController extends GetxController {
 
       // Reset page
       currentImageIndex.value = 0;
-      pageController.jumpToPage(0);
-    } catch (e) {
-      log("ERROR: $e");
+      jumpToPageSafe(0);
     } finally {
-      isLoading(false);
+      isProductLoading(false);
     }
   }
 
   Future<void> checkIfInWishlist(String id) async {
-    try {
-      final exists = await wishlistService.checkWishlist(id);
-      isFavorite.value = exists;
-    } catch (e) {
-      log("ERROR CHECKING WISHLIST: $e");
-    }
+    final exists = await wishlistService.checkWishlist(id);
+    isFavorite.value = exists;
   }
 
   Future<void> toggleFavorite(String id) async {
@@ -175,9 +171,9 @@ class ProductDetailsController extends GetxController {
     appLoader();
 
     // Fetch plans
-    isLoading.value = true;
+    isProductLoading.value = true;
     await loadPlans(product.value!.id);
-    isLoading.value = false;
+    isProductLoading.value = false;
 
     // Close loader
     if (Get.isDialogOpen ?? false) Get.back();
@@ -250,13 +246,13 @@ class ProductDetailsController extends GetxController {
   }
 
   Future loadPlans(String productId) async {
-    isLoading.value = true;
+    isProductLoading.value = true;
 
     final result = await ProductService().fetchProductPlans(productId);
 
     plans.assignAll(result);
 
-    isLoading.value = false;
+    isProductLoading.value = false;
   }
 
   void selectApiPlan(int index) {
@@ -321,11 +317,11 @@ class ProductDetailsController extends GetxController {
     // Reset slider
     currentImageIndex.value = 0;
 
-    Future.delayed(Duration(milliseconds: 50), () {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (pageController.hasClients) {
         pageController.animateToPage(
           0,
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
         );
       }
@@ -370,5 +366,24 @@ class ProductDetailsController extends GetxController {
         subject: "Product from EPI",
       ),
     );
+  }
+
+  void jumpToPageSafe(int page) {
+    if (pageController.hasClients) {
+      pageController.jumpToPage(page);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (pageController.hasClients) {
+          pageController.jumpToPage(page);
+        }
+      });
+    }
+  }
+
+  @override
+  void onClose() {
+    pageController.dispose();
+    scrollController.dispose();
+    super.onClose();
   }
 }

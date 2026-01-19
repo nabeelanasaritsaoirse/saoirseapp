@@ -1,7 +1,3 @@
-// ignore_for_file: avoid_print
-
-import 'dart:developer';
-
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -14,11 +10,15 @@ import 'api_service.dart';
 class CartService {
   // Fetch cart details
 
-  final token = storage.read(AppConst.ACCESS_TOKEN);
+  Future<String?> _token() async {
+    return storage.read(AppConst.ACCESS_TOKEN);
+  }
 
   Future<CartResponse?> fetchCart() async {
     final url = AppURLs.GET_FULL_CART;
     try {
+      final token = await _token();
+      if (token == null || token.isEmpty) return null;
       final response = await APIService.getRequest(
         url: url,
         onSuccess: (json) => json,
@@ -32,7 +32,6 @@ class CartService {
 
       return CartResponse.fromJson(response);
     } catch (e) {
-      print("Fetch Cart Error: $e");
       return null;
     }
   }
@@ -41,23 +40,19 @@ class CartService {
   Future<AddToCartResponse?> addToCart({
     required String productId,
     required String? variantId,
-    required int totalDays,
-    required double dailyAmount,
+    // required int totalDays,
+    // required double dailyAmount,
     int quantity = 1,
   }) async {
     try {
+      final token = await _token();
+      if (token == null || token.isEmpty) return null;
       final url = "${AppURLs.ADD_TO_CART}$productId";
 
       final body = {
         "quantity": quantity,
         "variantId": variantId,
-        "installmentPlan": {
-          "totalDays": totalDays,
-          "dailyAmount": dailyAmount,
-        }
       };
-
-      log("Cart passing body ===. $body");
 
       final response = await APIService.postRequest(
         url: url,
@@ -73,7 +68,6 @@ class CartService {
 
       return AddToCartResponse.fromJson(response);
     } catch (e) {
-      print("Add to cart error: $e");
       return null;
     }
   }
@@ -81,6 +75,8 @@ class CartService {
   // Clear cart
   Future<bool> clearCart() async {
     try {
+      final token = await _token();
+      if (token == null || token.isEmpty) return false;
       final response = await APIService.deleteRequest(
         url: AppURLs.CLEAR_CART,
         onSuccess: (json) => json,
@@ -94,7 +90,6 @@ class CartService {
 
       return response['success'] ?? false;
     } catch (e) {
-      print("Clear cart error: $e");
       return false;
     }
   }
@@ -102,6 +97,8 @@ class CartService {
   // Remove item from cart
   Future<RemoveCartItemResponse?> removeItemCart(String productId) async {
     try {
+      final token = await _token();
+      if (token == null || token.isEmpty) return null;
       final url = "${AppURLs.REMOVE_FROM_CART}$productId";
 
       final response = await APIService.deleteRequest(
@@ -117,7 +114,6 @@ class CartService {
 
       return RemoveCartItemResponse.fromJson(response);
     } catch (e) {
-      print("Remove item error: $e");
       return null;
     }
   }
@@ -125,6 +121,8 @@ class CartService {
   // Get cart item count
   Future<CartCountResponse?> getCartCount() async {
     try {
+      final token = await _token();
+      if (token == null || token.isEmpty) return null;
       final response = await APIService.getRequest(
         url: AppURLs.GET_CART_COUNT,
         onSuccess: (json) => json,
@@ -138,7 +136,6 @@ class CartService {
 
       return CartCountResponse.fromJson(response);
     } catch (e) {
-      print("Cart Count Error: $e");
       return null;
     }
   }
@@ -148,9 +145,8 @@ class CartService {
     final url = AppURLs.UPDATE_CART + productId;
 
     try {
-      print("=== UPDATE CART QTY API ===");
-      print("URL: $url");
-      print("Sending Quantity: $qty");
+      final token = await _token();
+      if (token == null || token.isEmpty) return null;
       final response = await APIService.putRequest(
         url: url,
         onSuccess: (json) => json,
@@ -162,10 +158,9 @@ class CartService {
           "Authorization": "Bearer $token",
         },
       );
-      print("Update Cart Response: $response");
+
       return response;
     } catch (e) {
-      print("Update cart qty error: $e");
       return null;
     }
   }

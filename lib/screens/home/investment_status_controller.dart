@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../constants/app_constant.dart';
+import '../../main.dart';
 import '../../models/investment_status_card_model.dart';
 import '../../services/investment_status_service.dart';
 
@@ -18,11 +20,31 @@ class InvestmentStatusController extends GetxController {
     remainingDays: 0,
     progressPercent: 0,
   ).obs;
-
   @override
-  void onInit() {
-    super.onInit();
-    fetchInvestmentStatus();
+  void onReady() {
+    super.onReady();
+    _initWhenTokenReady();
+  }
+
+  Future<void> _initWhenTokenReady() async {
+    debugPrint("⏳ [INVESTMENT] Waiting for token...");
+
+    String? token;
+    int retry = 0;
+
+    while (
+        (token = storage.read(AppConst.ACCESS_TOKEN)) == null && retry < 10) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      retry++;
+    }
+
+    if (token == null) {
+      debugPrint(" [INVESTMENT] Token not found");
+      return;
+    }
+
+    debugPrint(" [INVESTMENT] Token found, fetching status");
+    await fetchInvestmentStatus();
   }
 
   Future<void> fetchInvestmentStatus() async {
@@ -34,8 +56,6 @@ class InvestmentStatusController extends GetxController {
       if (response != null && response.success) {
         overview.value = response.overview;
       }
-    } catch (e) {
-      debugPrint("Error fetching investment status: $e");
     } finally {
       isLoading.value = false;
     }

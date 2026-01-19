@@ -51,8 +51,8 @@ class AppStrings {
   static String checkout = "Check Out";
 
   // Refferal page
-  static String refferalTitle = "Referral Details";
-  static String refferal_details = "Referral";
+  static String refferalTitle = "Referral";
+  static String refferal_details = "Referral Details";
   static String referalBannerContent =
       "Invite Friends\nEarn Money\nStart Referring Today!";
   static String refer_via = "Refer Via";
@@ -79,9 +79,9 @@ class AppStrings {
       "If someone referred you, enter their referral code below. This helps us apply rewards correctly.";
   static String refferal_applied_success =
       "Your referral code has been\nsuccessfully applied.";
-  static String productId = "Product ID";
-  static String amount = "Amount";
-  static String pending_status = "Pending Status";
+  static String productId = "Product ID :";
+  static String amount = "Amount :";
+  static String pending_status = "Pending Status :";
   static String view_details = "View Details";
   static String total_product = "Total Product";
   static String my_commission = "My commission";
@@ -112,8 +112,10 @@ class AppStrings {
       "You haven’t selected a plan yet. Please choose a plan before proceeding to Check out.";
 
   // KYC page
-
   static String KycTitle = "KYC Status";
+  static String kyc_required_discription =
+      "You must complete your KYC before processing withdrawal.";
+  static String kyc_required = "KYC Required";
 
   //Cart page
   static String carttitle = "Cart";
@@ -123,6 +125,7 @@ class AppStrings {
 
   // select address screen
   static String select_address = "Select Address";
+  static String manage_address = "Manage Address";
 
   //snackbars
   static String no_internet = 'No internet connection';
@@ -175,7 +178,7 @@ class AppStrings {
   static String address = "ADDRESS";
   static String phone = "Phone :";
   static String change = "CHANGE";
-  static String item = "ITEMS 1";
+  static String item = "ITEMS";
   static String qty = "QTY :";
   static String apply = "Apply";
   static String premoCode = "Available Promo Code";
@@ -202,6 +205,7 @@ class AppStrings {
 
   // Order history
   static String order_history_label = "Order History";
+  static String order_active_label = "Active Orders";
 
   // Transaction History
   static String transaction_history_label = "Transaction History";

@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:saoirse_app/screens/notification/notification_controller.dart';
 
 import '../../constants/app_colors.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../models/notification_details_response_model.dart';
+import '../notification/notification_controller.dart';
 
 class NotificationDetailsScreen extends StatefulWidget {
   final String notificationId;
@@ -23,11 +23,10 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
   final NotificationController controller = Get.find<NotificationController>();
   final TextEditingController commentCtrl = TextEditingController();
 
-
   @override
   void initState() {
     super.initState();
-     controller.markAsRead(widget.notificationId);
+    controller.markAsRead(widget.notificationId);
     controller.getNotificationDetails(widget.notificationId);
   }
 
@@ -62,39 +61,39 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (item.imageUrl != null && item.imageUrl!.isNotEmpty)
-                   ClipRRect(
-  borderRadius: BorderRadius.only(
-    bottomLeft: Radius.circular(20.r),
-    bottomRight: Radius.circular(20.r),
-  ),
-  child: Image.network(
-    item.imageUrl!,
-    width: double.infinity,
-    height: 220.h,
-    fit: BoxFit.cover,
-    loadingBuilder: (context, child, loadingProgress) {
-      if (loadingProgress == null) {
-        return child;
-      }
-      return Center(
-        child: CupertinoActivityIndicator(
-          radius: 10.0,
-          color: AppColors.textGray,
-        ),
-      );
-    },
-    errorBuilder: (context, error, stackTrace) => Container(
-      color: Colors.grey.shade300,
-      child: Center(
-        child: Icon(
-          Icons.broken_image,
-          size: 40.sp,
-          color: Colors.grey.shade600,
-        ),
-      ),
-    ),
-  ),
-),
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20.r),
+                        bottomRight: Radius.circular(20.r),
+                      ),
+                      child: Image.network(
+                        item.imageUrl!,
+                        width: double.infinity,
+                        height: 220.h,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return Center(
+                            child: CupertinoActivityIndicator(
+                              radius: 10.0,
+                              color: AppColors.textGray,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey.shade300,
+                          child: Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              size: 40.sp,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
 
                   SizedBox(height: 20.h),
 
@@ -170,7 +169,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-               GestureDetector(
+              GestureDetector(
                 onTap: () => controller.toggleLike(item.id),
                 child: Row(
                   children: [
@@ -178,8 +177,12 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                       scale: item.isLikedByMe ? 1.2 : 1.0,
                       duration: const Duration(milliseconds: 150),
                       child: Icon(
-                        item.isLikedByMe ? Icons.favorite : Icons.favorite_border,
-                        color: item.isLikedByMe ? Colors.red : AppColors.primaryColor,
+                        item.isLikedByMe
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: item.isLikedByMe
+                            ? Colors.red
+                            : AppColors.primaryColor,
                         size: 22.sp,
                       ),
                     ),
@@ -305,77 +308,63 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
   }
 
   /// COMMENT INPUT BOX
- Widget _commentInputBar() {
-  return Align(
-    alignment: Alignment.bottomCenter,
-    child: Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 8),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: commentCtrl,
-              maxLines: 2,
-              minLines: 1,
-              decoration: InputDecoration(
-                hintText: "Write a comment...",
-                filled: true,
-                fillColor: AppColors.scaffoldColor,
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14.r),
-                  borderSide: BorderSide.none,
+  Widget _commentInputBar() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          boxShadow: [
+            BoxShadow(color: Colors.black12, blurRadius: 8),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: commentCtrl,
+                maxLines: 2,
+                minLines: 1,
+                decoration: InputDecoration(
+                  hintText: "Write a comment...",
+                  filled: true,
+                  fillColor: AppColors.scaffoldColor,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14.r),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
             ),
-          ),
-          SizedBox(width: 12.w),
+            SizedBox(width: 12.w),
+            Obx(() {
+              return controller.isLoading.value
+                  ? SizedBox(width: 22.r, height: 22.r, child: appLoader())
+                  : GestureDetector(
+                      onTap: () async {
+                        final text = commentCtrl.text.trim();
+                        if (text.isEmpty) return;
 
-          Obx(() {
-            return controller.isLoading.value
-                ? SizedBox(
-                    width: 22.r,
-                    height: 22.r,
-                    child: appLoader()
-                  )
-                : GestureDetector(
-                    onTap: () async {
-                      final text = commentCtrl.text.trim();
-                      if (text.isEmpty) return;
+                        await controller.addComment(
+                          widget.notificationId,
+                          text,
+                        );
 
-                      await controller.addComment(
-                        widget.notificationId,
-                        text,
-                      );
-
-                      commentCtrl.clear();
-                    },
-                    child: CircleAvatar(
-                      backgroundColor: AppColors.primaryColor,
-                      radius: 22.r,
-                      child: const Icon(Icons.send, color: Colors.white),
-                    ),
-                  );
-          }),
-        ],
+                        commentCtrl.clear();
+                      },
+                      child: CircleAvatar(
+                        backgroundColor: AppColors.primaryColor,
+                        radius: 22.r,
+                        child: const Icon(Icons.send, color: Colors.white),
+                      ),
+                    );
+            }),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
-
-}
-
-
-
-
-
-
-
-
