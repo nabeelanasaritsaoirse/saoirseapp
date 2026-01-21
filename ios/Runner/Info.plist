@@ -69,9 +69,13 @@
       <key>CFBundleURLSchemes</key>
       <array>
         <string>com.googleusercontent.apps.486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q</string>
+        <string>com.saoirse.epi</string>
       </array>
     </dict>
   </array>
+
+  <key>FirebaseAppDelegateProxyEnabled</key>
+  <true/>
 
   <key>UIBackgroundModes</key>
   <array>
