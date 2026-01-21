@@ -208,6 +208,36 @@ jobs:
           project.save
           puts "💾 Xcode project saved with correct bundle id"
           RUBY
+
+          # 🔢 Set Build Number from GitHub Run Number
+      - name: 🔢 Set Build Number from GitHub Run Number
+        run: |
+          cd ios
+          
+          # Use GitHub run number as build number (always unique and incremental)
+          BUILD_NUMBER=${{ github.run_number }}
+          echo "Setting build number to: $BUILD_NUMBER"
+          
+          # Update Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" Runner/Info.plist
+          
+          # Update project.pbxproj for consistency
+          ruby <<'RUBY'
+          require 'xcodeproj'
+          
+          project = Xcodeproj::Project.open('Runner.xcodeproj')
+          project.targets.each do |target|
+            next unless target.name == 'Runner'
+            target.build_configurations.each do |config|
+              config.build_settings['CURRENT_PROJECT_VERSION'] = ENV['BUILD_NUMBER']
+            end
+          end
+          project.save
+          RUBY
+          
+          echo "✅ Build number set to $BUILD_NUMBER"
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
           
       - name: 📝 Create ExportOptions.plist
         run: |
