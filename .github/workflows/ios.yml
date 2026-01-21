@@ -57,9 +57,11 @@ jobs:
           /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily array" ios/Runner/Info.plist
           /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily:0 integer 1" ios/Runner/Info.plist
 
-      # 📦 Pods
+      # 📦 Pods (force Firebase version sync)
       - run: |
           cd ios
+          rm -rf Pods Podfile.lock
+          pod update Firebase/Auth
           pod install --repo-update
           cd ..
 
