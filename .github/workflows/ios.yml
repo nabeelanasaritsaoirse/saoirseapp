@@ -208,6 +208,28 @@ jobs:
           project.save
           puts "💾 Xcode project saved with correct bundle id"
           RUBY
+          
+      - name: 📝 Create ExportOptions.plist
+        run: |
+          cat > ios/ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>teamID</key>
+            <string>${{ env.TEAM_ID }}</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>${{ env.BUNDLE_ID }}</key>
+              <string>${{ env.PROFILE_NAME }}</string>
+            </dict>
+          </dict>
+          </plist>
+          EOF
 
       - name: 🔨 Build Flutter
         run: |
