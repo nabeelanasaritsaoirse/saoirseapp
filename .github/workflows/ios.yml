@@ -66,6 +66,13 @@ jobs:
           pod update Firebase/Auth
           cd ..
 
+      - name: ⬆️ Force iOS 16 deployment target
+        run: |
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 16.0;/g' ios/Runner.xcodeproj/project.pbxproj
+
+      - run: /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 16.0" ios/Runner/Info.plist || true
+
+
       # 🔨 Flutter build
       - run: flutter build ios --release --no-codesign
 
