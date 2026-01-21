@@ -1,0 +1,122 @@
+name: 🍎 iOS Release
+
+on:
+  push:
+    branches: [ test ]
+  workflow_dispatch:
+
+env:
+  BUNDLE_ID: com.saoirse.epi
+  TEAM_ID: BYQUNNQSQH
+  PROFILE_NAME: "match AppStore com.saoirse.epi 1765456537"
+
+jobs:
+  ios:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter clean
+      - run: flutter pub get
+
+      # 🔥 Firebase config
+      - name: Create GoogleService-Info.plist
+        run: |
+          cat > ios/Runner/GoogleService-Info.plist <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>API_KEY</key>
+            <string>${{ secrets.IOS_API_KEY }}</string>
+            <key>GCM_SENDER_ID</key>
+            <string>${{ secrets.IOS_MESSAGING_SENDER_ID }}</string>
+            <key>GOOGLE_APP_ID</key>
+            <string>${{ secrets.IOS_APP_ID }}</string>
+            <key>PROJECT_ID</key>
+            <string>${{ secrets.IOS_PROJECT_ID }}</string>
+            <key>BUNDLE_ID</key>
+            <string>com.saoirse.epi</string>
+          </dict>
+          </plist>
+          EOF
+
+      # 🧹 Remove Main.storyboard (Flutter black screen bug)
+      - run: |
+          /usr/libexec/PlistBuddy -c "Delete :UIMainStoryboardFile" ios/Runner/Info.plist || true
+
+      # 📱 iPhone ONLY (no iPad = no iPad crash)
+      - run: |
+          /usr/libexec/PlistBuddy -c "Delete :UIDeviceFamily" ios/Runner/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily array" ios/Runner/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily:0 integer 1" ios/Runner/Info.plist
+
+      # 📦 Pods
+      - run: |
+          cd ios
+          pod install --repo-update
+          cd ..
+
+      # 🔨 Flutter build
+      - run: flutter build ios --release --no-codesign
+
+      # 🔐 Setup signing
+      - run: |
+          sudo gem install fastlane xcodeproj -N
+          echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > ios/api_key.json
+
+      - name: Match certs
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        run: |
+          cd ios
+          fastlane match appstore \
+            --readonly \
+            --app_identifier "${{ env.BUNDLE_ID }}" \
+            --api_key_path api_key.json \
+            --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git
+
+      # 🏗 Archive
+      - run: |
+          cd ios
+          xcodebuild archive \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath build/Runner.xcarchive \
+            -destination 'generic/platform=iOS' \
+            DEVELOPMENT_TEAM=${{ env.TEAM_ID }} \
+            CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE_SPECIFIER="${{ env.PROFILE_NAME }}" \
+            CODE_SIGN_IDENTITY="Apple Distribution"
+
+      # 📦 Export IPA
+      - run: |
+          cd ios
+          cat > ExportOptions.plist <<EOF
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>teamID</key><string>${{ env.TEAM_ID }}</string>
+          </dict></plist>
+          EOF
+
+          xcodebuild -exportArchive \
+            -archivePath build/Runner.xcarchive \
+            -exportPath build/ipa \
+            -exportOptionsPlist ExportOptions.plist
+
+      # 🚀 Upload
+      - run: |
+          fastlane deliver \
+            --api_key_path ios/api_key.json \
+            --ipa ios/build/ipa/*.ipa \
+            --skip_metadata \
+            --skip_screenshots \
+            --force
