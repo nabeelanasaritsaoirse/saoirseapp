@@ -288,10 +288,11 @@ jobs:
             -allowProvisioningUpdates
             
       # 🚀 Upload
-      - run: |
+      - name: 🚀 Upload to TestFlight
+        run: |
           fastlane deliver \
             --api_key_path ios/api_key.json \
-            --ipa ios/build/ipa/*.ipa \
+           --ipa "${{ env.IPA_DIR }}/Runner.ipa" \
             --skip_metadata \
             --skip_screenshots \
             --force
