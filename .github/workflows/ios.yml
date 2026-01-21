@@ -317,19 +317,27 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             -allowProvisioningUpdates
             
-     # 🚀 Upload
+      # 📤 Save IPA as artifact (for BrowserStack/manual testing)
+      - name: 📤 Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: ${{ env.IPA_DIR }}/*.ipa
+          retention-days: 7
+
+      # 🚀 Upload
       - name: 🚀 Upload to TestFlight
         run: |
           IPA_FILE=$(find ${{ env.IPA_DIR }} -name "*.ipa" | head -n 1)
-          
+
           if [ -z "$IPA_FILE" ]; then
             echo "❌ ERROR: No IPA file found!"
             ls -la ${{ env.IPA_DIR }}
             exit 1
           fi
-          
+
           echo "✅ Found IPA: $IPA_FILE"
-          
+
           fastlane pilot upload \
             --api_key_path ios/api_key.json \
             --ipa "$IPA_FILE" \
