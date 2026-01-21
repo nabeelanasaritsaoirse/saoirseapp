@@ -73,17 +73,22 @@ jobs:
       - run: |
           sudo gem install fastlane xcodeproj -N
           echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > ios/api_key.json
-
-      - name: Match certs
+          
+      - name: 🔐 Fastlane Match
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
           cd ios
           fastlane match appstore \
             --readonly \
-            --app_identifier "${{ env.BUNDLE_ID }}" \
-            --api_key_path api_key.json \
-            --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git
+            --app_identifier "com.saoirse.epi" \
+            --api_key_path ./api_key.json \
+            --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git \
+            --git_branch main \
+            --keychain_name build.keychain-db \
+            --keychain_password "ci_keychain_pass"
+
+
 
       # 🏗 Archive
       - run: |
