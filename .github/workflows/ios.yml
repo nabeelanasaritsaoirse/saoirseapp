@@ -287,12 +287,20 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             -allowProvisioningUpdates
             
-      # 🚀 Upload
+     # 🚀 Upload
       - name: 🚀 Upload to TestFlight
         run: |
-          fastlane deliver \
+          IPA_FILE=$(find ${{ env.IPA_DIR }} -name "*.ipa" | head -n 1)
+          
+          if [ -z "$IPA_FILE" ]; then
+            echo "❌ ERROR: No IPA file found!"
+            ls -la ${{ env.IPA_DIR }}
+            exit 1
+          fi
+          
+          echo "✅ Found IPA: $IPA_FILE"
+          
+          fastlane pilot upload \
             --api_key_path ios/api_key.json \
-           --ipa "${{ env.IPA_DIR }}/Runner.ipa" \
-            --skip_metadata \
-            --skip_screenshots \
-            --force
+            --ipa "$IPA_FILE" \
+            --skip_waiting_for_build_processing
