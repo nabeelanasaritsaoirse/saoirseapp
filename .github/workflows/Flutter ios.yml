@@ -170,33 +170,39 @@ jobs:
       
           echo "✅ Simulator build artifact is valid"
 
+          - name: 🧹 Delete old artifacts (free space)
+            uses: c-hive/gha-remove-artifacts@v1
+            with:
+              age: '1 day'
+              skip-tags: true
+
             # --------------------------------------------------
       # Logs + Screenshot
       # --------------------------------------------------
-      - name: 🔍 Capture Logs
-        if: always()
-        run: |
-          UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
-          xcrun simctl spawn "$UDID" log show \
-            --predicate 'process == "Runner"' \
-            --last 2m \
-            --style compact > simulator_logs.txt || true
-          tail -50 simulator_logs.txt
+      # - name: 🔍 Capture Logs
+      #   if: always()
+      #   run: |
+      #     UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
+      #     xcrun simctl spawn "$UDID" log show \
+      #       --predicate 'process == "Runner"' \
+      #       --last 2m \
+      #       --style compact > simulator_logs.txt || true
+      #     tail -50 simulator_logs.txt
       
-      - name: 📸 Screenshot
-        if: always()
-        run: |
-          UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
-          xcrun simctl io "$UDID" screenshot simulator.png || true
+      # - name: 📸 Screenshot
+      #   if: always()
+      #   run: |
+      #     UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
+      #     xcrun simctl io "$UDID" screenshot simulator.png || true
       
-      - name: 📤 Upload Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-simulator-debug
-          path: |
-            simulator_logs.txt
-            simulator.png
+      # - name: 📤 Upload Artifacts
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ios-simulator-debug
+      #     path: |
+      #       simulator_logs.txt
+      #       simulator.png
 
   # ==================================================
   # 2️⃣ RELEASE BUILD
