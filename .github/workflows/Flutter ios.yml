@@ -742,16 +742,22 @@ jobs:
       #       --changelog "Build ${{ needs.ios-ci.outputs.build_number }}: Automated CI/CD deployment" \
       #       --distribute_external false
 
-      - name: 🚀 Upload to App Store (No TestFlight)
+      # - name: 🚀 Upload to App Store (No TestFlight)
+      #   run: |
+      #     fastlane deliver \
+      #     --api_key_path api_key.json \
+      #     --ipa build/ios/ipa/*.ipa \
+      #     --skip_metadata \
+      #     --skip_screenshots \
+      #     --force \
+      #     --automatic_release false \
+      #     --run_precheck_before_submit false
+
+      - name: 🚀 Upload & Submit for Review (Automated)
         run: |
-          fastlane deliver \
-          --api_key_path api_key.json \
-          --ipa build/ios/ipa/*.ipa \
-          --skip_metadata \
-          --skip_screenshots \
-          --force \
-          --automatic_release false \
-          --run_precheck_before_submit false
+          cd ios
+          fastlane submit_review
+
 
       - name: ✅ Deployment Complete
         run: |
