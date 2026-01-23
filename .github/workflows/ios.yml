@@ -121,11 +121,27 @@ jobs:
       - run: |
           /usr/libexec/PlistBuddy -c "Delete :UIMainStoryboardFile" ios/Runner/Info.plist || true
 
-      # 📱 iPhone ONLY (no iPad = no iPad crash)
-      - run: |
+      # 📱 iPhone ONLY release
+      - name: 📱 Configure iPhone-Only Device Family
+        run: |
           /usr/libexec/PlistBuddy -c "Delete :UIDeviceFamily" ios/Runner/Info.plist || true
           /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily array" ios/Runner/Info.plist
           /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily:0 integer 1" ios/Runner/Info.plist
+          echo "✅ Configured for iPhone-only release"
+
+      # 🔐 Verify Push Notifications entitlement (required for Firebase Phone Auth)
+      - name: 🔐 Verify Push Notifications Entitlement
+        run: |
+          echo "Checking Runner.entitlements for aps-environment..."
+          if grep -q "aps-environment" ios/Runner/Runner.entitlements; then
+            echo "✅ Push Notifications entitlement found"
+            cat ios/Runner/Runner.entitlements
+          else
+            echo "⚠️ Adding aps-environment entitlement..."
+            /usr/libexec/PlistBuddy -c "Add :aps-environment string production" ios/Runner/Runner.entitlements
+            echo "✅ Push Notifications entitlement added"
+            cat ios/Runner/Runner.entitlements
+          fi
 
       # 📦 Pods (force Firebase version sync)
   
