@@ -14,8 +14,16 @@ class NotificationServiceHelper {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
+    // iOS settings - REQUIRED for iOS 17+
+    const iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
+
     const initSettings = InitializationSettings(
       android: androidSettings,
+      iOS: iosSettings,
     );
 
     await _plugin.initialize(
@@ -29,7 +37,7 @@ class NotificationServiceHelper {
       },
     );
 
-    // Create Notification Channel
+    // Create Notification Channel (Android only)
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'high_importance_channel',
       'High Importance Notifications',

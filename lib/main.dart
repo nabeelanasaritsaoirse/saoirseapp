@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,17 +47,46 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 /// MAIN (LIGHTWEIGHT)
 /// ----------------------------------------------------
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    log("✅ WidgetsFlutterBinding initialized");
 
-  /// Orientation lock (safe before runApp)
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+    // Catch platform errors (before Flutter is ready)
+    PlatformDispatcher.instance.onError = (error, stack) {
+      log("❌ PLATFORM ERROR: $error", stackTrace: stack);
+      return true;
+    };
 
-  await GetStorage.init();
+    // Catch Flutter framework errors
+    FlutterError.onError = (details) {
+      log("❌ FLUTTER ERROR: ${details.exception}", stackTrace: details.stack);
+      FlutterError.presentError(details);
+    };
 
-  /// 🚀 Render UI immediately (NO heavy work here)
-  runApp(const BootstrapApp());
+    /// Orientation lock (safe before runApp)
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+    log("✅ Orientation set");
+
+    await GetStorage.init();
+    log("✅ GetStorage initialized");
+
+    /// 🚀 Render UI immediately (NO heavy work here)
+    runApp(const BootstrapApp());
+    log("✅ runApp called");
+  } catch (e, s) {
+    log("❌ MAIN CRASH: $e", stackTrace: s);
+    // Show error screen instead of crashing
+    runApp(MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.red,
+        body: Center(
+          child: Text("App Error: $e", style: const TextStyle(color: Colors.white)),
+        ),
+      ),
+    ));
+  }
 }
 
 /// ----------------------------------------------------
@@ -81,6 +111,8 @@ class _BootstrapAppState extends State<BootstrapApp> {
 
   Future<void> _initializeApp() async {
     try {
+      log("🔄 Starting app initialization...");
+
       /// -----------------------------
       /// ENV (NEVER crash release)
       /// -----------------------------
@@ -94,35 +126,45 @@ class _BootstrapAppState extends State<BootstrapApp> {
       /// -----------------------------
       /// FIREBASE
       /// -----------------------------
+      log("🔄 Initializing Firebase...");
       await Firebase.initializeApp();
       log("✅ Firebase initialized");
 
       /// -----------------------------
       /// CRASHLYTICS
       /// -----------------------------
+      log("🔄 Initializing Crashlytics...");
       await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
       FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
       log("✅ Crashlytics initialized");
 
+      /// Log app start to Crashlytics
+      FirebaseCrashlytics.instance.log("App initialization started");
+
+      log("🔄 Setting up Firebase Messaging...");
       FirebaseMessaging.onBackgroundMessage(
         firebaseMessagingBackgroundHandler,
       );
 
       /// iOS foreground notifications
       if (Platform.isIOS) {
+        log("🔄 Configuring iOS foreground notifications...");
         await FirebaseMessaging.instance
             .setForegroundNotificationPresentationOptions(
           alert: true,
           badge: true,
           sound: true,
         );
+        log("✅ iOS foreground notifications configured");
       }
 
+      log("🔄 Requesting notification permission...");
       await FirebaseMessaging.instance.requestPermission(
         alert: true,
         badge: true,
         sound: true,
       );
+      log("✅ Notification permission requested");
 
       FirebaseMessaging.onMessage.listen((message) {
         NotificationServiceHelper.showFlutterNotification(message);
@@ -139,17 +181,22 @@ class _BootstrapAppState extends State<BootstrapApp> {
           initialMessage.data,
         );
       }
+      log("✅ Firebase Messaging configured");
 
       /// -----------------------------
       /// LOCAL NOTIFICATIONS
       /// -----------------------------
+      log("🔄 Initializing local notifications...");
       await NotificationServiceHelper.initializeLocalNotifications();
+      log("✅ Local notifications initialized");
 
       /// -----------------------------
       /// APPSFLYER (OPTIONAL)
       /// -----------------------------
       try {
+        log("🔄 Initializing AppsFlyer...");
         await AppsFlyerService.instance.init();
+        log("✅ AppsFlyer initialized");
       } catch (e) {
         log("⚠️ AppsFlyer init failed: $e");
       }
@@ -159,10 +206,12 @@ class _BootstrapAppState extends State<BootstrapApp> {
       /// -----------------------------
       final lang = storage.read('language') ?? 'en';
       _locale = Locale(lang);
+      log("✅ Language set to: $lang");
 
       /// -----------------------------
       /// CONTROLLERS
       /// -----------------------------
+      log("🔄 Setting up controllers...");
       final notif = Get.put(NotificationController(), permanent: true);
       final token = storage.read(AppConst.ACCESS_TOKEN);
 
@@ -171,13 +220,22 @@ class _BootstrapAppState extends State<BootstrapApp> {
         notif.refreshNotifications();
         notif.fetchUnreadCount();
       }
+      log("✅ Controllers initialized");
+
+      FirebaseCrashlytics.instance.log("App initialization completed successfully");
+      log("✅ App initialization completed!");
     } catch (e, s) {
-      log("❌ Bootstrap init failed", error: e, stackTrace: s);
+      log("❌ Bootstrap init failed: $e", stackTrace: s);
+      // Report to Crashlytics
+      try {
+        await FirebaseCrashlytics.instance.recordError(e, s, reason: "Bootstrap init failed");
+      } catch (_) {}
       _locale = const Locale('en');
     }
 
     if (mounted) {
       setState(() => _ready = true);
+      log("✅ _ready set to true, showing main app");
     }
   }
 
