@@ -264,39 +264,90 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(360, 690),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      useInheritedMediaQuery: true,
-      builder: (context, child) {
-        return GetMaterialApp(
-          initialBinding: AllController(),
-          locale: locale,
-          debugShowCheckedModeBanner: false,
-          title: AppStrings.app_name,
-          theme: ThemeData(
-            scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
-            textTheme: GoogleFonts.poppinsTextTheme(),
-            highlightColor: AppColors.transparent,
-            splashColor: AppColors.transparent,
-            useMaterial3: true,
+    log("🔄 Building MyApp...");
+
+    // Get safe text theme (fallback if Google Fonts fails)
+    TextTheme safeTextTheme;
+    try {
+      safeTextTheme = GoogleFonts.poppinsTextTheme();
+      log("✅ Google Fonts loaded");
+    } catch (e) {
+      log("⚠️ Google Fonts failed, using default: $e");
+      safeTextTheme = ThemeData.light().textTheme;
+    }
+
+    try {
+      return ScreenUtilInit(
+        designSize: const Size(360, 690),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        // Removed useInheritedMediaQuery - can cause iOS 17+ issues
+        builder: (context, child) {
+          log("🔄 ScreenUtilInit builder called");
+          return _buildMaterialApp(safeTextTheme);
+        },
+      );
+    } catch (e) {
+      log("❌ ScreenUtilInit failed: $e, using fallback");
+      // Fallback without ScreenUtil
+      return _buildMaterialApp(safeTextTheme);
+    }
+  }
+
+  Widget _buildMaterialApp(TextTheme textTheme) {
+    log("🔄 Building GetMaterialApp...");
+    try {
+      return GetMaterialApp(
+        initialBinding: AllController(),
+        locale: locale,
+        debugShowCheckedModeBanner: false,
+        title: AppStrings.app_name,
+        theme: ThemeData(
+          scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
+          textTheme: textTheme,
+          highlightColor: AppColors.transparent,
+          splashColor: AppColors.transparent,
+          useMaterial3: true,
+        ),
+        home: const SplashScreen(),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'),
+          Locale('hi'),
+          Locale('ml'),
+        ],
+        fallbackLocale: const Locale('en'),
+        // Add error widget builder
+        builder: (context, widget) {
+          // Wrap with error boundary
+          ErrorWidget.builder = (FlutterErrorDetails details) {
+            log("❌ Widget error: ${details.exception}");
+            return Center(
+              child: Text(
+                'UI Error: ${details.exception}',
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
+          };
+          return widget ?? const SizedBox.shrink();
+        },
+      );
+    } catch (e) {
+      log("❌ GetMaterialApp failed: $e");
+      return MaterialApp(
+        home: Scaffold(
+          backgroundColor: Colors.orange,
+          body: Center(
+            child: Text("App Build Error: $e",
+              style: const TextStyle(color: Colors.white)),
           ),
-          home: const SplashScreen(),
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en'),
-            Locale('hi'),
-            Locale('ml'),
-          ],
-          fallbackLocale: const Locale('en'),
-        );
-      },
-    );
+        ),
+      );
+    }
   }
 }
