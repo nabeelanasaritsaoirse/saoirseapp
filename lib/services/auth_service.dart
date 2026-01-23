@@ -73,6 +73,9 @@ class AuthService {
       );
 
       return true;
+    } on FirebaseAuthException catch (e) {
+      appToast(content: e.message ?? "Authentication error", error: true);
+      return false;
     } catch (e) {
       appToast(content: "OTP sending failed. Please try again.", error: true);
       return false;
