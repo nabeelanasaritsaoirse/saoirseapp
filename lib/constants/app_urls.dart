@@ -2,7 +2,7 @@
 
 class AppURLs {
   //base api
-   static String BASE_API = 'https://api.epielio.com/';
+  static String BASE_API = 'https://api.epielio.com/';
  // static String BASE_API = 'http://13.127.15.87:8080/';
 
   //login api
