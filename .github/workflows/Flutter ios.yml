@@ -178,10 +178,16 @@ jobs:
           fi
           cat ios/Runner/Runner.entitlements
 
-      - name: 🧨 Install Pods
+      - name: 🧨 Fix Firebase pod mismatch & install
         run: |
           cd ios
-          pod install --repo-update
+      
+          # Remove stale lock for Firebase only
+          rm -rf Pods
+          rm -f Podfile.lock
+      
+          pod repo update
+          pod install
 
       - name: 🔨 Build Flutter iOS Release
         run: |
