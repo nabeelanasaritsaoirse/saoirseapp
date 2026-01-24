@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
@@ -196,11 +196,7 @@ class LoginController extends GetxController {
   Future<String?> getDeviceToken() async {
     try {
       String? fcmtoken;
-      if (Platform.isAndroid) {
-        fcmtoken = await FirebaseMessaging.instance.getToken();
-      } else {
-        fcmtoken = await FirebaseMessaging.instance.getAPNSToken();
-      }
+      fcmtoken = await FirebaseMessaging.instance.getToken();
       return fcmtoken;
     } catch (e) {
       return null;

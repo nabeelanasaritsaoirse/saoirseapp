@@ -2,86 +2,100 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>CFBundleDevelopmentRegion</key>
-  <string>$(DEVELOPMENT_LANGUAGE)</string>
-  <key>CFBundleDisplayName</key>
-  <string>epi Elio</string>
-  <key>CFBundleExecutable</key>
-  <string>$(EXECUTABLE_NAME)</string>
-  <key>CFBundleIdentifier</key>
-  <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-  <key>CFBundleInfoDictionaryVersion</key>
-  <string>6.0</string>
-  <key>CFBundleName</key>
-  <string>saoirse_app</string>
-  <key>CFBundlePackageType</key>
-  <string>APPL</string>
-  <key>CFBundleShortVersionString</key>
-  <string>$(FLUTTER_BUILD_NAME)</string>
-  <key>CFBundleSignature</key>
-  <string>????</string>
-  <key>CFBundleVersion</key>
-  <string>$(FLUTTER_BUILD_NUMBER)</string>
-  <key>LSRequiresIPhoneOS</key>
-  <true/>
-  <key>UILaunchStoryboardName</key>
-  <string>LaunchScreen</string>
-
-  <key>UISupportedInterfaceOrientations</key>
-  <array>
-    <string>UIInterfaceOrientationPortrait</string>
-    <string>UIInterfaceOrientationLandscapeLeft</string>
-    <string>UIInterfaceOrientationLandscapeRight</string>
-  </array>
-
-  <key>UISupportedInterfaceOrientations~ipad</key>
-  <array>
-    <string>UIInterfaceOrientationPortrait</string>
-    <string>UIInterfaceOrientationPortraitUpsideDown</string>
-    <string>UIInterfaceOrientationLandscapeLeft</string>
-    <string>UIInterfaceOrientationLandscapeRight</string>
-  </array>
-
-  <key>CADisableMinimumFrameDurationOnPhone</key>
-  <true/>
-  <key>UIApplicationSupportsIndirectInputEvents</key>
-  <true/>
-
-  <key>NSCameraUsageDescription</key>
-  <string>This app uses the camera to scan QR codes and capture images when required.</string>
-
-  <key>NSPhotoLibraryUsageDescription</key>
-  <string>This app accesses your photo library to upload and share images.</string>
-
-  <key>NSPhotoLibraryAddUsageDescription</key>
-  <string>This app saves images to your photo library when you choose to do so.</string>
-
-  <key>NSMicrophoneUsageDescription</key>
-  <string>This app may access the microphone for media-related features.</string>
-
-  <key>CFBundleURLTypes</key>
-  <array>
-    <dict>
-      <key>CFBundleTypeRole</key>
-      <string>Editor</string>
-      <key>CFBundleURLSchemes</key>
-      <array>
-        <string>com.googleusercontent.apps.486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q</string>
-        <string>com.saoirse.epi</string>
-      </array>
-    </dict>
-  </array>
-
-  <key>FirebaseAppDelegateProxyEnabled</key>
-  <true/>
-
-  <key>UIBackgroundModes</key>
-  <array>
-    <string>remote-notification</string>
-    <string>fetch</string>
-  </array>
-
-  <key>ITSAppUsesNonExemptEncryption</key>
-  <false/>
+    <key>CFBundleLocalizations</key>
+    <array>
+    <string>en</string>
+    <string>hi</string>
+    <string>ml</string>
+    </array>
+    <key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>epi Elio</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>saoirse_app</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+    <key>GIDClientID</key>
+    <string>486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q.apps.googleusercontent.com</string>
+	<!-- Google Sign In config -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+    		<key>CFBundleTypeRole</key>
+    		<string>Editor</string>
+    		<key>CFBundleURLSchemes</key>
+    		<array>
+      			<!-- Replace with your REVERSED_CLIENT_ID -->
+      			<string>com.googleusercontent.apps.486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q</string>
+                <string>app-1-486829564070-ios-07e32a618113ab29479467</string>
+    		</array>
+  		</dict>
+		<dict>
+    		<key>CFBundleTypeRole</key>
+    		<string>Editor</string>
+    		<key>CFBundleURLSchemes</key>
+    		<array>
+      			<string>inviteapp.onelink.me</string>
+				<string>epi</string>
+    		</array>
+  		</dict>
+	</array>
+	<!-- For Sharing -->
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+       <string>mailto</string>
+       <string>sms</string>
+       <string>whatsapp</string>
+       <string>fb</string>
+       <string>tg</string>
+       <string>twitter</string>
+	</array>
+	<!-- Gallery Permissions for images -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>EPI requires access to your photo library to select images.</string>
+	<!-- Camera Permissions -->
+	<key>NSCameraUsageDescription</key>
+	<string>EPI use your camera to capture photos.</string>
+	<!-- Notification Permissions -->
+	<key>NSUserNotificationUsageDescription</key>
+	<string>EPI use notifications to keep you updated.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier will be used to deliver personalized ads.</string>
 </dict>
 </plist>

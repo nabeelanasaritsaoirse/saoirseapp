@@ -1,5 +1,7 @@
 // ignore_for_file: unnecessary_nullable_for_final_variable_declarations, await_only_futures
 
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -40,27 +42,12 @@ class AuthService {
   /// STEP 1: SEND OTP
   static Future<bool> sendOTP(String phone, {bool isResend = false}) async {
     try {
-      // Validate phone number format
-      if (phone.isEmpty || !phone.startsWith('+')) {
-        appToast(content: "Invalid phone number format", error: true);
-        return false;
-      }
-
       await auth.verifyPhoneNumber(
         phoneNumber: phone,
         timeout: const Duration(seconds: 60),
         verificationCompleted: (PhoneAuthCredential credential) async {},
         verificationFailed: (FirebaseAuthException e) {
-          // Show user-friendly error message
-          String message = "Verification failed";
-          if (e.code == 'invalid-phone-number') {
-            message = "Invalid phone number format";
-          } else if (e.code == 'too-many-requests') {
-            message = "Too many attempts. Please try again later";
-          } else if (e.message != null) {
-            message = e.message!;
-          }
-          appToast(content: message, error: true);
+          // appToast(content: e.message!, error: true);
         },
         codeSent: (String vId, int? resendToken) {
           verificationId = vId;
@@ -73,11 +60,8 @@ class AuthService {
       );
 
       return true;
-    } on FirebaseAuthException catch (e) {
-      appToast(content: e.message ?? "Authentication error", error: true);
-      return false;
     } catch (e) {
-      appToast(content: "OTP sending failed. Please try again.", error: true);
+      // appToast(content: "OTP sending failed: $e", error: true);
       return false;
     }
   }
@@ -113,18 +97,13 @@ class AuthService {
     try {
       final google = GoogleSignIn.instance;
 
-      // Sign out first to ensure clean state (fixes iPad issues)
-      try {
-        await google.signOut();
-      } catch (_) {
-        // Ignore signOut errors
+      // Initialize Google Sign-In
+      if (Platform.isAndroid) {
+        await google.initialize(
+          serverClientId:
+              '486829564070-mkrkm4v9tji249t6u7gdfiefups09gs4.apps.googleusercontent.com',
+        );
       }
-
-      // Initialize Google Sign-In with server client ID
-      await google.initialize(
-        serverClientId:
-            '486829564070-mkrkm4v9tji249t6u7gdfiefups09gs4.apps.googleusercontent.com',
-      );
 
       // Authenticate (opens Google account selector)
       final GoogleSignInAccount? account = await google.authenticate();

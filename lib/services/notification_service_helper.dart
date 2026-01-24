@@ -13,17 +13,16 @@ class NotificationServiceHelper {
   static Future<void> initializeLocalNotifications() async {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    // iOS settings - REQUIRED for iOS 17+
-    const iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: false,
-      requestBadgePermission: false,
-      requestSoundPermission: false,
+    const DarwinInitializationSettings initializationSettingsDarwin =
+        DarwinInitializationSettings(
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
     );
 
     const initSettings = InitializationSettings(
       android: androidSettings,
-      iOS: iosSettings,
+      iOS: initializationSettingsDarwin,
     );
 
     await _plugin.initialize(
@@ -37,7 +36,7 @@ class NotificationServiceHelper {
       },
     );
 
-    // Create Notification Channel (Android only)
+    // Create Notification Channel
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'high_importance_channel',
       'High Importance Notifications',
