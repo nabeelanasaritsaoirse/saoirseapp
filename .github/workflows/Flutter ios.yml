@@ -3,8 +3,8 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [ test ]
+  workflow_dispatch:
 
 concurrency:
   group: ios-build-${{ github.ref }}
