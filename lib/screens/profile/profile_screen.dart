@@ -303,7 +303,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Get.to(() => PrivacyPolicyScreen());
                           break;
 
-                        case "FAQ":
+                        case "FAQs":
                           Get.to(() => FaqScreen());
                           break;
 

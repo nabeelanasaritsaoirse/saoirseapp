@@ -76,7 +76,7 @@ class FaqScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   appText(
-                                    '${(index + 1).toString().padLeft(2, '0')}',
+                                    (index + 1).toString().padLeft(2, '0'),
                                     fontSize: 15.sp,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -128,4 +128,3 @@ class FaqScreen extends StatelessWidget {
     );
   }
 }
-
