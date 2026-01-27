@@ -12,10 +12,13 @@ class ProductListResponse {
   factory ProductListResponse.fromJson(Map<String, dynamic> json) {
     return ProductListResponse(
       success: json["success"] ?? false,
-      data: json["data"] == null
-          ? []
-          : (json["data"] as List).map((e) => Product.fromJson(e)).toList(),
-      pagination: Pagination.fromJson(json["pagination"] ?? {}),
+      data: (json["data"] as List? ?? [])
+          .map((e) => Product.fromJson(e))
+          .toList(),
+      // pagination is NOT sent by new API → fallback safely
+      pagination: json["pagination"] != null
+          ? Pagination.fromJson(json["pagination"])
+          : Pagination.empty(),
     );
   }
 }
@@ -66,14 +69,12 @@ class Product {
       availability: Availability.fromJson(json["availability"] ?? {}),
       pricing: Pricing.fromJson(json["pricing"] ?? {}),
       hasVariants: json["hasVariants"] ?? false,
-      variants: json["variants"] == null
-          ? []
-          : (json["variants"] as List).map((e) => Variant.fromJson(e)).toList(),
-      images: json["images"] == null
-          ? []
-          : (json["images"] as List)
-              .map((e) => ProductImage.fromJson(e))
-              .toList(),
+      variants: (json["variants"] as List? ?? [])
+          .map((e) => Variant.fromJson(e))
+          .toList(),
+      images: (json["images"] as List? ?? [])
+          .map((e) => ProductImage.fromJson(e))
+          .toList(),
     );
   }
 }
@@ -90,7 +91,6 @@ class Description {
   factory Description.fromJson(Map<String, dynamic> json) {
     return Description(
       short: json["short"] ?? "",
-      // API does NOT send "long", so keep field but default safely
       long: json["long"] ?? "",
     );
   }
@@ -145,15 +145,16 @@ class Pricing {
 
   factory Pricing.fromJson(Map<String, dynamic> json) {
     return Pricing(
-      // API sometimes sends double → convert safely to int
       regularPrice: (json["regularPrice"] is num)
           ? (json["regularPrice"] as num).round()
           : 0,
-      salePrice:
-          (json["salePrice"] is num) ? (json["salePrice"] as num).round() : 0,
-      finalPrice:
-          (json["finalPrice"] is num) ? (json["finalPrice"] as num).round() : 0,
-      currency: json["currency"] ?? "USD",
+      salePrice: (json["salePrice"] is num)
+          ? (json["salePrice"] as num).round()
+          : 0,
+      finalPrice: (json["finalPrice"] is num)
+          ? (json["finalPrice"] as num).round()
+          : 0,
+      currency: json["currency"] ?? "INR",
     );
   }
 }
@@ -228,9 +229,22 @@ class Pagination {
       current: current,
       pages: pages,
       total: json["total"] ?? 0,
-      // API does not send these → derive safely
       hasNext: current < pages,
       hasPrev: current > 1,
     );
   }
+
+  /// Fallback when API does NOT send pagination
+  factory Pagination.empty() {
+    return Pagination(
+      current: 1,
+      pages: 1,
+      total: 0,
+      hasNext: false,
+      hasPrev: false,
+    );
+  }
 }
+
+
+

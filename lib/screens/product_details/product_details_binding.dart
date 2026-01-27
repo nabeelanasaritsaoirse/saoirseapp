@@ -4,20 +4,15 @@ import 'product_details_controller.dart';
 
 class ProductDetailsBinding extends Bindings {
   final String productId;
-  final String? id;
 
-  ProductDetailsBinding({
-    required this.productId,
-    this.id,
-  });
+  ProductDetailsBinding({required this.productId});
 
   @override
   void dependencies() {
-    Get.put(
-      ProductDetailsController(
-        productId: productId,
-        id: id,
-      ),
+    Get.put<ProductDetailsController>(
+      ProductDetailsController(productId: productId),
+      tag: productId, // ⭐ VERY IMPORTANT
     );
   }
 }
+

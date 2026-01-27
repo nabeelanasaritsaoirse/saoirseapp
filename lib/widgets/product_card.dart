@@ -42,13 +42,24 @@ class _ProductCardState extends State<ProductCard> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Get.to(
-          () => ProductDetailsScreen(
-                productId: widget.productId,
-                id: widget.id,
-              ),
-          binding: ProductDetailsBinding(
-              productId: widget.productId, id: widget.id)),
+      // onTap: () => Get.to(
+      //     () => ProductDetailsScreen(
+      //           productId: widget.productId,
+
+      //         ),
+      //     binding: ProductDetailsBinding(
+      //         productId: widget.productId,)),
+  onTap: () {
+  debugPrint("🟢 ProductCard tapped: ${widget.productId}");
+
+  Get.to(
+    () => ProductDetailsScreen(productId: widget.productId),
+    binding: ProductDetailsBinding(productId: widget.productId),
+    preventDuplicates: false,
+  );
+},
+
+
       child: Container(
         width: 150.w,
         margin: widget.margin ?? EdgeInsets.only(right: 10.w),

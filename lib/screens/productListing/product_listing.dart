@@ -192,17 +192,7 @@ class _ProductListingState extends State<ProductListing> {
                 itemBuilder: (context, index) {
                   final product = productlistingController.products[index];
                   return GestureDetector(
-                      onTap: () {
-                    
-                        Get.to((
-                          ProductDetailsScreen(
-                            productId: product.productId,
-                            id: product.id,
-                          ),
-                        ),
-                            binding: ProductDetailsBinding(
-                                productId: product.productId, id: product.id));
-                      },
+                  
                       child: ProductCard(
                           margin: EdgeInsets.all(0),
                           productId: product.id,

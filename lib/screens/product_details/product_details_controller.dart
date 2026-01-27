@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/product_list_response.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../models/plan_model.dart';
@@ -41,6 +42,11 @@ class ProductDetailsController extends GetxController {
   /// Custom plan values
   RxInt customDays = 0.obs;
   RxDouble customAmount = 0.0.obs;
+
+    // ---------------- SIMILAR PRODUCTS (NEW) ----------------
+  RxList<Product> similarProducts = <Product>[].obs;
+  RxBool isSimilarLoading = false.obs;
+
 
   RxBool showBottomButtons = false.obs;
   final ScrollController scrollController = ScrollController();
@@ -96,6 +102,8 @@ class ProductDetailsController extends GetxController {
         }
       }
 
+      fetchSimilarProducts();
+
       // Reset page
       currentImageIndex.value = 0;
       jumpToPageSafe(0);
@@ -103,6 +111,37 @@ class ProductDetailsController extends GetxController {
       isProductLoading(false);
     }
   }
+
+
+  // ========================================================
+  // FETCH SIMILAR PRODUCTS (USES SAME getProducts API)
+  // ========================================================
+  Future<void> fetchSimilarProducts() async {
+  final data = product.value;
+  if (data == null) return;
+
+  final String categoryId = data.category.mainCategoryId;
+
+  try {
+    isSimilarLoading(true);
+
+    final ProductListResponse? response =
+        await productService.getProducts(
+      1, 
+      10, 
+      categoryId: categoryId,
+    );
+
+    if (response != null && response.success) {
+      similarProducts.assignAll(
+        response.data.where((p) => p.id != data.id).toList(),
+      );
+    }
+  } finally {
+    isSimilarLoading(false);
+  }
+}
+
 
   Future<void> checkIfInWishlist(String id) async {
     final exists = await wishlistService.checkWishlist(id);
@@ -162,29 +201,54 @@ class ProductDetailsController extends GetxController {
     currentImageIndex.value = index;
   }
 
+  // void openSelectPlanSheet() async {
+  //   if (product.value == null) return;
+
+  //   // Reset previous plan selection
+  //   resetPlanSelection();
+
+  //   appLoader();
+
+  //   // Fetch plans
+  //   isProductLoading.value = true;
+  //   await loadPlans(product.value!.id);
+  //   isProductLoading.value = false;
+
+  //   // Close loader
+  //   if (Get.isDialogOpen ?? false) Get.back();
+
+  //   // Open sheet
+  //   Get.bottomSheet(
+  //     const SelectPlanSheet(),
+  //     isScrollControlled: true,
+  //     backgroundColor: Colors.transparent,
+  //   );
+  // }
+
   void openSelectPlanSheet() async {
-    if (product.value == null) return;
+  if (product.value == null) return;
 
-    // Reset previous plan selection
-    resetPlanSelection();
+  // Reset previous plan selection
+  resetPlanSelection();
 
-    appLoader();
+  appLoader();
 
-    // Fetch plans
-    isProductLoading.value = true;
-    await loadPlans(product.value!.id);
-    isProductLoading.value = false;
+  // Fetch plans
+  isProductLoading.value = true;
+  await loadPlans(product.value!.id);
+  isProductLoading.value = false;
 
-    // Close loader
-    if (Get.isDialogOpen ?? false) Get.back();
+  // Close loader
+  if (Get.isDialogOpen ?? false) Get.back();
 
-    // Open sheet
-    Get.bottomSheet(
-      const SelectPlanSheet(),
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-    );
-  }
+
+  Get.bottomSheet(
+    SelectPlanSheet(productId: productId),
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+  );
+}
+
 
   void updateAmountFromDays(
     TextEditingController daysController,
@@ -328,16 +392,16 @@ class ProductDetailsController extends GetxController {
     });
   }
 
-  Variant? getSelectedVariant() {
-    if (selectedVariantId.value.isEmpty) return null;
+  // Variant? getSelectedVariant() {
+  //   if (selectedVariantId.value.isEmpty) return null;
 
-    for (final v in product.value?.variants ?? []) {
-      if (v.variantId == selectedVariantId.value) {
-        return v;
-      }
-    }
-    return null;
-  }
+  //   for (final v in product.value?.variants ?? []) {
+  //     if (v.variantId == selectedVariantId.value) {
+  //       return v;
+  //     }
+  //   }
+  //   return null;
+  // }
 
   void clearSelectedVariant() {
     selectedVariantId.value = "";

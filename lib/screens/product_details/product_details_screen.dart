@@ -4,7 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
+import 'package:saoirse_app/screens/home/home_shimmer.dart';
+import 'package:saoirse_app/screens/productListing/product_listing.dart';
+import 'package:saoirse_app/widgets/product_card.dart';
 import '../../models/product_details_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
@@ -37,7 +39,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    controller = Get.find<ProductDetailsController>();
+    controller = Get.find<ProductDetailsController>(tag: widget.productId);
     controller.checkIfInWishlist(widget.productId);
   }
 
@@ -177,8 +179,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ],
             ),
           ),
-
-          SizedBox(height: 50),
+          SizedBox(
+            height: 20.h,
+          ),
+          buildSimilarProductsSection(),
         ],
       ),
     );
@@ -616,6 +620,96 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             ),
           ],
         ),
+      );
+    });
+  }
+
+  Widget buildSimilarProductsSection() {
+    return Obx(() {
+      /// ---------------- LOADING STATE ----------------
+      if (controller.isSimilarLoading.value) {
+        return appLoader();
+      }
+
+      /// ---------------- EMPTY STATE ----------------
+      if (controller.similarProducts.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      /// ---------------- DATA STATE ----------------
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// TITLE ROW (same as Home)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                appText(
+                  "Similar Products",
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+                InkWell(
+                  onTap: () {
+                    final product = controller.product.value;
+                    if (product == null) return;
+
+                    Get.to(
+                      () => const ProductListing(),
+                      arguments: {
+                        'categoryId': product.category.mainCategoryId,
+                        'title': product.category.mainCategoryName,
+                      },
+                    );
+                  },
+                  child: appText(
+                    AppStrings.see_all,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: 8.h),
+
+          /// HORIZONTAL LIST (KEY PART)
+          SizedBox(
+            height: 200.h, // 👈 must be fixed height
+            child: ListView.separated(
+              padding: EdgeInsets.symmetric(horizontal: 10.w),
+              scrollDirection: Axis.horizontal,
+              itemCount: controller.similarProducts.length,
+              separatorBuilder: (_, __) => SizedBox(width: 2.w),
+              itemBuilder: (context, index) {
+                final product = controller.similarProducts[index];
+
+                return SizedBox(
+                  width: 160.w,
+                  child: GestureDetector(
+                    child: ProductCard(
+                      margin: EdgeInsets.all(6),
+                      productId: product.productId,
+                      name: product.name,
+                      brand: product.brand,
+                      image: product.images.isNotEmpty
+                          ? product.images.last.url
+                          : "https://via.placeholder.com/200",
+                      price: product.pricing.finalPrice.toStringAsFixed(0),
+                      isFavorite: false,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          SizedBox(height: 14.h),
+        ],
       );
     });
   }
