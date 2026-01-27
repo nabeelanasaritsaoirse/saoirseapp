@@ -13,6 +13,7 @@ class AppStrings {
   static String sign_up = "SIGN UP";
   static String Referral_code = "Referrel code";
   static String LoginWithGoogle = "Login with Google";
+  static String LoginWithApple = "Login with Apple";
   static String login_title = "Let’s you log in";
   static String login_note = "Welcome back you have been missed";
   static String Forgot_password = "Forgot Password..?";
