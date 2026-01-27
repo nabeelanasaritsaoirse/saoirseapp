@@ -71,6 +71,9 @@ class AppURLs {
   static String KYC_SUBMIT_API = BASE_API + "api/kyc/submit";
   static String KYC_UPLOAD_API = BASE_API + "api/kyc/upload";
 
+  // FAQ api
+  static String FAQ_API = BASE_API + "api/faqs/app";
+
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/installments/orders";
   static String CREATE_BULK_ORDER_API =

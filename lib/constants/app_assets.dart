@@ -58,7 +58,7 @@ class AppAssets {
   static String password_security = "assets/icons/security.png";
   // static String privacy_policy = "assets/icons/privacy.png";
   // static String terms_condition = "assets/icons/terms.png";
-  static String faq = "assets/icons/faq.png";
+  static String faq = "assets/icons/FAQ.png";
   static String about = "assets/icons/about.png";
   // static String logout = "assets/icons/log_out.png";
   // static String kyc = "assets/icons/KYC.png";

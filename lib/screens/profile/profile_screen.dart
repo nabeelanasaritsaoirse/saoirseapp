@@ -24,6 +24,7 @@ import '../terms_and_privacy/terms_conditions.dart';
 import '../transaction_history/transaction_history.dart';
 import '../wishlist/wishlist_screen.dart';
 import 'profile_controller.dart';
+import 'package:saoirse_app/screens/faqs/faqs.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -300,6 +301,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           break;
                         case "Privacy Policy":
                           Get.to(() => PrivacyPolicyScreen());
+                          break;
+
+                        case "FAQ":
+                          Get.to(() => FaqScreen());
                           break;
 
                         case "Terms & Condition":
