@@ -248,7 +248,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
             SizedBox(height: 10.h),
 
-            //-------------------------- Category Section--------------------------------//
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Obx(() {
@@ -258,40 +257,197 @@ class _HomeScreenState extends State<HomeScreen> {
                   return const CategoryChipShimmer();
                 }
 
-                if (categories.isEmpty) {
-                  return const SizedBox.shrink();
-                }
+                return SizedBox(
+                  height: 56.h,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categories.length,
+                    separatorBuilder: (_, __) => SizedBox(width: 10.w),
+                    itemBuilder: (context, index) {
+                      final cat = categories[index];
 
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: categories.map((cat) {
-                      return GestureDetector(
-                        onTap: () {
-                          Get.to(() => SubCategoryScreen(category: cat));
-                        },
-                        child: Container(
-                          margin: EdgeInsets.only(right: 8.w),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 14.w, vertical: 4.h),
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(color: Colors.grey.shade400),
+                      return Obx(() {
+                        final isSelected =
+                            homeController.selectedCategoryId.value == cat.id;
+
+                        return GestureDetector(
+                          onTap: () => homeController.onParentCategoryTap(cat),
+                          child: Container(
+                            width: 55.w,
+                            padding: EdgeInsets.symmetric(vertical: 2.h),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppColors.primaryColor.withOpacity(0.12)
+                                  : AppColors.lightGrey,
+                              borderRadius: BorderRadius.circular(14.r),
+                              border: Border.all(
+                                color: isSelected
+                                    ? AppColors.primaryColor
+                                    : Colors.transparent,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  AppAssets.catandsub,
+                                  width: 23.w,
+                                  height: 25.h,
+                                  fit: BoxFit.contain,
+                                  color: isSelected
+                                      ? AppColors.primaryColor
+                                      : AppColors.textBlack,
+                                ),
+                                SizedBox(height: 2.h),
+                                appText(
+                                  shortName(cat.name),
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w500,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
                           ),
-                          child: appText(
-                            cat.name,
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textBlack,
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      });
+                    },
                   ),
                 );
               }),
             ),
+
+            //SUB-CATEGORY GRID (PASTE YOUR CODE HERE 👇)
+            // -----------------------------------------------
+            Obx(() {
+              final subs = homeController.visibleSubCategories;
+
+              if (homeController.selectedCategoryId.value.isEmpty) {
+                return const SizedBox(); // nothing selected yet
+              }
+
+              if (subs.isEmpty) {
+                return Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: appText("No sub-categories found"),
+                );
+              }
+
+              final displayList =
+                  subs.length > 7 ? subs.take(7).toList() : subs;
+
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: displayList.length + 1,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 12.h,
+                    crossAxisSpacing: 12.w,
+                    childAspectRatio: 0.78,
+                  ),
+                  itemBuilder: (context, index) {
+                    // VIEW ALL
+                    if (index == displayList.length) {
+                      return GestureDetector(
+                        onTap: () {
+                          Get.to(() => ProductListing());
+                        },
+                        child: SizedBox(
+                          height: 95.h, // SAME HEIGHT
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 52.w,
+                                height: 52.w,
+                                decoration: BoxDecoration(
+                                  color:
+                                      AppColors.primaryColor.withOpacity(0.10),
+                                  shape: BoxShape.circle,
+                                ),
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  Icons.arrow_forward,
+                                  size: 24.sp,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                              SizedBox(height: 6.h),
+                              SizedBox(
+                                height: 28.h, // SAME TEXT HEIGHT
+                                child: appText(
+                                  "View All",
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w500,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+
+                    final sub = displayList[index];
+
+                    return GestureDetector(
+                      onTap: () {
+                        Get.to(
+                          () => ProductListing(),
+                          arguments: {"categoryId": sub.id},
+                        );
+                      },
+                      child: SizedBox(
+                        height: 95.h, // 🔒 FIXED HEIGHT (important)
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            /// ICON
+                            Container(
+                              width: 52.w,
+                              height: 52.w,
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor.withOpacity(0.10),
+                                shape: BoxShape.circle,
+                              ),
+                              alignment: Alignment.center,
+                              child: Image.asset(
+                                AppAssets.catandsub,
+                                width: 24.w,
+                                height: 24.w,
+                                fit: BoxFit.contain,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+
+                            SizedBox(height: 6.h), // 🔧 controlled spacing
+
+                            /// TITLE (2 lines, fixed height)
+                            SizedBox(
+                              height: 28.h, // 🔒 FIXED TEXT HEIGHT
+                              child: appText(
+                                formatTwoLineName(sub.name),
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w500,
+                                textAlign: TextAlign.start,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            }),
 
             SizedBox(height: 10.h),
 //----------------Progress Card Section----------------//
@@ -672,4 +828,110 @@ class _HomeScreenState extends State<HomeScreen> {
   //     },
   //   );
   // }
+}
+
+// ignore: unused_element
+class _CategoryItem extends StatelessWidget {
+  final String title;
+  final String iconUrl;
+  final VoidCallback onTap;
+
+  const _CategoryItem({
+    required this.title,
+    required this.iconUrl,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 54.w,
+            height: 54.w,
+            decoration: BoxDecoration(
+              color: AppColors.lightGrey,
+              shape: BoxShape.circle,
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(10.w),
+              child: Image.network(
+                iconUrl,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => Icon(Icons.image_not_supported),
+              ),
+            ),
+          ),
+          SizedBox(height: 6.h),
+          appText(
+            title,
+            fontSize: 11.sp,
+            maxLines: 2,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String shortName(String text, {int max = 6}) {
+  if (text.length <= max) return text;
+  return "${text.substring(0, max)}...";
+}
+
+// ignore: unused_element
+class _ViewAllCategory extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _ViewAllCategory({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 54.w,
+            height: 54.w,
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.arrow_forward,
+              color: AppColors.primaryColor,
+              size: 26.sp,
+            ),
+          ),
+          SizedBox(height: 6.h),
+          appText(
+            "View All",
+            fontSize: 11.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String formatTwoLineName(String text) {
+  final clean = text.trim();
+
+  if (clean.length <= 7) {
+    return clean;
+  }
+
+  if (clean.length <= 10) {
+    return "${clean.substring(0, 7)}\n${clean.substring(7)}";
+  }
+
+  return "${clean.substring(0, 7)}\n${clean.substring(7, 10)}...";
 }
