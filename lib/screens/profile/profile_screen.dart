@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../edit_profile/edit_profile_screen.dart';
+import '../faqs/faqs.dart';
 import '../kyc/kyc_controller.dart';
 import '../kyc/kyc_screen.dart';
 import '../../constants/app_assets.dart';
@@ -300,6 +301,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           break;
                         case "Privacy Policy":
                           Get.to(() => PrivacyPolicyScreen());
+                          break;
+
+                        case "FAQs":
+                          Get.to(() => FaqScreen());
                           break;
 
                         case "Terms & Condition":
