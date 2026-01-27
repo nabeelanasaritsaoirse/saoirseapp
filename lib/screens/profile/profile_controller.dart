@@ -418,7 +418,9 @@ class ProfileController extends GetxController {
       }
 
       // Delete local FCM token
-      await FirebaseMessaging.instance.deleteToken();
+      if (Platform.isAndroid) {
+        await FirebaseMessaging.instance.deleteToken();
+      }
 
       // Call logout API (optional but recommended)
 

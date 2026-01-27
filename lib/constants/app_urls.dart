@@ -2,8 +2,8 @@
 
 class AppURLs {
   //base api
-  static String BASE_API = 'https://api.epielio.com/';
-  // static String BASE_API = 'http://13.127.15.87:8080/';
+   static String BASE_API = 'https://api.epielio.com/';
+ // static String BASE_API = 'http://13.127.15.87:8080/';
 
   //login api
   static String LOGIN_API = BASE_API + 'api/auth/login';
@@ -94,8 +94,7 @@ class AppURLs {
 
   // Orders History
   static String ORDER_HISTORY_API = BASE_API + "api/installments/orders";
-  static String ORDER_DELIVERED_HISTORY_API =
-      BASE_API +
+  static String ORDER_DELIVERED_HISTORY_API = BASE_API +
       "api/installments/orders"; // same endpoint with different status filter only
 
   // Pending Transactions Api

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -24,7 +26,7 @@ class AppsFlyerService {
 
     final options = AppsFlyerOptions(
       afDevKey: '42ygpJ8vjAxWw4dg5YZoSZ',
-      appId: 'com.saoirse.epi',
+      appId: Platform.isAndroid ? 'com.saoirse.epi' : '6755812043',
       showDebug: true,
       timeToWaitForATTUserAuthorization: 0,
       manualStart: false,

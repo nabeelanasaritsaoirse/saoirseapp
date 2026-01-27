@@ -1,5 +1,7 @@
 // ignore_for_file: unnecessary_nullable_for_final_variable_declarations, await_only_futures
 
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -96,10 +98,12 @@ class AuthService {
       final google = GoogleSignIn.instance;
 
       // Initialize Google Sign-In
-      await google.initialize(
-        serverClientId:
-            '486829564070-mkrkm4v9tji249t6u7gdfiefups09gs4.apps.googleusercontent.com',
-      );
+      if (Platform.isAndroid) {
+        await google.initialize(
+          serverClientId:
+              '486829564070-mkrkm4v9tji249t6u7gdfiefups09gs4.apps.googleusercontent.com',
+        );
+      }
 
       // Authenticate (opens Google account selector)
       final GoogleSignInAccount? account = await google.authenticate();
