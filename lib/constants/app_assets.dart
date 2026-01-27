@@ -14,6 +14,7 @@ class AppAssets {
   static String notification = "assets/icons/notification.png";
   static String add_banner = "assets/images/add_banner.jpeg";
   static String banner_refer = "assets/images/banner_refer.jpg";
+  static String catandsub = "assets/images/cat.png";
 
   //icons
   static String google_icon = "assets/icons/google_icon.webp";
