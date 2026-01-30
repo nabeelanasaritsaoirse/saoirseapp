@@ -151,3 +151,38 @@ class IconBox extends StatelessWidget {
     );
   }
 }
+
+// class IconBoxs extends StatelessWidget {
+//   final String image;
+//   final VoidCallback onTap;
+
+//   const IconBoxs({
+//     super.key,
+//     required this.image,
+//     required this.onTap,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return InkWell(
+//       onTap: onTap,
+//       borderRadius: BorderRadius.circular(8.r),
+//       child: SizedBox(
+//         width: 36.w, // 🔒 fixed tap area
+//         height: 36.h,
+//         child: Center(
+//           child: SvgPicture.asset(
+//             image,
+//             width: 22.w, // ✅ REAL ICON SIZE
+//             height: 22.w,
+//             fit: BoxFit.contain,
+//             colorFilter: const ColorFilter.mode(
+//               AppColors.white,
+//               BlendMode.srcIn,
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

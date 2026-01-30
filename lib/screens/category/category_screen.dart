@@ -191,7 +191,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       ),
                       padding: EdgeInsets.all(12.w),
                       child: Image.network(
-                        category.image?.url ?? '',
+                        category.categoryImage?.url ?? '',
                         fit: BoxFit.contain,
                         errorBuilder: (_, __, ___) => Icon(
                           Icons.image_outlined,
