@@ -78,7 +78,7 @@ class _CategoryImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = category.image?.url;
+    final imageUrl = category.categoryImage?.url;
 
     if (imageUrl == null || imageUrl.isEmpty) {
       return Icon(

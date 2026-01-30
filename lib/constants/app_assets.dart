@@ -15,6 +15,7 @@ class AppAssets {
   static String add_banner = "assets/images/add_banner.jpeg";
   static String banner_refer = "assets/images/banner_refer.jpg";
   static String catandsub = "assets/images/cat.png";
+  static String test = "assets/images/cpng.png";
 
   //icons
   static String google_icon = "assets/icons/google_icon.webp";
@@ -80,8 +81,11 @@ class AppAssets {
   static String address = "assets/svg/address.svg";
   static String like = "assets/svg/like.svg";
   static String searchh = "assets/svg/search.svg";
+  static String searchicon = "assets/svg/searchicon.svg";
   static String bell = "assets/svg/bell.svg";
+  static String notificationicon = "assets/svg/notificationicon.svg";
   static String wallett = "assets/svg/wallet.svg";
+  static String walleticon = "assets/svg/walleticon.svg";
 
   //Dummy Assets for image needed response
   static String mobile = "assets/images/phone.png";
