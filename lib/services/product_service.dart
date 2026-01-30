@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:saoirse_app/models/product_faq.dart';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
@@ -117,4 +118,37 @@ class ProductService {
       return [];
     }
   }
+
+  // **** Product FAQ section **** //
+  Future<List<ProductFaq>> fetchProductFaqs(String productId) async {
+  try {
+    final token = await _token();
+
+    debugPrint("[FAQ API] token = $token");
+
+    final url = "${AppURLs.PRODUCT_FAQ_API}$productId";
+
+    final response = await APIService.getRequest(
+      url: url,
+      onSuccess: (data) => data,
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response == null || response['success'] != true) {
+      return [];
+    }
+
+    final List list = response['data'] ?? [];
+
+    return list
+        .map((e) => ProductFaq.fromJson(e))
+        .toList();
+  } catch (e) {
+    debugPrint("❌ fetchProductFaqs error: $e");
+    return [];
+  }
+}
+
 }

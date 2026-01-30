@@ -120,9 +120,11 @@ class MyApp extends StatelessWidget {
           },
           child: GetMaterialApp(
             initialBinding: AllController(),
+            
             locale: locale,
             debugShowCheckedModeBanner: false,
             title: AppStrings.app_name,
+            
             theme: ThemeData(
               scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
               textTheme: GoogleFonts.poppinsTextTheme(),
@@ -131,6 +133,7 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
             ),
             scrollBehavior: CustomScrollBehavior(),
+            
             home: SplashScreen(),
             localizationsDelegates: const [
               AppLocalizations.delegate,
