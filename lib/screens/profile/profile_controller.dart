@@ -57,6 +57,7 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.active_oders, "title": "Active Orders"},
     {"icon": AppAssets.transactions, "title": "Transactions"},
     {"icon": AppAssets.delivered, "title": "Delivered"},
+    {"icon": AppAssets.autopay, "title": "Autopay"},
     // {"icon": AppAssets.customer_care, "title": "Customer Care"},
   ];
 

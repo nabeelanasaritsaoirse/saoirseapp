@@ -74,6 +74,15 @@ class AppURLs {
   // FAQ api
   static String FAQ_API = BASE_API + "api/faqs/app";
 
+  //Autopay Dashboard Api
+  static String AUTOPAY_DASHBOARD_API =
+      BASE_API + "api/installments/autopay/dashboard";
+
+  static String AUTOPAY_SETTINGS_API_PUT =
+      BASE_API + "api/installments/autopay/settings";
+  static String AUTOPAY_SETTINGS_API =
+      BASE_API + "api/installments/autopay/settings";
+
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/installments/orders";
   static String CREATE_BULK_ORDER_API =

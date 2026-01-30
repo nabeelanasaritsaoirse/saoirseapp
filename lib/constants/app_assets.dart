@@ -60,7 +60,7 @@ class AppAssets {
   static String password_security = "assets/icons/security.png";
   // static String privacy_policy = "assets/icons/privacy.png";
   // static String terms_condition = "assets/icons/terms.png";
-  static String faq = "assets/svg/faq.svg";
+
   static String about = "assets/icons/about.png";
   // static String logout = "assets/icons/log_out.png";
   // static String kyc = "assets/icons/KYC.png";
@@ -77,6 +77,8 @@ class AppAssets {
   static String terms_condition = "assets/svg/terms_condition.svg";
   static String logout = "assets/svg/logout.svg";
   static String kyc = "assets/svg/kyc.svg";
+  static String faq = "assets/svg/faq.svg";
+  static String autopay = "assets/svg/autopay.svg";
   static String manage_accounts = "assets/svg/account.svg";
   static String address = "assets/svg/address.svg";
   static String like = "assets/svg/like.svg";

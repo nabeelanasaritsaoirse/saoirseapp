@@ -9,6 +9,7 @@ class AppColors {
   //  Neutral Colors
   static const Color transparent = Colors.transparent;
   static const Color white = Colors.white;
+  static const Color offWhite = Color.fromARGB(255, 232, 231, 231);
   static const Color transparentWhite = Color.fromRGBO(255, 255, 255, 0.5);
   static const Color black = Colors.black;
   static const Color white70 = Colors.white70;
@@ -31,6 +32,7 @@ class AppColors {
   static const Color red = Colors.red;
   static const Color orange = Colors.orange;
   static const Color yellow = Colors.yellow;
+  static const Color purple = Colors.purple;
   static const Color blueshade = Color.fromARGB(255, 175, 214, 246);
   static const Color mediumBlue = Color.fromARGB(255, 29, 16, 211);
   static const Color skyBlue = Color(0xFF9BBBFC);

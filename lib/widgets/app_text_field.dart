@@ -37,7 +37,6 @@ class appTextField extends StatefulWidget {
   final bool readOnly;
   final bool? enabled;
 
-  /// ✅ Added FocusNode here
   final FocusNode? focusNode;
 
   const appTextField({
@@ -71,7 +70,7 @@ class appTextField extends StatefulWidget {
     this.readOnly = false,
     this.enabled = false,
 
-    /// ✅ Added FocusNode param
+   
     this.focusNode,
   });
 
@@ -93,7 +92,7 @@ class _appTextFieldState extends State<appTextField> {
     return TextFormField(
       controller: widget.controller,
 
-      /// ✅ Apply FocusNode here
+     
       focusNode: widget.focusNode,
 
       cursorColor: widget.textColor ?? AppColors.black,
