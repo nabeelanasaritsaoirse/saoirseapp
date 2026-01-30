@@ -121,6 +121,9 @@ class AppStrings {
   // FAQ page
   static String FAQsTitle = "FAQs";
 
+  // Autopay Dashboard page
+  static String AutopayDashboard_Title = "Autopay Dashboard";
+
   //Cart page
   static String carttitle = "Cart";
 
