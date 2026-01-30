@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/product_faq.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
+import '../../models/product_faq.dart';
 import '../../models/product_list_response.dart';
 import '../../services/product_service.dart';
 import '../../services/wishlist_service.dart';
@@ -521,12 +521,11 @@ class ProductDetailsController extends GetxController {
     }
   }
 
- void removeReviewImage(int index) {
-  if (index >= 0 && index < reviewImages.length) {
-    reviewImages.removeAt(index);
+  void removeReviewImage(int index) {
+    if (index >= 0 && index < reviewImages.length) {
+      reviewImages.removeAt(index);
+    }
   }
-}
-
 
   void updateReviewText(String text) {
     reviewText.value = text;

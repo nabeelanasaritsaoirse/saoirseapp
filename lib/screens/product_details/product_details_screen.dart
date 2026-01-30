@@ -4,21 +4,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/all_review/all_review_screen.dart';
-import 'package:saoirse_app/screens/product_faq/product_faq_screen.dart';
-
-import 'package:saoirse_app/widgets/build_expandable_header.dart';
 
 import '../../models/product_details_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
+import '../../widgets/build_expandable_header.dart';
 import '../../widgets/product_card.dart';
 import '../../widgets/warning_dialog.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_text.dart';
+import '../all_review/all_review_screen.dart';
 import '../cart/cart_controller.dart';
 import '../productListing/product_listing.dart';
+import '../product_faq/product_faq_screen.dart';
 import '../select_address/select_address.dart';
 import 'product_details_controller.dart';
 

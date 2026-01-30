@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/product_details/product_details_controller.dart';
 
 import '../constants/app_colors.dart';
-
+import '../screens/product_details/product_details_controller.dart';
 import 'app_text.dart';
 
 class WriteReviewDialog extends StatelessWidget {
@@ -230,7 +229,6 @@ class WriteReviewDialog extends StatelessWidget {
                       backgroundColor: AppColors.primaryColor,
                     ),
                     onPressed: () {
-                      // TODO: Submit review API
                       controller.resetReviewForm();
                       Get.back();
                     },

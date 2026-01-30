@@ -1,12 +1,14 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/all_review/all_review_controller.dart';
-import 'package:saoirse_app/widgets/app_loader.dart';
-import 'package:saoirse_app/widgets/custom_appbar.dart';
 
 import '../../constants/app_colors.dart';
+import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
+import '../../widgets/custom_appbar.dart';
+import 'all_review_controller.dart';
 
 class AllReviewsScreen extends StatelessWidget {
   AllReviewsScreen({super.key});

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:saoirse_app/models/product_faq.dart';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
 import '../models/plan_model.dart';
 import '../models/product_details_model.dart';
+import '../models/product_faq.dart';
 import '../models/product_list_response.dart';
 import 'api_service.dart';
 
@@ -121,34 +121,31 @@ class ProductService {
 
   // **** Product FAQ section **** //
   Future<List<ProductFaq>> fetchProductFaqs(String productId) async {
-  try {
-    final token = await _token();
+    try {
+      final token = await _token();
 
-    debugPrint("[FAQ API] token = $token");
+      debugPrint("[FAQ API] token = $token");
 
-    final url = "${AppURLs.PRODUCT_FAQ_API}$productId";
+      final url = "${AppURLs.PRODUCT_FAQ_API}$productId";
 
-    final response = await APIService.getRequest(
-      url: url,
-      onSuccess: (data) => data,
-      headers: {
-        "Authorization": "Bearer $token",
-      },
-    );
+      final response = await APIService.getRequest(
+        url: url,
+        onSuccess: (data) => data,
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+      );
 
-    if (response == null || response['success'] != true) {
+      if (response == null || response['success'] != true) {
+        return [];
+      }
+
+      final List list = response['data'] ?? [];
+
+      return list.map((e) => ProductFaq.fromJson(e)).toList();
+    } catch (e) {
+      debugPrint("❌ fetchProductFaqs error: $e");
       return [];
     }
-
-    final List list = response['data'] ?? [];
-
-    return list
-        .map((e) => ProductFaq.fromJson(e))
-        .toList();
-  } catch (e) {
-    debugPrint("❌ fetchProductFaqs error: $e");
-    return [];
   }
-}
-
 }
