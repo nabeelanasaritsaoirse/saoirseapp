@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/screens/autopay_dashboard/autopay_settings_preferences.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -12,6 +13,7 @@ import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_appbar.dart';
 import 'autopay_dashboard_controller.dart';
+import 'package:iconsax/iconsax.dart';
 
 class AutopayDashboardScreen extends StatelessWidget {
   AutopayDashboardScreen({super.key});
@@ -20,64 +22,69 @@ class AutopayDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(375, 812),
-      builder: (_, __) {
-        return Scaffold(
-          backgroundColor: AppColors.offWhite,
-          appBar: CustomAppBar(
-            title: AppStrings.AutopayDashboard_Title,
-            showBack: true,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.settings, color: AppColors.white),
-                onPressed: () async {
-                  final controller = Get.find<AutopayController>();
-                  controller.fetchAutopaySettings();
+    return Scaffold(
+      backgroundColor: AppColors.offWhite,
+      appBar: CustomAppBar(
+        title: AppStrings.AutopayDashboard_Title,
+        showBack: true,
+        actions: [
+          IconButton(
+            icon: Icon(Iconsax.settings4, color: AppColors.white),
+            //
+            //   todo: open settings dialog                                                Settings Button
+            //
+            onPressed: () async {
+              final controller = Get.find<AutopayController>();
+              controller.fetchAutopaySettings();
 
-                  Get.dialog(
-                    AutopaySettingsDialog(),
-                    barrierDismissible: true,
-                  );
-                },
+              Get.dialog(
+                AutopaySettingsDialog(),
+                barrierDismissible: true,
+              );
+            },
+          ),
+        ],
+      ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return appLoader();
+        }
+
+        if (controller.errorMessage.isNotEmpty) {
+          return Center(
+            child: appText(
+              controller.errorMessage.value,
+              color: AppColors.red,
+            ),
+          );
+        }
+
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(10.w),
+                child: walletCard(),
               ),
+              SizedBox(height: 12.h),
+              forecastAndList(),
+              SizedBox(height: 20.h),
             ],
           ),
-          body: Obx(() {
-            if (controller.isLoading.value) {
-              return appLoader();
-            }
-
-            if (controller.errorMessage.isNotEmpty) {
-              return Center(
-                child: appText(
-                  controller.errorMessage.value,
-                  color: AppColors.red,
-                ),
-              );
-            }
-
-            return Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(16.w),
-                  child: walletCard(),
-                ),
-                SizedBox(height: 12.h),
-                Expanded(
-                  child: forecastAndList(),
-                ),
-              ],
-            );
-          }),
         );
-      },
+      }),
     );
   }
 
   Widget walletCard() {
     return Container(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.only(
+        left: 12.w,
+        top: 12.h,
+        right: 12.w,
+        bottom: 10.h,
+      ),
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -85,7 +92,9 @@ class AutopayDashboardScreen extends StatelessWidget {
             blurRadius: 12.0,
           ),
         ],
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           colors: [Color(0xFF0B0F5C), Color(0xFF1B2AAE)],
         ),
         borderRadius: BorderRadius.circular(14.r),
@@ -130,10 +139,24 @@ class AutopayDashboardScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: 10.h),
-            appText(
-              'Daily Deductions: ₹${controller.dailyDeduction.value}',
-              fontSize: 14.sp,
+            Container(
+              height: 1.h,
               color: AppColors.grey,
+            ),
+            SizedBox(height: 8.h),
+            Row(
+              children: [
+                appText(
+                  'Daily Deductions:',
+                  fontSize: 14.sp,
+                  color: AppColors.grey,
+                ),
+                appText(
+                  '₹${controller.dailyDeduction.value}',
+                  fontSize: 14.sp,
+                  color: AppColors.white,
+                ),
+              ],
             ),
           ],
         );
@@ -167,7 +190,6 @@ class AutopayDashboardScreen extends StatelessWidget {
             size: 14.sp,
             color: Colors.white,
           ),
-          // SizedBox(width: 3.w),
           appText(
             text,
             fontSize: 12.sp,
@@ -188,6 +210,8 @@ class AutopayDashboardScreen extends StatelessWidget {
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(30.r),
           topRight: Radius.circular(30.r),
+          bottomLeft: Radius.circular(30.r),
+          bottomRight: Radius.circular(30.r),
         ),
       ),
       child: Obx(() {
@@ -203,38 +227,27 @@ class AutopayDashboardScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               height: 44.h,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0B0F5C),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                ),
-                onPressed: () {},
-                child: appText(
-                  'Quick Add ₹${controller.suggestedTopUp.value}',
-                  fontSize: 14.sp,
-                  color: AppColors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+              child: appButton(
+                onTap: () {
+                  //   todo: open settings dialog                                                Quick Button
+                },
+                buttonText: 'Quick Add ₹${controller.suggestedTopUp.value}',
+                buttonColor: AppColors.primaryColor,
+                textColor: AppColors.white,
+                borderRadius: BorderRadius.circular(10.r),
               ),
             ),
             SizedBox(height: 16.h),
-            Expanded(
-              child: controller.items.isEmpty
-                  ? Center(
-                      child: appText(
+            Column(
+              children: controller.items.isEmpty
+                  ? [
+                      appText(
                         'No autopay orders found',
                         fontSize: 13.sp,
                         color: AppColors.grey,
                       ),
-                    )
-                  : ListView.builder(
-                      itemCount: controller.items.length,
-                      itemBuilder: (_, index) {
-                        return autopayCard(controller.items[index]);
-                      },
-                    ),
+                    ]
+                  : controller.items.map((item) => autopayCard(item)).toList(),
             ),
           ],
         );
@@ -250,9 +263,9 @@ class AutopayDashboardScreen extends StatelessWidget {
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: isDisabled ? AppColors.grey : AppColors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-          color: AppColors.darkGray,
+          color: AppColors.offWhite,
         ),
       ),
       child: Opacity(
@@ -278,10 +291,28 @@ class AutopayDashboardScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Icon(
-                      Icons.settings,
-                      size: 18.sp,
-                      color: AppColors.grey,
+                    Row(
+                      children: [
+                        appText(
+                          'Active',
+                          fontSize: 11.sp,
+                          color: AppColors.red,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            showAutopayPreferenceSheet(Get.context!);
+                          },
+                          child: Icon(
+                            Icons.open_in_new_rounded,
+                            size: 18.sp,
+                            color: AppColors.skyBlue,
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 6.h),
                     Container(
@@ -290,13 +321,13 @@ class AutopayDashboardScreen extends StatelessWidget {
                         vertical: 2.h,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.purple.shade100,
-                        borderRadius: BorderRadius.circular(10.r),
+                        color: AppColors.lightAmber,
+                        borderRadius: BorderRadius.circular(5.r),
                       ),
                       child: appText(
                         'Priority: ${item.priority}',
                         fontSize: 11.sp,
-                        color: AppColors.gradientBlue,
+                        color: AppColors.white,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -321,19 +352,7 @@ class AutopayDashboardScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: 8.h),
-            SizedBox(
-              height: 6.h,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(50.r),
-                child: LinearProgressIndicator(
-                  value: item.progress,
-                  backgroundColor: Colors.grey.shade300,
-                  valueColor:
-                      const AlwaysStoppedAnimation<Color>(AppColors.purple),
-                ),
-              ),
-            ),
-            SizedBox(height: 6.h),
+            customGradientProgress(value: item.progress),
           ],
         ),
       ),
@@ -341,6 +360,45 @@ class AutopayDashboardScreen extends StatelessWidget {
   }
 }
 
+Widget customGradientProgress({
+  required double value,
+}) {
+  return Container(
+    height: 8.h,
+    width: double.infinity,
+    decoration: BoxDecoration(
+      color: const Color(0xFFE8EEFF),
+      borderRadius: BorderRadius.circular(50),
+    ),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(50),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              width: constraints.maxWidth * value.clamp(0.0, 1.0),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Color(0xFF9CB6FF),
+                    Color(0xFF5A7CFF),
+                    Color(0xFF4A5BFF),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(50),
+              ),
+            ),
+          );
+        },
+      ),
+    ),
+  );
+}
+
+//                                                                                        AUTOPAY SETTINGS DIALOGBOX
 class AutopaySettingsDialog extends StatelessWidget {
   AutopaySettingsDialog({super.key});
 
@@ -349,157 +407,143 @@ class AutopaySettingsDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      backgroundColor: AppColors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.r)),
       child: Obx(() {
         if (controller.isSettingsLoading.value) {
           return appLoader();
         }
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * .9.h,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              header(),
-              switchTile(
-                'Enable Autopay',
-                controller.autopayEnabled.value,
-                (v) => controller.autopayEnabled.value = v,
-              ),
-              const SizedBox(height: 10),
-              timePreference(),
-              const SizedBox(height: 14),
-              appText('Wallet Reserves', fontWeight: FontWeight.w600),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      autopayTitle(),
+                      switchTile(
+                        'Enable Autopay',
+                        controller.autopayEnabled.value,
+                        (v) => controller.autopayEnabled.value = v,
+                      ),
+                      SizedBox(height: 10.h),
+                      timePreference(),
+                      SizedBox(height: 14.h),
 
-              const SizedBox(height: 8),
+//                                                                                         WALLET RESERVES & REMINDER & NOTIFICATION
 
-//=================================================================
-//              AUTYOPAY SETTINGS DIALOG - RUPEE TEXT FIELDS
-//=================================================================
-              appTextField(
-                controller: controller.minBalanceCtrl,
-                hintText: "Minimum Balance Lock",
-                fillColor: AppColors.white,
-                hintColor: AppColors.black,
-                textColor: AppColors.black,
-                onChanged: (v) =>
-                    controller.minimumBalanceLock.value = int.tryParse(v) ?? 0,
-                textInputType: TextInputType.number,
-                prefixWidget: appText(
-                  '₹',
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.grey,
+                      appText('Wallet Reserves', fontWeight: FontWeight.w600),
+                      SizedBox(height: 8.h),
+                      appTextField(
+                        controller: controller.minBalanceCtrl,
+                        hintText: "₹Minimum Balance Lock",
+                        fillColor: AppColors.white,
+                        hintColor: AppColors.grey,
+                        textColor: AppColors.black,
+                        onChanged: (v) => controller.minimumBalanceLock.value =
+                            int.tryParse(v) ?? 0,
+                        textInputType: TextInputType.number,
+                      ),
+                      SizedBox(height: 10.h),
+                      appTextField(
+                        controller: controller.lowBalanceCtrl,
+                        hintText: "₹ Low Balance Threshold",
+                        fillColor: AppColors.white,
+                        hintColor: AppColors.grey,
+                        textColor: AppColors.black,
+                        onChanged: (v) => controller.lowBalanceThreshold.value =
+                            int.tryParse(v) ?? 0,
+                        textInputType: TextInputType.number,
+                      ),
+                      SizedBox(height: 14.h),
+
+//                                                                                                   REMINDER
+
+                      appText('Reminder', fontWeight: FontWeight.w600),
+                      SizedBox(height: 8.h),
+                      appTextField(
+                        controller: controller.reminderHoursCtrl,
+                        hintText: 'Hours Before Payment (1–12)',
+                        fillColor: AppColors.white,
+                        hintColor: AppColors.grey,
+                        textColor: AppColors.black,
+                        onChanged: (v) {
+                          controller.reminderHoursBefore.value =
+                              int.tryParse(v) ?? 1;
+                        },
+                        textInputType: TextInputType.number,
+                        suffixWidget: appText(
+                          'hours',
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 14.h),
+
+//                                                                                   NOTIFICATION PREFERENCES
+
+                      appText('Notification Preferences',
+                          fontWeight: FontWeight.w600),
+                      SizedBox(height: 10.h),
+                      switchTile(
+                        'Autopay Success',
+                        controller.notifyAutopaySuccess.value,
+                        (v) => controller.notifyAutopaySuccess.value = v,
+                      ),
+                      switchTile(
+                        'Autopay Failed',
+                        controller.notifyAutopayFailed.value,
+                        (v) => controller.notifyAutopayFailed.value = v,
+                      ),
+                      switchTile(
+                        'Low Balance Alert',
+                        controller.notifyLowBalance.value,
+                        (v) => controller.notifyLowBalance.value = v,
+                      ),
+                      switchTile(
+                        'Daily Reminder',
+                        controller.notifyDailyReminder.value,
+                        (v) => controller.notifyDailyReminder.value = v,
+                      ),
+                      SizedBox(height: 20.h),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
-              appTextField(
-                controller: controller.lowBalanceCtrl,
-                hintText: "Low Balance Threshold",
-                fillColor: AppColors.white,
-                hintColor: AppColors.black,
-                textColor: AppColors.black,
-                onChanged: (v) =>
-                    controller.lowBalanceThreshold.value = int.tryParse(v) ?? 0,
-                textInputType: TextInputType.number,
-                prefixWidget: appText(
-                  '₹',
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.grey,
-                ),
-              ),
 
-              const SizedBox(height: 14),
-//===============================================================================
-//          AUTYOPAY SETTINGS DIALOG - REMINDER HOURS FIELD
-//===============================================================================
+//                                                                                SAVE & CANCEL BUTTONS
 
-              appText('Reminder', fontWeight: FontWeight.w600),
-
-              const SizedBox(height: 8),
-              appTextField(
-                controller: controller.reminderHoursCtrl,
-                hintText: 'Hours Before Payment (1–12)',
-                fillColor: AppColors.white,
-                hintColor: AppColors.black,
-                textColor: AppColors.black,
-                onChanged: (v) {
-                  final val = int.tryParse(v) ?? 1;
-                  controller.reminderHoursBefore.value = val;
-                },
-                validator: (v) {
-                  final val = int.tryParse(v ?? '');
-                  if (val == null || val < 1 || val > 12) {
-                    return 'Enter a value between 1 and 12';
-                  }
-                  return null;
-                },
-                textInputType: TextInputType.number,
-                suffixWidget: appText(
-                  'hours',
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  color: const Color.fromARGB(255, 13, 9, 9),
-                ),
-              ),
-
-//=====================================================================================
-//              AUTYOPAY SETTINGS DIALOG - NOTIFICATION PREFERENCES
-//=====================================================================================
-              const SizedBox(height: 14),
-              appText('Notification Preferences', fontWeight: FontWeight.w600),
-
-              switchTile(
-                'Autopay Success',
-                controller.notifyAutopaySuccess.value,
-                (v) => controller.notifyAutopaySuccess.value = v,
-              ),
-              switchTile(
-                'Autopay Failed',
-                controller.notifyAutopayFailed.value,
-                (v) => controller.notifyAutopayFailed.value = v,
-              ),
-              switchTile(
-                'Low Balance Alert',
-                controller.notifyLowBalance.value,
-                (v) => controller.notifyLowBalance.value = v,
-              ),
-              switchTile(
-                'Daily Reminder',
-                controller.notifyDailyReminder.value,
-                (v) => controller.notifyDailyReminder.value = v,
-              ),
-              const SizedBox(height: 20),
-//==============================================================================
-//                            SAVE & CANCEL BUTTONS
-//==============================================================================
-
-              Row(
-                children: [
-                  Expanded(
-                    child: appButton(
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: appButton(
                         onTap: () => Get.back(),
                         buttonText: "Cancel",
                         textColor: AppColors.primaryColor,
                         buttonColor: AppColors.white,
-                        borderColor: AppColors.primaryColor),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: appButton(
-                      onTap: () {
-                        FocusScope.of(Get.context!).unfocus();
-                        controller.saveAutopaySettings();
-                      },
-                      buttonText: "Save Settings",
-                      textColor: AppColors.white,
-                      buttonColor: AppColors.primaryColor,
-                      borderColor: AppColors.white,
-                      borderWidth: 1.5,
+                        borderColor: AppColors.primaryColor,
+                      ),
                     ),
-                  ),
-                ],
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: appButton(
+                        onTap: () {
+                          FocusScope.of(context).unfocus();
+                          controller.saveAutopaySettings();
+                        },
+                        buttonText: "Save ",
+                        textColor: AppColors.white,
+                        buttonColor: AppColors.primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -508,31 +552,35 @@ class AutopaySettingsDialog extends StatelessWidget {
     );
   }
 
-  Widget header() {
+//                                                                                   AUTOPAY SETTINGS Title
+  Widget autopayTitle() {
     return Center(
       child: Padding(
-          padding: EdgeInsets.only(bottom: 12),
+          padding: EdgeInsets.only(bottom: 12.h),
           child: appText('Autopay Settings',
-              fontSize: 18, fontWeight: FontWeight.bold)),
+              fontSize: 18.sp, fontWeight: FontWeight.w600)),
     );
   }
 
   Widget switchTile(String title, bool value, ValueChanged<bool> onChanged) {
     return SwitchListTile(
+      activeColor: AppColors.primaryColor,
       dense: true,
       contentPadding: EdgeInsets.zero,
-      title: appText(title, textAlign: TextAlign.left),
+      title: appText(title,
+          textAlign: TextAlign.left, fontWeight: FontWeight.w600),
       value: value,
       onChanged: onChanged,
     );
   }
 
+//                                                                               TIME PREFERENCE DROPDOWN
   Widget timePreference() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         appText('Time Preference', fontWeight: FontWeight.w600),
-        const SizedBox(height: 6),
+        SizedBox(height: 6.h),
         DropdownButtonFormField<String>(
           value: controller.timePreference.value,
           items: const [
@@ -568,9 +616,23 @@ class AutopaySettingsDialog extends StatelessWidget {
       prefixIcon: prefix,
       suffixIcon: suffix,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.r),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      contentPadding: EdgeInsets.symmetric(horizontal: 12.h, vertical: 12.w),
     );
   }
+}
+
+void showAutopayPreferenceSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+    ),
+    builder: (_) {
+      return AutopaySettingsSheet();
+    },
+  );
 }

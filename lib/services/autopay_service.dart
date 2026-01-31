@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 
+
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
@@ -51,7 +53,7 @@ class AutopayService {
     );
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
-      log("AUTOPAY SETTINGS_ GET==${response.body}");
+      log("AUTOPAY SETTINGS  GET======>${response.body}");
       final settingsModel = AutopaySettingsDialogModel.fromJson(decoded);
       return settingsModel;
     } else {
@@ -80,7 +82,7 @@ class AutopayService {
       "reminderHoursBefore": reminderHoursBefore,
     };
 
-    log("AUTOPAY SETTINGS BODY FINAL: ${jsonEncode(body)}");
+    log("AUTOPAY SETTINGS PUT BODY : ${jsonEncode(body)}");
 
     final result = await APIService.putRequest<bool>(
       url: AppURLs.AUTOPAY_SETTINGS_API,
@@ -90,7 +92,7 @@ class AutopayService {
         "Content-Type": "application/json",
       },
       onSuccess: (json) {
-        log("AUTOPAY SETTINGS UPDATED RESPONSE: $json");
+        log("AUTOPAY SETTINGS UPDATED RESPONSE PUT========>: $json");
         return json["success"] == true;
       },
     );
@@ -98,58 +100,71 @@ class AutopayService {
     return result ?? false;
   }
 
-//   Future<bool> updateAutopaySettings({
-//     required bool enabled,
-//     required int lowBalanceThreshold,
-//     required int minimumBalanceLock,
-//     required int reminderHoursBefore,
-//     required bool sendDailyReminder,
-//     required String timePreference,
-//     required bool autopaySuccess,
-//     required bool autopayFailed,
-//     required bool lowBalanceAlert,
-//     required bool dailyReminder,
-//   }) async {
-//     final token = box.read(AppConst.ACCESS_TOKEN);
-//     final body = {
-//   "enabled": enabled,
-//   "timePreference": timePreference,
-//   "minimumBalanceLock": minimumBalanceLock,
-//   "lowBalanceThreshold": lowBalanceThreshold,
-//   "sendDailyReminder": sendDailyReminder,
-//   "reminderHoursBefore": reminderHoursBefore,
-// };
+  Future<bool> updateNotificationPreferences({
+    required bool autopaySuccess,
+    required bool autopayFailed,
+    required bool lowBalanceAlert,
+    required bool dailyReminder,
+  }) async {
+    final token = box.read(AppConst.ACCESS_TOKEN);
 
-//     // final body = {
-//     //   "enabled": false,
-//     //   "lowBalanceThreshold": 500,
-//     //   "minimumBalanceLock": 0,
-//     //   "reminderHoursBefore": 1,
-//     //   "sendDailyReminder": true,
-//     //   "timePreference": "MORNING_6AM"
-//     // };
+    final body = {
+      "autopaySuccess": autopaySuccess,
+      "autopayFailed": autopayFailed,
+      "lowBalanceAlert": lowBalanceAlert,
+      "dailyReminder": dailyReminder,
+    };
 
-//     //  {
-//     //   "enabled": enabled,
-//     //   "timePreference": "timePreference",
-//     //   "minimumBalanceLock": minimumBalanceLock,
-//     //   "lowBalanceThreshold": lowBalanceThreshold,
-//     //   "sendDailyReminder": sendDailyReminder,
-//     //   "reminderHoursBefore": reminderHoursBefore
-//     // };
-//     log("AUTOPAY SETTINGS BODY:============= $body");
-//     final result = await APIService.putRequest<bool>(
-//         url: AppURLs.AUTOPAY_SETTINGS_API_PUT,
-//         body: body,
-//         headers: {
-//           "Authorization": "Bearer $token",
-//           "Content-Type": "application/json",
-//         },
-//         onSuccess: (json) {
-//           log("AUTOPAY SETTINGS UPDATED:============= $json");
-//           return json["success"] == true;
-//         });
+    log("NOTIFICATION PREFERENCES BODY: ${jsonEncode(body)}");
 
-//     return result ?? false;
-//   }
+    final result = await APIService.putRequest<bool>(
+      url: AppURLs.AUTOPAY_NOTIFICATION_PREFERENCES_API,
+      body: body,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (json) {
+        log("NOTIFICATION PREF RESPONSE PUT=======>: $json");
+        return json["success"] == true;
+      },
+    );
+
+    return result ?? false;
+  }
+
+  // ================= ADD SKIP DATES =================
+  Future<bool> addSkipDates({
+    required String orderId,
+    required List<DateTime> dates,
+  }) async {
+    final token = box.read(AppConst.ACCESS_TOKEN);
+
+    final body = {
+      "dates": dates.map((d) => DateFormat('yyyy-MM-dd').format(d)).toList(),
+    };
+
+    log("ADD SKIP DATES BODY: ${jsonEncode(body)}");
+
+    final result = await APIService.postRequest<bool>(
+      url: "${AppURLs.AUTOPAY_SKIP_DATES_ADD_API}/$orderId",
+      body: body,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (json) {
+        log(" ADD SKIP DATES RESPONSE  ==> $json");
+        return json["success"] == true;
+      },
+      // onError: (status, json) {
+      //   if (status == 400) {
+      //     Get.snackbar("Limit Reached", "Maximum 10 skip dates allowed");
+      //   }
+      //   return false;
+      // },
+    );
+
+    return result ?? false;
+  }
 }
