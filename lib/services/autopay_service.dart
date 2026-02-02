@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 
-
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:saoirse_app/models/autopay_status_model.dart';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
@@ -147,7 +147,7 @@ class AutopayService {
     log("ADD SKIP DATES BODY: ${jsonEncode(body)}");
 
     final result = await APIService.postRequest<bool>(
-      url: "${AppURLs.AUTOPAY_SKIP_DATES_ADD_API}/$orderId",
+      url: "${AppURLs.AUTOPAY_SKIP_DATES_ADD_API}/:$orderId",
       body: body,
       headers: {
         "Authorization": "Bearer $token",
@@ -157,12 +157,59 @@ class AutopayService {
         log(" ADD SKIP DATES RESPONSE  ==> $json");
         return json["success"] == true;
       },
-      // onError: (status, json) {
-      //   if (status == 400) {
-      //     Get.snackbar("Limit Reached", "Maximum 10 skip dates allowed");
-      //   }
-      //   return false;
-      // },
+    );
+
+    return result ?? false;
+  }
+
+  Future<AutopayStatus> getAutopayStatus() async {
+    final token = box.read(AppConst.ACCESS_TOKEN);
+    final uri = Uri.parse(AppURLs.AUTOPAY_STATUS_API);
+
+    final response = await http.get(
+      uri,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+      },
+    );
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+      log("AUTOPAY STATUS GET======>${response.body}");
+      final statusModel = AutopayStatus.fromJson(decoded);
+
+      return statusModel;
+    } else {
+      throw Exception(
+        "Failed to load Autopay Status (${response.statusCode})",
+      );
+    }
+  }
+
+// ================= REMOVE SKIP DATE =================
+  Future<bool> removeSkipDate({
+    required String orderId,
+    required DateTime date,
+  }) async {
+    final token = box.read(AppConst.ACCESS_TOKEN);
+
+    final body = {
+      "date": DateFormat('yyyy-MM-dd').format(date),
+    };
+
+    log("REMOVE SKIP DATE BODY: ${jsonEncode(body)}");
+
+    final result = await APIService.deleteRequest<bool>(
+      url: "${AppURLs.AUTOPAY_SKIPDATE_DELET_API}/$orderId",
+      body: body,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (json) {
+        log("REMOVE SKIP DATE RESPONSE ==> $json");
+        return json["success"] == true;
+      },
     );
 
     return result ?? false;

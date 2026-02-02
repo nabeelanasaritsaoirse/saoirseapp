@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
@@ -11,17 +13,26 @@ import 'package:saoirse_app/widgets/app_button.dart';
 import 'package:saoirse_app/widgets/app_text.dart';
 import 'package:saoirse_app/widgets/app_text_field.dart';
 
-
 class AutopaySettingsSheet extends StatelessWidget {
-   AutopaySettingsSheet({super.key});
+  AutopaySettingsSheet({super.key});
 
   final AutopayController controller = Get.find();
 
-
-  
-
   @override
   Widget build(BuildContext context) {
+    // Ensure we always have a selected order when this sheet opens.
+    // If it was not set explicitly from the dashboard card,
+    // fall back to the first order from the loaded autopay status.
+    if (controller.selectedOrderId.value.isEmpty) {
+      final status = controller.autopayStatus.value;
+      if (status != null && status.data.orders.isNotEmpty) {
+        final fallbackOrderId = status.data.orders.first.orderId;
+        controller.selectedOrderId.value = fallbackOrderId;
+        controller.applyAutopayStatusForOrder(fallbackOrderId);
+        log("AutopaySettingsSheet: fallback selectedOrderId = $fallbackOrderId");
+      }
+    }
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 16.h),
@@ -77,20 +88,35 @@ class AutopaySettingsSheet extends StatelessWidget {
 
           SizedBox(height: 10.h),
 
-          appButton(
-            buttonText: 'SAVE CHANGES',
-            onTap: () {
-              controller.saveAutopaySettings();
-              //  controller.saveSkipDates(orderId);
-              controller.saveSkipDates(
-  controller.selectedOrderId.value,
-);
+          Obx(
+            () => appButton(
+              buttonText: controller.isSkipDateSaving.value
+                  ? 'SAVING...'
+                  : 'SAVE CHANGES',
+              onTap: controller.isSkipDateSaving.value
+                  ? () {}
+                  : () async {
+                      // Save global autopay settings first
+                      await controller.saveAutopaySettings();
 
+                      // Then save skip dates for the currently selected order
+                      final orderId = controller.selectedOrderId.value;
 
-            },
-            buttonColor: AppColors.primaryColor,
-            textColor: AppColors.white,
-            height: 48.h,
+                      if (orderId.isEmpty) {
+                    
+                        log("AutopaySettingsSheet: selectedOrderId is empty, skip dates not saved");
+                        return;
+                      }
+
+                      await controller.saveSkipDates(orderId);
+                      log("Skip dates saved: ${controller.skipDates.toString()}");
+                    },
+              buttonColor: controller.isSkipDateSaving.value
+                  ? AppColors.grey
+                  : AppColors.primaryColor,
+              textColor: AppColors.white,
+              height: 48.h,
+            ),
           )
         ],
       ),
@@ -226,16 +252,12 @@ class AutopaySettingsSheet extends StatelessWidget {
                   children: [
                     Icon(Icons.calendar_month_rounded,
                         color: AppColors.textGray),
-                    appText(
-
-                     
-                        DateFormat('d MMMM yyyy').format(date),
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16.sp),
+                    appText(DateFormat('d MMMM yyyy').format(date),
+                        fontWeight: FontWeight.w600, fontSize: 16.sp),
                     GestureDetector(
                       child: Icon(Icons.delete_outline, color: Colors.red),
-                      onTap: () {
-                        controller.removeSkipDate(date);
+                      onTap: () async {
+                        await controller.removeSkipDateApi(date);
                       },
                     ),
                   ],

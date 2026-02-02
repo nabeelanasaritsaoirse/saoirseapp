@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -30,13 +32,16 @@ class AutopayDashboardScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Iconsax.settings4, color: AppColors.white),
-            //
-            //   todo: open settings dialog                                                Settings Button
-            //
             onPressed: () async {
               final controller = Get.find<AutopayController>();
-              controller.fetchAutopaySettings();
 
+              // ✅ 1. Global settings
+              await controller.fetchAutopaySettings();
+
+              // ✅ 2. Autopay status (orders + skip dates + priority)
+              await controller.fetchAutopayStatus();
+
+              // ✅ 3. Open dialog
               Get.dialog(
                 AutopaySettingsDialog(),
                 barrierDismissible: true,
@@ -49,7 +54,6 @@ class AutopayDashboardScreen extends StatelessWidget {
         if (controller.isLoading.value) {
           return appLoader();
         }
-
         if (controller.errorMessage.isNotEmpty) {
           return Center(
             child: appText(
@@ -202,6 +206,7 @@ class AutopayDashboardScreen extends StatelessWidget {
   }
 
   Widget forecastAndList() {
+    
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(14.w),
@@ -304,6 +309,20 @@ class AutopayDashboardScreen extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () {
+                            final controller = Get.find<AutopayController>();
+
+                            // ✅ SET REAL ORDER ID
+                            controller.selectedOrderId.value = item.orderId;
+
+                            // ✅ APPLY PREFILL FROM AUTOPAY STATUS
+                            controller.applyAutopayStatusForOrder(item.orderId);
+
+                            // ✅ DEBUG LOGS (NOW ACCURATE)
+                            log("Opening autopay settings for ${item.orderId}");
+                            log("Selected Order ID = ${controller.selectedOrderId.value}");
+                            log("Skip dates after prefill = ${controller.skipDates}");
+
+                            // ✅ OPEN BOTTOM SHEET
                             showAutopayPreferenceSheet(Get.context!);
                           },
                           child: Icon(
@@ -311,7 +330,7 @@ class AutopayDashboardScreen extends StatelessWidget {
                             size: 18.sp,
                             color: AppColors.skyBlue,
                           ),
-                        ),
+                        )
                       ],
                     ),
                     SizedBox(height: 6.h),
@@ -352,7 +371,7 @@ class AutopayDashboardScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: 8.h),
-            customGradientProgress(value: item.progress),
+            customGradientProgress(value: item.progress.toDouble()),
           ],
         ),
       ),

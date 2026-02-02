@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/autopay_status_model.dart';
 
 import '/models/autopay_dashboard-model.dart';
 import '/services/autopay_service.dart';
@@ -32,7 +33,7 @@ class AutopayController extends GetxController {
 
   // ================= AUTOPAY SETTINGS =================
   RxBool autopayEnabled = false.obs;
-  RxBool pauseAutopay = false.obs; // 🆕 bottom sheet support
+  RxBool pauseAutopay = false.obs; //
 
   RxInt lowBalanceThreshold = 0.obs;
   RxInt minimumBalanceLock = 0.obs;
@@ -50,7 +51,11 @@ class AutopayController extends GetxController {
   RxInt priority = 50.obs;
   late TextEditingController priorityCtrl;
 
+  // ================= AUTOPAY STATUS =================
+  Rx<AutopayStatus?> autopayStatus = Rx<AutopayStatus?>(null);
+
   // ================= SKIP DATES (BOTTOM SHEET) =================
+
   RxList<DateTime> skipDates = <DateTime>[].obs;
   RxBool isSkipDateSaving = false.obs;
 
@@ -71,6 +76,7 @@ class AutopayController extends GetxController {
     priorityCtrl = TextEditingController(text: '50');
 
     fetchDashboard();
+    fetchAutopayStatus();
   }
 
   // ================= VALIDATION =================
@@ -86,6 +92,41 @@ class AutopayController extends GetxController {
     return true;
   }
 
+  void applyAutopayStatusForOrder(String orderId) {
+    final status = autopayStatus.value;
+    if (status == null) return;
+
+    final order = status.data.orders.firstWhereOrNull(
+      (o) => o.orderId == orderId,
+    );
+
+    if (order == null) return;
+
+    // ✅ PREFILL ENABLE / PAUSE
+    autopayEnabled.value = order.autopay.enabled;
+    pauseAutopay.value = !order.autopay.isActive;
+
+    // ✅ PREFILL PRIORITY
+    priority.value = order.autopay.priority;
+    priorityCtrl.text = order.autopay.priority.toString();
+
+    // ✅ PREFILL SKIP DATES - CLEAR FIRST, THEN ADD
+    skipDates.clear(); // 🔥 Critical: Clear existing data
+
+    if (order.autopay.skipDates.isNotEmpty) {
+      skipDates.addAll(
+        order.autopay.skipDates
+            .map((d) => DateTime.parse(d.toString())) // Parse ISO string
+            .map((d) => DateTime(d.year, d.month, d.day)) // Normalize
+            .toList(),
+      );
+    }
+
+    log("AUTOPAY PREFILLED FOR ORDER $orderId");
+    log("SKIP DATES COUNT: ${skipDates.length}");
+    log("SKIP DATES: ${skipDates.map((d) => d.toIso8601String()).toList()}");
+  }
+
   // ================= SAVE SETTINGS =================
   Future<void> saveAutopaySettings() async {
     try {
@@ -93,7 +134,6 @@ class AutopayController extends GetxController {
 
       if (!validateSettings()) return;
 
-      // 1️⃣ Core settings
       final settingsSuccess = await _service.updateAutopaySettings(
         enabled: autopayEnabled.value,
         lowBalanceThreshold: lowBalanceThreshold.value,
@@ -105,7 +145,6 @@ class AutopayController extends GetxController {
 
       if (!settingsSuccess) return;
 
-      // 2️⃣ Notification preferences
       final notificationSuccess = await _service.updateNotificationPreferences(
         autopaySuccess: notifyAutopaySuccess.value,
         autopayFailed: notifyAutopayFailed.value,
@@ -175,15 +214,12 @@ class AutopayController extends GetxController {
         final total = order.remainingAmount + order.dailyAmount;
         final progress = total == 0 ? 0.0 : 1 - (order.remainingAmount / total);
 
-
-
-
         return AutopayItem(
-
+          orderId: order.id, // ✅ ADD THIS
           title: order.productName,
           perDay: order.dailyAmount,
           remaining: order.remainingAmount,
-          progress: progress.clamp(0.0, 1.0),
+          progress: progress.toInt(),
           priority: order.priority,
           enabled: order.autopayEnabled,
         );
@@ -200,8 +236,7 @@ class AutopayController extends GetxController {
     final normalized = DateTime(date.year, date.month, date.day);
 
     if (skipDates.length >= 10) {
-      // Get.snackbar("Limit Reached", "Maximum 10 skip dates allowed");
-      log("Limit Reached" "Maximum 10 skip dates allowed");
+      log("Limit Reached: Maximum 10 skip dates allowed");
       return;
     }
 
@@ -211,22 +246,38 @@ class AutopayController extends GetxController {
         d.day == normalized.day);
 
     if (exists) {
-      log("Duplicate Date" "This date is already added");
+      log("Duplicate Date: This date is already added");
       return;
     }
 
     skipDates.add(normalized);
     skipDates.sort((a, b) => a.compareTo(b));
+
+    log("Skip date added: ${normalized.toString()}");
+    log("Total skip dates: ${skipDates.length}");
+  }
+
+  void removeSkipDate() {
+    skipDates.clear();
   }
 
   Future<void> saveSkipDates(String orderId) async {
     if (skipDates.isEmpty) {
-      log("No Dates" "Please add at least one skip date");
+      log("No Dates: Please add at least one skip date");
+      return;
+    }
+
+    if (orderId.isEmpty) {
+      log("ERROR: Order ID is empty");
       return;
     }
 
     try {
       isSkipDateSaving.value = true;
+
+      log("SAVING SKIP DATES FOR ORDER: $orderId");
+      log("SKIP DATES COUNT: ${skipDates.length}");
+      log("SKIP DATES: ${skipDates.map((d) => d.toString()).toList()}");
 
       final success = await _service.addSkipDates(
         orderId: orderId,
@@ -234,10 +285,21 @@ class AutopayController extends GetxController {
       );
 
       if (success) {
-        Get.back();
-
         log("SKIP DATES SAVED SUCCESSFULLY");
+
+        // ✅ REFRESH AUTOPAY STATUS TO GET UPDATED SKIP DATES
+        await fetchAutopayStatus();
+
+        // ✅ REAPPLY STATUS FOR THIS ORDER TO UPDATE UI
+        applyAutopayStatusForOrder(orderId);
+
+        Get.back();
+      } else {
+        log("FAILED TO SAVE SKIP DATES");
       }
+
+      final AutopayController controller = Get.find();
+      controller.removeSkipDate();
     } catch (e) {
       log("SAVE SKIP DATES ERROR: $e");
     } finally {
@@ -245,9 +307,40 @@ class AutopayController extends GetxController {
     }
   }
 
-  void removeSkipDate(DateTime date) {
-    skipDates.removeWhere((d) =>
-        d.year == date.year && d.month == date.month && d.day == date.day);
+  Future<void> removeSkipDateApi(DateTime date) async {
+    final orderId = selectedOrderId.value;
+
+    if (orderId.isEmpty) {
+      log("REMOVE SKIP DATE FAILED: Order ID empty");
+      return;
+    }
+
+    try {
+      isSkipDateSaving.value = true;
+
+      final success = await _service.removeSkipDate(
+        orderId: orderId,
+        date: date,
+      );
+
+      if (success) {
+        log("SKIP DATE REMOVED SUCCESSFULLY");
+
+        // Remove locally
+        skipDates.removeWhere((d) =>
+            d.year == date.year && d.month == date.month && d.day == date.day);
+
+        // Refresh status
+        await fetchAutopayStatus();
+        applyAutopayStatusForOrder(orderId);
+      } else {
+        log("FAILED TO REMOVE SKIP DATE");
+      }
+    } catch (e) {
+      log("REMOVE SKIP DATE ERROR: $e");
+    } finally {
+      isSkipDateSaving.value = false;
+    }
   }
 
   @override
@@ -258,20 +351,55 @@ class AutopayController extends GetxController {
     priorityCtrl.dispose();
     super.onClose();
   }
+
+  Future<void> fetchAutopayStatus() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      final response = await _service.getAutopayStatus();
+      autopayStatus.value = response;
+
+      // If dashboard items are not populated but status has orders,
+      // also map status orders into the UI items list so the UI can render.
+      if (items.isEmpty && response.data.orders.isNotEmpty) {
+        items.value = response.data.orders.map((order) {
+          return AutopayItem(
+            orderId: order.orderId,
+            title: order.productName,
+            perDay: order.dailyAmount,
+            remaining: order.remainingAmount,
+            // Use the status progress value directly (already calculated by backend)
+            progress: order.progress,
+            priority: order.autopay.priority,
+            enabled: order.autopay.enabled,
+          );
+        }).toList();
+      }
+
+      log("AUTOPAY STATUS LOADED");
+      log(" AUTOPAY SThereATUS RESPONSE$response");
+    } catch (e) {
+      errorMessage.value = 'Failed to load autopay status';
+      log("AUTOPAY STATUS ERROR: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }
 
 // ================= ITEM MODEL =================
 class AutopayItem {
-   
+  final String orderId;
   final String title;
   final int perDay;
   final int remaining;
-  final double progress;
+  final int progress;
   final int priority;
   final bool enabled;
 
   AutopayItem({
-   
+    required this.orderId,
     required this.title,
     required this.perDay,
     required this.remaining,
@@ -280,6 +408,3 @@ class AutopayItem {
     required this.enabled,
   });
 }
-
-
-

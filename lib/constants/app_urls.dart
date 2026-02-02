@@ -75,7 +75,7 @@ class AppURLs {
   // FAQ api
   static String FAQ_API = BASE_API + "api/faqs/app";
 
-  //Autopay Dashboard Api
+  //Autopay Api
   static String AUTOPAY_DASHBOARD_API =
       BASE_API + "api/installments/autopay/dashboard";
   static String AUTOPAY_SETTINGS_API_PUT =
@@ -85,7 +85,11 @@ class AppURLs {
   static String AUTOPAY_NOTIFICATION_PREFERENCES_API =
       BASE_API + "api/installments/autopay/notification-preferences";
   static String AUTOPAY_SKIP_DATES_ADD_API =
-      BASE_API + "api/installments/autopay/skip-dates/:orderId";
+      BASE_API + "api/installments/autopay/skip-dates";
+  static String AUTOPAY_STATUS_API =
+      BASE_API + "api/installments/autopay/status";
+  static String AUTOPAY_SKIPDATE_DELET_API =
+      BASE_API + "api/installments/autopay/skip-dates";
 
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/installments/orders";
