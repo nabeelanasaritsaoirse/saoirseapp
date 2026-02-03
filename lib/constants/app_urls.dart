@@ -90,6 +90,7 @@ class AppURLs {
       BASE_API + "api/installments/autopay/status";
   static String AUTOPAY_SKIPDATE_DELET_API =
       BASE_API + "api/installments/autopay/skip-dates";
+      static String AUTOPAY_SUGGESTED_TOPUP_API=BASE_API+ "api/installments/autopay/suggested-topup";
 
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/installments/orders";

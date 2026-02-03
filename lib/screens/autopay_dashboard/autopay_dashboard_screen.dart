@@ -206,7 +206,6 @@ class AutopayDashboardScreen extends StatelessWidget {
   }
 
   Widget forecastAndList() {
-    
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(14.w),
@@ -234,7 +233,8 @@ class AutopayDashboardScreen extends StatelessWidget {
               height: 44.h,
               child: appButton(
                 onTap: () {
-                  //   todo: open settings dialog                                                Quick Button
+                  //   todo: open settings dialog                                                Quick Add Button
+                  print('Quick Add ₹${controller.suggestedTopUp.value}');
                 },
                 buttonText: 'Quick Add ₹${controller.suggestedTopUp.value}',
                 buttonColor: AppColors.primaryColor,
@@ -262,6 +262,7 @@ class AutopayDashboardScreen extends StatelessWidget {
 
   Widget autopayCard(AutopayItem item) {
     final isDisabled = !item.enabled;
+    log('Rendering ${item.orderId} progress=${item.progress}');
 
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
@@ -311,18 +312,15 @@ class AutopayDashboardScreen extends StatelessWidget {
                           onTap: () {
                             final controller = Get.find<AutopayController>();
 
-                            // ✅ SET REAL ORDER ID
                             controller.selectedOrderId.value = item.orderId;
 
-                            // ✅ APPLY PREFILL FROM AUTOPAY STATUS
                             controller.applyAutopayStatusForOrder(item.orderId);
 
-                            // ✅ DEBUG LOGS (NOW ACCURATE)
                             log("Opening autopay settings for ${item.orderId}");
                             log("Selected Order ID = ${controller.selectedOrderId.value}");
                             log("Skip dates after prefill = ${controller.skipDates}");
 
-                            // ✅ OPEN BOTTOM SHEET
+                            // OPEN BOTTOM SHEET
                             showAutopayPreferenceSheet(Get.context!);
                           },
                           child: Icon(
@@ -371,7 +369,12 @@ class AutopayDashboardScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: 8.h),
-            customGradientProgress(value: item.progress.toDouble()),
+            // customGradientProgress(value: item.progress.toDouble())              
+   //                                                                                TODO        CUSTOM PROGRESS
+   
+              customGradientProgress(
+              value: item.progress / 100.0,
+            )
           ],
         ),
       ),
@@ -393,6 +396,8 @@ Widget customGradientProgress({
       borderRadius: BorderRadius.circular(50),
       child: LayoutBuilder(
         builder: (context, constraints) {
+          log('Progress maxWidth: ${constraints.maxWidth}, value: $value');
+
           return Align(
             alignment: Alignment.centerLeft,
             child: Container(

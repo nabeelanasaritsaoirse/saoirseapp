@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:saoirse_app/models/autopay_status_model.dart';
+import 'package:saoirse_app/models/autopay_suggested_topup_model.dart';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
@@ -147,7 +148,7 @@ class AutopayService {
     log("ADD SKIP DATES BODY: ${jsonEncode(body)}");
 
     final result = await APIService.postRequest<bool>(
-      url: "${AppURLs.AUTOPAY_SKIP_DATES_ADD_API}/:$orderId",
+      url: "${AppURLs.AUTOPAY_SKIP_DATES_ADD_API}/$orderId",
       body: body,
       headers: {
         "Authorization": "Bearer $token",
@@ -213,5 +214,31 @@ class AutopayService {
     );
 
     return result ?? false;
+  }
+
+  Future<AutopaySuggestedTopupModel> getSuggestedTopUp({int days = 7}) async {
+    final token = box.read(AppConst.ACCESS_TOKEN);
+
+    final uri = Uri.parse(
+      "${AppURLs.AUTOPAY_SUGGESTED_TOPUP_API}?days=$days",
+    );
+
+    final response = await http.get(
+      uri,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+      log("SUGGESTED TOPUP GET ==> ${response.body}");
+      return AutopaySuggestedTopupModel.fromJson(decoded);
+    } else {
+      throw Exception(
+        "Failed to load Suggested Top-up (${response.statusCode})",
+      );
+    }
   }
 }

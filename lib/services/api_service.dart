@@ -38,6 +38,7 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
+        print("body: url:$url       ================ ${jsonEncode(body)}");
         print("response dataaaa");
         print(response.body);
         switch (response.statusCode) {

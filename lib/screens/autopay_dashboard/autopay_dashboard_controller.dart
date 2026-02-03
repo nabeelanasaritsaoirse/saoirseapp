@@ -27,9 +27,12 @@ class AutopayController extends GetxController {
 
   // ================= SUGGESTIONS =================
   RxInt suggestedTopUp = 0.obs;
+  RxInt daysRequested = 7.obs;
 
   // ================= ORDERS =================
   RxList<AutopayItem> items = <AutopayItem>[].obs;
+
+  //==============suggested topups==============
 
   // ================= AUTOPAY SETTINGS =================
   RxBool autopayEnabled = false.obs;
@@ -77,6 +80,7 @@ class AutopayController extends GetxController {
 
     fetchDashboard();
     fetchAutopayStatus();
+    fetchSuggestedTopUp();
   }
 
   // ================= VALIDATION =================
@@ -102,22 +106,19 @@ class AutopayController extends GetxController {
 
     if (order == null) return;
 
-    // ✅ PREFILL ENABLE / PAUSE
     autopayEnabled.value = order.autopay.enabled;
     pauseAutopay.value = !order.autopay.isActive;
 
-    // ✅ PREFILL PRIORITY
     priority.value = order.autopay.priority;
     priorityCtrl.text = order.autopay.priority.toString();
 
-    // ✅ PREFILL SKIP DATES - CLEAR FIRST, THEN ADD
-    skipDates.clear(); // 🔥 Critical: Clear existing data
+    skipDates.clear();
 
     if (order.autopay.skipDates.isNotEmpty) {
       skipDates.addAll(
         order.autopay.skipDates
-            .map((d) => DateTime.parse(d.toString())) // Parse ISO string
-            .map((d) => DateTime(d.year, d.month, d.day)) // Normalize
+            .map((d) => DateTime.parse(d.toString()))
+            .map((d) => DateTime(d.year, d.month, d.day))
             .toList(),
       );
     }
@@ -213,13 +214,14 @@ class AutopayController extends GetxController {
       items.value = data.orders.map((order) {
         final total = order.remainingAmount + order.dailyAmount;
         final progress = total == 0 ? 0.0 : 1 - (order.remainingAmount / total);
+//                                                              TODO                      PROGRESS DETAILS
 
         return AutopayItem(
-          orderId: order.id, // ✅ ADD THIS
+          orderId: order.id,
           title: order.productName,
           perDay: order.dailyAmount,
           remaining: order.remainingAmount,
-          progress: progress.toInt(),
+          progress: order.progress.toInt(),
           priority: order.priority,
           enabled: order.autopayEnabled,
         );
@@ -287,10 +289,8 @@ class AutopayController extends GetxController {
       if (success) {
         log("SKIP DATES SAVED SUCCESSFULLY");
 
-        // ✅ REFRESH AUTOPAY STATUS TO GET UPDATED SKIP DATES
         await fetchAutopayStatus();
 
-        // ✅ REAPPLY STATUS FOR THIS ORDER TO UPDATE UI
         applyAutopayStatusForOrder(orderId);
 
         Get.back();
@@ -360,8 +360,6 @@ class AutopayController extends GetxController {
       final response = await _service.getAutopayStatus();
       autopayStatus.value = response;
 
-      // If dashboard items are not populated but status has orders,
-      // also map status orders into the UI items list so the UI can render.
       if (items.isEmpty && response.data.orders.isNotEmpty) {
         items.value = response.data.orders.map((order) {
           return AutopayItem(
@@ -369,7 +367,6 @@ class AutopayController extends GetxController {
             title: order.productName,
             perDay: order.dailyAmount,
             remaining: order.remainingAmount,
-            // Use the status progress value directly (already calculated by backend)
             progress: order.progress,
             priority: order.autopay.priority,
             enabled: order.autopay.enabled,
@@ -384,6 +381,19 @@ class AutopayController extends GetxController {
       log("AUTOPAY STATUS ERROR: $e");
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchSuggestedTopUp({int days = 7}) async {
+    try {
+      final response = await _service.getSuggestedTopUp(days: days);
+
+      suggestedTopUp.value = response.data.suggestedTopUp;
+      daysRequested.value = response.data.daysRequested;
+
+      log("SUGGESTED TOPUP UPDATED: ₹${suggestedTopUp.value}");
+    } catch (e) {
+      log("SUGGESTED TOPUP ERROR: $e");
     }
   }
 }
