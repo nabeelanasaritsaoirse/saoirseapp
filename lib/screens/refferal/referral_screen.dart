@@ -171,7 +171,12 @@ class _ReferralScreenState extends State<ReferralScreen> {
               ]
             : [],
       ),
-      body: NestedScrollView(
+      body: isLoggedIn ? _buildReferralBody() : _loginOnlyView(),
+    );
+  }
+
+  NestedScrollView _buildReferralBody() {
+    return NestedScrollView(
         controller: scrollController,
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -200,36 +205,31 @@ class _ReferralScreenState extends State<ReferralScreen> {
             ),
           ];
         },
-        body: isLoggedIn
-            ? Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(16.r),
-                  ),
-                ),
-                child: RefreshIndicator(
-                  onRefresh: controller.refreshAll,
-                  color: AppColors.primaryColor, // spinner color
-                  backgroundColor: AppColors.white,
-                  child: SingleChildScrollView(
-                    physics: const ClampingScrollPhysics(),
-                    padding: EdgeInsets.all(16.w),
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    child: _buildContentSection(
-                      loginController: loginController,
-                      referralController: controller,
-                      searchController: searchController,
-                      focusNode: searchFocusNode,
-                    ),
-                  ),
-                ),
-              )
-            : _loginOnlyView(),
-      ),
-    );
+        body: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(16.r),
+            ),
+          ),
+          child: RefreshIndicator(
+            onRefresh: controller.refreshAll,
+            color: AppColors.primaryColor, // spinner color
+            backgroundColor: AppColors.white,
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              padding: EdgeInsets.all(16.w),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: _buildContentSection(
+                loginController: loginController,
+                referralController: controller,
+                searchController: searchController,
+                focusNode: searchFocusNode,
+              ),
+            ),
+          ),
+        ));
   }
 
   Widget _buildContentSection({

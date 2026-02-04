@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../constants/app_constant.dart';
+import '../../main.dart';
 import '../../models/product_details_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
@@ -13,6 +15,7 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_text.dart';
 import '../cart/cart_controller.dart';
+import '../login/login_page.dart';
 import '../select_address/select_address.dart';
 import 'product_details_controller.dart';
 
@@ -39,6 +42,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     super.initState();
     controller = Get.find<ProductDetailsController>();
     controller.checkIfInWishlist(widget.productId);
+  }
+
+  bool get isLoggedIn {
+    return storage.read(AppConst.USER_ID) != null;
+  }
+
+  void requireLogin(VoidCallback onAuthenticated) {
+    if (!isLoggedIn) {
+      Get.to(() => LoginPage());
+      return;
+    }
+    onAuthenticated();
   }
 
   @override
@@ -388,20 +403,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           /// Add to Cart
           Obx(() => appButton(
                 onTap: () {
-                  if (cartController.isAddToCartLoading.value)
-                    return; // ⛔ block tap
+                  requireLogin(() {
+                    if (cartController.isAddToCartLoading.value) return;
 
-                  debugPrint("ADD TO CART BUTTON TAPPED");
+                    final selectedVariantId =
+                        controller.selectedVariantId.value.isEmpty
+                            ? null
+                            : controller.selectedVariantId.value;
 
-                  final selectedVariantId =
-                      controller.selectedVariantId.value.isEmpty
-                          ? null
-                          : controller.selectedVariantId.value;
-
-                  cartController.addProductToCart(
-                    productId: controller.product.value!.id,
-                    variantId: selectedVariantId,
-                  );
+                    cartController.addProductToCart(
+                      productId: controller.product.value!.id,
+                      variantId: selectedVariantId,
+                    );
+                  });
                 },
                 width: 50.w,
                 height: 35.h,
@@ -468,42 +482,42 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 padding: EdgeInsets.symmetric(vertical: 10.h),
               ),
               onPressed: () {
-                bool hasPlan = controller.selectedPlanIndex.value != -1 ||
-                    (controller.customDays.value > 0 &&
-                        controller.customAmount.value > 0);
+                requireLogin(() {
+                  bool hasPlan = controller.selectedPlanIndex.value != -1 ||
+                      (controller.customDays.value > 0 &&
+                          controller.customAmount.value > 0);
 
-                if (!hasPlan) {
-                  WarningDialog.show(
-                    title: AppStrings.warning_label,
-                    message: AppStrings.checkout_warning_body,
+                  if (!hasPlan) {
+                    WarningDialog.show(
+                      title: AppStrings.warning_label,
+                      message: AppStrings.checkout_warning_body,
+                    );
+                    return;
+                  }
+
+                  int selectedDays;
+                  double selectedAmount;
+
+                  if (controller.selectedPlanIndex.value != -1) {
+                    final plan =
+                        controller.plans[controller.selectedPlanIndex.value];
+                    selectedDays = plan.days;
+                    selectedAmount = plan.perDayAmount;
+                  } else {
+                    selectedDays = controller.customDays.value;
+                    selectedAmount = controller.customAmount.value;
+                  }
+
+                  Get.to(
+                    () => SelectAddress(
+                      product: controller.product.value!,
+                      selectVarientId: controller.selectedVariantId.value,
+                      selectedDays: selectedDays,
+                      selectedAmount: selectedAmount,
+                      checkoutSource: CheckoutSource.product,
+                    ),
                   );
-                  return;
-                }
-
-                // COMPUTE FINAL SELECTED VALUES
-                int selectedDays;
-                double selectedAmount;
-
-                if (controller.selectedPlanIndex.value != -1) {
-                  final plan =
-                      controller.plans[controller.selectedPlanIndex.value];
-                  selectedDays = plan.days;
-                  selectedAmount = plan.perDayAmount;
-                } else {
-                  selectedDays = controller.customDays.value;
-                  selectedAmount = controller.customAmount.value;
-                }
-
-                // GO TO SELECT ADDRESS
-                Get.to(
-                  () => SelectAddress(
-                    product: controller.product.value!,
-                    selectVarientId: controller.selectedVariantId.value,
-                    selectedDays: selectedDays,
-                    selectedAmount: selectedAmount,
-                    checkoutSource: CheckoutSource.product,
-                  ),
-                );
+                });
               },
               child: Text(
                 AppStrings.checkout,
