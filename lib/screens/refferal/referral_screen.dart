@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:saoirse_app/screens/coupon_screen/coupon_screen.dart';
 
 import '../../constants/app_strings.dart';
 import '../../models/refferal_info_model.dart';
@@ -444,11 +445,16 @@ class _ReferralScreenState extends State<ReferralScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            appText(
-              AppStrings.your_refferal,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textBlack,
+            GestureDetector(
+              onTap: () {
+                Get.to(() => CouponScreen());
+              },
+              child: appText(
+                AppStrings.your_refferal,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textBlack,
+              ),
             ),
             Obx(() {
               return appText(
