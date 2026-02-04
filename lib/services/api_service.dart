@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -38,7 +39,8 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-
+        log("API URL ==> $url");
+        log("Respose body : =====> ${response.body}");
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -120,7 +122,8 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-
+        log("API URL ==> $url");
+        log("Respose body : =====> ${response.body}");
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -216,7 +219,8 @@ class APIService {
             .timeout(Duration(seconds: timeoutSeconds));
 
         ("Response [${response.statusCode}]: ${response.body}");
-
+        log("API URL ==> $url");
+        log("Respose body : =====> ${response.body}");
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -457,6 +461,33 @@ class APIService {
       return null;
     }
   }
+
+  static Future<http.Response?> uploadMultiImagesRequest({
+  required String url,
+  required List<http.MultipartFile> files,
+  Map<String, String>? headers,
+  int timeoutSeconds = 20,
+}) async {
+  try {
+    final request = http.MultipartRequest('POST', Uri.parse(url));
+
+    request.files.addAll(files);
+
+    if (headers != null) {
+      request.headers.addAll(headers);
+    }
+
+    final streamedResponse =
+        await request.send().timeout(Duration(seconds: timeoutSeconds));
+
+    return await http.Response.fromStream(streamedResponse);
+  } catch (e) {
+    return null;
+  }
+}
+
+
+  
 
   static Future<void> handleUnauthorized() async {
     ("🚫 401 Unauthorized → Force out");

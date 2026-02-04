@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/write_review_dialog.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -56,7 +57,9 @@ class OrderHistoryScreen extends StatelessWidget {
                   : const SizedBox.shrink();
             }
             final order = controller.orders[index];
-            return OrderCard(order: order);
+            return OrderCard(
+              order: order,
+            );
           },
         );
       }),

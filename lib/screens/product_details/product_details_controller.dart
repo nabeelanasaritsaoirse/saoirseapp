@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/review_resposne.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -63,6 +64,16 @@ class ProductDetailsController extends GetxController {
   RxDouble averageRating = 4.9.obs;
   RxInt totalRatings = 83.obs;
   RxInt totalReviews = 47.obs;
+
+  // ---------------- REVIEWS ----------------
+RxBool isReviewLoading = false.obs;
+
+RxList<Review> reviews = <Review>[].obs;
+
+
+
+RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
+
 
 // ---------------- WRITE REVIEW ----------------
   final ImagePicker _reviewImagePicker = ImagePicker();
@@ -132,6 +143,7 @@ class ProductDetailsController extends GetxController {
       }
       fetchFaqs();
       fetchSimilarProducts();
+      fetchProductReviews();
 
       // Reset page
       currentImageIndex.value = 0;
@@ -184,6 +196,44 @@ class ProductDetailsController extends GetxController {
       isFaqLoading(false);
     }
   }
+
+  Future<void> fetchProductReviews() async {
+  try {
+    isReviewLoading(true);
+
+    final ReviewResponse? response =
+        await productService.fetchProductReviews(
+      productId: "PROD185699527",
+      page: 1,
+      limit: 10,
+      sort: "mostHelpful",
+    );
+
+    if (response == null) return;
+
+    // Stats
+    averageRating.value =
+        response.data.ratingStats.averageRating;
+    totalReviews.value =
+        response.data.ratingStats.totalReviews;
+    totalRatings.value =
+        response.data.ratingStats.totalReviews;
+
+    // Reviews
+    reviews.assignAll(response.data.reviews);
+
+    // Image preview (first 3 images)
+    final images = response.data.reviews
+        .expand((r) => r.images)
+        .take(3)
+        .toList();
+
+    reviewImagesPreview.assignAll(images);
+  } finally {
+    isReviewLoading(false);
+  }
+}
+
 
   Future<void> checkIfInWishlist(String id) async {
     final exists = await wishlistService.checkWishlist(id);

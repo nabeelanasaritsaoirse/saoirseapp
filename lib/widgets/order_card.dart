@@ -9,8 +9,14 @@ import 'app_text.dart';
 
 class OrderCard extends StatelessWidget {
   final OrderHistoryItem order;
+  final bool showReviewButton;
+  final VoidCallback? onWriteReview;
 
-  const OrderCard({super.key, required this.order});
+  const OrderCard(
+      {super.key,
+      required this.order,
+      this.showReviewButton = false,
+      this.onWriteReview});
 
   @override
   Widget build(BuildContext context) {
@@ -192,6 +198,20 @@ class OrderCard extends StatelessWidget {
                 ),
               ],
             ),
+            if (showReviewButton)
+              Padding(
+                padding: EdgeInsets.only(top: 12.h),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: onWriteReview,
+                    child: appText(
+                      "Write Review",
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
