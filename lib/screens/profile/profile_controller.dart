@@ -1,8 +1,10 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -13,6 +15,8 @@ import '../../models/delete_acc_model.dart';
 import '../../models/profile_response.dart';
 import '../../services/profile_service.dart';
 import '../../services/wishlist_service.dart';
+import '../../widgets/app_loader.dart';
+import '../../widgets/app_text.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_controller.dart';
 import '../notification/notification_controller.dart';
@@ -472,15 +476,75 @@ class ProfileController extends GetxController {
     } catch (e) {}
   }
 
-  void deleteAccount() {
+  Future<void> deleteAccount() async {
+    deleteAccountData.value = null;
+
+    fetchDeleteInfo();
+
     Get.defaultDialog(
       title: "Delete Account",
-      middleText:
-          "This action is permanent. Are you sure you want to delete your account?",
+      content: Obx(() {
+        final info = deletionInfo;
+
+        if (info == null) {
+          return appLoader();
+        }
+
+        final items = info.dataToBeDeleted;
+        final note = info.note;
+        final retention = info.retentionPeriod;
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            appText(
+              "The following data will be deleted:",
+              fontWeight: FontWeight.w600,
+              color: AppColors.grey,
+            ),
+            SizedBox(height: 8.h),
+            ...items.map(
+              (e) => Padding(
+                padding: EdgeInsets.symmetric(vertical: 2.w),
+                child: appText(
+                  "• $e",
+                  fontWeight: FontWeight.w600,
+                  textAlign: TextAlign.left,
+                  color: AppColors.mediumGray,
+                ),
+              ),
+            ),
+            SizedBox(height: 12.h),
+            if (retention.isNotEmpty)
+              appText(
+                "Data retention: $retention",
+                fontSize: 12.sp,
+                color: AppColors.grey,
+              ),
+            if (note.isNotEmpty) ...[
+              SizedBox(height: 4.h),
+              appText(
+                note,
+                textAlign: TextAlign.left,
+                fontSize: 12.sp,
+                color: AppColors.grey,
+              ),
+            ],
+            SizedBox(height: 16.h),
+            appText(
+              "This action is permanent. Are you sure you want to delete your account?",
+              textAlign: TextAlign.left,
+              //  fontSize: 12, color: AppColors.grey,
+            ),
+          ],
+        );
+      }),
       textConfirm: "Delete",
       textCancel: "Cancel",
-      confirmTextColor: Colors.white,
-      buttonColor: Colors.red,
+      confirmTextColor: AppColors.white,
+      buttonColor: AppColors.primaryColor,
       cancelTextColor: AppColors.primaryColor,
       onConfirm: () {
         Get.back();
@@ -493,11 +557,7 @@ class ProfileController extends GetxController {
     final userId = profile.value?.user.id;
 
     if (userId == null) {
-      appToast(
-        error: true,
-        title: "Error",
-        content: "User not found",
-      );
+      log("User not found=========User id is null");
       return;
     }
 
@@ -507,9 +567,15 @@ class ProfileController extends GetxController {
       final success = await _profileService.requestAccountDeletion(userId);
 
       if (success) {
+        log("==========================>Your account deletion request has been submitted successfully.");
+
         Get.offAll(() => OnBoardScreen());
         await logoutUserInBackground();
+      } else {
+        log("==========================>Unable to request account deletion");
       }
+    } catch (e) {
+      log("==========================>Something went wrong");
     } finally {
       isLoading(false);
     }
