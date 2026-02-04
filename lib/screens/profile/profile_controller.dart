@@ -511,6 +511,7 @@ class ProfileController extends GetxController {
                 child: appText(
                   "• $e",
                   fontWeight: FontWeight.w600,
+                  textAlign: TextAlign.left,
                   color: AppColors.mediumGray,
                 ),
               ),
@@ -526,6 +527,7 @@ class ProfileController extends GetxController {
               SizedBox(height: 4.h),
               appText(
                 note,
+                textAlign: TextAlign.left,
                 fontSize: 12.sp,
                 color: AppColors.grey,
               ),
@@ -533,6 +535,7 @@ class ProfileController extends GetxController {
             SizedBox(height: 16.h),
             appText(
               "This action is permanent. Are you sure you want to delete your account?",
+              textAlign: TextAlign.left,
               //  fontSize: 12, color: AppColors.grey,
             ),
           ],
