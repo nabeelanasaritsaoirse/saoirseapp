@@ -308,6 +308,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         case "Log Out":
                           controller.confirmLogout();
                           break;
+                        case "Delete\nAccount":
+                          controller.deleteAccount();
+                          break;
                         case "Manage Address":
                           Get.to(() => ManageAddressScreen());
 
