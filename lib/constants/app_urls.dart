@@ -119,6 +119,12 @@ class AppURLs {
   //Log Out Api
   static String LOGOUT_API = BASE_API + "api/auth/logout";
 
+  //  Delete Account
+  static String DELETE_ACCOUNT_GET_API =
+      BASE_API + "api/users/:userId/deletion-info";
+  static String DELETE_REQUEST_API =
+      BASE_API + "api/users/:userId/request-deletion";
+
   // Pending Transaction (BEFORE PAYMENT METHOD API RESPONSE)
   static String PENDING_TRANSACTION_PAYMENT_RESPONSE =
       BASE_API + "api/installments/payments/create-combined-razorpay";

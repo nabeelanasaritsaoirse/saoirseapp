@@ -1,346 +1,282 @@
-name: 🍎 iOS Release
+name: ♻️ iOS Regenerate (Clean Platform Fix)
+
+run-name: "♻️ iOS Regenerate by ${{ github.actor }}"
 
 on:
+  workflow_dispatch:
   push:
     branches: [ test ]
-  workflow_dispatch:
 
 concurrency:
-  group: ios-build-${{ github.ref }}
+  group: ios-regenerate-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  contents: read
-  checks: write
-  pull-requests: write
+  contents: write
 
 env:
-  IOS_MIN_VERSION: "16.0"
-  BUNDLE_ID: com.saoirse.epi
-  TEAM_ID: BYQUNNQSQH
-  PROFILE_NAME: "match AppStore com.saoirse.epi 1765456537"
-  ARCHIVE_DIR: build/ios/archive
-  IPA_DIR: build/ios/ipa
+  IOSMINVERSION: "16.0"
+  BUNDLEID: com.saoirse.epi
 
 jobs:
-  ios:
+  regenerate:
+    name: ♻️ Regenerate iOS Platform
     runs-on: macos-latest
 
     steps:
-
+      # --------------------------------------------------
+      # Checkout
+      # --------------------------------------------------
       - uses: actions/checkout@v4
-      
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # --------------------------------------------------
+      # Flutter
+      # --------------------------------------------------
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
 
-      - run: sudo gem install fastlane cocoapods xcodeproj -N
-      - run: flutter clean
-      - run: flutter pub get
-
-      - name: 📝 Create .env file
+      # --------------------------------------------------
+      # Clean & Recreate iOS Platform
+      # --------------------------------------------------
+      - name: 🧹 Flutter clean & recreate iOS
         run: |
-          cat > .env <<EOF
-          RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}
-          IOS_API_KEY=${{ secrets.IOS_API_KEY }}
-          IOS_APP_ID=${{ secrets.IOS_APP_ID }}
-          IOS_MESSAGING_SENDER_ID=${{ secrets.IOS_MESSAGING_SENDER_ID }}
-          IOS_PROJECT_ID=${{ secrets.IOS_PROJECT_ID }}
-          ANDROID_API_KEY=${{ secrets.ANDROID_API_KEY }}
-          ANDROID_APP_ID=${{ secrets.ANDROID_APP_ID }}
-          ANDROID_MESSAGING_SENDER_ID=${{ secrets.ANDROID_MESSAGING_SENDER_ID }}
-          ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
-          EOF
+          flutter clean
+          flutter pub get
+          flutter create . --platforms=ios --org com.saoirse
 
-      - name: 📥 Download Fonts
-        run: |
-          mkdir -p assets/fonts
-          cd assets/fonts
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Medium.ttf
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
-          cd ../..
-
-      # 🔥 Firebase config - use complete GoogleService-Info.plist from repo
-      # The file already exists in ios/Runner/GoogleService-Info.plist with all required keys
-      - name: Verify GoogleService-Info.plist
-        run: |
-          echo "✅ Using existing GoogleService-Info.plist from repository"
-          cat ios/Runner/GoogleService-Info.plist
-
-      - name: 🔧 Configure iOS Settings (xcconfig only)
-        run: |
-          # ✅ Overwrite instead of append (deterministic)
-          cat > ios/Flutter/Release.xcconfig <<'XCCONFIG'
-          #include "Generated.xcconfig"
-          
-          STRIP_STYLE = non-global
-          DEAD_CODE_STRIPPING = YES
-          IPHONEOS_DEPLOYMENT_TARGET = 16.0
-          ENABLE_BITCODE = NO
-          ONLY_ACTIVE_ARCH = NO
-          XCCONFIG
-          
-          echo "✅ iOS 16.0 deployment target configured via xcconfig (deterministic)"
-
-      - name: 🔓 Setup Keychain
-        run: |
-          KEYCHAIN_PASSWORD="ci_keychain_pass"
-          security delete-keychain build.keychain-db 2>/dev/null || true
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain-db
-          security default-keychain -s build.keychain-db
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain-db
-          security set-keychain-settings -lut 7200 build.keychain-db
-          security list-keychains -d user -s build.keychain-db $(security list-keychains -d user | sed s/\"//g)
-
-      - name: 🔐 Setup API Key
-        run: |
-          mkdir -p ios
-          echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > ios/api_key.json
-          chmod 600 ios/api_key.json
-
-      - name: 🔐 Fastlane Match
-        env:
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      # --------------------------------------------------
+      # Fix Podfile BEFORE pod install
+      # --------------------------------------------------
+      - name: 🔧 Fix Podfile
         run: |
           cd ios
-          fastlane match appstore \
-            --readonly \
-            --app_identifier "com.saoirse.epi" \
-            --api_key_path ./api_key.json \
-            --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git \
-            --git_branch main \
-            --keychain_name build.keychain-db \
-            --keychain_password "ci_keychain_pass"
 
+          cp Podfile Podfile.backup
 
-
-      # 🧹 Remove Main.storyboard (Flutter black screen bug)
-      - run: |
-          /usr/libexec/PlistBuddy -c "Delete :UIMainStoryboardFile" ios/Runner/Info.plist || true
-
-      # 📱 iPhone ONLY release
-      - name: 📱 Configure iPhone-Only Device Family
-        run: |
-          /usr/libexec/PlistBuddy -c "Delete :UIDeviceFamily" ios/Runner/Info.plist || true
-          /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily array" ios/Runner/Info.plist
-          /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily:0 integer 1" ios/Runner/Info.plist
-          echo "✅ Configured for iPhone-only release"
-
-      # 🔐 Verify Push Notifications entitlement (required for Firebase Phone Auth)
-      - name: 🔐 Verify Push Notifications Entitlement
-        run: |
-          echo "Checking Runner.entitlements for aps-environment..."
-          if grep -q "aps-environment" ios/Runner/Runner.entitlements; then
-            echo "✅ Push Notifications entitlement found"
-            cat ios/Runner/Runner.entitlements
+          if grep -q "^platform :ios" Podfile; then
+            sed -i '' "s/^platform :ios.*/platform :ios, '${IOSMINVERSION}'/" Podfile
           else
-            echo "⚠️ Adding aps-environment entitlement..."
-            /usr/libexec/PlistBuddy -c "Add :aps-environment string production" ios/Runner/Runner.entitlements
-            echo "✅ Push Notifications entitlement added"
-            cat ios/Runner/Runner.entitlements
+            sed -i '' "1s/^/platform :ios, '${IOSMINVERSION}'\n\n/" Podfile
           fi
 
-      # 📦 Pods (force Firebase version sync)
-  
-      - run: |
-          cd ios
-          rm -rf Pods Podfile.lock
-          pod install --repo-update
-          pod update Firebase/Auth
-          cd ..
+          if ! grep -q "post_install do |installer|" Podfile; then
+          cat >> Podfile <<EOF
 
-      - name: ⬆️ Force iOS 16 deployment target
-        run: |
-          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]\+;/IPHONEOS_DEPLOYMENT_TARGET = 16.0;/g' ios/Runner.xcodeproj/project.pbxproj
-
-      - run: /usr/libexec/PlistBuddy -c "Set :MinimumOSVersion 16.0" ios/Runner/Info.plist || true
-      
-      - name: ⚙️ Configure Xcode Signing
-        run: |
-          cat > update_signing.rb <<'RUBY'
-          require 'xcodeproj'
-
-          project_path = 'ios/Runner.xcodeproj'
-          project = Xcodeproj::Project.open(project_path)
-
-          project.targets.each do |target|
-            if target.name == 'Runner'
+          post_install do |installer|
+            installer.pods_project.targets.each do |target|
+              flutter_additional_ios_build_settings(target)
               target.build_configurations.each do |config|
-                if config.name == 'Release'
-                  # ✅ Signing configuration only (deployment target handled by xcconfig)
-                  config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
-                  config.build_settings['DEVELOPMENT_TEAM'] = ENV['TEAM_ID']
-                  config.build_settings['CODE_SIGN_IDENTITY'] = 'Apple Distribution'
-                  config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ENV['PROFILE_NAME']
-                  config.build_settings['CODE_SIGN_IDENTITY[sdk=iphoneos*]'] = 'Apple Distribution'
-                  config.build_settings['ENABLE_BITCODE'] = 'NO'
-                  config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
-                end
+                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '${IOSMINVERSION}'
+                config.build_settings['ENABLE_BITCODE'] = 'NO'
               end
             end
           end
+          EOF
+          fi
 
-          project.save
-          RUBY
+          pod install --repo-update
+          cd ..
 
-          ruby update_signing.rb
-          echo "✅ Signing configured (deployment target via xcconfig only)"
-
-      - name: 🔧 Force correct iOS Bundle Identifier (CRITICAL FIX)
+      # --------------------------------------------------
+      # AppDelegate.swift
+      # --------------------------------------------------
+      - name: 🔧 AppDelegate.swift
         run: |
-          ruby <<'RUBY'
-          require 'xcodeproj'
-      
-          project_path = 'ios/Runner.xcodeproj'
-          project = Xcodeproj::Project.open(project_path)
-      
-          project.targets.each do |target|
-            next unless target.name == 'Runner'
-      
-            target.build_configurations.each do |config|
-              config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'com.saoirse.epi'
-              puts "✅ Set bundle id for #{config.name}"
-            end
-          end
-      
-          project.save
-          puts "💾 Xcode project saved with correct bundle id"
-          RUBY
+          cat > ios/Runner/AppDelegate.swift <<'EOF'
+          import UIKit
+          import Flutter
 
-          # 🔢 Set Build Number from GitHub Run Number
-      - name: 🔢 Set Build Number from GitHub Run Number
+          @main
+          @objc class AppDelegate: FlutterAppDelegate {
+            override func application(
+              _ application: UIApplication,
+              didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+            ) -> Bool {
+              GeneratedPluginRegistrant.register(with: self)
+              return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+            }
+          }
+          EOF
+
+      # --------------------------------------------------
+      # Runner.entitlements
+      # --------------------------------------------------
+      - name: 🔐 Create Runner.entitlements
         run: |
-          cd ios
-          
-          # Use GitHub run number as build number (always unique and incremental)
-          BUILD_NUMBER=${{ github.run_number }}
-          echo "Setting build number to: $BUILD_NUMBER"
-          
-          # Update Info.plist
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" Runner/Info.plist
-          
-          # Update project.pbxproj for consistency
-          ruby <<'RUBY'
-          require 'xcodeproj'
-          
-          project = Xcodeproj::Project.open('Runner.xcodeproj')
-          project.targets.each do |target|
-            next unless target.name == 'Runner'
-            target.build_configurations.each do |config|
-              config.build_settings['CURRENT_PROJECT_VERSION'] = ENV['BUILD_NUMBER']
-            end
-          end
-          project.save
-          RUBY
-          
-          echo "✅ Build number set to $BUILD_NUMBER"
-        env:
-          BUILD_NUMBER: ${{ github.run_number }}
-          
-      - name: 📝 Create ExportOptions.plist
-        run: |
-          cat > ios/ExportOptions.plist <<EOF
+          cat > ios/Runner/Runner.entitlements <<'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
-            <key>method</key>
-            <string>app-store</string>
-            <key>signingStyle</key>
-            <string>manual</string>
-            <key>teamID</key>
-            <string>${{ env.TEAM_ID }}</string>
-            <key>provisioningProfiles</key>
-            <dict>
-              <key>${{ env.BUNDLE_ID }}</key>
-              <string>${{ env.PROFILE_NAME }}</string>
-            </dict>
+            <key>com.apple.developer.associated-domains</key>
+            <array>
+              <string>applinks:inviteapp.onelink.me</string>
+            </array>
+            <key>aps-environment</key>
+            <string>production</string>
           </dict>
           </plist>
           EOF
 
-      - name: 🔨 Build Flutter
+      # --------------------------------------------------
+      # Link entitlements
+      # --------------------------------------------------
+      - name: 🔗 Link entitlements
         run: |
-          flutter build ios \
-          --release \
-          --no-codesign \
-         
-      - name: 🏗️ Archive
-        run: |
-          cd ios
-          mkdir -p ../${{ env.ARCHIVE_DIR }}
-          mkdir -p ../${{ env.IPA_DIR }}
+          if ! grep -q "CODE_SIGN_ENTITLEMENTS" ios/Runner.xcodeproj/project.pbxproj; then
+            sed -i '' 's/INFOPLIST_FILE = Runner\/Info.plist;/INFOPLIST_FILE = Runner\/Info.plist;\n\t\t\t\tCODE_SIGN_ENTITLEMENTS = Runner\/Runner.entitlements;/g' ios/Runner.xcodeproj/project.pbxproj
+          fi
 
-          xcodebuild archive \
-            -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -archivePath ../${{ env.ARCHIVE_DIR }}/Runner.xcarchive \
-            -destination 'generic/platform=iOS' \
-            DEVELOPMENT_TEAM=${{ env.TEAM_ID }} \
-            CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE_SPECIFIER="${{ env.PROFILE_NAME }}" \
-            CODE_SIGN_IDENTITY="Apple Distribution" \
-            STRIP_STYLE=non-global \
-            DEAD_CODE_STRIPPING=YES \
-            IPHONEOS_DEPLOYMENT_TARGET=16.0 \
-            ENABLE_BITCODE=NO \
-            OTHER_CODE_SIGN_FLAGS="--keychain $HOME/Library/Keychains/build.keychain-db"
-
-      - name: 📦 Export IPA
+      # --------------------------------------------------
+      # GoogleService-Info.plist (EXACT)
+      # --------------------------------------------------
+      - name: 🔑 Write GoogleService-Info.plist
         run: |
-          cd ios
-          cat > ExportOptions.plist << 'EXPORTEOF'
+          cat > ios/Runner/GoogleService-Info.plist <<'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
-            <key>method</key>
-            <string>app-store</string>
-            <key>signingStyle</key>
-            <string>manual</string>
-            <key>teamID</key>
-            <string>BYQUNNQSQH</string>
-            <key>provisioningProfiles</key>
-            <dict>
-              <key>com.saoirse.epi</key>
-              <string>match AppStore com.saoirse.epi 1765456537</string>
-            </dict>
+            <key>CLIENT_ID</key>
+            <string>486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q.apps.googleusercontent.com</string>
+            <key>REVERSED_CLIENT_ID</key>
+            <string>com.googleusercontent.apps.486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q</string>
+            <key>ANDROID_CLIENT_ID</key>
+            <string>486829564070-4d1fkup9ndsfec17mg830p1p7eqd6469.apps.googleusercontent.com</string>
+            <key>API_KEY</key>
+            <string>AIzaSyDpQb5HVM28WGffCCwrMmNs9luxSMFyaBY</string>
+            <key>GCM_SENDER_ID</key>
+            <string>486829564070</string>
+            <key>PLIST_VERSION</key>
+            <string>1</string>
+            <key>BUNDLE_ID</key>
+            <string>com.saoirse.epi</string>
+            <key>PROJECT_ID</key>
+            <string>saoirse-epi</string>
+            <key>STORAGE_BUCKET</key>
+            <string>saoirse-epi.firebasestorage.app</string>
+            <key>IS_ADS_ENABLED</key>
+            <false/>
+            <key>IS_ANALYTICS_ENABLED</key>
+            <false/>
+            <key>IS_APPINVITE_ENABLED</key>
+            <true/>
+            <key>IS_GCM_ENABLED</key>
+            <true/>
+            <key>IS_SIGNIN_ENABLED</key>
+            <true/>
+            <key>GOOGLE_APP_ID</key>
+            <string>1:486829564070:ios:07e32a618113ab29479467</string>
           </dict>
           </plist>
-          EXPORTEOF
-          xcodebuild -exportArchive \
-            -archivePath ../${{ env.ARCHIVE_DIR }}/Runner.xcarchive \
-            -exportPath ../${{ env.IPA_DIR }} \
-            -exportOptionsPlist ExportOptions.plist \
-            -allowProvisioningUpdates
-            
-      # 📤 Save IPA as artifact (for BrowserStack/manual testing)
-      - name: 📤 Upload IPA Artifact
-        uses: actions/upload-artifact@v4
-        continue-on-error: true
-        with:
-          name: ios-ipa
-          path: ${{ env.IPA_DIR }}/*.ipa
-          retention-days: 3
+          EOF
 
-      # 🚀 Upload
-      - name: 🚀 Upload to TestFlight
+      # --------------------------------------------------
+      # Info.plist (EXACT)
+      # --------------------------------------------------
+      - name: 🧾 Write Info.plist
         run: |
-          IPA_FILE=$(find ${{ env.IPA_DIR }} -name "*.ipa" | head -n 1)
+          cat > ios/Runner/Info.plist <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleDevelopmentRegion</key>
+            <string>$(DEVELOPMENT_LANGUAGE)</string>
+            <key>CFBundleDisplayName</key>
+            <string>Saoirse App</string>
+            <key>CFBundleExecutable</key>
+            <string>$(EXECUTABLE_NAME)</string>
+            <key>CFBundleIdentifier</key>
+            <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+            <key>CFBundleInfoDictionaryVersion</key>
+            <string>6.0</string>
+            <key>CFBundleName</key>
+            <string>saoirse_app</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>CFBundleShortVersionString</key>
+            <string>$(FLUTTER_BUILD_NAME)</string>
+            <key>CFBundleSignature</key>
+            <string>????</string>
+            <key>CFBundleVersion</key>
+            <string>$(FLUTTER_BUILD_NUMBER)</string>
+            <key>LSRequiresIPhoneOS</key>
+            <true/>
+            <key>UILaunchStoryboardName</key>
+            <string>LaunchScreen</string>
+            <key>UIMainStoryboardFile</key>
+            <string>Main</string>
 
-          if [ -z "$IPA_FILE" ]; then
-            echo "❌ ERROR: No IPA file found!"
-            ls -la ${{ env.IPA_DIR }}
-            exit 1
-          fi
+            <key>UISupportedInterfaceOrientations</key>
+            <array>
+              <string>UIInterfaceOrientationPortrait</string>
+              <string>UIInterfaceOrientationLandscapeLeft</string>
+              <string>UIInterfaceOrientationLandscapeRight</string>
+            </array>
 
-          echo "✅ Found IPA: $IPA_FILE"
+            <key>UISupportedInterfaceOrientations~ipad</key>
+            <array>
+              <string>UIInterfaceOrientationPortrait</string>
+              <string>UIInterfaceOrientationPortraitUpsideDown</string>
+              <string>UIInterfaceOrientationLandscapeLeft</string>
+              <string>UIInterfaceOrientationLandscapeRight</string>
+            </array>
 
-          fastlane pilot upload \
-            --api_key_path ios/api_key.json \
-            --ipa "$IPA_FILE" \
-            --skip_waiting_for_build_processing
+            <key>CADisableMinimumFrameDurationOnPhone</key>
+            <true/>
+            <key>UIApplicationSupportsIndirectInputEvents</key>
+            <true/>
+
+            <key>NSCameraUsageDescription</key>
+            <string>This app uses the camera to scan QR codes and capture images when required.</string>
+
+            <key>NSPhotoLibraryUsageDescription</key>
+            <string>This app accesses your photo library to upload and share images.</string>
+
+            <key>NSPhotoLibraryAddUsageDescription</key>
+            <string>This app saves images to your photo library when you choose to do so.</string>
+
+            <key>NSMicrophoneUsageDescription</key>
+            <string>This app may access the microphone for media-related features.</string>
+
+            <key>CFBundleURLTypes</key>
+            <array>
+              <dict>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                  <string>com.googleusercontent.apps.486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q</string>
+                </array>
+              </dict>
+            </array>
+          </dict>
+          </plist>
+          EOF
+
+      # --------------------------------------------------
+      # Verify
+      # --------------------------------------------------
+      - name: 🔍 Verify iOS platform
+        run: |
+          plutil -lint ios/Runner/Runner.entitlements
+          plutil -lint ios/Runner/GoogleService-Info.plist
+          plutil -lint ios/Runner/Info.plist
+          echo "✅ iOS platform regenerated correctly"
+
+      # --------------------------------------------------
+      # Commit & Push
+      # --------------------------------------------------
+      - name: 📤 Commit regenerated iOS platform
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add ios/
+          git commit -m "fix(ios): regenerate platform with exact plist configs" || exit 0
+          git push
