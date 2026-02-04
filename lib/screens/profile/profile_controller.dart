@@ -477,18 +477,41 @@ class ProfileController extends GetxController {
   }
 
  Future<void> deleteAccount() async {
-    deleteAccountData.value = null;
+   if (profile.value?.user.id == null) {
+    log("Profile not loaded yet, fetching profile...");
+    await fetchUserProfile(); 
+  }
 
-    fetchDeleteInfo();
+  if (profile.value?.user.id == null) {
+    Get.snackbar("Error", "User information not available");
+    return;
+  }
 
-    Get.defaultDialog(
-      title: "Delete Account",
-      content: Obx(() {
-        final info = deletionInfo;
+  deleteAccountData.value = null;
+  await fetchDeleteInfo();
 
-        if (info == null) {
-          return appLoader();
-        }
+  Get.defaultDialog(
+    title: "Delete Account",
+    content: Obx(() {
+      final info = deletionInfo; 
+      
+
+      if (info == null) {
+        return appLoader();
+      }
+      
+    // deleteAccountData.value = null;
+
+    // fetchDeleteInfo();
+
+    // Get.defaultDialog(
+    //   title: "Delete Account",
+    //   content: Obx(() {
+    //     final info = deletionInfo;
+
+    //     if (info == null) {
+    //       return appLoader();
+    //     }
 
         final items = info.dataToBeDeleted;
         final note = info.note;
