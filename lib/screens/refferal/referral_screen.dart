@@ -171,7 +171,11 @@ class _ReferralScreenState extends State<ReferralScreen> {
               ]
             : [],
       ),
-      body: NestedScrollView(
+      body:  isLoggedIn ? _buildReferralBody() : _loginOnlyView(),
+    );
+  }
+  NestedScrollView _buildReferralBody(){
+    return NestedScrollView(
         controller: scrollController,
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -200,8 +204,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
             ),
           ];
         },
-        body: isLoggedIn
-            ? Container(
+        body:  Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.white,
@@ -227,9 +230,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
                   ),
                 ),
               )
-            : _loginOnlyView(),
-      ),
-    );
+           
+      );
   }
 
   Widget _buildContentSection({

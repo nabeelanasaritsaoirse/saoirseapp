@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_constant.dart';
+import 'package:saoirse_app/main.dart';
+import 'package:saoirse_app/screens/login/login_page.dart';
 
 import '../../screens/order_details/order_details_controller.dart';
 import '../../constants/app_strings.dart';
@@ -153,6 +156,7 @@ class SelectPlanSheet extends StatelessWidget {
 
                   SizedBox(width: 12.w),
 
+                  
                   /// Convert Button
                   GestureDetector(
                     onTap: () {
@@ -161,6 +165,7 @@ class SelectPlanSheet extends StatelessWidget {
                       final double amount =
                           double.tryParse(amountController.text.trim()) ?? 0.0;
 
+                      // 🔹 VALIDATIONS (unchanged)
                       if (days <= 0 || amount <= 0) {
                         appToast(
                           error: true,
@@ -188,6 +193,16 @@ class SelectPlanSheet extends StatelessWidget {
                         return;
                       }
 
+                      // 🔐 LOGIN CHECK (ONLY HERE)
+                      final isLoggedIn = storage.read(AppConst.USER_ID) != null;
+
+                      if (!isLoggedIn) {
+                        Get.back(); // close bottom sheet first
+                        Get.to(() => LoginPage());
+                        return;
+                      }
+
+                      // ✅ ORIGINAL FLOW (unchanged)
                       controller.customDays.value = days;
                       controller.customAmount.value = amount;
                       Get.back();

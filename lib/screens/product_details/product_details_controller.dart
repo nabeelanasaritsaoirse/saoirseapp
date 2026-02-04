@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_constant.dart';
+import 'package:saoirse_app/main.dart';
+import 'package:saoirse_app/screens/login/login_page.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../models/plan_model.dart';
@@ -109,40 +112,55 @@ class ProductDetailsController extends GetxController {
     isFavorite.value = exists;
   }
 
+  bool get isLoggedIn {
+  return storage.read(AppConst.USER_ID) != null;
+}
+
+  
+
   Future<void> toggleFavorite(String id) async {
-    final productData = product.value;
-
-    if (productData == null) {
-      appToast(content: "Product not loaded");
-      return;
-    }
-    if (id.isEmpty) {
-      appToast(content: "Invalid Product ID", error: true);
-      return;
-    }
-
-    if (isFavorite.value) {
-      final removed = await wishlistService.removeFromWishlist(id);
-
-      if (removed) {
-        isFavorite(false);
-        appToaster(content: "Removed from wishlist");
-      } else {
-        appToast(content: "Failed to remove from wishlist", error: true);
-      }
-
-      return;
-    }
-
-    final added = await wishlistService.addToWishlist(id);
-
-    if (added) {
-      isFavorite(true);
-      appToaster(content: "Added to wishlist");
-    } else {
-      appToast(content: "Failed to add wishlist", error: true);
-    }
+  // 🔐 LOGIN CHECK FIRST
+  if (!isLoggedIn) {
+    Get.to(() => LoginPage());
+    return;
   }
+
+  final productData = product.value;
+
+  if (productData == null) {
+    appToast(content: "Product not loaded");
+    return;
+  }
+
+  if (id.isEmpty) {
+    appToast(content: "Invalid Product ID", error: true);
+    return;
+  }
+
+  if (isFavorite.value) {
+    final removed = await wishlistService.removeFromWishlist(id);
+
+    if (removed) {
+      isFavorite(false);
+      appToaster(content: "Removed from wishlist");
+    } else {
+      appToast(content: "Failed to remove from wishlist", error: true);
+    }
+
+    return;
+  }
+
+  final added = await wishlistService.addToWishlist(id);
+
+  if (added) {
+    isFavorite(true);
+    appToaster(content: "Added to wishlist");
+  } else {
+    appToast(content: "Failed to add wishlist", error: true);
+  }
+}
+
+  
 
   // SCROLL LISTENER
   void _scrollListener() {
