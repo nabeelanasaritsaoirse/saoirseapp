@@ -33,15 +33,13 @@ class AutopayDashboardScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Iconsax.settings4, color: AppColors.white),
             onPressed: () async {
-              final controller = Get.find<AutopayController>();
-
-              // ✅ 1. Global settings
+            
               await controller.fetchAutopaySettings();
 
-              // ✅ 2. Autopay status (orders + skip dates + priority)
-              await controller.fetchAutopayStatus();
+            
+              // await controller.fetchAutopayStatus();
 
-              // ✅ 3. Open dialog
+            
               Get.dialog(
                 AutopaySettingsDialog(),
                 barrierDismissible: true,
@@ -206,6 +204,11 @@ class AutopayDashboardScreen extends StatelessWidget {
   }
 
   Widget forecastAndList() {
+    print("controller json");
+    print(controller.items.toJson());
+    print(controller.items[0].orderId);
+    print(controller.items[1].orderId);
+    print(controller.items[2].orderId);
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(14.w),
@@ -235,6 +238,9 @@ class AutopayDashboardScreen extends StatelessWidget {
                 onTap: () {
                   //   todo: open settings dialog                                                Quick Add Button
                   print('Quick Add ₹${controller.suggestedTopUp.value}');
+                  print(controller.items[0].title);
+                  print(controller.items[1].title);
+                  print(controller.items[2].title);
                 },
                 buttonText: 'Quick Add ₹${controller.suggestedTopUp.value}',
                 buttonColor: AppColors.primaryColor,
@@ -262,7 +268,6 @@ class AutopayDashboardScreen extends StatelessWidget {
 
   Widget autopayCard(AutopayItem item) {
     final isDisabled = !item.enabled;
-    log('Rendering ${item.orderId} progress=${item.progress}');
 
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
@@ -369,10 +374,10 @@ class AutopayDashboardScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: 8.h),
-            // customGradientProgress(value: item.progress.toDouble())              
-   //                                                                                TODO        CUSTOM PROGRESS
-   
-              customGradientProgress(
+            // customGradientProgress(value: item.progress.toDouble())
+            //                                                                                TODO        CUSTOM PROGRESS
+
+            customGradientProgress(
               value: item.progress / 100.0,
             )
           ],

@@ -358,21 +358,12 @@ class AutopayController extends GetxController {
       errorMessage.value = '';
 
       final response = await _service.getAutopayStatus();
+      print("controller");
+      print(response.toString());
       autopayStatus.value = response;
-
-      if (items.isEmpty && response.data.orders.isNotEmpty) {
-        items.value = response.data.orders.map((order) {
-          return AutopayItem(
-            orderId: order.orderId,
-            title: order.productName,
-            perDay: order.dailyAmount,
-            remaining: order.remainingAmount,
-            progress: order.progress,
-            priority: order.autopay.priority,
-            enabled: order.autopay.enabled,
-          );
-        }).toList();
-      }
+      print(autopayStatus.value?.data.orders[0].orderId);
+      print(autopayStatus.value?.data.orders[1].orderId);
+      print(autopayStatus.value?.data.orders[2].orderId);
 
       log("AUTOPAY STATUS LOADED");
       log(" AUTOPAY SThereATUS RESPONSE$response");

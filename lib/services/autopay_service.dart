@@ -178,7 +178,6 @@ class AutopayService {
       final decoded = jsonDecode(response.body);
       log("AUTOPAY STATUS GET======>${response.body}");
       final statusModel = AutopayStatus.fromJson(decoded);
-
       return statusModel;
     } else {
       throw Exception(
