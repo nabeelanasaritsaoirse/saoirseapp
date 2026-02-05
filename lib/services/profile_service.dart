@@ -131,30 +131,25 @@ class ProfileService {
     }
   }
 
- //     Delete Account 
+  // Delete Account
+  Future<Map<String, dynamic>?> requestAccountDeletion(String userId) async {
+    try {
+      final token = storage.read(AppConst.ACCESS_TOKEN);
+      final url = "${AppURLs.BASE_API}api/users/$userId/request-deletion";
 
-Future<Map<String, dynamic>?> requestAccountDeletion(String userId) async {
-  try {
-    final token = storage.read(AppConst.ACCESS_TOKEN);
-    final url = "${AppURLs.BASE_API}api/users/$userId/request-deletion";
-
-    return await APIService.postRequest(
-      url: url,
-      headers: {
-        "Authorization": "Bearer $token",
-       
-      },
-      body: {
-        "reason": "User requested account deletion"
-      },
-      onSuccess: (json) => json,
-    );
-  } catch (e) {
-    log("Delete account error: $e");
-    return null;
+      return await APIService.postRequest(
+        url: url,
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+        body: {"reason": "User requested account deletion"},
+        onSuccess: (json) => json,
+      );
+    } catch (e) {
+      log("Delete account error: $e");
+      return null;
+    }
   }
-}
-
 
   Future<DeleteAccountModel> getDeleteInfo() async {
     final token = storage.read(AppConst.ACCESS_TOKEN);
@@ -163,8 +158,6 @@ Future<Map<String, dynamic>?> requestAccountDeletion(String userId) async {
     final uri = Uri.parse(
       "${AppURLs.BASE_API}api/users/$userId/deletion-info",
     );
-
-  
 
     final response = await http.get(
       uri,

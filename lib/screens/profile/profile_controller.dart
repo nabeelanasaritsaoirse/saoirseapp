@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:saoirse_app/screens/login/login_page.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -20,6 +19,7 @@ import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_controller.dart';
+import '../login/login_page.dart';
 import '../notification/notification_controller.dart';
 import '../onboard/onboard_screen.dart';
 
@@ -477,9 +477,7 @@ class ProfileController extends GetxController {
     } catch (e) {}
   }
 
-
-
-//         Delete Account 
+//         Delete Account
 
   Future<void> deleteAccount() async {
     if (profile.value?.user.id == null) {
@@ -503,8 +501,6 @@ class ProfileController extends GetxController {
         if (info == null) {
           return appLoader();
         }
-
-        
 
         final items = info.dataToBeDeleted;
         final note = info.note;
@@ -552,7 +548,6 @@ class ProfileController extends GetxController {
             appText(
               "This action is permanent. Are you sure you want to delete your account?",
               textAlign: TextAlign.left,
-             
             ),
           ],
         );
@@ -569,39 +564,35 @@ class ProfileController extends GetxController {
     );
   }
 
+  Future<void> confirmDeleteAccount() async {
+    final userId = profile.value?.user.id;
 
-
-Future<void> confirmDeleteAccount() async {
-  final userId = profile.value?.user.id;
-
-  if (userId == null) {
-    log("User id is null");
-    return;
-  }
-
-  try {
-    isLoading(true);
-
-    final response =
-        await _profileService.requestAccountDeletion(userId);
-
-    if (response == null) {
-      Get.snackbar("Error", "Something went wrong");
+    if (userId == null) {
+      log("User id is null");
       return;
     }
 
-    if (response["success"] == true) {
-      Get.offAll(() => LoginPage());
-      await logoutUserInBackground();
-    
-    } else {
-      log( response["message"] ?? "Unable to delete account");
-     
+    try {
+      isLoading(true);
+
+      final response = await _profileService.requestAccountDeletion(userId);
+
+      if (response == null) {
+        Get.snackbar("Error", "Something went wrong");
+        return;
+      }
+
+      if (response["success"] == true) {
+        Get.offAll(() => LoginPage());
+        await logoutUserInBackground();
+      } else {
+        log(response["message"] ?? "Unable to delete account");
+      }
+    } finally {
+      isLoading(false);
     }
-  } finally {
-    isLoading(false);
   }
-}
+
 //-------------------------------------------------------------------------------------------------------------------------------------
   // ================== CLEANUP ==================
   @override
