@@ -50,6 +50,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return storage.read(AppConst.USER_ID) != null;
   }
 
+  Widget _loginOnlyView() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            appText(
+              "Please login to view your Profile",
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w500,
+            ),
+            SizedBox(height: 20.h),
+            appButton(
+              buttonColor: AppColors.primaryColor,
+              onTap: () async {
+                await Get.to(() => LoginPage());
+                if (isLoggedIn) {
+                  controller.fetchUserProfile();
+                  controller.fetchWishlistCount();
+                  controller.fetchDeleteInfo();
+                }
+              },
+              child: appText(
+                "Login",
+                color: AppColors.white,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -340,35 +376,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
     );
   }
-}
-
-Widget _loginOnlyView() {
-  return Center(
-    child: Padding(
-      padding: EdgeInsets.all(20.w),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          appText(
-            "Please login to view your Profile",
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w500,
-          ),
-          SizedBox(height: 20.h),
-          appButton(
-            buttonColor: AppColors.primaryColor,
-            onTap: () {
-              Get.to(() => LoginPage());
-            },
-            child: appText(
-              "Login",
-              color: AppColors.white,
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 }

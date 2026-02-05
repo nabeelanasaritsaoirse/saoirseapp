@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart';
@@ -13,10 +14,9 @@ import 'api_service.dart';
 import 'package:http/http.dart' as http;
 
 class ProfileService {
-  final token = storage.read(AppConst.ACCESS_TOKEN);
-
   Future<UserProfileModel?> fetchProfile() async {
     try {
+      final token = storage.read(AppConst.ACCESS_TOKEN); // FETCH DYNAMICALLY
       final url = AppURLs.MY_PROFILE;
 
       final response = await APIService.getRequest<UserProfileModel>(
@@ -41,6 +41,7 @@ class ProfileService {
   // -------- UPDATE PROFILE PICTURE --------
   Future<bool> updateProfilePicture(String userId, String imagePath) async {
     try {
+      final token = storage.read(AppConst.ACCESS_TOKEN); // FETCH DYNAMICALLY
       final url = "${AppURLs.BASE_API}api/users/$userId/profile-picture";
 
       // ---- FORCE NEW FILE NAME WITH .jpg ----
@@ -130,27 +131,23 @@ class ProfileService {
     }
   }
 
-  Future<bool> requestAccountDeletion(String userId) async {
+  // Delete Account
+  Future<Map<String, dynamic>?> requestAccountDeletion(String userId) async {
     try {
       final token = storage.read(AppConst.ACCESS_TOKEN);
-
       final url = "${AppURLs.BASE_API}api/users/$userId/request-deletion";
 
-      final response = await APIService.postRequest(
+      return await APIService.postRequest(
         url: url,
         headers: {
           "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
         },
-        body: {}, // no body required
+        body: {"reason": "User requested account deletion"},
         onSuccess: (json) => json,
       );
-
-      if (response == null) return false;
-
-      return response["success"] == true;
     } catch (e) {
-      return false;
+      log("Delete account error: $e");
+      return null;
     }
   }
 
@@ -161,8 +158,6 @@ class ProfileService {
     final uri = Uri.parse(
       "${AppURLs.BASE_API}api/users/$userId/deletion-info",
     );
-
-    // print("delete api: $uri");
 
     final response = await http.get(
       uri,

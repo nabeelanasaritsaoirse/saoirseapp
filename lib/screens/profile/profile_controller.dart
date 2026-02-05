@@ -19,6 +19,7 @@ import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_controller.dart';
+import '../login/login_page.dart';
 import '../notification/notification_controller.dart';
 import '../onboard/onboard_screen.dart';
 
@@ -476,10 +477,20 @@ class ProfileController extends GetxController {
     } catch (e) {}
   }
 
+  // Delete Account
   Future<void> deleteAccount() async {
-    deleteAccountData.value = null;
+    if (profile.value?.user.id == null) {
+      log("Profile not loaded yet, fetching profile...");
+      await fetchUserProfile();
+    }
 
-    fetchDeleteInfo();
+    if (profile.value?.user.id == null) {
+      Get.snackbar("Error", "User information not available");
+      return;
+    }
+
+    deleteAccountData.value = null;
+    await fetchDeleteInfo();
 
     Get.defaultDialog(
       title: "Delete Account",
@@ -536,7 +547,6 @@ class ProfileController extends GetxController {
             appText(
               "This action is permanent. Are you sure you want to delete your account?",
               textAlign: TextAlign.left,
-              //  fontSize: 12, color: AppColors.grey,
             ),
           ],
         );
@@ -557,25 +567,26 @@ class ProfileController extends GetxController {
     final userId = profile.value?.user.id;
 
     if (userId == null) {
-      log("User not found=========User id is null");
+      log("User id is null");
       return;
     }
 
     try {
       isLoading(true);
 
-      final success = await _profileService.requestAccountDeletion(userId);
+      final response = await _profileService.requestAccountDeletion(userId);
 
-      if (success) {
-        log("==========================>Your account deletion request has been submitted successfully.");
+      if (response == null) {
+        Get.snackbar("Error", "Something went wrong");
+        return;
+      }
 
-        Get.offAll(() => OnBoardScreen());
+      if (response["success"] == true) {
+        Get.offAll(() => LoginPage());
         await logoutUserInBackground();
       } else {
-        log("==========================>Unable to request account deletion");
+        log(response["message"] ?? "Unable to delete account");
       }
-    } catch (e) {
-      log("==========================>Something went wrong");
     } finally {
       isLoading(false);
     }
