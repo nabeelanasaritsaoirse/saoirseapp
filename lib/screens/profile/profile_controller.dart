@@ -477,9 +477,18 @@ class ProfileController extends GetxController {
   }
 
   Future<void> deleteAccount() async {
-    deleteAccountData.value = null;
+    if (profile.value?.user.id == null) {
+      log("Profile not loaded yet, fetching profile...");
+      await fetchUserProfile();
+    }
 
-    fetchDeleteInfo();
+    if (profile.value?.user.id == null) {
+      Get.snackbar("Error", "User information not available");
+      return;
+    }
+
+    deleteAccountData.value = null;
+    await fetchDeleteInfo();
 
     Get.defaultDialog(
       title: "Delete Account",
@@ -489,6 +498,19 @@ class ProfileController extends GetxController {
         if (info == null) {
           return appLoader();
         }
+
+        // deleteAccountData.value = null;
+
+        // fetchDeleteInfo();
+
+        // Get.defaultDialog(
+        //   title: "Delete Account",
+        //   content: Obx(() {
+        //     final info = deletionInfo;
+
+        //     if (info == null) {
+        //       return appLoader();
+        //     }
 
         final items = info.dataToBeDeleted;
         final note = info.note;
