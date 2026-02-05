@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart';
@@ -130,29 +131,30 @@ class ProfileService {
     }
   }
 
-  Future<bool> requestAccountDeletion(String userId) async {
-    try {
-      final token = storage.read(AppConst.ACCESS_TOKEN);
+ //     Delete Account 
 
-      final url = "${AppURLs.BASE_API}api/users/$userId/request-deletion";
+Future<Map<String, dynamic>?> requestAccountDeletion(String userId) async {
+  try {
+    final token = storage.read(AppConst.ACCESS_TOKEN);
+    final url = "${AppURLs.BASE_API}api/users/$userId/request-deletion";
 
-      final response = await APIService.postRequest(
-        url: url,
-        headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
-        },
-        body: {}, // no body required
-        onSuccess: (json) => json,
-      );
-
-      if (response == null) return false;
-
-      return response["success"] == true;
-    } catch (e) {
-      return false;
-    }
+    return await APIService.postRequest(
+      url: url,
+      headers: {
+        "Authorization": "Bearer $token",
+       
+      },
+      body: {
+        "reason": "User requested account deletion"
+      },
+      onSuccess: (json) => json,
+    );
+  } catch (e) {
+    log("Delete account error: $e");
+    return null;
   }
+}
+
 
   Future<DeleteAccountModel> getDeleteInfo() async {
     final token = storage.read(AppConst.ACCESS_TOKEN);
@@ -162,7 +164,7 @@ class ProfileService {
       "${AppURLs.BASE_API}api/users/$userId/deletion-info",
     );
 
-    // print("delete api: $uri");
+  
 
     final response = await http.get(
       uri,

@@ -41,6 +41,7 @@ class APIService {
         // log("request Url =====> : $url");
         // log("BODY ====> $body");
         // log(response.body);
+        // log("STATUS CODE=========================>${response.statusCode}");
         switch (response.statusCode) {
           case 200:
           case 201:
