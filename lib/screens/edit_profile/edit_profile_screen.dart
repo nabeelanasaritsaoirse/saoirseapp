@@ -73,9 +73,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   width: 120.w,
                                   height: 120.w,
                                 )
-                              : (user!.profilePicture.isNotEmpty
+                              : (user?.profilePicture.isNotEmpty ?? false
                                   ? Image.network(
-                                      user.profilePicture,
+                                      user!.profilePicture,
                                       fit: BoxFit.cover,
                                       width: 120.w,
                                       height: 120.w,

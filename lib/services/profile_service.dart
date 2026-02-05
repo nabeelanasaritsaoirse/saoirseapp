@@ -14,10 +14,9 @@ import 'api_service.dart';
 import 'package:http/http.dart' as http;
 
 class ProfileService {
-  final token = storage.read(AppConst.ACCESS_TOKEN);
-
   Future<UserProfileModel?> fetchProfile() async {
     try {
+      final token = storage.read(AppConst.ACCESS_TOKEN); // FETCH DYNAMICALLY
       final url = AppURLs.MY_PROFILE;
 
       final response = await APIService.getRequest<UserProfileModel>(
@@ -42,6 +41,7 @@ class ProfileService {
   // -------- UPDATE PROFILE PICTURE --------
   Future<bool> updateProfilePicture(String userId, String imagePath) async {
     try {
+      final token = storage.read(AppConst.ACCESS_TOKEN); // FETCH DYNAMICALLY
       final url = "${AppURLs.BASE_API}api/users/$userId/profile-picture";
 
       // ---- FORCE NEW FILE NAME WITH .jpg ----
