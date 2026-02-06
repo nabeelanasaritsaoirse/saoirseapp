@@ -65,14 +65,18 @@ class CouponCard extends StatelessWidget {
 
   String get discountLabel {
     if (coupon.discountType == "percentage") {
-      return "${coupon.discountValue.toInt()}%\nOFF";
+      return "${coupon.discountValue.toInt()}%";
     }
-    return "₹${coupon.discountValue.toInt()}\nOFF";
+    return "₹${coupon.discountValue.toInt()}";
   }
 
-  String get expiryLabel {
+  String get expiryDay {
     if (coupon.expiryDate == null) return "--";
-    final d = coupon.expiryDate!;
+    return coupon.expiryDate!.day.toString();
+  }
+
+  String get expiryMonth {
+    if (coupon.expiryDate == null) return "--";
     const months = [
       "",
       "Jan",
@@ -88,7 +92,7 @@ class CouponCard extends StatelessWidget {
       "Nov",
       "Dec"
     ];
-    return "${d.day}\n${months[d.month]}";
+    return months[coupon.expiryDate!.month];
   }
 
   String get discountText {
@@ -100,139 +104,273 @@ class CouponCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(14.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          /// LEFT DISCOUNT
-          Container(
-            width: 78.w,
-            height: 90.h,
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor.withOpacity(0.12),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(14.r),
-                bottomLeft: Radius.circular(14.r),
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: ClipPath(
+        clipper: CouponClipper(),
+        child: Container(
+          height: 120.h,
+          decoration: BoxDecoration(
+            color: AppColors.offWhite,
+            borderRadius: BorderRadius.circular(14.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 8),
               ),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              discountLabel,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primaryColor,
-              ),
-            ),
+            ],
           ),
-          SizedBox(
-            width: 10,
-          ),
-
-          /// CENTER DETAILS
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// TITLE
-                Text(
-                  coupon.couponCode, // or replace with title if backend adds it
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textBlack,
-                  ),
-                ),
-
-                SizedBox(height: 4.h),
-
-                /// DISCOUNT LINE
-                Text(
-                  discountText,
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    color: AppColors.grey,
-                  ),
-                ),
-
-                SizedBox(height: 2.h),
-
-                /// MIN ORDER
-                Text(
-                  "Minimum order value ₹${coupon.minOrderValue.toInt()}",
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: AppColors.grey,
-                  ),
-                ),
-
-                SizedBox(height: 6.h),
-
-                /// CODE
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "Code: ",
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: AppColors.textBlack,
+          child: Stack(
+            children: [
+              Row(
+                children: [
+                  /// LEFT DISCOUNT BADGE
+                  Container(
+                    width: 120.w,
+                    padding: EdgeInsets.all(16.w),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor,
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Center(
+                        child: Text(
+                          discountLabel,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                      TextSpan(
-                        text: coupon.couponCode.toLowerCase(),
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textBlack,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
 
-          /// RIGHT EXPIRY
-          Container(
-            width: 55.w,
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Exp.",
-                  style: TextStyle(fontSize: 10.sp, color: Colors.grey),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  expiryLabel,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.bold,
+                  /// CENTER DETAILS
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          coupon.couponCode,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textBlack,
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          discountText,
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: AppColors.grey,
+                          ),
+                        ),
+                        SizedBox(height: 2.h),
+                        Text(
+                          "Minimum order value ₹${coupon.minOrderValue.toInt()}",
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: AppColors.grey,
+                          ),
+                        ),
+                        SizedBox(height: 6.h),
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "Code: ",
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  color: AppColors.textBlack,
+                                ),
+                              ),
+                              TextSpan(
+                                text: coupon.couponCode.toLowerCase(),
+                                style: TextStyle(
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textBlack,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+
+                  /// RIGHT EXPIRY
+                  Container(
+                    width: 80.w,
+                    padding: EdgeInsets.symmetric(vertical: 18.h),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Exp.",
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        SizedBox(height: 6.h),
+                        Text(
+                          expiryDay,
+                          style: TextStyle(
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF2C3E50),
+                          ),
+                        ),
+                        Text(
+                          expiryMonth,
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF2C3E50),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              /// DOTTED DIVIDER
+              Positioned(
+                right: 80.w,
+                top: 0,
+                bottom: 0,
+                child: CustomPaint(
+                  painter: DottedLinePainter(),
+                  size: Size(1.w, double.infinity),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
+}
+
+class CouponClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    double radius = 12;
+    double notchRadius = 10;
+    double notchPosition = size.width - 90;
+
+    // Start from top-left with radius
+    path.moveTo(radius, 0);
+
+    // Top edge to first notch
+    path.lineTo(notchPosition - notchRadius, 0);
+
+    // Top notch (curved cut)
+    path.arcToPoint(
+      Offset(notchPosition + notchRadius, 0),
+      radius: Radius.circular(notchRadius),
+      clockwise: false,
+    );
+
+    // Continue to top-right
+    path.lineTo(size.width - radius, 0);
+    path.arcToPoint(
+      Offset(size.width, radius),
+      radius: Radius.circular(radius),
+    );
+
+    // Right edge
+    path.lineTo(size.width, size.height - radius);
+    path.arcToPoint(
+      Offset(size.width - radius, size.height),
+      radius: Radius.circular(radius),
+    );
+
+    // Bottom edge to second notch
+    path.lineTo(notchPosition + notchRadius, size.height);
+
+    // Bottom notch (curved cut)
+    path.arcToPoint(
+      Offset(notchPosition - notchRadius, size.height),
+      radius: Radius.circular(notchRadius),
+      clockwise: false,
+    );
+
+    // Continue to bottom-left
+    path.lineTo(radius, size.height);
+    path.arcToPoint(
+      Offset(0, size.height - radius),
+      radius: Radius.circular(radius),
+    );
+
+    // Left edge with notches
+    double leftNotch1 = size.height * 0.35;
+    double leftNotch2 = size.height * 0.65;
+    double leftNotchRadius = 10;
+
+    path.lineTo(0, leftNotch2 + leftNotchRadius);
+
+    // Left bottom notch
+    path.arcToPoint(
+      Offset(0, leftNotch2 - leftNotchRadius),
+      radius: Radius.circular(leftNotchRadius),
+      clockwise: false,
+    );
+
+    path.lineTo(0, leftNotch1 + leftNotchRadius);
+
+    // Left top notch
+    path.arcToPoint(
+      Offset(0, leftNotch1 - leftNotchRadius),
+      radius: Radius.circular(leftNotchRadius),
+      clockwise: false,
+    );
+
+    path.lineTo(0, radius);
+    path.arcToPoint(
+      Offset(radius, 0),
+      radius: Radius.circular(radius),
+    );
+
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+class DottedLinePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.grey[300]!
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    const dashHeight = 4.0;
+    const dashSpace = 4.0;
+    double startY = 0;
+
+    while (startY < size.height) {
+      canvas.drawLine(
+        Offset(0, startY),
+        Offset(0, startY + dashHeight),
+        paint,
+      );
+      startY += dashHeight + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
 
 class CouponShimmer extends StatelessWidget {
