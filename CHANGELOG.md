@@ -1,48 +1,6 @@
-## Version 1.5.0+108
+## Version 1.5.1+109
 
-- Merge pull request #305 from nabeelanasaritsaoirse/developer
-- Merge pull request #304 from nabeelanasaritsaoirse/deep
-- fix: google login
-- fix: refer banner image,username,category to product listing
-- fea: added cache cleanup
-- fix: solved cart count and blue box issue
-- fix:
-- Changed ProductListResponse Model
-- Merge remote-tracking branch 'origin/shadin' into deep
-- cart count and blue boxintiall fetching issue completed
-- Merge remote-tracking branch 'origin/akash' into deep
--  Add category shimmer
--  Add category shimmer
-- Merge remote-tracking branch 'origin/sahir' into deep
-- Create PendingPaymentConfirmation screen and added the pushnotification
-- category page See All butoon
-- Merge remote-tracking branch 'origin/akash' into deep
-- Kyc comsent check box validation
-- Kyc consent checkbox added
-- fix: removed safearea in splash screen
-- Kyc consent checkbox added
-- Merge branch 'deep' of https://github.com/nishantitsaoirse-head/saoirseapp into akash
-- Merge remote-tracking branch 'origin/sahir' into deep
-- fix: lint issues
-- fixed issues like add to cart issue and wallet issue intially
-- feat: integrate order preview API for single and bulk orders fix: resolve plan mismatch and prevent duplicate API calls in wallet flows
-- added some ui changes
-- Merge branch 'deep' of https://github.com/nishantitsaoirse-head/saoirseapp into akash
-- Merge remote-tracking branch 'origin/shadin' into deep
-- completed the profile screen icon changes and blue box fix also means conditions changes
-- Merge remote-tracking branch 'origin/sahir' into deep
-- Added invalid Coupon toast on order details section and Resolved autopay calling issue
-- fix:
-- attach ProductDetails binding when navigating from featured products
-- Merge remote-tracking branch 'origin/shadin' into deep
-- Merge remote-tracking branch 'origin/sahir' into deep
-- done the avoiding of multiple ccalling of razorpay from wallet pending transcation and add money and checkout and applycoupoin toast added
-- Fix crash on Product Details screen and add proper bindings
-- Merge remote-tracking branch 'origin/shadin' into deep
-- fix: cache issue
-- changes in ui of manage account and manage address icons and delete dialog
-- Merge pull request #299 from nabeelanasaritsaoirse/deep
-- Category screen updated
-- Merge branch 'deep' of https://github.com/nishantitsaoirse-head/saoirseapp into akash
-- Category screen navigation
-- Category screen design changed
+- Merge pull request #312 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-1
+- Update Flutter ios.yml
+- Update auto-version.yml
+- Update Flutter Android.yml
