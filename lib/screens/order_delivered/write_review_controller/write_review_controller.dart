@@ -1,5 +1,7 @@
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:saoirse_app/models/review_image_upload_response.dart';
@@ -16,6 +18,7 @@ class WriteReviewController extends GetxController {
   // ================== REVIEW FORM STATE ==================
   RxInt reviewRating = 0.obs;
   RxString reviewText = "".obs;
+  final TextEditingController reviewTextController = TextEditingController();
 
   // ================== IMAGE SELECTION ==================
   RxList<XFile> reviewImages = <XFile>[].obs;
@@ -23,6 +26,9 @@ class WriteReviewController extends GetxController {
 
   // ================== IMAGE UPLOAD STATE ==================
   RxBool isUploadingImages = false.obs;
+
+  RxInt currentUploadIndex = 0.obs; // Which image is being uploaded (1-5)
+  RxInt totalUploadCount = 0.obs;
 
   /// Uploaded S3 images (after upload)
   RxList<ReviewImage> uploadedImages = <ReviewImage>[].obs;
@@ -45,7 +51,7 @@ class WriteReviewController extends GetxController {
     final remaining = maxImages - reviewImages.length;
     if (remaining <= 0) return;
 
-    final picked = await _picker.pickMultiImage(imageQuality: 70);
+    final picked = await _picker.pickMultiImage(imageQuality: 50);
     if (picked.isEmpty) return;
 
     reviewImages.addAll(picked.take(remaining));
@@ -65,71 +71,90 @@ class WriteReviewController extends GetxController {
   void resetReviewForm() {
     reviewRating.value = 0;
     reviewText.value = "";
+    reviewTextController.clear(); // clear text input
     reviewImages.clear();
     uploadedImages.clear();
     isUploadingImages.value = false;
+    currentUploadIndex.value = 0;
+    totalUploadCount.value = 0;
   }
 
   // ======================================================
   // STEP 1️⃣ UPLOAD IMAGES (S3)
   // ======================================================
+  
+
   Future<bool> uploadImagesIfNeeded() async {
     if (reviewImages.isEmpty) return true;
 
     isUploadingImages.value = true;
+    totalUploadCount.value = reviewImages.length;
+    currentUploadIndex.value = 0;
 
     try {
-      // Convert XFile → File
       final files = reviewImages.map((x) => File(x.path)).toList();
 
-      final result = await reviewService.uploadReviewImages(files);
+      // ✅ Upload with progress callback
+      final result = await reviewService.uploadReviewImages(
+        files,
+        onProgress: (current, total) {
+          currentUploadIndex.value = current;
+          totalUploadCount.value = total;
+        },
+      );
+
       uploadedImages.assignAll(result);
       return true;
     } catch (e) {
       Get.snackbar(
         "Upload Failed",
-        e.toString().replaceAll("Exception:", ""),
+        e.toString().replaceAll("Exception:", "").replaceAll("Exception: ", ""),
+        duration: const Duration(seconds: 5),
       );
       return false;
     } finally {
       isUploadingImages.value = false;
+      currentUploadIndex.value = 0;
+      totalUploadCount.value = 0;
     }
   }
 
   // ======================================================
   // STEP 2️⃣ SUBMIT REVIEW
   // ======================================================
+  //
+
+
   Future<bool> submitReview() async {
-    // ================= VALIDATION =================
+    log("STEP 1: submitReview started");
+
     if (reviewRating.value == 0) {
       Get.snackbar("Rating required", "Please select a star rating");
       return false;
     }
 
-    if (reviewText.value.trim().isEmpty) {
+    final text = reviewTextController.text.trim();
+
+    if (text.isEmpty) {
       Get.snackbar("Review required", "Please write your feedback");
       return false;
     }
 
-    if (reviewText.value.length > 2000) {
-      Get.snackbar("Too long", "Review cannot exceed 2000 characters");
-      return false;
-    }
+    log("STEP 2: validation passed");
 
-    // ================= STEP 1️⃣ UPLOAD IMAGES =================
     final uploaded = await uploadImagesIfNeeded();
+    log("STEP 3: uploadImagesIfNeeded result = $uploaded");
+
     if (!uploaded) return false;
 
-    // ================= STEP 2️⃣ CREATE REVIEW =================
+    log("STEP 4: calling createReview API");
+
     final response = await reviewService.createReview(
       productId: productId,
       rating: reviewRating.value,
       title: _generateTitleFromRating(),
-      comment: reviewText.value.trim(),
-
-      /// ✅ IMPORTANT: pass ReviewImage models
+      comment: text, // ✅ FIXED
       images: uploadedImages.toList(),
-
       detailedRatings: {
         "quality": reviewRating.value,
         "valueForMoney": reviewRating.value,
@@ -137,6 +162,8 @@ class WriteReviewController extends GetxController {
         "accuracy": reviewRating.value,
       },
     );
+
+    log("STEP 5: createReview response = $response");
 
     if (response == null || response.success != true) {
       Get.snackbar(
@@ -146,18 +173,13 @@ class WriteReviewController extends GetxController {
       return false;
     }
 
-    // ================= STEP 3️⃣ AUTO-MODERATION =================
-    if (response.autoModeration?.isFlagged == true) {
-      Get.snackbar(
-        "Review Submitted",
-        response.autoModeration!.message ??
-            "Your review is under moderation",
-      );
-    } else {
-      Get.snackbar("Success", "Review posted successfully");
+   
+    resetReviewForm();
+
+    if (Get.isDialogOpen == true) {
+      Get.back(result: true);
     }
 
-    resetReviewForm();
     return true;
   }
 

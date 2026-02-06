@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:saoirse_app/screens/order_delivered/write_review_controller/write_review_controller.dart';
+import 'package:saoirse_app/widgets/app_toast.dart';
 import 'package:saoirse_app/widgets/write_review_dialog.dart';
 
 import '../../constants/app_colors.dart';
@@ -108,16 +109,23 @@ class OrderDeliveredScreen extends StatelessWidget {
                 order: order,
                 showReviewButton: canReview,
                 onWriteReview: canReview
-                    ? () {
+                    ? () async {
                         Get.put(
                           WriteReviewController(productId: productId),
                           tag: productId,
                         );
 
-                        Get.dialog(
+                        final result = await Get.dialog(
                           WriteReviewDialog(productId: productId),
                           barrierDismissible: false,
                         );
+
+                        if (result == true) {
+                          controller.fetchDeliveredOrders();
+
+                          appToaster(content: "Review added successfully");
+                        }
+                        
                       }
                     : null,
               );

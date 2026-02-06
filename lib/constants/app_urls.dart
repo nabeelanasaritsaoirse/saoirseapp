@@ -56,8 +56,8 @@ class AppURLs {
 
   // Product Review
   static String CAN_REVIEW_API = BASE_API + "api/reviews/can-review/";
-  static String UPLOAD_REVIEW_IMAGES_API = "api/reviews/upload-images";
-  static String CREATE_REVIEW_API = "api/reviews";
+  static String UPLOAD_REVIEW_IMAGES_API = BASE_API + "api/reviews/upload-images";
+  static String CREATE_REVIEW_API =BASE_API + "api/reviews";
 
   // Products List
   static String PRODUCTS_LISTING = BASE_API + "api/products";

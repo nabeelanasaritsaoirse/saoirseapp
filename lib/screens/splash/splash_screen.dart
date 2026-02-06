@@ -36,10 +36,14 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(const Duration(seconds: 2), () async {
       if (isLogin) {
         Get.offAll(() => DashboardScreen());
-      } else {
+      }
+       else {
         Get.offAll(() => const OnBoardScreen());
       }
     });
+    // Future.delayed(const Duration(seconds: 2), () async {
+    //    Get.offAll(() => DashboardScreen());
+    // });
   }
 
   @override
