@@ -342,4 +342,10 @@ class LoginController extends GetxController {
 
     return false;
   }
+
+  //open url
+  void openUrl(String url) async {
+    if (url.isEmpty) return;
+    await APIService.openUrl(url);
+  }
 }

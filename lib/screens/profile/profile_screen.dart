@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_constant.dart';
+import '../../constants/app_urls.dart';
 import '../../main.dart';
 import '../../widgets/app_button.dart';
 import '../edit_profile/edit_profile_screen.dart';
@@ -23,8 +24,6 @@ import '../order_history/order_history_screen.dart';
 import '../orders_active/orders_active_screen.dart';
 import '../pending_transaction/pending_transaction_screen.dart';
 import '../select_account/managa_account.dart';
-import '../terms_and_privacy/privacy_policy.dart';
-import '../terms_and_privacy/terms_conditions.dart';
 import '../transaction_history/transaction_history.dart';
 import '../wishlist/wishlist_screen.dart';
 import 'profile_controller.dart';
@@ -347,11 +346,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Get.to(() => ManageAccountScreen());
                                 break;
                               case "Privacy Policy":
-                                Get.to(() => PrivacyPolicyScreen());
+                                controller.openUrl(AppURLs.PRIVACY_POLICY);
                                 break;
-
                               case "Terms & Condition":
-                                Get.to(() => TermsAndConditionsScreen());
+                                controller
+                                    .openUrl(AppURLs.TERMS_AND_CONDITIONS);
+                                break;
+                              case "Contact Us":
+                                controller.openUrl(AppURLs.CONTACT_US);
                                 break;
                               case "Log Out":
                                 controller.confirmLogout();
