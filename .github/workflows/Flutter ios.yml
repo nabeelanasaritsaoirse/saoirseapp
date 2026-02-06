@@ -4,7 +4,7 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 on:
   push:
     tags:
-      - "v*"
+      - "ios-v*"
   workflow_dispatch:
 
 
@@ -343,7 +343,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Version:** ${{ needs.ios-ci.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Build Number:** ${{ needs.ios-ci.outputs.build_number }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **iOS Release Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Status:** ✅ Uploaded to TestFlight" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "The build will be available for testing once Apple completes processing." >> $GITHUB_STEP_SUMMARY
