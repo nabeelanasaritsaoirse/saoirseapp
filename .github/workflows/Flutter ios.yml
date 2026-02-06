@@ -3,8 +3,10 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
 on:
   push:
-    branches: [ test ]
+    tags:
+      - "v*"
   workflow_dispatch:
+
 
 concurrency:
   group: ios-build-${{ github.ref }}
@@ -32,6 +34,8 @@ jobs:
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: ⚙️ Setup Flutter
         uses: subosito/flutter-action@v2
@@ -57,24 +61,24 @@ jobs:
       - name: 📦 Flutter Pub Get
         run: flutter pub get
 
-      - name: 🔢 Read Version from pubspec.yaml
+      - name: 🔢 Read version from pubspec & generate build number
         id: version
         run: |
           VERSION_LINE=$(grep "^version:" pubspec.yaml)
           VERSION_NAME=$(echo "$VERSION_LINE" | cut -d '+' -f 1 | sed 's/version: //')
           BUILD_NUMBER=$(echo "$VERSION_LINE" | cut -d '+' -f 2)
-          
-          # If no build number in pubspec, use run number
+      
           if [ -z "$BUILD_NUMBER" ]; then
-            BUILD_NUMBER=$GITHUB_RUN_NUMBER
+            BUILD_NUMBER=$(date +%s)
           fi
-          
+      
           echo "Version Name: $VERSION_NAME"
           echo "Build Number: $BUILD_NUMBER"
           echo "Tag: ${{ github.ref_name }}"
-          
+      
           echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+          echo "Resolved Version: $VERSION_NAME+$BUILD_NUMBER"
 
 
       - name: 🔑 Create .env file
@@ -311,6 +315,8 @@ jobs:
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: 📦 Download IPA
         uses: actions/download-artifact@v4
