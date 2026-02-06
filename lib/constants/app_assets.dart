@@ -77,6 +77,7 @@ class AppAssets {
   static String terms_condition = "assets/svg/terms_condition.svg";
   static String logout = "assets/svg/logout.svg";
   static String delete_account = "assets/svg/delete_account.svg";
+  static String contact_us = "assets/svg/contact_us.svg";
   static String kyc = "assets/svg/kyc.svg";
   static String faq = "assets/svg/faq.svg";
   static String autopay = "assets/svg/autopay.svg";
