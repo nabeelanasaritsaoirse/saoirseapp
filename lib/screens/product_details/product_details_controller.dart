@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../constants/app_constant.dart';
+import '../../main.dart';
 import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
 import '../../models/product_faq.dart';
@@ -12,6 +14,7 @@ import '../../services/wishlist_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_toast.dart';
 import '../../widgets/select_plan_sheet.dart';
+import '../login/login_page.dart';
 
 class ProductDetailsController extends GetxController {
   final String productId;
@@ -190,13 +193,24 @@ class ProductDetailsController extends GetxController {
     isFavorite.value = exists;
   }
 
+  bool get isLoggedIn {
+    return storage.read(AppConst.USER_ID) != null;
+  }
+
   Future<void> toggleFavorite(String id) async {
+    // 🔐 LOGIN CHECK FIRST
+    if (!isLoggedIn) {
+      Get.to(() => LoginPage());
+      return;
+    }
+
     final productData = product.value;
 
     if (productData == null) {
       appToast(content: "Product not loaded");
       return;
     }
+
     if (id.isEmpty) {
       appToast(content: "Invalid Product ID", error: true);
       return;

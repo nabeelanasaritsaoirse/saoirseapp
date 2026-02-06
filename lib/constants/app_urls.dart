@@ -2,8 +2,8 @@
 
 class AppURLs {
   //base api
-  //  static String BASE_API = 'https://api.epielio.com/';
-  static String BASE_API = 'http://13.127.15.87:8080/';
+  static String BASE_API = 'https://api.epielio.com/';
+//   static String BASE_API = 'http://13.127.15.87:8080/';
 
   //login api
   static String LOGIN_API = BASE_API + 'api/auth/login';
@@ -131,6 +131,12 @@ class AppURLs {
 
   //Log Out Api
   static String LOGOUT_API = BASE_API + "api/auth/logout";
+
+  //  Delete Account
+  static String DELETE_ACCOUNT_GET_API =
+      BASE_API + "api/users/:userId/deletion-info";
+  static String DELETE_REQUEST_API =
+      BASE_API + "api/users/:userId/request-deletion";
 
   // Pending Transaction (BEFORE PAYMENT METHOD API RESPONSE)
   static String PENDING_TRANSACTION_PAYMENT_RESPONSE =

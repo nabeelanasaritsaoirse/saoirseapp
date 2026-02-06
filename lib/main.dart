@@ -120,11 +120,9 @@ class MyApp extends StatelessWidget {
           },
           child: GetMaterialApp(
             initialBinding: AllController(),
-            
             locale: locale,
             debugShowCheckedModeBanner: false,
             title: AppStrings.app_name,
-            
             theme: ThemeData(
               scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
               textTheme: GoogleFonts.poppinsTextTheme(),
@@ -133,7 +131,6 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
             ),
             scrollBehavior: CustomScrollBehavior(),
-            
             home: SplashScreen(),
             localizationsDelegates: const [
               AppLocalizations.delegate,
@@ -146,9 +143,7 @@ class MyApp extends StatelessWidget {
               Locale('hi'), // Hindi
               Locale('ml'), // Malayalam
             ],
-
             // optional - default locale
-
             fallbackLocale: const Locale('en'),
           ),
         );
@@ -165,6 +160,7 @@ class CustomScrollBehavior extends ScrollBehavior {
   }
 
   // Optional: remove overscroll glow on Android
+  // this code
   @override
   Widget buildOverscrollIndicator(
     BuildContext context,
