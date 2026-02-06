@@ -2,24 +2,27 @@ name: 📌 Auto Version & Tag
 
 on:
   pull_request:
-    branches: [ main ]
-    types: [ closed ]
+    branches: [test]
+    types: [closed]
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
+
   version-bump:
-    # Only run for merged PRs that are NOT version bump PRs
+    # Run only for merged PRs that are NOT CI version PRs
     if: >
       github.event.pull_request.merged == true &&
-      !contains(github.event.pull_request.title, 'ci: automated version bump')
+      !startsWith(github.event.pull_request.title, 'ci:')
     runs-on: ubuntu-latest
+
     steps:
-      - name: 📥 Checkout
+      - name: 📥 Checkout test branch
         uses: actions/checkout@v4
         with:
+          ref: test
           fetch-depth: 0
           token: ${{ secrets.CI_PAT }}
 
@@ -40,17 +43,16 @@ jobs:
         run: |
           git config user.name "CI Bot"
           git config user.email "ci@saoirse.com"
-          
-          BRANCH="ci/version-bump-${{ github.run_number }}"
+
+          BRANCH="ci/version-bump-test-${{ github.run_number }}"
           git checkout -b $BRANCH
           git add pubspec.yaml CHANGELOG.md
-          
-          # Only commit if there are changes
+
           if git diff --cached --quiet; then
             echo "No version changes detected"
             exit 0
           fi
-          
+
           git commit -m "ci: automated version bump to ${{ steps.bump.outputs.new_version }}"
           git push origin $BRANCH
 
@@ -58,36 +60,35 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.CI_PAT }}
         run: |
-          BRANCH="ci/version-bump-${{ github.run_number }}"
-          
-          # Create PR
+          BRANCH="ci/version-bump-test-${{ github.run_number }}"
+
           PR_URL=$(gh pr create \
-            --base main \
+            --base test \
             --head $BRANCH \
             --title "ci: automated version bump to ${{ steps.bump.outputs.new_version }}" \
             --body "Automated version bump to **${{ steps.bump.outputs.new_version }}**" \
             --label "automated" | tail -n1)
-          
+
           echo "Created PR: $PR_URL"
-          
-          # Enable auto-merge (requires branch protection rules allowing it)
-          gh pr merge $PR_URL --auto --squash || echo "Auto-merge not available, manual merge required"
+
+          gh pr merge $PR_URL --auto --squash || echo "Auto-merge not enabled"
 
   create-tag:
-    # This job only runs when a version bump PR is merged
+    # Runs only when version bump PR is merged
     if: >
       github.event.pull_request.merged == true &&
       contains(github.event.pull_request.title, 'ci: automated version bump')
     runs-on: ubuntu-latest
+
     steps:
-      - name: 📥 Checkout main
+      - name: 📥 Checkout test branch
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: test
           fetch-depth: 0
           token: ${{ secrets.CI_PAT }}
 
-      - name: 🔢 Get Version from pubspec.yaml
+      - name: 🔢 Get Version
         id: version
         run: |
           VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
@@ -98,26 +99,21 @@ jobs:
         run: |
           git config user.name "CI Bot"
           git config user.email "ci@saoirse.com"
-          
+
           TAG="v${{ steps.version.outputs.VERSION }}"
-          
-          # Check if tag already exists
+
           if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "⚠️ Tag $TAG already exists, skipping"
+            echo "Tag already exists — skipping"
             exit 0
           fi
-          
-          echo "✅ Creating tag: $TAG"
+
+          echo "Creating tag: $TAG"
           git tag -a "$TAG" -m "Release $TAG"
           git push origin "$TAG"
-          
-          echo "🚀 Tag $TAG pushed successfully!"
 
       - name: 📊 Summary
         run: |
           echo "## 🏷️ Tag Created Successfully" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** ${{ steps.version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tag:** v${{ steps.version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "This will trigger the Android Build & Deploy workflow." >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: test" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ steps.version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Tag: v${{ steps.version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
