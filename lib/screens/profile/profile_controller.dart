@@ -13,6 +13,7 @@ import '../../constants/app_colors.dart';
 import '../../main.dart';
 import '../../models/delete_acc_model.dart';
 import '../../models/profile_response.dart';
+import '../../services/api_service.dart';
 import '../../services/profile_service.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_loader.dart';
@@ -85,9 +86,9 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.address, "title": "Manage Address"},
     {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
     {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
+    {"icon": AppAssets.privacy_policy, "title": "Contact Us"},
     // {"icon": AppAssets.faq, "title": "FAQ"},
     // {"icon": AppAssets.about, "title": "About EPI"},
-
     {"icon": AppAssets.logout, "title": "Log Out"},
     {"icon": AppAssets.delete_account, "title": "Delete\nAccount"},
   ];
@@ -477,8 +478,7 @@ class ProfileController extends GetxController {
     } catch (e) {}
   }
 
-//         Delete Account
-
+  // Delete Account
   Future<void> deleteAccount() async {
     if (profile.value?.user.id == null) {
       log("Profile not loaded yet, fetching profile...");
@@ -591,6 +591,12 @@ class ProfileController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  //open url
+  void openUrl(String url) async {
+    if (url.isEmpty) return;
+    await APIService.openUrl(url);
   }
 
 //-------------------------------------------------------------------------------------------------------------------------------------

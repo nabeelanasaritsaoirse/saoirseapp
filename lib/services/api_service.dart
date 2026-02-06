@@ -8,6 +8,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../screens/onboard/onboard_screen.dart';
 
@@ -38,10 +39,7 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-        // log("request Url =====> : $url");
-        // log("BODY ====> $body");
-        // log(response.body);
-        // log("STATUS CODE=========================>${response.statusCode}");
+
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -123,8 +121,7 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-        //    log("request Url =====> : $url");
-        // log("Response body :${response.body}");
+
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -477,6 +474,23 @@ class APIService {
       Get.offAll(() => OnBoardScreen());
     } catch (e) {
       ("out handling error: $e");
+    }
+  }
+
+  //open url
+  static Future<void> openUrl(String url) async {
+    try {
+      Uri uri = Uri.parse(url);
+
+      if (internet) {
+        try {
+          launchUrl(uri);
+        } catch (e) {
+          return;
+        }
+      }
+    } catch (e) {
+      return;
     }
   }
 }
