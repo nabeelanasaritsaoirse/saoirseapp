@@ -1,6 +1,4 @@
-## Version 1.5.1+109
+## Version 1.5.2+110
 
-- Merge pull request #312 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-1
-- Update Flutter ios.yml
-- Update auto-version.yml
-- Update Flutter Android.yml
+- Merge pull request #316 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-2
+- Fix release workflow for platform tagging and notes
