@@ -86,7 +86,7 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.address, "title": "Manage Address"},
     {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
     {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
-    {"icon": AppAssets.privacy_policy, "title": "Contact Us"},
+    {"icon": AppAssets.contact_us, "title": "Contact Us"},
     // {"icon": AppAssets.faq, "title": "FAQ"},
     // {"icon": AppAssets.about, "title": "About EPI"},
     {"icon": AppAssets.logout, "title": "Log Out"},
