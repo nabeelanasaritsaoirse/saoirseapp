@@ -4,7 +4,9 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 on:
   push:
     tags:
-      - "v*"
+      - "ios-v*"
+  workflow_dispatch:
+
 
 concurrency:
   group: ios-build-${{ github.ref }}
@@ -16,7 +18,6 @@ permissions:
   pull-requests: write
 
 env:
-  IOS_MIN_VERSION: "16.0"
   BUNDLE_ID: com.saoirse.epi
   TEAM_ID: BYQUNNQSQH
   PROFILE_NAME: "match AppStore com.saoirse.epi 1765456537"
@@ -24,203 +25,63 @@ env:
   IPA_DIR: build/ios/ipa
 
 jobs:
- 
-  # ==================================================
-  # 1️⃣ SIMULATOR DEBUG TEST
-  # ==================================================
-  ios-native-debug:
-    name: 🧪 iOS Native Debug (Simulator)
-    runs-on: macos-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      # --------------------------------------------------
-      # Flutter setup
-      # --------------------------------------------------
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.35.7"
-          channel: stable
-          cache: true
-      
-      - run: flutter clean
-      - run: flutter pub get
-      
-      # --------------------------------------------------
-      # Fonts (required by your app)
-      # --------------------------------------------------
-      - name: 📥 Download Fonts
-        run: |
-          mkdir -p assets/fonts
-          cd assets/fonts
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Medium.ttf
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
-          cd ../..
-      
-      # --------------------------------------------------
-      # Firebase plist (simulator)
-      # --------------------------------------------------
-      - name: 🔥 Create GoogleService-Info.plist
-        run: |
-          mkdir -p ios/Runner
-          cat > ios/Runner/GoogleService-Info.plist <<'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>API_KEY</key>
-            <string>${{ secrets.IOS_API_KEY }}</string>
-            <key>GCM_SENDER_ID</key>
-            <string>${{ secrets.IOS_MESSAGING_SENDER_ID }}</string>
-            <key>GOOGLE_APP_ID</key>
-            <string>${{ secrets.IOS_APP_ID }}</string>
-            <key>PROJECT_ID</key>
-            <string>${{ secrets.IOS_PROJECT_ID }}</string>
-            <key>BUNDLE_ID</key>
-            <string>com.saoirse.epi</string>
-          </dict>
-          </plist>
-          EOF
-      
-      # --------------------------------------------------
-      # 🚨 CRITICAL FIX — REMOVE Main.storyboard
-      # --------------------------------------------------
-      - name: 🚨 Fix Info.plist (BLACK SCREEN FIX)
-        run: |
-          /usr/libexec/PlistBuddy -c "Delete :UIMainStoryboardFile" ios/Runner/Info.plist || true
-          /usr/libexec/PlistBuddy -c "Print :UILaunchStoryboardName" ios/Runner/Info.plist
-          echo "✅ Main.storyboard removed (Flutter-safe)"
-      
-      # --------------------------------------------------
-      # CocoaPods
-      # --------------------------------------------------
-      - name: 🧹 Install Pods
-        run: |
-          cd ios
-          rm -rf Pods Podfile.lock
-          pod install --repo-update
-          cd ..
-
-      - name: 🔧 Force correct iOS Bundle Identifier (CRITICAL FIX)
-        run: |
-          ruby <<'RUBY'
-          require 'xcodeproj'
-      
-          project_path = 'ios/Runner.xcodeproj'
-          project = Xcodeproj::Project.open(project_path)
-      
-          project.targets.each do |target|
-            next unless target.name == 'Runner'
-      
-            target.build_configurations.each do |config|
-              config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'com.saoirse.epi'
-              puts "✅ Set bundle id for #{config.name}"
-            end
-          end
-      
-          project.save
-          puts "💾 Xcode project saved with correct bundle id"
-          RUBY
-      
-            
-      # --------------------------------------------------
-      # Build for Simulator
-      # --------------------------------------------------
-      - name: 🛠️ Build iOS Simulator
-        run: |
-          flutter build ios --simulator --debug --no-codesign
-      
-      # --------------------------------------------------
-      # Boot simulator
-      # --------------------------------------------------
-      - name: 🚀 Boot Simulator
-        run: |
-          UDID=$(xcrun simctl list devices available | grep "iPhone" | head -1 | awk -F '[()]' '{print $2}')
-          xcrun simctl boot "$UDID" || true
-          sleep 5
-          echo "Using simulator: $UDID"
-      
-      # --------------------------------------------------
-      # Install & Launch (CI-safe)
-      # --------------------------------------------------
-      - name: ✅ Validate Simulator Build Artifact (CI-safe)
-        run: |
-          APP_PATH="build/ios/iphonesimulator/Runner.app"
-      
-          echo "🔍 Checking Runner.app exists"
-          test -d "$APP_PATH"
-      
-          echo "🔍 Validating Info.plist"
-          plutil -lint "$APP_PATH/Info.plist"
-      
-          echo "🔍 Verifying bundle identifier"
-          BUNDLE_ID_IN_APP=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$APP_PATH/Info.plist")
-          echo "Found bundle id: $BUNDLE_ID_IN_APP"
-          test "$BUNDLE_ID_IN_APP" = "com.saoirse.epi"
-      
-          echo "🔍 Checking executable"
-          test -x "$APP_PATH/Runner"
-      
-          echo "🔍 Checking architecture"
-          lipo -info "$APP_PATH/Runner"
-      
-          echo "✅ Simulator build artifact is valid"
-
-            # --------------------------------------------------
-      # Logs + Screenshot
-      # --------------------------------------------------
-      - name: 🔍 Capture Logs
-        if: always()
-        run: |
-          UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
-          xcrun simctl spawn "$UDID" log show \
-            --predicate 'process == "Runner"' \
-            --last 2m \
-            --style compact > simulator_logs.txt || true
-          tail -50 simulator_logs.txt
-      
-      - name: 📸 Screenshot
-        if: always()
-        run: |
-          UDID=$(xcrun simctl list devices | grep "(Booted)" | head -1 | awk -F '[()]' '{print $2}')
-          xcrun simctl io "$UDID" screenshot simulator.png || true
-      
-      - name: 📤 Upload Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-simulator-debug
-          path: |
-            simulator_logs.txt
-            simulator.png
-
-  # ==================================================
-  # 2️⃣ RELEASE BUILD
-  # ==================================================
   ios-ci:
-    name: 🏗️ iOS CI Build
-    needs: ios-native-debug
     runs-on: macos-latest
     outputs:
       version_name: ${{ steps.version.outputs.VERSION_NAME }}
       build_number: ${{ steps.version.outputs.BUILD_NUMBER }}
 
     steps:
-      - uses: actions/checkout@v4
-      
-      - uses: subosito/flutter-action@v2
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
         with:
+          fetch-depth: 0
+
+      - name: ⚙️ Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.7"
           channel: stable
           cache: true
 
-      - run: sudo gem install fastlane cocoapods xcodeproj -N
-      - run: flutter clean
-      - run: flutter pub get
+      - name: 🧰 Select latest Xcode (auto)
+        run: |
+          echo "Available Xcodes:"
+          ls /Applications | grep Xcode
+      
+          LATEST_XCODE=$(ls -d /Applications/Xcode*.app | sort -V | tail -n 1)
+          echo "Using: $LATEST_XCODE"
+      
+          sudo xcode-select -s "$LATEST_XCODE/Contents/Developer"
+      
+          xcodebuild -version
+          xcodebuild -showsdks
 
-      - name: 📝 Create .env file
+
+      - name: 📦 Flutter Pub Get
+        run: flutter pub get
+
+      - name: 🔢 Read version from pubspec & generate build number
+        id: version
+        run: |
+          VERSION_LINE=$(grep "^version:" pubspec.yaml)
+          VERSION_NAME=$(echo "$VERSION_LINE" | cut -d '+' -f 1 | sed 's/version: //')
+          BUILD_NUMBER=$(echo "$VERSION_LINE" | cut -d '+' -f 2)
+      
+          if [ -z "$BUILD_NUMBER" ]; then
+            BUILD_NUMBER=$(date +%s)
+          fi
+      
+          echo "Version Name: $VERSION_NAME"
+          echo "Build Number: $BUILD_NUMBER"
+          echo "Tag: ${{ github.ref_name }}"
+      
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+          echo "Resolved Version: $VERSION_NAME+$BUILD_NUMBER"
+
+
+      - name: 🔑 Create .env file
         run: |
           cat > .env <<EOF
           RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}
@@ -234,65 +95,29 @@ jobs:
           ANDROID_PROJECT_ID=${{ secrets.ANDROID_PROJECT_ID }}
           EOF
 
-      - name: 📥 Download Fonts
+      - name: ✅ Verify .env file
         run: |
-          mkdir -p assets/fonts
-          cd assets/fonts
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Medium.ttf
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-SemiBold.ttf
-          curl -LO https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf
-          cd ../..
+          echo "✅ .env file created in project root"
+          ls -la .env
 
-      - name: 🔢 Auto-Increment Build Number
-        id: version
+      - name: 🚀 Install Fastlane & CocoaPods
         run: |
-          VERSION_LINE=$(grep "^version:" pubspec.yaml)
-          VERSION_NAME=$(echo "$VERSION_LINE" | cut -d '+' -f 1 | sed 's/version: //')
-          CURRENT_BUILD=$(echo "$VERSION_LINE" | cut -d '+' -f 2)
-          
-          # Always increment from current build number
-          if [ -z "$CURRENT_BUILD" ] || [ "$CURRENT_BUILD" -lt 109 ]; then
-            BUILD_NUMBER=110
-          else
-            BUILD_NUMBER=$((CURRENT_BUILD + 1))
-          fi
-          
-          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
-          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
-          echo "🔢 Building version: $VERSION_NAME (Build $BUILD_NUMBER)"
-          echo "   Previous build: $CURRENT_BUILD → New build: $BUILD_NUMBER"
+          sudo gem install fastlane -N
+          sudo gem install cocoapods -N
 
-      - name: 🔧 Configure iOS Settings (xcconfig only)
-        run: |
-          # ✅ Overwrite instead of append (deterministic)
-          cat > ios/Flutter/Release.xcconfig <<'XCCONFIG'
-          #include "Generated.xcconfig"
-          
-          STRIP_STYLE = non-global
-          DEAD_CODE_STRIPPING = YES
-          IPHONEOS_DEPLOYMENT_TARGET = 16.0
-          ENABLE_BITCODE = NO
-          ONLY_ACTIVE_ARCH = NO
-          XCCONFIG
-          
-          echo "✅ iOS 16.0 deployment target configured via xcconfig (deterministic)"
-
-      - name: 🔓 Setup Keychain
-        run: |
-          KEYCHAIN_PASSWORD="ci_keychain_pass"
-          security delete-keychain build.keychain-db 2>/dev/null || true
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain-db
-          security default-keychain -s build.keychain-db
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain-db
-          security set-keychain-settings -lut 7200 build.keychain-db
-          security list-keychains -d user -s build.keychain-db $(security list-keychains -d user | sed s/\"//g)
-
-      - name: 🔐 Setup API Key
+      - name: 🔐 Write App Store Connect API Key
         run: |
           mkdir -p ios
           echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > ios/api_key.json
           chmod 600 ios/api_key.json
+
+      - name: 🔓 Setup Keychain
+        run: |
+          KEYCHAIN_PASSWORD="ci_keychain_pass"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -lut 7200 build.keychain
 
       - name: 🔐 Fastlane Match
         env:
@@ -301,399 +126,197 @@ jobs:
           cd ios
           fastlane match appstore \
             --readonly \
-            --app_identifier "com.saoirse.epi" \
             --api_key_path ./api_key.json \
-            --git_url https://github.com/nabeelanasaritsaoirse/ios-certificates.git \
             --git_branch main \
-            --keychain_name build.keychain-db \
+            --keychain_name build.keychain \
             --keychain_password "ci_keychain_pass"
 
+      - name: 💾 Cache Xcode DerivedData
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData
+            ios/Pods
+          key: ${{ runner.os }}-xcode-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-xcode-
 
-      - name: 🔥 GoogleService-Info.plist
+      - name: 🧨 Reset Pods (if not cached)
         run: |
-          cat > ios/Runner/GoogleService-Info.plist <<'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>API_KEY</key>
-            <string>${{ secrets.IOS_API_KEY }}</string>
-            <key>GCM_SENDER_ID</key>
-            <string>${{ secrets.IOS_MESSAGING_SENDER_ID }}</string>
-            <key>GOOGLE_APP_ID</key>
-            <string>${{ secrets.IOS_APP_ID }}</string>
-            <key>PROJECT_ID</key>
-            <string>${{ secrets.IOS_PROJECT_ID }}</string>
-            <key>BUNDLE_ID</key>
-            <string>com.saoirse.epi</string>
-            <key>STORAGE_BUCKET</key>
-            <string>saoirse-epi.firebasestorage.app</string>
-            <key>IS_ADS_ENABLED</key>
-            <false/>
-            <key>IS_ANALYTICS_ENABLED</key>
-            <false/>
-            <key>IS_APPINVITE_ENABLED</key>
-            <true/>
-            <key>IS_GCM_ENABLED</key>
-            <true/>
-            <key>IS_SIGNIN_ENABLED</key>
-            <true/>
-          </dict>
-          </plist>
-          EOF
+          if [ ! -d "ios/Pods" ]; then
+            rm -rf ios/Podfile.lock
+          fi
 
-      - name: ✅ Validate GoogleService-Info.plist
-        run: plutil -lint ios/Runner/GoogleService-Info.plist
+      - name: 📱 Configure iPhone-Only Device Family
+        run: |
+          /usr/libexec/PlistBuddy -c "Delete :UIDeviceFamily" ios/Runner/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily array" ios/Runner/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily:0 integer 1" ios/Runner/Info.plist
+          echo "✅ Configured for iPhone-only release"
 
-      - name: 📦 Install Pods
+      - name: 🚫 Disable iPad & Mac Catalyst
+        run: |
+          # Disable Mac Catalyst
+          /usr/libexec/PlistBuddy -c "Set :SupportsMacCatalyst false" ios/Runner/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Set :UIDeviceFamily:0 1" ios/Runner/Info.plist
+      
+          # Remove iPad device family if exists
+          /usr/libexec/PlistBuddy -c "Delete :UIDeviceFamily:1" ios/Runner/Info.plist || true
+      
+          # Force only iphoneos build
+          /usr/libexec/PlistBuddy -c "Add :UIRequiredDeviceCapabilities array" ios/Runner/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Add :UIRequiredDeviceCapabilities:0 string arm64" ios/Runner/Info.plist || true
+      
+          echo "✅ iPhone-only, no iPad, no Mac Catalyst"
+
+
+      - name: 🔐 Verify Push Notifications Entitlement
+        run: |
+          echo "Checking Runner.entitlements for aps-environment..."
+          if grep -q "aps-environment" ios/Runner/Runner.entitlements; then
+            echo "✅ Push Notifications entitlement found"
+          else
+            echo "⚠️ Adding aps-environment entitlement..."
+            /usr/libexec/PlistBuddy -c "Add :aps-environment string production" ios/Runner/Runner.entitlements
+            echo "✅ Push Notifications entitlement added"
+          fi
+          cat ios/Runner/Runner.entitlements
+
+      - name: 🧨 Fix Firebase pod mismatch & install
         run: |
           cd ios
-          pod install --repo-update
+      
+          # Remove stale lock for Firebase only
+          rm -rf Pods
+          rm -f Podfile.lock
+      
+          pod repo update
+          pod install
 
-      - name: 📦 Ensure GoogleService-Info.plist is bundled (FIXED)
+      - name: 🔨 Build Flutter iOS Release
         run: |
-          ruby <<'RUBY'
-          require 'xcodeproj'
+          echo "🚀 Starting Flutter build..."
+          flutter clean
+          flutter build ios --release --no-codesign
+          echo "✅ Flutter build completed!"
 
-          project = Xcodeproj::Project.open('ios/Runner.xcodeproj')
-          target = project.targets.find { |t| t.name == 'Runner' }
-          raise 'Runner target not found' unless target
+      - name: ✅ Verify Flutter Build Output
+        run: |
+          echo "🔍 Checking Flutter build artifacts..."
+          ls -la ios/Flutter/
 
-          resources = target.resources_build_phase
-
-          # Find or create file reference in Runner group
-          runner_group = project.main_group.find_subpath('Runner')
-          raise 'Runner group not found' unless runner_group
-
-          # Look for existing reference
-          file_ref = runner_group.files.find { |f| f.path == 'GoogleService-Info.plist' }
-
-          # Create if doesn't exist
-          unless file_ref
-            file_ref = runner_group.new_file('GoogleService-Info.plist')
-            file_ref.last_known_file_type = 'text.plist.xml'
-            puts '📝 Created file reference for GoogleService-Info.plist'
-          end
-
-          # Add to Copy Bundle Resources if not already there
-          unless resources.files.any? { |build_file| build_file.file_ref == file_ref }
-            resources.add_file_reference(file_ref)
-            puts '✅ GoogleService-Info.plist added to Copy Bundle Resources'
-          else
-            puts 'ℹ️  GoogleService-Info.plist already in Copy Bundle Resources'
-          end
-
-          project.save
-          puts '💾 Project saved'
-          RUBY
-
-          # Verify it was added
-          if grep -q "GoogleService-Info.plist" ios/Runner.xcodeproj/project.pbxproj; then
-            echo "✅ Verified: GoogleService-Info.plist is in project.pbxproj"
-          else
-            echo "❌ ERROR: Failed to add GoogleService-Info.plist to project"
+          if [ ! -f "ios/Flutter/Generated.xcconfig" ]; then
+            echo "❌ ERROR: Generated.xcconfig not found!"
             exit 1
           fi
 
-
-      - name: 🔍  Check Firebase Files Before Build
-        run: |
-          echo "=== Checking Firebase configuration ==="
-          
-          if [ -f "ios/Runner/GoogleService-Info.plist" ]; then
-            echo "✅ Source plist exists"
-            plutil -p ios/Runner/GoogleService-Info.plist | grep -E "(PROJECT_ID|BUNDLE_ID)"
-          else
-            echo "❌ Source plist NOT FOUND!"
+          if [ ! -d "build/ios/iphoneos/Runner.app" ]; then
+            echo "❌ ERROR: Runner.app not built!"
             exit 1
           fi
-          
-          echo "=== Checking Xcode project configuration ==="
-          if grep -A 30 "PBXResourcesBuildPhase" ios/Runner.xcodeproj/project.pbxproj | grep -q GoogleService; then
-            echo "✅ GoogleService-Info.plist configured in Copy Bundle Resources"
-          else
-            echo "❌ CRITICAL: GoogleService-Info.plist NOT in Copy Bundle Resources!"
-            exit 1
-          fi
-          
-      - name: ⚙️ Configure Xcode Signing
-        run: |
-          cat > update_signing.rb <<'RUBY'
-          require 'xcodeproj'
 
-          project_path = 'ios/Runner.xcodeproj'
-          project = Xcodeproj::Project.open(project_path)
-
-          project.targets.each do |target|
-            if target.name == 'Runner'
-              target.build_configurations.each do |config|
-                if config.name == 'Release'
-                  # ✅ Signing configuration only (deployment target handled by xcconfig)
-                  config.build_settings['CODE_SIGN_STYLE'] = 'Manual'
-                  config.build_settings['DEVELOPMENT_TEAM'] = ENV['TEAM_ID']
-                  config.build_settings['CODE_SIGN_IDENTITY'] = 'Apple Distribution'
-                  config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ENV['PROFILE_NAME']
-                  config.build_settings['CODE_SIGN_IDENTITY[sdk=iphoneos*]'] = 'Apple Distribution'
-                  config.build_settings['ENABLE_BITCODE'] = 'NO'
-                  config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
-                end
-              end
-            end
-          end
-
-          project.save
-          RUBY
-
-          ruby update_signing.rb
-          echo "✅ Signing configured (deployment target via xcconfig only)"
-
-      - name: 🔧 Force correct iOS Bundle Identifier (CRITICAL FIX)
-        run: |
-          ruby <<'RUBY'
-          require 'xcodeproj'
-      
-          project_path = 'ios/Runner.xcodeproj'
-          project = Xcodeproj::Project.open(project_path)
-      
-          project.targets.each do |target|
-            next unless target.name == 'Runner'
-      
-            target.build_configurations.each do |config|
-              config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] = 'com.saoirse.epi'
-              puts "✅ Set bundle id for #{config.name}"
-            end
-          end
-      
-          project.save
-          puts "💾 Xcode project saved with correct bundle id"
-          RUBY
-
-      - name: 🔨 Build Flutter
-        run: |
-          flutter build ios \
-            --release \
-            --no-codesign \
-            --build-name ${{ steps.version.outputs.VERSION_NAME }} \
-            --build-number ${{ steps.version.outputs.BUILD_NUMBER }}
+          echo "✅ Flutter build artifacts verified!"
+          cat ios/Flutter/Generated.xcconfig
 
       - name: 📝 Create ExportOptions.plist
         run: |
           cat > ios/ExportOptions.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+           "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
             <key>method</key>
             <string>app-store</string>
             <key>teamID</key>
-            <string>${{ env.TEAM_ID }}</string>
+            <string>${TEAM_ID}</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>provisioningProfiles</key>
             <dict>
-              <key>${{ env.BUNDLE_ID }}</key>
-              <string>${{ env.PROFILE_NAME }}</string>
+              <key>${BUNDLE_ID}</key>
+              <string>${PROFILE_NAME}</string>
             </dict>
-            <key>uploadSymbols</key>
-            <true/>
-            <key>compileBitcode</key>
-            <false/>
           </dict>
           </plist>
           EOF
 
-      - name: 🏗️ Archive
+      - name: 🏗️ Archive Build
         run: |
           cd ios
-          mkdir -p ../${{ env.ARCHIVE_DIR }}
-          mkdir -p ../${{ env.IPA_DIR }}
+          mkdir -p ../${ARCHIVE_DIR}
+          mkdir -p ../${IPA_DIR}
 
-          xcodebuild archive \
+          xcodebuild clean archive \
             -workspace Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
-            -archivePath ../${{ env.ARCHIVE_DIR }}/Runner.xcarchive \
-            -destination 'generic/platform=iOS' \
-            DEVELOPMENT_TEAM=${{ env.TEAM_ID }} \
+            -archivePath ../${ARCHIVE_DIR}/Runner.xcarchive \
+            -destination 'generic/platform=iOS,variant=iphoneos' \
+            DEVELOPMENT_TEAM=${TEAM_ID} \
             CODE_SIGN_STYLE=Manual \
-            PROVISIONING_PROFILE_SPECIFIER="${{ env.PROFILE_NAME }}" \
+            PROVISIONING_PROFILE_SPECIFIER="${PROFILE_NAME}" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            STRIP_STYLE=non-global \
-            DEAD_CODE_STRIPPING=YES \
-            IPHONEOS_DEPLOYMENT_TARGET=16.0 \
-            ENABLE_BITCODE=NO \
-            OTHER_CODE_SIGN_FLAGS="--keychain $HOME/Library/Keychains/build.keychain-db"
+            OTHER_CODE_SIGN_FLAGS="--keychain build.keychain" \
+            | tee ../xcodebuild.log
+
+      - name: ✅ Verify Archive
+        run: |
+          if [ ! -d "${ARCHIVE_DIR}/Runner.xcarchive" ]; then
+            echo "❌ Archive not created!"
+            tail -n 200 xcodebuild.log || true
+            exit 1
+          fi
 
       - name: 📦 Export IPA
         run: |
           cd ios
           xcodebuild -exportArchive \
-            -archivePath ../${{ env.ARCHIVE_DIR }}/Runner.xcarchive \
-            -exportPath ../${{ env.IPA_DIR }} \
+            -archivePath ../${ARCHIVE_DIR}/Runner.xcarchive \
+            -exportPath ../${IPA_DIR} \
             -exportOptionsPlist ExportOptions.plist \
-            -allowProvisioningUpdates
-      - name: 🔍 Inspect iOS Info.plist (CI)
+            | tee ../export.log || true
+
+      - name: ✅ Verify IPA
         run: |
-          PLIST_PATH="ios/Runner/Info.plist"
-          echo "=== Raw Info.plist ==="
-          plutil -p "$PLIST_PATH"
+          ls ${IPA_DIR}/*.ipa || (echo "❌ IPA export failed!" && exit 1)
 
-          echo "=== Launch storyboard keys ==="
-          plutil -extract UILaunchStoryboardName xml1 -o - "$PLIST_PATH" || echo "No UILaunchStoryboardName"
-          plutil -extract UIMainStoryboardFile xml1 -o - "$PLIST_PATH" || echo "No UIMainStoryboardFile"
-          plutil -extract UIApplicationSceneManifest xml1 -o - "$PLIST_PATH" || echo "No UIApplicationSceneManifest"
-
-        
-      - name: 🔍 Check LaunchScreen.storyboard in IPA
-        run: |
-          IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -1)
-          unzip -q "$IPA_PATH" -d /tmp/ipa_launch
-          APP_PATH=$(find /tmp/ipa_launch/Payload -name "*.app" | head -1)
-
-          echo "=== LaunchScreen.storyboard presence ==="
-          find "$APP_PATH" -path "*LaunchScreen.storyboard*" || echo "❌ LaunchScreen.storyboard not found in app bundle"
-          
-      - name: 🔍 Show AppDelegate.swift
-        run: |
-          echo "=== AppDelegate.swift ==="
-          cat ios/Runner/AppDelegate.swift
-
-
-
-      - name: ✅ Verify Firebase Config in IPA
-        run: |
-          IPA_PATH=$(find ${{ env.IPA_DIR }} -name "*.ipa" | head -1)
-          
-          echo "=== Extracting IPA for Firebase validation ==="
-          unzip -q "$IPA_PATH" -d /tmp/ipa_verify
-          APP_PATH=$(find /tmp/ipa_verify/Payload -name "*.app" | head -1)
-          
-          # Check GoogleService-Info.plist exists in IPA
-          PLIST_PATH="$APP_PATH/GoogleService-Info.plist"
-          
-          if [ ! -f "$PLIST_PATH" ]; then
-            echo "❌ CRITICAL: GoogleService-Info.plist NOT found in IPA!"
-            echo "   App will crash on launch with Firebase error"
-            exit 1
-          fi
-          
-          echo "✅ GoogleService-Info.plist found in IPA"
-          
-          # Validate plist structure
-          plutil -lint "$PLIST_PATH" > /dev/null 2>&1
-          if [ $? -eq 0 ]; then
-            echo "✅ plist is valid XML"
-          else
-            echo "❌ plist is corrupted!"
-            exit 1
-          fi
-          
-          # Verify critical Firebase keys
-          PROJECT_ID=$(plutil -extract PROJECT_ID raw "$PLIST_PATH" 2>/dev/null || echo "")
-          BUNDLE_ID=$(plutil -extract BUNDLE_ID raw "$PLIST_PATH" 2>/dev/null || echo "")
-          
-          if [ -z "$PROJECT_ID" ] || [ -z "$BUNDLE_ID" ]; then
-            echo "❌ Missing critical Firebase configuration!"
-            exit 1
-          fi
-          
-          echo "✅ Firebase config validated successfully:"
-          echo "   PROJECT_ID: $PROJECT_ID"
-          echo "   BUNDLE_ID: $BUNDLE_ID"
-
-      - name: 📤 Upload IPA
+      - name: 📤 Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
           path: ${{ env.IPA_DIR }}/*.ipa
 
-      - name: 📤 Upload dSYM
+      - name: 📋 Upload build logs
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ios-dsym
-          path: ${{ env.ARCHIVE_DIR }}/Runner.xcarchive/dSYMs/
+          name: ios-build-logs
+          path: |
+            xcodebuild.log
+            export.log
+            
+      - name: 🧾 Build Summary
+        run: |
+          echo "## 🍎 iOS Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.version.outputs.VERSION_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Number:** ${{ steps.version.outputs.BUILD_NUMBER }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Bundle ID:** ${BUNDLE_ID}" >> $GITHUB_STEP_SUMMARY
 
-  # ==================================================
-  # 3️⃣ VALIDATE IPA
-  # ==================================================
-  ios-validate:
-    name: ✅ Validate IPA
+  ios-deploy:
+    name: "🚀 Deploy to TestFlight"
     needs: ios-ci
     runs-on: macos-latest
-    
+    environment:
+      name: ios-deploy   # Optional: add manual approval like Android
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: 📦 Download IPA
-        uses: actions/download-artifact@v4
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
         with:
-          name: ios-ipa
-          path: build/ios/ipa
-      
-      - name: 🔍 Comprehensive IPA Validation
-        run: |
-          IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -1)
-          
-          if [ ! -f "$IPA_PATH" ]; then
-            echo "❌ IPA not found!"
-            exit 1
-          fi
-          
-          IPA_SIZE=$(du -h "$IPA_PATH" | cut -f1)
-          echo "✅ IPA found: $IPA_PATH (Size: $IPA_SIZE)"
-          
-          # Verify IPA integrity
-          unzip -t "$IPA_PATH" > /dev/null 2>&1
-          if [ $? -ne 0 ]; then
-            echo "❌ IPA is corrupted!"
-            exit 1
-          fi
-          echo "✅ IPA integrity verified"
-          
-          # Extract IPA
-          echo "=== Extracting IPA ==="
-          unzip -q "$IPA_PATH" -d /tmp/ipa_extract
-          APP_PATH=$(find /tmp/ipa_extract/Payload -name "*.app" | head -1)
-          
-          # Validate Info.plist
-          echo "=== Info.plist Validation ==="
-          plutil -p "$APP_PATH/Info.plist" | grep -E "(CFBundleIdentifier|CFBundleVersion|CFBundleShortVersionString|MinimumOSVersion)"
-          
-          # Check Firebase Configuration
-          echo "=== Firebase Configuration Check ==="
-          if [ -f "$APP_PATH/GoogleService-Info.plist" ]; then
-            echo "✅ Firebase config found in IPA"
-            plutil -p "$APP_PATH/GoogleService-Info.plist" | grep -E "(PROJECT_ID|BUNDLE_ID|GOOGLE_APP_ID)"
-          else
-            echo "❌ CRITICAL: Firebase config MISSING from IPA!"
-            echo "   App will crash on launch!"
-            exit 1
-          fi
-          
-          # Verify Binary Architecture
-          echo "=== Binary Architecture ==="
-          lipo -info "$APP_PATH/Runner"
-          
-          # Check Critical Frameworks
-          echo "=== Critical Frameworks Check ==="
-          if [ -d "$APP_PATH/Frameworks" ]; then
-            echo "Frameworks included:"
-            ls -1 "$APP_PATH/Frameworks" | grep -E "(Firebase|Flutter)" || echo "⚠️ Firebase frameworks not found"
-          fi
-          
-          echo ""
-          echo "✅ IPA validation complete - ready for TestFlight!"
-
-  # ==================================================
-  # 4️⃣ DEPLOY TO TESTFLIGHT
-  # ==================================================
-  ios-deploy:
-    name: 🚀 Deploy to TestFlight
-    needs: [ios-ci, ios-validate]
-    runs-on: macos-latest
-
-    steps:
-      - uses: actions/checkout@v4
+          fetch-depth: 0
 
       - name: 📦 Download IPA
         uses: actions/download-artifact@v4
@@ -704,55 +327,23 @@ jobs:
       - name: 🚀 Install Fastlane
         run: sudo gem install fastlane -N
 
-      - name: 🔐 Write API Key
+      - name: 🔐 Write api_key.json
         run: echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > api_key.json
-
-      - name: 🔍 Pre-Upload Validation
-        run: |
-          IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -1)
-          
-          if [ ! -f "$IPA_PATH" ]; then
-            echo "❌ IPA not found!"
-            exit 1
-          fi
-          
-          # Final integrity check
-          unzip -t "$IPA_PATH" > /dev/null 2>&1
-          if [ $? -eq 0 ]; then
-            IPA_SIZE=$(du -h "$IPA_PATH" | cut -f1)
-            echo "✅ IPA ready for upload"
-            echo "   File: $(basename "$IPA_PATH")"
-            echo "   Size: $IPA_SIZE"
-          else
-            echo "❌ IPA is corrupted!"
-            exit 1
-          fi
 
       - name: 🚀 Upload to TestFlight
         run: |
-          echo "🚀 Starting TestFlight upload..."
-          echo "   Version: ${{ needs.ios-ci.outputs.version_name }}"
-          echo "   Build: ${{ needs.ios-ci.outputs.build_number }}"
-          
           fastlane pilot upload \
             --api_key_path api_key.json \
             --ipa build/ios/ipa/*.ipa \
-            --skip_waiting_for_build_processing \
-            --changelog "Build ${{ needs.ios-ci.outputs.build_number }}: Automated CI/CD deployment" \
-            --distribute_external false
+            --skip_waiting_for_build_processing
 
-      - name: ✅ Deployment Complete
+      - name: 🧾 Deploy Summary
         run: |
-          echo ""
-          echo "🎉 Successfully uploaded to TestFlight!"
-          echo ""
-          echo "📱 Version: ${{ needs.ios-ci.outputs.version_name }}"
-          echo "🔢 Build: ${{ needs.ios-ci.outputs.build_number }}"
-          echo ""
-          echo "⏰ Next steps:"
-          echo "   1. Check App Store Connect in 5-10 minutes"
-          echo "   2. Build will process automatically"
-          echo "   3. Add to internal testing group when ready"
-          echo "   4. For external testing: Submit for Beta App Review"
-          echo ""
-          echo "🔗 https://appstoreconnect.apple.com"
+          echo "## 🚀 TestFlight Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ needs.ios-ci.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Number:** ${{ needs.ios-ci.outputs.build_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **iOS Release Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ✅ Uploaded to TestFlight" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The build will be available for testing once Apple completes processing." >> $GITHUB_STEP_SUMMARY
