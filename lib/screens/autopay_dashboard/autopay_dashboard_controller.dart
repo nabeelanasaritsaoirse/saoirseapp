@@ -2,12 +2,13 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:saoirse_app/models/autopay_status_model.dart';
+import 'package:saoirse_app/models/delete_account_model.dart';
 
 import '/models/autopay_dashboard-model.dart';
 import '/services/autopay_service.dart';
 
 class AutopayController extends GetxController {
-  final AutopayService _service = AutopayService();
+  final AutopayService service = AutopayService();
 
   // ================= UI STATES =================
   RxBool isLoading = true.obs;
@@ -81,6 +82,7 @@ class AutopayController extends GetxController {
     fetchDashboard();
     fetchAutopayStatus();
     fetchSuggestedTopUp();
+    // fetchDeleteInfo();
   }
 
   // ================= VALIDATION =================
@@ -135,7 +137,7 @@ class AutopayController extends GetxController {
 
       if (!validateSettings()) return;
 
-      final settingsSuccess = await _service.updateAutopaySettings(
+      final settingsSuccess = await service.updateAutopaySettings(
         enabled: autopayEnabled.value,
         lowBalanceThreshold: lowBalanceThreshold.value,
         minimumBalanceLock: minimumBalanceLock.value,
@@ -146,7 +148,7 @@ class AutopayController extends GetxController {
 
       if (!settingsSuccess) return;
 
-      final notificationSuccess = await _service.updateNotificationPreferences(
+      final notificationSuccess = await service.updateNotificationPreferences(
         autopaySuccess: notifyAutopaySuccess.value,
         autopayFailed: notifyAutopayFailed.value,
         lowBalanceAlert: notifyLowBalance.value,
@@ -172,7 +174,7 @@ class AutopayController extends GetxController {
     try {
       isSettingsLoading.value = true;
 
-      final response = await _service.getautopaysettings();
+      final response = await service.getautopaysettings();
       final settings = response.data.settings;
       final notifications = response.data.notificationPreferences;
 
@@ -202,7 +204,7 @@ class AutopayController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final response = await _service.getAutopayDashboard();
+      final response = await service.getAutopayDashboard();
       final data = response.data;
 
       walletBalance.value = data.wallet.balance.toDouble();
@@ -232,6 +234,35 @@ class AutopayController extends GetxController {
       isLoading.value = false;
     }
   }
+
+Future<void> saveOrderPriorityForOrder(String orderId) async {
+  if (orderId.isEmpty) {
+    log("SAVE PRIORITY FAILED: Order ID empty");
+    return;
+  }
+
+  final parsedPriority = int.tryParse(priorityCtrl.text) ?? priority.value;
+
+  if (parsedPriority < 1 || parsedPriority > 100) {
+    log("INVALID PRIORITY: $parsedPriority");
+    return;
+  }
+
+  final success = await service.updateOrderPriority(
+    orderId: orderId,
+    priority: parsedPriority,
+  );
+
+  if (success) {
+    priority.value = parsedPriority;
+    log("ORDER PRIORITY UPDATED TO $parsedPriority FOR ORDER $orderId");
+
+    await fetchAutopayStatus();
+    applyAutopayStatusForOrder(orderId);
+  } else {
+    log("FAILED TO UPDATE PRIORITY FOR ORDER $orderId");
+  }
+}
 
   // ================= SKIP DATE HELPERS =================
   void addSkipDate(DateTime date) {
@@ -281,7 +312,7 @@ class AutopayController extends GetxController {
       log("SKIP DATES COUNT: ${skipDates.length}");
       log("SKIP DATES: ${skipDates.map((d) => d.toString()).toList()}");
 
-      final success = await _service.addSkipDates(
+      final success = await service.addSkipDates(
         orderId: orderId,
         dates: skipDates,
       );
@@ -318,7 +349,7 @@ class AutopayController extends GetxController {
     try {
       isSkipDateSaving.value = true;
 
-      final success = await _service.removeSkipDate(
+      final success = await service.removeSkipDate(
         orderId: orderId,
         date: date,
       );
@@ -353,31 +384,27 @@ class AutopayController extends GetxController {
   }
 
   Future<void> fetchAutopayStatus() async {
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
+    // try {
+    isLoading.value = true;
+    errorMessage.value = '';
 
-      final response = await _service.getAutopayStatus();
-      print("controller");
-      print(response.toString());
-      autopayStatus.value = response;
-      print(autopayStatus.value?.data.orders[0].orderId);
-      print(autopayStatus.value?.data.orders[1].orderId);
-      print(autopayStatus.value?.data.orders[2].orderId);
+    final response = await service.getAutopayStatus();
 
-      log("AUTOPAY STATUS LOADED");
-      log(" AUTOPAY SThereATUS RESPONSE$response");
-    } catch (e) {
-      errorMessage.value = 'Failed to load autopay status';
-      log("AUTOPAY STATUS ERROR: $e");
-    } finally {
-      isLoading.value = false;
-    }
+    autopayStatus.value = response;
+
+    log("AUTOPAY STATUS LOADED");
+    log(" AUTOPAY SThereATUS RESPONSE$response");
+    // } catch (e) {
+    //   errorMessage.value = 'Failed to load autopay status';
+    //   log("AUTOPAY STATUS ERROR: $e");
+    // } finally {
+    isLoading.value = false;
+    // }
   }
 
   Future<void> fetchSuggestedTopUp({int days = 7}) async {
     try {
-      final response = await _service.getSuggestedTopUp(days: days);
+      final response = await service.getSuggestedTopUp(days: days);
 
       suggestedTopUp.value = response.data.suggestedTopUp;
       daysRequested.value = response.data.daysRequested;
@@ -387,6 +414,84 @@ class AutopayController extends GetxController {
       log("SUGGESTED TOPUP ERROR: $e");
     }
   }
+
+  // ================= PAUSE / RESUME AUTOPAY =================
+  //                                                                TODO             pause autopay
+
+  Future<void> togglePauseAutopay(bool pause) async {
+    final orderId = selectedOrderId.value;
+
+    if (orderId.isEmpty) {
+      log("PAUSE AUTOPAY FAILED: Order ID empty");
+      return;
+    }
+
+    try {
+      isSettingsLoading.value = true;
+
+      if (pause) {
+        // Pause for 7 days
+        final pauseUntil = DateTime.now().add(const Duration(days: 7));
+
+        final success = await service.pauseAutopay(
+          orderId: orderId,
+          pauseUntil: pauseUntil,
+        );
+
+        if (!success) {
+          log("PAUSE AUTOPAY FAILED FROM API");
+          return;
+        }
+
+        pauseAutopay.value = true; // ✅ IMPORTANT
+        log("AUTOPAY PAUSED UNTIL $pauseUntil");
+      } else {
+        // Resume (no API)
+        pauseAutopay.value = false; // ✅ IMPORTANT
+        log("AUTOPAY RESUMED");
+      }
+
+      await fetchAutopayStatus();
+      applyAutopayStatusForOrder(orderId);
+    } catch (e) {
+      log("TOGGLE PAUSE AUTOPAY ERROR: $e");
+    } finally {
+      isSettingsLoading.value = false;
+    }
+  }
+
+Future<void> saveOrderPriority() async {
+  final orderId = selectedOrderId.value;
+
+  if (orderId.isEmpty) {
+    log("SAVE PRIORITY FAILED: Order ID empty");
+    return;
+  }
+
+  final parsedPriority = int.tryParse(priorityCtrl.text) ?? priority.value;
+
+  if (parsedPriority < 1 || parsedPriority > 100) {
+    log("INVALID PRIORITY: $parsedPriority");
+    return;
+  }
+
+  final success = await service.updateOrderPriority(
+    orderId: orderId,
+    priority: parsedPriority,
+  );
+
+  if (success) {
+    priority.value = parsedPriority;
+    log("ORDER PRIORITY UPDATED TO $parsedPriority");
+
+    await fetchAutopayStatus();
+    applyAutopayStatusForOrder(orderId);
+  } else {
+    log("FAILED TO UPDATE PRIORITY");
+  }
+}
+
+
 }
 
 // ================= ITEM MODEL =================

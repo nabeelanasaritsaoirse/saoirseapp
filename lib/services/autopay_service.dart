@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:saoirse_app/models/delete_account_model.dart';
 import 'package:saoirse_app/models/autopay_status_model.dart';
 import 'package:saoirse_app/models/autopay_suggested_topup_model.dart';
 
@@ -240,4 +241,67 @@ class AutopayService {
       );
     }
   }
+
+
+// ================= PAUSE / RESUME AUTOPAY =================
+Future<bool> pauseAutopay({
+  required String orderId,
+  required DateTime pauseUntil,
+}) async {
+  final token = box.read(AppConst.ACCESS_TOKEN);
+
+  final body = {
+    "pauseUntil": pauseUntil.toUtc().toIso8601String(),
+  };
+
+  log("PAUSE AUTOPAY BODY: ${jsonEncode(body)}");
+
+  final result = await APIService.postRequest<bool>(
+    url: "${AppURLs.AUTOPAY_PAUSE_API}/$orderId",
+    body: body,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+    onSuccess: (json) {
+      log("PAUSE AUTOPAY RESPONSE ==> $json");
+      return json["success"] == true;
+    },
+  );
+
+  return result ?? false;
+}
+
+
+
+
+Future<bool> updateOrderPriority({
+  required String orderId,
+  required int priority,
+}) async {
+  final token = box.read(AppConst.ACCESS_TOKEN);
+
+  final body = {
+    "priority": priority,
+  };
+
+  log("UPDATE PRIORITY BODY: ${jsonEncode(body)}");
+
+  final result = await APIService.putRequest<bool>(
+    url: "${AppURLs.AUTOPAY_PRIORITY_API}/$orderId",
+    body: body,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+    onSuccess: (json) {
+      log("UPDATE PRIORITY RESPONSE ==> $json");
+      return json["success"] == true;
+    },
+  );
+
+  return result ?? false;
+}
+
+  
 }

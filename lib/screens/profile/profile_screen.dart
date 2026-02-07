@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+
 import '../autopay_dashboard/autopay_dashboard_screen.dart';
 import '../edit_profile/edit_profile_screen.dart';
 import '../faqs/faqs.dart';
@@ -315,6 +316,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           break;
                         case "Log Out":
                           controller.confirmLogout();
+                          break;
+                        case "Delete\nAccount":
+                                                 
+                          controller.deleteAccount();
                           break;
                         case "Manage Address":
                           Get.to(() => ManageAddressScreen());

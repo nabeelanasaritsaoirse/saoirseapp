@@ -66,7 +66,7 @@ class AppAssets {
   // static String kyc = "assets/icons/KYC.png";
   // static String manage_accounts = "assets/icons/manage_account.png";
   // static String address = "assets/icons/address.png";
-
+  static String globalSetings = "assets/svg/autopay_setting.svg";
   static String pending_payment = "assets/svg/pending_transactionn.svg";
   static String order_history = "assets/svg/order_historyy.svg";
   static String wishlist = "assets/svg/wishlist.svg";
