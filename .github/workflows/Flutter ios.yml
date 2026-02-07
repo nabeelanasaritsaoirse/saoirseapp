@@ -3,8 +3,8 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [ test ]
+  workflow_dispatch:
 
 concurrency:
   group: ios-build-${{ github.ref }}
@@ -40,11 +40,19 @@ jobs:
           channel: stable
           cache: true
 
-      - name: 🧰 Select Xcode 16.1
+      - name: 🧰 Select latest Xcode (auto)
         run: |
-          sudo xcode-select -s /Applications/Xcode_16.1.app
+          echo "Available Xcodes:"
+          ls /Applications | grep Xcode
+      
+          LATEST_XCODE=$(ls -d /Applications/Xcode*.app | sort -V | tail -n 1)
+          echo "Using: $LATEST_XCODE"
+      
+          sudo xcode-select -s "$LATEST_XCODE/Contents/Developer"
+      
           xcodebuild -version
           xcodebuild -showsdks
+
 
       - name: 📦 Flutter Pub Get
         run: flutter pub get
@@ -135,10 +143,51 @@ jobs:
             rm -rf ios/Podfile.lock
           fi
 
-      - name: 🧨 Install Pods
+      - name: 📱 Configure iPhone-Only Device Family
+        run: |
+          /usr/libexec/PlistBuddy -c "Delete :UIDeviceFamily" ios/Runner/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily array" ios/Runner/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :UIDeviceFamily:0 integer 1" ios/Runner/Info.plist
+          echo "✅ Configured for iPhone-only release"
+
+      - name: 🚫 Disable iPad & Mac Catalyst
+        run: |
+          # Disable Mac Catalyst
+          /usr/libexec/PlistBuddy -c "Set :SupportsMacCatalyst false" ios/Runner/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Set :UIDeviceFamily:0 1" ios/Runner/Info.plist
+      
+          # Remove iPad device family if exists
+          /usr/libexec/PlistBuddy -c "Delete :UIDeviceFamily:1" ios/Runner/Info.plist || true
+      
+          # Force only iphoneos build
+          /usr/libexec/PlistBuddy -c "Add :UIRequiredDeviceCapabilities array" ios/Runner/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Add :UIRequiredDeviceCapabilities:0 string arm64" ios/Runner/Info.plist || true
+      
+          echo "✅ iPhone-only, no iPad, no Mac Catalyst"
+
+
+      - name: 🔐 Verify Push Notifications Entitlement
+        run: |
+          echo "Checking Runner.entitlements for aps-environment..."
+          if grep -q "aps-environment" ios/Runner/Runner.entitlements; then
+            echo "✅ Push Notifications entitlement found"
+          else
+            echo "⚠️ Adding aps-environment entitlement..."
+            /usr/libexec/PlistBuddy -c "Add :aps-environment string production" ios/Runner/Runner.entitlements
+            echo "✅ Push Notifications entitlement added"
+          fi
+          cat ios/Runner/Runner.entitlements
+
+      - name: 🧨 Fix Firebase pod mismatch & install
         run: |
           cd ios
-          pod install --repo-update
+      
+          # Remove stale lock for Firebase only
+          rm -rf Pods
+          rm -f Podfile.lock
+      
+          pod repo update
+          pod install
 
       - name: 🔨 Build Flutter iOS Release
         run: |
@@ -199,7 +248,7 @@ jobs:
             -scheme Runner \
             -configuration Release \
             -archivePath ../${ARCHIVE_DIR}/Runner.xcarchive \
-            -destination 'generic/platform=iOS' \
+            -destination 'generic/platform=iOS,variant=iphoneos' \
             DEVELOPMENT_TEAM=${TEAM_ID} \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE_SPECIFIER="${PROFILE_NAME}" \
