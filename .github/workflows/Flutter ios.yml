@@ -347,3 +347,36 @@ jobs:
           echo "- **Status:** ✅ Uploaded to TestFlight" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "The build will be available for testing once Apple completes processing." >> $GITHUB_STEP_SUMMARY
+
+  ios-submit-review:
+    name: 🚀 Submit to App Store Review
+    needs: ios-deploy
+    runs-on: macos-latest
+
+    environment:
+      name: ios-review   # 👈 Manual approval gate
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🚀 Install Fastlane
+        run: sudo gem install fastlane -N
+
+      - name: 🔐 Write api_key.json
+        run: echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > api_key.json
+
+      - name: 📤 Submit Build to Apple Review
+        run: |
+          fastlane deliver \
+            --api_key_path api_key.json \
+            --skip_binary_upload true \
+            --submit_for_review true \
+            --automatic_release false \
+            --skip_screenshots true \
+            --skip_metadata true
+
+      - name: 🧾 Review Submission Summary
+        run: |
+          echo "## 🍎 App Store Submission" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: Submitted to Apple Review ✅" >> $GITHUB_STEP_SUMMARY
