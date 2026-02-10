@@ -59,8 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
             clipBehavior: Clip.none,
             children: [
               IconBox(
-                image: AppAssets.notification,
-                padding: 3.w,
+                image: AppAssets.notificationnew,
                 onTap: () {
                   Get.to(() => NotificationScreen());
                 },
@@ -96,15 +95,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           SizedBox(width: 8.w),
           IconBox(
-              image: AppAssets.search,
-              padding: 7.w,
+              image: AppAssets.searchnew,
               onTap: () {
                 Get.to(() => const ProductListing());
               }),
           SizedBox(width: 8.w),
           IconBox(
-              image: AppAssets.wallet,
-              padding: 5.w,
+              image: AppAssets.walletnew,
               onTap: () => Get.to(() => WalletScreen())),
           SizedBox(width: 12.w)
         ],

@@ -212,8 +212,8 @@ class DashboardScreen extends StatelessWidget {
                 ),
           if (badgeCount != null && badgeCount > 0)
             Positioned(
-              right: -2,
-              top: -2,
+              right: 5,
+              top: 5,
               child: Container(
                 padding: EdgeInsets.all(4.r),
                 decoration: const BoxDecoration(
