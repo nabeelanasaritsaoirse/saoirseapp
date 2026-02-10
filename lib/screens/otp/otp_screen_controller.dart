@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -124,6 +125,7 @@ class VerifyOtpController extends GetxController {
     await notif.fetchUnreadCount();
 
     final fcmToken = await getDeviceToken();
+    log("$fcmToken");
     if (fcmToken != null) {
       Get.find<NotificationController>().registerFCM(fcmToken);
     }
@@ -183,14 +185,38 @@ class VerifyOtpController extends GetxController {
   }
 
   /// GET FCM TOKEN
+  // Future<String?> getDeviceToken() async {
+  //   try {
+  //     final token = await FirebaseMessaging.instance.getToken();
+  //     return token;
+  //   } catch (e) {
+  //     return null;
+  //   }
+  // }
+
   Future<String?> getDeviceToken() async {
-    try {
-      final token = await FirebaseMessaging.instance.getToken();
-      return token;
-    } catch (e) {
-      return null;
+  try {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    // Request permission (important for iOS, safe for Android too)
+    await messaging.requestPermission();
+
+    String? token = await messaging.getToken();
+
+    if (token != null) {
+      log("FCM Token: $token");
+      print("FCM Token: $token");
+    } else {
+      log("FCM Token is null");
     }
+
+    return token;
+  } catch (e) {
+    log("Error getting FCM token: $e");
+    return null;
   }
+}
+
 
   /// --- Resend OTP (Local mock) ---
   Future<void> resendOtp() async {
