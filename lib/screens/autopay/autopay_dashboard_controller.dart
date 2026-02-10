@@ -213,10 +213,6 @@ class AutopayController extends GetxController {
       suggestedTopUp.value = data.suggestions.suggestedTopUp;
 
       items.value = data.orders.map((order) {
-        final total = order.remainingAmount + order.dailyAmount;
-        final progress = total == 0 ? 0.0 : 1 - (order.remainingAmount / total);
-//                                                              TODO                      PROGRESS DETAILS
-
         return AutopayItem(
           orderId: order.id,
           title: order.productName,
@@ -256,7 +252,9 @@ class AutopayController extends GetxController {
       priority.value = parsedPriority;
       log("ORDER PRIORITY UPDATED TO $parsedPriority FOR ORDER $orderId");
 
+      // Refresh only from API so this order's data is up to date
       await fetchAutopayStatus();
+      await fetchDashboard();
       applyAutopayStatusForOrder(orderId);
     } else {
       log("FAILED TO UPDATE PRIORITY FOR ORDER $orderId");
@@ -320,7 +318,7 @@ class AutopayController extends GetxController {
         log("SKIP DATES SAVED SUCCESSFULLY");
 
         await fetchAutopayStatus();
-
+      
         applyAutopayStatusForOrder(orderId);
 
         Get.back();
@@ -356,12 +354,11 @@ class AutopayController extends GetxController {
       if (success) {
         log("SKIP DATE REMOVED SUCCESSFULLY");
 
-        // Remove locally
         skipDates.removeWhere((d) =>
             d.year == date.year && d.month == date.month && d.day == date.day);
 
-        // Refresh status
         await fetchAutopayStatus();
+      
         applyAutopayStatusForOrder(orderId);
       } else {
         log("FAILED TO REMOVE SKIP DATE");
@@ -383,7 +380,6 @@ class AutopayController extends GetxController {
   }
 
   Future<void> fetchAutopayStatus() async {
-    // try {
     isLoading.value = true;
     errorMessage.value = '';
 
@@ -393,12 +389,8 @@ class AutopayController extends GetxController {
 
     log("AUTOPAY STATUS LOADED");
     log(" AUTOPAY SThereATUS RESPONSE$response");
-    // } catch (e) {
-    //   errorMessage.value = 'Failed to load autopay status';
-    //   log("AUTOPAY STATUS ERROR: $e");
-    // } finally {
+
     isLoading.value = false;
-    // }
   }
 
   Future<void> fetchSuggestedTopUp({int days = 7}) async {
@@ -414,120 +406,186 @@ class AutopayController extends GetxController {
     }
   }
 
-  // ================= PAUSE / RESUME AUTOPAY =================
-  //                                                                TODO             pause autopay
+  // ================= PAUSE / RESUME AUTOPAY ==============
 
+  Future<bool> resumeAutopay() async {
+    final orderId = selectedOrderId.value;
 
+    if (orderId.isEmpty) {
+      log("RESUME AUTOPAY FAILED: Order ID empty");
 
-// ================= RESUME AUTOPAY =================
-Future<bool> resumeAutopay() async {  // Change return type to bool
-  final orderId = selectedOrderId.value;
-
-  if (orderId.isEmpty) {
-    log("RESUME AUTOPAY FAILED: Order ID empty");
-    Get.snackbar(
-      'Error',
-      'No order selected',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
-    return false;  // Return false on error
-  }
-
-  try {
-    isSettingsLoading.value = true;
-
-    final success = await service.resumeAutopay(
-      orderId: orderId,
-    );
-
-    if (success) {
-      pauseAutopay.value = false;
-      log("AUTOPAY RESUMED SUCCESSFULLY");
-
-      // Refresh the status
-      await fetchAutopayStatus();
-      applyAutopayStatusForOrder(orderId);
-      
-      // Show success message
-      Get.snackbar(
-        'Success',
-        'Autopay resumed successfully',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-      return true;  // Return true on success
-    } else {
-      log("RESUME AUTOPAY FAILED FROM API");
-     
-      return false;  // Return false on API failure
+      return false;
     }
-  } catch (e) {
-    log("RESUME AUTOPAY ERROR: $e");
-   
-    return false;  
-  } finally {
-    isSettingsLoading.value = false;
-  }
-}
 
+    try {
+      isSettingsLoading.value = true;
 
-// ================= TOGGLE PAUSE AUTOPAY =================
-Future<void> togglePauseAutopay(bool shouldPause) async {
-  final orderId = selectedOrderId.value;
-
-  if (orderId.isEmpty) {
-    log("TOGGLE AUTOPAY FAILED: Order ID empty");
-    return;
-  }
-
-  try {
-    isSettingsLoading.value = true;
-
-    if (shouldPause) {
-      // Pause for 7 days
-      final pauseUntil = DateTime.now().add(const Duration(days: 7));
-
-      final success = await service.pauseAutopay(
+      final success = await service.resumeAutopay(
         orderId: orderId,
-        pauseUntil: pauseUntil,
       );
 
-      if (!success) {
-        log("PAUSE AUTOPAY FAILED FROM API");
-        return;
-      }
-
-      pauseAutopay.value = true;
-      log("AUTOPAY PAUSED  SUCCSESSFULLY UNTIL $pauseUntil");
-      
-    
-    } else {
-      // Resume using the resume API - now it returns boolean
-      final success = await resumeAutopay();  // This now returns bool
-      
-      if (success) {  
+      if (success) {
         pauseAutopay.value = false;
         log("AUTOPAY RESUMED SUCCESSFULLY");
-        // Note: The resumeAutopay method already shows snackbar and refreshes data
+
+        await fetchAutopayStatus();
+      
+        applyAutopayStatusForOrder(orderId);
+
+        return true;
+      } else {
+        log("RESUME AUTOPAY FAILED FROM API");
+
+        return false;
       }
+    } catch (e) {
+      log("RESUME AUTOPAY ERROR: $e");
+
+      return false;
+    } finally {
+      isSettingsLoading.value = false;
+    }
+  }
+
+// ================= TOGGLE PAUSE AUTOPAY =================
+  Future<void> togglePauseAutopay(bool shouldPause) async {
+    final orderId = selectedOrderId.value;
+
+    if (orderId.isEmpty) {
+      log("TOGGLE AUTOPAY FAILED: Order ID empty");
+      return;
     }
 
-  
-    await fetchAutopayStatus();
-    applyAutopayStatusForOrder(orderId);
-  } catch (e) {
-    log("TOGGLE PAUSE AUTOPAY ERROR: $e");
-  } finally {
-    isSettingsLoading.value = false;
+    try {
+      isSettingsLoading.value = true;
+
+      if (shouldPause) {
+        final pauseUntil = DateTime.now().add(const Duration(days: 7));
+
+        final success = await service.pauseAutopay(
+          orderId: orderId,
+          pauseUntil: pauseUntil,
+        );
+
+        if (!success) {
+          log("PAUSE AUTOPAY FAILED FROM API");
+          return;
+        }
+
+        pauseAutopay.value = true;
+        log("AUTOPAY PAUSED  SUCCSESSFULLY UNTIL $pauseUntil");
+      } else {
+        final success = await resumeAutopay();
+
+        if (success) {
+          pauseAutopay.value = false;
+          log("AUTOPAY RESUMED SUCCESSFULLY");
+        }
+      }
+
+      await fetchAutopayStatus();
+      await fetchDashboard();
+      applyAutopayStatusForOrder(orderId);
+    } catch (e) {
+      log("TOGGLE PAUSE AUTOPAY ERROR: $e");
+    } finally {
+      isSettingsLoading.value = false;
+    }
   }
-}
 
+// ================= ENABLE AUTOPAY FOR ORDER =================
+  Future<void> enableAutopayForOrder(String orderId,
+      {int? customPriority}) async {
+    if (orderId.isEmpty) {
+      log("ENABLE AUTOPAY FAILED: Order ID empty");
 
+      return;
+    }
 
-  
+    try {
+      isSettingsLoading.value = true;
+
+      final priorityToUse = customPriority ?? priority.value;
+
+      final success = await service.enableAutopayForOrder(
+        orderId: orderId,
+        priority: priorityToUse,
+      );
+
+      if (success) {
+        autopayEnabled.value = true;
+        log("AUTOPAY ENABLED FOR ORDER $orderId WITH PRIORITY $priorityToUse");
+
+        // Refresh the status & dashboard so only this order reflects the change
+        await fetchAutopayStatus();
+        await fetchDashboard();
+        applyAutopayStatusForOrder(orderId);
+      } else {
+        log("ENABLE AUTOPAY FAILED FROM API");
+      }
+    } catch (e) {
+      log("ENABLE AUTOPAY ERROR: $e");
+    } finally {
+      isSettingsLoading.value = false;
+    }
+  }
+
+// ================= DISABLE AUTOPAY FOR ORDER =================
+  Future<void> disableAutopayForOrder(String orderId) async {
+    if (orderId.isEmpty) {
+      log("DISABLE AUTOPAY FAILED: Order ID empty");
+
+      return;
+    }
+
+    try {
+      isSettingsLoading.value = true;
+
+      final success = await service.disableAutopayForOrder(
+        orderId: orderId,
+      );
+
+      if (success) {
+        autopayEnabled.value = false;
+        log("AUTOPAY DISABLED FOR ORDER $orderId");
+
+        await fetchAutopayStatus();
+        await fetchDashboard();
+        applyAutopayStatusForOrder(orderId);
+      } else {
+        log("DISABLE AUTOPAY FAILED FROM API");
+      }
+    } catch (e) {
+      log("DISABLE AUTOPAY ERROR: $e");
+    } finally {
+      isSettingsLoading.value = false;
+    }
+  }
+
+// ================= TOGGLE ENABLE/DISABLE AUTOPAY =================
+  Future<void> toggleEnableAutopay(bool shouldEnable) async {
+    final orderId = selectedOrderId.value;
+
+    if (orderId.isEmpty) {
+      log("TOGGLE AUTOPAY FAILED: No order selected");
+      return;
+    }
+
+    try {
+      isSettingsLoading.value = true;
+
+      if (shouldEnable) {
+        final priority = int.tryParse(priorityCtrl.text) ?? this.priority.value;
+        await enableAutopayForOrder(orderId, customPriority: priority);
+      } else {
+        await disableAutopayForOrder(orderId);
+      }
+    } catch (e) {
+      log("TOGGLE AUTOPAY ERROR: $e");
+    } finally {
+      isSettingsLoading.value = false;
+    }
+  }
 
   Future<void> saveOrderPriority() async {
     final orderId = selectedOrderId.value;
@@ -554,6 +612,7 @@ Future<void> togglePauseAutopay(bool shouldPause) async {
       log("ORDER PRIORITY UPDATED TO $parsedPriority");
 
       await fetchAutopayStatus();
+      
       applyAutopayStatusForOrder(orderId);
     } else {
       log("FAILED TO UPDATE PRIORITY");

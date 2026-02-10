@@ -210,7 +210,7 @@ class Suggestions {
 // ================= ORDERS =================
 
 class Order {
-  final String id;
+  final String id; 
   final String productName;
   final int dailyAmount;
   final int remainingAmount;

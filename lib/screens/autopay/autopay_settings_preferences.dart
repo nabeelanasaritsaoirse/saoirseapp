@@ -1,12 +1,14 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:intl/intl.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+
 import 'package:saoirse_app/constants/app_colors.dart';
 
 import 'package:saoirse_app/widgets/app_button.dart';
@@ -89,27 +91,30 @@ class AutopaySettingsSheet extends StatelessWidget {
 
           Obx(
             () => appButton(
-              buttonText: controller.isSkipDateSaving.value
+              buttonText: controller.isSkipDateSaving.value ||
+                      controller.isSettingsLoading.value
                   ? 'SAVING...'
                   : 'SAVE CHANGES',
-              onTap: controller.isSkipDateSaving.value
+              onTap: controller.isSkipDateSaving.value ||
+                      controller.isSettingsLoading.value
                   ? () {}
                   : () async {
-                      // Save global autopay settings first
-                      await controller.saveAutopaySettings();
+                      
+                      await controller.saveOrderPriority();
 
-                      // Then save skip dates for the currently selected order
+                   
                       final orderId = controller.selectedOrderId.value;
-
-                      if (orderId.isEmpty) {
-                        log("AutopaySettingsSheet: selectedOrderId is empty, skip dates not saved");
-                        return;
+                      if (orderId.isNotEmpty) {
+                        await controller.saveSkipDates(orderId);
                       }
 
-                      await controller.saveSkipDates(orderId);
-                      log("Skip dates saved: ${controller.skipDates.toString()}");
+                      log("AutopaySettingsSheet: Save button tapped. isSettingsLoading=${controller.isSettingsLoading.value}, isSkipDateSaving=${controller.isSkipDateSaving.value}, selectedOrderId=${controller.selectedOrderId.value}");
+
+               
+                      Get.back();
                     },
-              buttonColor: controller.isSkipDateSaving.value
+              buttonColor: controller.isSkipDateSaving.value ||
+                      controller.isSettingsLoading.value
                   ? AppColors.grey
                   : AppColors.primaryColor,
               textColor: AppColors.white,
@@ -136,14 +141,41 @@ class AutopaySettingsSheet extends StatelessWidget {
 
   Widget enableAutopay() {
     return Obx(() {
-      return SwitchListTile(
-        contentPadding: EdgeInsets.zero,
-        title: appText('Enable Autopay',
-            fontWeight: FontWeight.w600, textAlign: TextAlign.start),
-        value: controller.autopayEnabled.value,
-        onChanged: (v) => controller.autopayEnabled.value = v,
-        // ignore: deprecated_member_use
-        activeColor: AppColors.primaryColor,
+      final orderId = controller.selectedOrderId.value;
+      bool isEnabled = controller.autopayEnabled.value;
+
+      if (controller.autopayStatus.value != null && orderId.isNotEmpty) {
+        final order = controller.autopayStatus.value!.data.orders
+            .firstWhereOrNull((o) => o.orderId == orderId);
+        if (order != null) {
+          isEnabled = order.autopay.enabled;
+        }
+      }
+
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          appText(
+            'Enable Autopay',
+            fontWeight: FontWeight.w600,
+          ),
+          Switch(
+            value: isEnabled,
+            onChanged: orderId.isNotEmpty
+                ? (value) async {
+                    if (value) {
+                      final priority =
+                          int.tryParse(controller.priorityCtrl.text) ?? 1;
+                      await controller.enableAutopayForOrder(orderId,
+                          customPriority: priority);
+                    } else {
+                      await controller.disableAutopayForOrder(orderId);
+                    }
+                  }
+                : null,
+            activeColor: AppColors.primaryColor,
+          ),
+        ],
       );
     });
   }
@@ -164,25 +196,35 @@ class AutopaySettingsSheet extends StatelessWidget {
             textInputType: TextInputType.number,
             hintText: '85',
             hintColor: AppColors.textGray,
+            onChanged: (value) async {
+          
+              final parsed = int.tryParse(value);
+              if (parsed != null && parsed >= 1 && parsed <= 100) {
+             
+                await Future.delayed(Duration(milliseconds: 500));
+                await controller.saveOrderPriority();
+              }
+            },
           ),
         ),
       ],
     );
   }
 
+ 
+
   Widget pauseAutopay() {
     return Obx(() {
-      // Check if autopay is currently paused by checking the status
+      
       final isCurrentlyPaused = controller.pauseAutopay.value;
       final orderId = controller.selectedOrderId.value;
 
-      // Get the pauseUntil date from status if available
       DateTime? pauseUntilDate;
       if (controller.autopayStatus.value != null && orderId.isNotEmpty) {
         final order = controller.autopayStatus.value!.data.orders
             .firstWhereOrNull((o) => o.orderId == orderId);
         if (order != null && order.autopay.pausedUntil != null) {
-          // Check if pausedUntil is already a DateTime or needs parsing
+     
           if (order.autopay.pausedUntil is DateTime) {
             pauseUntilDate = order.autopay.pausedUntil as DateTime;
           } else if (order.autopay.pausedUntil is String) {
@@ -217,37 +259,15 @@ class AutopaySettingsSheet extends StatelessWidget {
                 ],
               ),
               Switch(
-                value:
-                    !isCurrentlyPaused, // Switch shows enabled when NOT paused
+                value: !isCurrentlyPaused,
                 onChanged: (v) async {
-                  // v = true means switch is ON (autopay active)
-                  // v = false means switch is OFF (autopay paused)
                   final shouldPause = !v;
                   await controller.togglePauseAutopay(shouldPause);
                 },
-                // ignore: deprecated_member_use
                 activeColor: AppColors.primaryColor,
               ),
             ],
           ),
-
-          // Add resume button if autopay is paused
-          if (isCurrentlyPaused &&
-              pauseUntilDate != null &&
-              pauseUntilDate.isAfter(DateTime.now()))
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.play_arrow_rounded,
-                    color: Colors.white, size: 18.sp),
-                SizedBox(width: 8.w),
-                appText(
-                  'Resume Autopay Now',
-                  color: Colors.green,
-                  fontWeight: FontWeight.w600,
-                ),
-              ],
-            ),
         ],
       );
     });

@@ -298,6 +298,59 @@ Future<bool> resumeAutopay({
 }
 
 
+// ================= ENABLE AUTOPAY FOR ORDER =================
+Future<bool> enableAutopayForOrder({
+  required String orderId,
+  int priority = 1,
+}) async {
+  final token = box.read(AppConst.ACCESS_TOKEN);
+
+  final body = {
+    "priority": priority,
+  };
+
+  log("ENABLE AUTOPAY FOR ORDER REQUEST: ${jsonEncode(body)}");
+
+  final result = await APIService.postRequest<bool>(
+    url: "${AppURLs.AUTOPAY_ENABLE_FOR_ORDER_API}/$orderId",
+    body: body,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+    onSuccess: (json) {
+      log("ENABLE AUTOPAY RESPONSE ==> $json");
+      return json["success"] == true;
+    },
+  );
+
+  return result ?? false;
+}
+
+// ================= DISABLE AUTOPAY FOR ORDER =================
+Future<bool> disableAutopayForOrder({
+  required String orderId,
+}) async {
+  final token = box.read(AppConst.ACCESS_TOKEN);
+
+  log("DISABLE AUTOPAY FOR ORDER REQUEST: $orderId");
+
+  final result = await APIService.postRequest<bool>(
+    url: "${AppURLs.AUTOPAY_DISABLE_FOR_ORDER_API}/$orderId",
+    body: {}, // Empty body as per API
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+    onSuccess: (json) {
+      log("DISABLE AUTOPAY RESPONSE ==> $json");
+      return json["success"] == true;
+    },
+  );
+
+  return result ?? false;
+}
+
 Future<bool> updateOrderPriority({
   required String orderId,
   required int priority,

@@ -92,11 +92,20 @@ class AppURLs {
       BASE_API + "api/installments/autopay/skip-dates";
   static String AUTOPAY_SUGGESTED_TOPUP_API =
       BASE_API + "api/installments/autopay/suggested-topup";
-  static String AUTOPAY_PAUSE_API = BASE_API + "api/installments/autopay/pause";
+  static String AUTOPAY_PAUSE_API = 
+  BASE_API + "api/installments/autopay/pause";
   static String AUTOPAY_RESUME_API =
       BASE_API + "api/installments/autopay/resume";
+static String AUTOPAY_ENABLE_FOR_ORDER_API =
+  BASE_API + "api/installments/autopay/enable";
+  static String AUTOPAY_DISABLE_FOR_ORDER_API =
+  BASE_API + "api/installments/autopay/disable";
+
   static String AUTOPAY_PRIORITY_API =
       BASE_API + "api/installments/autopay/priority";
+
+
+     
 
 //  Delete Account
   static String DELETE_ACCOUNT_GET_API =
