@@ -2,8 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
-import '../autopay_dashboard/autopay_dashboard_screen.dart';
+import 'package:saoirse_app/screens/autopay/autopay_dashboard_screen.dart';
 import '../edit_profile/edit_profile_screen.dart';
 import '../faqs/faqs.dart';
 import '../kyc/kyc_controller.dart';

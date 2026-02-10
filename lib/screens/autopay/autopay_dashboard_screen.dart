@@ -4,18 +4,20 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/autopay_dashboard/autopay_settings_preferences.dart';
+import 'package:saoirse_app/constants/app_assets.dart';
+import 'package:saoirse_app/constants/app_colors.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
-import '../../constants/app_colors.dart';
-import '../../constants/app_strings.dart';
-import '../../widgets/app_button.dart';
-import '../../widgets/app_loader.dart';
-import '../../widgets/app_text.dart';
-import '../../widgets/app_text_field.dart';
-import '../../widgets/custom_appbar.dart';
+import 'package:saoirse_app/widgets/app_button.dart';
+import 'package:saoirse_app/widgets/app_loader.dart';
+import 'package:saoirse_app/widgets/app_text.dart';
+import 'package:saoirse_app/widgets/app_text_field.dart';
+import 'package:saoirse_app/widgets/custom_appbar.dart';
+
 import 'autopay_dashboard_controller.dart';
-import 'package:iconsax/iconsax.dart';
+import 'autopay_settings_preferences.dart';
 
 class AutopayDashboardScreen extends StatelessWidget {
   AutopayDashboardScreen({super.key});
@@ -31,15 +33,17 @@ class AutopayDashboardScreen extends StatelessWidget {
         showBack: true,
         actions: [
           IconButton(
-            icon: Icon(Iconsax.settings4, color: AppColors.white),
+            icon: SvgPicture.asset(
+              AppAssets.globalSetings,
+              width: 18.h,
+              height: 18.h,
+              colorFilter: ColorFilter.mode(
+                AppColors.white,
+                BlendMode.srcIn,
+              ),
+            ),
             onPressed: () async {
-            
               await controller.fetchAutopaySettings();
-
-            
-              // await controller.fetchAutopayStatus();
-
-            
               Get.dialog(
                 AutopaySettingsDialog(),
                 barrierDismissible: true,
@@ -204,11 +208,6 @@ class AutopayDashboardScreen extends StatelessWidget {
   }
 
   Widget forecastAndList() {
-    print("controller json");
-    print(controller.items.toJson());
-    print(controller.items[0].orderId);
-    print(controller.items[1].orderId);
-    print(controller.items[2].orderId);
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(14.w),
@@ -305,9 +304,9 @@ class AutopayDashboardScreen extends StatelessWidget {
                     Row(
                       children: [
                         appText(
-                          'Active',
+                          isDisabled ? 'Inactive' : 'Active',
                           fontSize: 11.sp,
-                          color: AppColors.red,
+                          color: isDisabled ? Colors.red : AppColors.green,
                           fontWeight: FontWeight.w500,
                         ),
                         SizedBox(

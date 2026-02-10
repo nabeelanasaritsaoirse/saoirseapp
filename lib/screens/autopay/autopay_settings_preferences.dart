@@ -8,10 +8,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:saoirse_app/constants/app_colors.dart';
-import 'package:saoirse_app/screens/autopay_dashboard/autopay_dashboard_controller.dart';
+
 import 'package:saoirse_app/widgets/app_button.dart';
 import 'package:saoirse_app/widgets/app_text.dart';
 import 'package:saoirse_app/widgets/app_text_field.dart';
+
+import 'autopay_dashboard_controller.dart';
 
 class AutopaySettingsSheet extends StatelessWidget {
   AutopaySettingsSheet({super.key});
@@ -20,9 +22,6 @@ class AutopaySettingsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Ensure we always have a selected order when this sheet opens.
-    // If it was not set explicitly from the dashboard card,
-    // fall back to the first order from the loaded autopay status.
     if (controller.selectedOrderId.value.isEmpty) {
       final status = controller.autopayStatus.value;
       if (status != null && status.data.orders.isNotEmpty) {
@@ -103,7 +102,6 @@ class AutopaySettingsSheet extends StatelessWidget {
                       final orderId = controller.selectedOrderId.value;
 
                       if (orderId.isEmpty) {
-                    
                         log("AutopaySettingsSheet: selectedOrderId is empty, skip dates not saved");
                         return;
                       }
@@ -174,16 +172,82 @@ class AutopaySettingsSheet extends StatelessWidget {
 
   Widget pauseAutopay() {
     return Obx(() {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      // Check if autopay is currently paused by checking the status
+      final isCurrentlyPaused = controller.pauseAutopay.value;
+      final orderId = controller.selectedOrderId.value;
+
+      // Get the pauseUntil date from status if available
+      DateTime? pauseUntilDate;
+      if (controller.autopayStatus.value != null && orderId.isNotEmpty) {
+        final order = controller.autopayStatus.value!.data.orders
+            .firstWhereOrNull((o) => o.orderId == orderId);
+        if (order != null && order.autopay.pausedUntil != null) {
+          // Check if pausedUntil is already a DateTime or needs parsing
+          if (order.autopay.pausedUntil is DateTime) {
+            pauseUntilDate = order.autopay.pausedUntil as DateTime;
+          } else if (order.autopay.pausedUntil is String) {
+            pauseUntilDate =
+                DateTime.parse(order.autopay.pausedUntil as String);
+          }
+        }
+      }
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          appText('Pause Autopay', fontWeight: FontWeight.w600),
-          Switch(
-            value: controller.pauseAutopay.value,
-            onChanged: (v) => controller.pauseAutopay.value = v,
-            // ignore: deprecated_member_use
-            activeColor: AppColors.primaryColor,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  appText(
+                    isCurrentlyPaused ? 'Autopay Paused' : 'Pause Autopay',
+                    fontWeight: FontWeight.w600,
+                  ),
+                  if (pauseUntilDate != null && isCurrentlyPaused)
+                    Padding(
+                      padding: EdgeInsets.only(top: 4.h),
+                      child: appText(
+                        'Until ${DateFormat('dd MMM yyyy').format(pauseUntilDate)}',
+                        fontSize: 12.sp,
+                        color: AppColors.textGray,
+                      ),
+                    ),
+                ],
+              ),
+              Switch(
+                value:
+                    !isCurrentlyPaused, // Switch shows enabled when NOT paused
+                onChanged: (v) async {
+                  // v = true means switch is ON (autopay active)
+                  // v = false means switch is OFF (autopay paused)
+                  final shouldPause = !v;
+                  await controller.togglePauseAutopay(shouldPause);
+                },
+                // ignore: deprecated_member_use
+                activeColor: AppColors.primaryColor,
+              ),
+            ],
           ),
+
+          // Add resume button if autopay is paused
+          if (isCurrentlyPaused &&
+              pauseUntilDate != null &&
+              pauseUntilDate.isAfter(DateTime.now()))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.play_arrow_rounded,
+                    color: Colors.white, size: 18.sp),
+                SizedBox(width: 8.w),
+                appText(
+                  'Resume Autopay Now',
+                  color: Colors.green,
+                  fontWeight: FontWeight.w600,
+                ),
+              ],
+            ),
         ],
       );
     });
