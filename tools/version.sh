@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Accept PR body from workflow
+PR_BODY="${1:-$PR_BODY}"
+
 PUBSPEC_FILE="pubspec.yaml"
 
 # -------------------------------------------------------
@@ -17,21 +20,30 @@ PATCH=$(echo "$VERSION_NAME" | cut -d. -f3)
 echo "Current version: $MAJOR.$MINOR.$PATCH+$BUILD_NUMBER"
 
 # -------------------------------------------------------
-# Detect bump type from PR checkbox (GitHub Actions)
+# Detect bump type from PR checkbox
 # -------------------------------------------------------
 BUMP=""
+CHECK_COUNT=0
 
 if [ -n "$PR_BODY" ]; then
   echo "Checking PR body for manual bump selection..."
 
-  echo "$PR_BODY" | grep -iq "\[x\].*major" && BUMP="major"
-  echo "$PR_BODY" | grep -iq "\[x\].*minor" && [ -z "$BUMP" ] && BUMP="minor"
-  echo "$PR_BODY" | grep -iq "\[x\].*patch" && [ -z "$BUMP" ] && BUMP="patch"
+  echo "$PR_BODY" | grep -iq "\[x\].*major" && { BUMP="major"; CHECK_COUNT=$((CHECK_COUNT+1)); }
+  echo "$PR_BODY" | grep -iq "\[x\].*minor" && { [ -z "$BUMP" ] && BUMP="minor"; CHECK_COUNT=$((CHECK_COUNT+1)); }
+  echo "$PR_BODY" | grep -iq "\[x\].*patch" && { [ -z "$BUMP" ] && BUMP="patch"; CHECK_COUNT=$((CHECK_COUNT+1)); }
+
+  # Fail if multiple selected
+  if [ "$CHECK_COUNT" -gt 1 ]; then
+    echo "❌ ERROR: Multiple version bump options selected"
+    exit 1
+  fi
 fi
 
 # -------------------------------------------------------
 # Fallback: Detect bump type from commits
 # -------------------------------------------------------
+COMMITS=""
+
 if [ -z "$BUMP" ]; then
   echo "No checkbox selection — falling back to commit detection"
 
@@ -71,9 +83,10 @@ NEW_VERSION="$MAJOR.$MINOR.$PATCH+$BUILD_NUMBER"
 echo "New version: $NEW_VERSION"
 
 # -------------------------------------------------------
-# Update pubspec.yaml
+# Update pubspec.yaml (Linux-safe)
 # -------------------------------------------------------
-sed -i "s/^version:.*/version: $NEW_VERSION/" $PUBSPEC_FILE
+sed -i.bak "s/^version:.*/version: $NEW_VERSION/" $PUBSPEC_FILE
+rm -f ${PUBSPEC_FILE}.bak
 
 # -------------------------------------------------------
 # Generate changelog
@@ -85,4 +98,4 @@ if [ -n "$COMMITS" ]; then
   echo "$COMMITS" | sed 's/^/- /' >> CHANGELOG.md
 fi
 
-echo "Version bump completed!"
+echo "✅ Version bump completed!"
