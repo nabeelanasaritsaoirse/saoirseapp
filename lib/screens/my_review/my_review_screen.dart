@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:saoirse_app/models/own_review_resposne_model.dart';
-import 'package:saoirse_app/my_review/my_review_controller.dart';
+import 'package:saoirse_app/screens/my_review/my_review_controller.dart';
 import 'package:saoirse_app/screens/order_delivered/write_review_controller/write_review_controller.dart';
 import 'package:saoirse_app/widgets/app_text.dart';
 import 'package:saoirse_app/widgets/custom_appbar.dart';
 import 'package:saoirse_app/widgets/write_review_dialog.dart';
 
-import '../constants/app_colors.dart';
+import '../../constants/app_colors.dart';
 
 class MyReviewScreen extends StatelessWidget {
   final MyReviewController controller = Get.put(MyReviewController());
