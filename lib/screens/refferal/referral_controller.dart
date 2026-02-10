@@ -49,6 +49,7 @@ class ReferralController extends GetxController {
         fetchReferralStats(),
         fetchReferralData(),
         fetchReferrerInfo(),
+        loadReferralFromStorage()
       ]);
     } finally {}
   }

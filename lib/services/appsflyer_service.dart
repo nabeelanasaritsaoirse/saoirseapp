@@ -29,6 +29,7 @@ class AppsFlyerService {
       appId: Platform.isAndroid ? 'com.saoirse.epi' : '6755812043',
       showDebug: true,
       timeToWaitForATTUserAuthorization: 0,
+      disableAdvertisingIdentifier: true,
       manualStart: false,
     );
 

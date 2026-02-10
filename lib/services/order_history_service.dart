@@ -51,7 +51,7 @@ class OrderHistoryService {
     final token = await _token();
 
     final url =
-        "${AppURLs.ORDER_HISTORY_API}?status=COMPLETE&limit=$limit&page=$page";
+        "${AppURLs.ORDER_HISTORY_API}?status=COMPLETED&limit=$limit&page=$page";
 
     return APIService.getRequest<OrderHistoryResponse>(
       url: url,
