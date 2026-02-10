@@ -15,7 +15,9 @@ class WriteReviewDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<WriteReviewController>(tag: productId);
-
+    final isMaxReached =
+        (controller.existingImages.length + controller.reviewImages.length) >=
+            WriteReviewController.maxImages;
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 16.w),
       shape: RoundedRectangleBorder(
@@ -99,25 +101,30 @@ class WriteReviewDialog extends StatelessWidget {
                       ),
                     ],
                   ),
-                  
                   OutlinedButton.icon(
-                    onPressed:controller.isUploadingImages.value
-                    ? null
-                    : controller.pickReviewImages,
+                    onPressed:
+                        controller.isUploadingImages.value || isMaxReached
+                            ? null
+                            : controller.pickReviewImages,
                     icon: Icon(
                       Icons.camera_alt_outlined,
                       size: 16.sp,
+                      color:
+                          isMaxReached ? AppColors.grey : AppColors.lightBlue,
                     ),
                     label: appText(
                       "Add Image",
-                      color: AppColors.lightBlue,
+                      color:
+                          isMaxReached ? AppColors.grey : AppColors.lightBlue,
                       fontWeight: FontWeight.w500,
                       fontSize: 12.sp,
                     ),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.lightBlue,
+                      foregroundColor:
+                          isMaxReached ? AppColors.grey : AppColors.lightBlue,
                       side: BorderSide(
-                        color: AppColors.lightBlue, 
+                        color:
+                            isMaxReached ? AppColors.grey : AppColors.lightBlue,
                         width: 1,
                       ),
                       shape: RoundedRectangleBorder(
@@ -132,52 +139,157 @@ class WriteReviewDialog extends StatelessWidget {
                 ],
               ),
 
-              // ================= IMAGE PREVIEW =================
-              if (controller.reviewImages.isNotEmpty)
+              // // ================= IMAGE PREVIEW =================
+              // if (controller.reviewImages.isNotEmpty)
+              //   Padding(
+              //     padding: EdgeInsets.only(top: 10.h),
+              //     child: SizedBox(
+              //       height: 70.h,
+              //       child: ListView.separated(
+              //         scrollDirection: Axis.horizontal,
+              //         itemCount: controller.reviewImages.length,
+              //         separatorBuilder: (_, __) => SizedBox(width: 8.w),
+              //         itemBuilder: (_, index) {
+              //           return Stack(
+              //             children: [
+              //               ClipRRect(
+              //                 borderRadius: BorderRadius.circular(8.r),
+              //                 child: Image.file(
+              //                   File(controller.reviewImages[index].path),
+              //                   width: 70.w,
+              //                   height: 70.h,
+              //                   fit: BoxFit.cover,
+              //                 ),
+              //               ),
+              //               Positioned(
+              //                 top: 4.h,
+              //                 right: 4.w,
+              //                 child: GestureDetector(
+              //                   onTap: () =>
+              //                       controller.removeReviewImage(index),
+              //                   child: Container(
+              //                     width: 18.w,
+              //                     height: 18.w,
+              //                     decoration: const BoxDecoration(
+              //                       color: Colors.black54,
+              //                       shape: BoxShape.circle,
+              //                     ),
+              //                     child: Icon(
+              //                       Icons.close,
+              //                       size: 12.sp,
+              //                       color: Colors.white,
+              //                     ),
+              //                   ),
+              //                 ),
+              //               ),
+              //             ],
+              //           );
+              //         },
+              //       ),
+              //     ),
+              //   ),
+
+              /// ================= IMAGE PREVIEW =================
+              if (controller.existingImages.isNotEmpty ||
+                  controller.reviewImages.isNotEmpty)
                 Padding(
                   padding: EdgeInsets.only(top: 10.h),
                   child: SizedBox(
                     height: 70.h,
-                    child: ListView.separated(
+                    child: ListView(
                       scrollDirection: Axis.horizontal,
-                      itemCount: controller.reviewImages.length,
-                      separatorBuilder: (_, __) => SizedBox(width: 8.w),
-                      itemBuilder: (_, index) {
-                        return Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8.r),
-                              child: Image.file(
-                                File(controller.reviewImages[index].path),
-                                width: 70.w,
-                                height: 70.h,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Positioned(
-                              top: 4.h,
-                              right: 4.w,
-                              child: GestureDetector(
-                                onTap: () =>
-                                    controller.removeReviewImage(index),
-                                child: Container(
-                                  width: 18.w,
-                                  height: 18.w,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.black54,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.close,
-                                    size: 12.sp,
-                                    color: Colors.white,
+                      children: [
+                        /// Existing images
+                        ...controller.existingImages
+                            .asMap()
+                            .entries
+                            .map((entry) {
+                          final index = entry.key;
+                          final image = entry.value;
+
+                          return Padding(
+                            padding: EdgeInsets.only(right: 8.w),
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  child: Image.network(
+                                    image.thumbnail ?? image.url,
+                                    width: 70.w,
+                                    height: 70.h,
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
-                              ),
+                                Positioned(
+                                  top: 4.h,
+                                  right: 4.w,
+                                  child: GestureDetector(
+                                    onTap: () =>
+                                        controller.removeExistingImage(index),
+                                    child: Container(
+                                      width: 18.w,
+                                      height: 18.w,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black54,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.close,
+                                        size: 12.sp,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        );
-                      },
+                          );
+                        }),
+
+                        /// New picked images
+                        ...controller.reviewImages.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final image = entry.value;
+
+                          return Padding(
+                            padding: EdgeInsets.only(right: 8.w),
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  child: Image.file(
+                                    File(image.path),
+                                    width: 70.w,
+                                    height: 70.h,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 4.h,
+                                  right: 4.w,
+                                  child: GestureDetector(
+                                    onTap: () =>
+                                        controller.removeReviewImage(index),
+                                    child: Container(
+                                      width: 18.w,
+                                      height: 18.w,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black54,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.close,
+                                        size: 12.sp,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
                     ),
                   ),
                 ),

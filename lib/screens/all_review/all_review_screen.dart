@@ -122,74 +122,7 @@ class AllReviewsScreen extends StatelessWidget {
     );
   }
 
-  // ================= IMAGE ROW =================
-  // Widget _buildImageRow() {
-  //   return Obx(() => SizedBox(
-  //         height: 70.h,
-  //         child: ListView.separated(
-  //           scrollDirection: Axis.horizontal,
-  //           itemCount: controller.reviewImages.length,
-  //           separatorBuilder: (_, __) => SizedBox(width: 8.w),
-  //           itemBuilder: (_, index) {
-  //             return ClipRRect(
-  //               borderRadius: BorderRadius.circular(8.r),
-  //               child: Stack(
-  //                 children: [
-  //                   SizedBox(
-  //                     height: 70.h,
-  //                     width: 80.w,
-  //                     child: Image.network(
-  //                       controller.reviewImages[index],
-  //                       fit: BoxFit.cover,
-
-  //                       // 👇 PER IMAGE LOADER
-  //                       loadingBuilder: (context, child, loadingProgress) {
-  //                         if (loadingProgress == null) {
-  //                           return child; // image loaded
-  //                         }
-  //                         return Container(
-  //                           color: AppColors.lightGrey,
-  //                           alignment: Alignment.center,
-  //                           child: appLoader(), // small loader
-  //                         );
-  //                       },
-
-  //                       // 👇 optional error UI
-  //                       errorBuilder: (_, __, ___) => Container(
-  //                         color: AppColors.lightGrey,
-  //                         alignment: Alignment.center,
-  //                         child: Icon(
-  //                           Icons.broken_image,
-  //                           size: 20.sp,
-  //                           color: AppColors.grey,
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ),
-
-  //                   // +N overlay
-  //                   if (index == controller.reviewImages.length - 1 &&
-  //                       controller.reviewImages.length > 3)
-  //                     Container(
-  //                       height: 70.h,
-  //                       width: 80.w,
-  //                       alignment: Alignment.center,
-  //                       color: Colors.black.withOpacity(0.5),
-  //                       child: appText(
-  //                         "+${controller.reviewImages.length - 3}",
-  //                         color: AppColors.white,
-  //                         fontWeight: FontWeight.w600,
-  //                         fontSize: 14.sp,
-  //                       ),
-  //                     ),
-  //                 ],
-  //               ),
-  //             );
-  //           },
-  //         ),
-  //       ));
-  // }
-
+  
   Widget _buildImageRow(AllReviewsController controller) {
     return Obx(() {
       if (controller.reviewImages.isEmpty) {
@@ -239,67 +172,7 @@ class AllReviewsScreen extends StatelessWidget {
     });
   }
 
-  // ================= REVIEW CARD =================
-  // Widget _buildReviewCard(Map<String, dynamic> review) {
-  //   return Container(
-  //     margin: EdgeInsets.only(bottom: 12.h),
-  //     padding: EdgeInsets.all(14.w),
-  //     decoration: BoxDecoration(
-  //       color: AppColors.lightGrey,
-  //       borderRadius: BorderRadius.circular(12.r),
-  //     ),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Row(
-  //           children: [
-  //             Container(
-  //               padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-  //               decoration: BoxDecoration(
-  //                 color: AppColors.white,
-  //                 borderRadius: BorderRadius.circular(4.r),
-  //               ),
-  //               child: Row(
-  //                 children: [
-  //                   Icon(
-  //                     Icons.star,
-  //                     size: 12.sp,
-  //                     color: AppColors.lightAmber,
-  //                   ),
-  //                   SizedBox(width: 2.w),
-  //                   appText(
-  //                     review["rating"].toString(),
-  //                     fontSize: 11.sp,
-  //                     fontWeight: FontWeight.w600,
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //             SizedBox(width: 8.w),
-  //             appText(
-  //               review["title"],
-  //               fontSize: 13.sp,
-  //               fontWeight: FontWeight.w600,
-  //             ),
-  //             const Spacer(),
-  //             appText(
-  //               review["time"],
-  //               fontSize: 11.sp,
-  //               color: AppColors.grey,
-  //             ),
-  //           ],
-  //         ),
-  //         SizedBox(height: 8.h),
-  //         appText(
-  //           review["message"],
-  //           textAlign: TextAlign.left,
-  //           fontSize: 12.sp,
-  //           color: AppColors.textBlack,
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+ 
   Widget _buildReviewCard(Review review) {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),

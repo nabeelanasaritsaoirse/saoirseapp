@@ -6,6 +6,8 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:saoirse_app/models/create_review_response.dart';
+import 'package:saoirse_app/models/own_review_resposne_model.dart'
+    hide ReviewImage;
 import 'package:saoirse_app/models/review_image_upload_response.dart';
 import 'package:http/http.dart' as http;
 
@@ -42,7 +44,6 @@ class ReviewService {
     );
   }
 
-
   /// ================= CONVERT ANY IMAGE TO JPEG =================
   /// Uses flutter_image_compress to ensure valid JPEG output
   Future<File> _ensureJpeg(File imageFile) async {
@@ -51,8 +52,6 @@ class ReviewService {
       final fileName = path.basenameWithoutExtension(imageFile.path);
       final targetPath =
           '${dir.path}/${fileName}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-
-      
 
       // Compress and convert to JPEG
       final result = await FlutterImageCompress.compressAndGetFile(
@@ -63,7 +62,6 @@ class ReviewService {
       );
 
       if (result == null) {
-        
         return imageFile;
       }
 
@@ -174,8 +172,6 @@ class ReviewService {
     return uploadedImages;
   }
 
-  
-
   Future<CreateReviewResponse?> createReview({
     required String productId,
     required int rating,
@@ -244,4 +240,78 @@ class ReviewService {
       return null;
     }
   }
+
+  Future<OwnReviewResponse?> getMyReviews({
+    int page = 1,
+    int limit = 10,
+  }) async {
+    final token = await _token();
+
+    final url = "${AppURLs.GET_OWN_REVIEWs_API}?page=$page&limit=$limit";
+
+    final response = await APIService.getRequest<OwnReviewResponse?>(
+      url: url,
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+      onSuccess: (data) {
+        if (data["success"] == true) {
+          return OwnReviewResponse.fromJson(data);
+        }
+        return null;
+      },
+    );
+
+    return response;
+  }
+
+  /// ================= UPDATE REVIEW =================
+Future<CreateReviewResponse?> updateReview({
+  required String reviewId,
+  int? rating,
+  String? title,
+  String? comment,
+  List<ReviewImage>? images,
+  Map<String, int>? detailedRatings,
+}) async {
+  try {
+    final token = await _token();
+
+    final body = <String, dynamic>{};
+
+    if (rating != null) body["rating"] = rating;
+    if (title != null) body["title"] = title;
+    if (comment != null) body["comment"] = comment;
+
+    if (images != null) {
+      body["images"] = images
+          .map((img) => {
+                "url": img.url,
+                "caption": img.caption,
+              })
+          .toList();
+    }
+
+    if (detailedRatings != null) {
+      body["detailedRatings"] = detailedRatings;
+    }
+
+    final url = "${AppURLs.EDIT_REVIEW}$reviewId";
+
+    return APIService.putRequest<CreateReviewResponse>(
+      url: url,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: body,
+      onSuccess: (data) {
+        return CreateReviewResponse.fromJson(data);
+      },
+    );
+  } catch (e) {
+    log("UPDATE REVIEW ERROR: $e");
+    return null;
+  }
+}
 }
