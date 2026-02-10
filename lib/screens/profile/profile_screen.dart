@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/my_review/my_review_screen.dart';
+import 'package:saoirse_app/screens/my_review/my_review_screen.dart';
 import 'package:saoirse_app/screens/coupon_screen/coupon_screen.dart';
 
 import '../edit_profile/edit_profile_screen.dart';
@@ -255,7 +255,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Get.to(() => AutopayDashboardScreen());
                         } else if (index == 7) {
                           Get.to(() => MyReviewScreen());
-                          Get.to(() => CouponScreen());
+                        
+                        }else if (index == 8) {
+                            Get.to(() => CouponScreen());
+                        
                         } else {}
                       },
                     );

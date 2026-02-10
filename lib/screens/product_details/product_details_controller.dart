@@ -203,7 +203,7 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
 
     final ReviewResponse? response =
         await productService.fetchProductReviews(
-      productId: "PROD185699527",
+      productId: productId,
       page: 1,
       limit: 10,
       sort: "mostHelpful",

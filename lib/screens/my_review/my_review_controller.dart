@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:saoirse_app/models/own_review_resposne_model.dart';
-import '../services/review_service.dart';
+import '../../services/review_service.dart';
 
 class MyReviewController extends GetxController {
   final ReviewService _reviewService = ReviewService();

@@ -1202,7 +1202,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           InkWell(
             onTap: () {
               Get.to(() => AllReviewsScreen(
-                    productId: "PROD185699527",
+                    productId: widget.productId,
                   ));
             },
             child: Container(

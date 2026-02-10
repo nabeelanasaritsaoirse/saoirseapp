@@ -9,7 +9,7 @@ import 'package:saoirse_app/services/review_service.dart';
 
 import '../../../models/own_review_resposne_model.dart'
     show Review, ReviewImages;
-import '../../../my_review/my_review_controller.dart';
+import '../../my_review/my_review_controller.dart';
 
 class WriteReviewController extends GetxController {
   final String productId;
