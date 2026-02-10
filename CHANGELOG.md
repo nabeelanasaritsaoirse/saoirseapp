@@ -1,8 +1,4 @@
-## Version 1.4.27+44
+## Version 1.4.28+45
 
-- Merge pull request #322 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-1
-- Update README.md
-- Merge pull request #321 from nabeelanasaritsaoirse/ci/version-bump-test-88
-- ci: automated version bump to 1.4.26
-- Merge pull request #320 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-1
-- Add workflow step to submit iOS app for review
+- Merge pull request #324 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-2
+- Update Flutter ios.yml
