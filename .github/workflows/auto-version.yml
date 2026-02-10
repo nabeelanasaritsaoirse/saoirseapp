@@ -32,7 +32,7 @@ jobs:
         with:
           channel: stable
 
-      # ⭐ NEW — Detect manual checkbox selection
+    # ⭐ NEW — Detect manual checkbox selection
       - name: 🧠 Detect bump selection from PR
         id: detect
         run: |
