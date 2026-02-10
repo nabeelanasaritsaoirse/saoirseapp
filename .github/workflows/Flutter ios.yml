@@ -375,8 +375,12 @@ jobs:
             --submit_for_review true \
             --automatic_release false \
             --force \
+            --non_interactive \
             --skip_screenshots true \
-            --skip_metadata true
+            --skip_metadata true \
+            --run_precheck_before_submit false \
+            --submission_information '{"export_compliance_uses_encryption": false}'
+
 
       - name: 🧾 Review Submission Summary
         run: |
