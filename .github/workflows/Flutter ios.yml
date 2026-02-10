@@ -354,7 +354,7 @@ jobs:
     runs-on: macos-latest
 
     environment:
-      name: ios-review   # 👈 Manual approval gate
+      name: ios-review
 
     steps:
       - name: 📥 Checkout
@@ -366,17 +366,30 @@ jobs:
       - name: 🔐 Write api_key.json
         run: echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > api_key.json
 
+      # ⭐ Wait until Apple finishes processing uploaded build
+      - name: ⏳ Wait for TestFlight Processing
+        run: |
+          fastlane pilot wait_for_build_processing \
+            --api_key_path api_key.json \
+            --app_identifier "${{ env.BUNDLE_ID }}"
+
+      # ⭐ Submit to Review (CI-safe flags)
       - name: 📤 Submit Build to Apple Review
         run: |
           fastlane deliver \
             --api_key_path api_key.json \
+            --app_identifier "${{ env.BUNDLE_ID }}" \
             --skip_binary_upload true \
             --submit_for_review true \
             --automatic_release false \
+            --force \
             --skip_screenshots true \
             --skip_metadata true
 
       - name: 🧾 Review Submission Summary
         run: |
           echo "## 🍎 App Store Submission" >> $GITHUB_STEP_SUMMARY
+          echo "- Bundle: ${{ env.BUNDLE_ID }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Tag: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- Status: Submitted to Apple Review ✅" >> $GITHUB_STEP_SUMMARY
+
