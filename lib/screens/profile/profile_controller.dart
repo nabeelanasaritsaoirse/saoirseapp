@@ -1,10 +1,16 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:saoirse_app/constants/app_constant.dart';
+import 'package:saoirse_app/models/delete_account_model.dart';
+import 'package:saoirse_app/widgets/app_loader.dart';
+import 'package:saoirse_app/widgets/app_text.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -42,11 +48,26 @@ class ProfileController extends GetxController {
   var isLoading = false.obs;
   var errorMessage = "".obs;
 
+  /// API response holder for delete-account info
+  final deleteAccountData = Rxn<DeleteAccountModel>();
+
+  /// Internal flag to avoid multiple delete-info calls while dialog rebuilds
+  final hasRequestedDeleteInfo = false.obs;
+
+  /// Convenient getters for UI
+  bool get isDeleteInfoSuccess => deleteAccountData.value?.success ?? false;
+
+  DeletionInfo? get deletionInfo => deleteAccountData.value?.deletionInfo;
+
+  DataCounts? get dataCounts => deletionInfo?.dataCounts;
+
   @override
   void onInit() {
     _setInitialCountryFromCode('+91');
     fetchWishlistCount();
     fetchUserProfile();
+    fetchDeleteInfo();
+
     super.onInit();
   }
 
@@ -58,7 +79,8 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.transactions, "title": "Transactions"},
     {"icon": AppAssets.delivered, "title": "Delivered"},
     {"icon": AppAssets.autopay, "title": "Autopay"},
-    {"icon": AppAssets.autopay, "title": "My Review"},
+    {"icon": AppAssets.coupons, "title": "Coupons"},
+    // {"icon": AppAssets.customer_care, "title": "Customer Care"},
   ];
 
   final settings = [
@@ -71,6 +93,7 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
     // {"icon": AppAssets.about, "title": "About EPI"},
     {"icon": AppAssets.logout, "title": "Log Out"},
+    {"icon": AppAssets.logout, "title": "Delete\nAccount"},
   ];
 
   Future<void> fetchWishlistCount() async {
@@ -95,6 +118,32 @@ class ProfileController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  Future<DeleteAccountModel?> fetchDeleteInfo() async {
+    try {
+      isLoading.value = true;
+
+      final response = await _profileService.getDeleteInfo();
+
+      if (response.success) {
+        deleteAccountData.value = response;
+        return response;
+      }
+
+      log("Delete info API returned success=false");
+    } catch (e) {
+      log("DeleteAccountController error: $e");
+    } finally {
+      isLoading.value = false;
+    }
+
+    return null;
+  }
+
+  /// Retry handler (optional)
+  void retry() {
+    fetchDeleteInfo();
   }
 
 // ================== PICK PROFILE IMAGE ==================
@@ -434,6 +483,131 @@ class ProfileController extends GetxController {
 
       // ignore: empty_catches
     } catch (e) {}
+  }
+
+  // ================== DELETE ACCOUNT  ==================
+  // void deleteAccount() {
+  //   Get.defaultDialog(
+  //     title: "Delete Account",
+  //     middleText: "Are you sure you want to Delete your account?",
+  //     textConfirm: "Yes",
+  //     textCancel: "No",
+  //     confirmTextColor: Colors.white,
+  //     buttonColor: AppColors.primaryColor,
+  //     cancelTextColor: AppColors.primaryColor,
+  //     onConfirm: () {
+  //       Get.back(); // close dialog
+  //       if (Get.isRegistered<DashboardController>()) {
+  //         Get.find<DashboardController>().selectedIndex.value = 0;
+  //       }
+  //       // Navigate immediately
+  //       Get.offAll(() => OnBoardScreen());
+
+  //       // Perform logout in background
+  //       logoutUserInBackground();
+  //     },
+  //   );
+  // }
+  Future<void> deleteAccount() async {
+    deleteAccountData.value = null;
+
+    fetchDeleteInfo();
+
+    Get.defaultDialog(
+      title: "Delete Account",
+      content: Obx(() {
+        final info = deletionInfo;
+
+        if (info == null) {
+          return appLoader();
+        }
+
+        final items = info.dataToBeDeleted;
+        final note = info.note;
+        final retention = info.retentionPeriod;
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            appText(
+              "The following data will be deleted:",
+              fontWeight: FontWeight.w600,
+              color: AppColors.grey,
+            ),
+            SizedBox(height: 8.h),
+            ...items.map(
+              (e) => Padding(
+                padding: EdgeInsets.symmetric(vertical: 2.w),
+                child: appText(
+                  "• $e",
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.mediumGray,
+                ),
+              ),
+            ),
+            SizedBox(height: 12.h),
+            if (retention.isNotEmpty)
+              appText(
+                "Data retention: $retention",
+                fontSize: 12.sp,
+                color: AppColors.grey,
+              ),
+            if (note.isNotEmpty) ...[
+              SizedBox(height: 4.h),
+              appText(
+                note,
+                fontSize: 12.sp,
+                color: AppColors.grey,
+              ),
+            ],
+            SizedBox(height: 16.h),
+            appText(
+              "This action is permanent. Are you sure you want to delete your account?",
+              //  fontSize: 12, color: AppColors.grey,
+            ),
+          ],
+        );
+      }),
+      textConfirm: "Delete",
+      textCancel: "Cancel",
+      confirmTextColor: Colors.white,
+      buttonColor: AppColors.primaryColor,
+      cancelTextColor: AppColors.primaryColor,
+      onConfirm: () {
+        Get.back();
+        confirmDeleteAccount();
+      },
+    );
+  }
+
+  Future<void> confirmDeleteAccount() async {
+    final userId = profile.value?.user.id;
+
+    if (userId == null) {
+      log("User not found=========User id is null");
+      return;
+    }
+
+    try {
+      isLoading(true);
+
+      final success = await _profileService.requestAccountDeletion(userId);
+
+      if (success) {
+        log("==========================>Your account deletion request has been submitted successfully.");
+
+        Get.offAll(() => OnBoardScreen());
+        await logoutUserInBackground();
+      } else {
+        log("==========================>Unable to request account deletion");
+      }
+    } catch (e) {
+      log("==========================>Something went wrong");
+    } finally {
+      isLoading(false);
+    }
   }
 
 //-------------------------------------------------------------------------------------------------------------------------------------

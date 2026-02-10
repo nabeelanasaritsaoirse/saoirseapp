@@ -39,8 +39,8 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-        log("API URL ==> $url");
-        log("Respose body : =====> ${response.body}");
+       // log("API URL ==> $url");
+        // log("Respose body : =====> ${response.body}");
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -122,8 +122,8 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-        log("API URL ==> $url");
-        log("Respose body : =====> ${response.body}");
+        // log("API URL ==> $url");
+        // log("Respose body : =====> ${response.body}");
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -319,9 +319,10 @@ class APIService {
         final response = await http.Response.fromStream(
           await request.send().timeout(Duration(seconds: timeoutSeconds)),
         );
-
+        print(url);
         ("Response [${response.statusCode}]: ${response.body}");
-
+        print("data priiting");
+        print(response.body);
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -332,10 +333,13 @@ class APIService {
             }
 
             final data = jsonDecode(response.body);
+            print("printing data");
+            print(data);
             if (data is! Map<String, dynamic>) {
               ("Invalid server response format.");
               return null;
             }
+            print(data);
             return onSuccess(data); // ✅ stop retry on success
 
           case 400:

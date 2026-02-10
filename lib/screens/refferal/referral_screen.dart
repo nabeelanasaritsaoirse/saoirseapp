@@ -7,8 +7,6 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:saoirse_app/constants/app_constant.dart';
-import 'package:saoirse_app/main.dart';
 import 'package:saoirse_app/screens/login/login_page.dart';
 
 import '../../constants/app_strings.dart';
@@ -104,8 +102,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
             clipBehavior: Clip.none,
             children: [
               IconBox(
-                image: AppAssets.notification,
-                padding: 3.w,
+                image: AppAssets.notificationnew,
                 onTap: () {
                   Get.to(() => NotificationScreen());
                 },
@@ -141,8 +138,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
           ),
           SizedBox(width: 8.w),
           IconBox(
-            image: AppAssets.wallet,
-            padding: 5.w,
+            image: AppAssets.walletnew,
             onTap: () {
               Get.to(WalletScreen());
             },

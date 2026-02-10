@@ -1,10 +1,11 @@
 name: Automated Release Publishing
-run-name: "🚀 Relaese note"
+run-name: "🚀 Release note"
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'android-v*'
+      - 'ios-v*'
 
 permissions:
   contents: write
@@ -22,9 +23,19 @@ jobs:
       - name: Extract version from tag
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
-          VERSION="${TAG#v}"
+
+          # Detect platform
+          if [[ "$TAG" == android-* ]]; then
+            PLATFORM="Android"
+            VERSION="${TAG#android-v}"
+          else
+            PLATFORM="iOS"
+            VERSION="${TAG#ios-v}"
+          fi
+
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "PLATFORM=$PLATFORM" >> $GITHUB_ENV
 
       - name: Generate Auto Release Notes
         run: |
@@ -40,11 +51,11 @@ jobs:
             COMPARE="Initial release"
           fi
 
-          echo "# 🚀 Release v${VERSION}" > RELEASE_NOTES.md
+          echo "# 🚀 ${PLATFORM} Release v${VERSION}" > RELEASE_NOTES.md
           echo "" >> RELEASE_NOTES.md
 
           echo "## 📌 Summary" >> RELEASE_NOTES.md
-          echo "This release includes bug fixes, stability improvements, and CI enhancements." >> RELEASE_NOTES.md
+          echo "Automated release for ${PLATFORM} platform." >> RELEASE_NOTES.md
           echo "" >> RELEASE_NOTES.md
 
           echo "## 🔧 Changes & Reasons" >> RELEASE_NOTES.md
@@ -64,6 +75,7 @@ jobs:
           echo "" >> RELEASE_NOTES.md
 
           echo "## 📦 Build" >> RELEASE_NOTES.md
+          echo "Platform: ${PLATFORM}" >> RELEASE_NOTES.md
           echo "Version: ${VERSION}" >> RELEASE_NOTES.md
           echo "Compare: ${COMPARE}" >> RELEASE_NOTES.md
 
@@ -71,5 +83,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.TAG }}
-          name: "Release v${{ env.VERSION }}"
+          name: Release ${{ env.TAG }}
           body_path: RELEASE_NOTES.md

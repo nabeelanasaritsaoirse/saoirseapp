@@ -1,7 +1,4 @@
-## Version 1.4.20+105
+## Version 1.5.2+110
 
-- Merge pull request #297 from nabeelanasaritsaoirse/deep
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- updated transaction histroy ui
-- fix
-- Resolve overflow in Invite Friend details screen and update wallet and friendDetails models
+- Merge pull request #316 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-2
+- Fix release workflow for platform tagging and notes

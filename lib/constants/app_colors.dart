@@ -37,7 +37,8 @@ class AppColors {
   static const Color purple = Colors.purple;
   static const Color blueshade = Color.fromARGB(255, 175, 214, 246);
   static const Color mediumBlue = Color.fromARGB(255, 29, 16, 211);
-  static const Color skyBlue = Color(0xFF9BBBFC);
+
+  static const Color skyBlue = Color.fromARGB(255, 57, 120, 248);
   static const Color lightGreen = Color(0xFFE8F5E9);
   static const Color buttonSecondary = Color(0xFF9BBEF4);
   static const Color mediumGreen = Color(0xFFA0D69A);
