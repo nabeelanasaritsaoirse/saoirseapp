@@ -1,6 +1,9 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart';
+import 'package:saoirse_app/models/delete_account_model.dart';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
@@ -125,6 +128,64 @@ class ProfileService {
       return response["success"] == true;
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<bool> requestAccountDeletion(String userId) async {
+    try {
+      final token = storage.read(AppConst.ACCESS_TOKEN);
+
+      final url = "${AppURLs.BASE_API}api/users/$userId/request-deletion";
+
+      final response = await APIService.postRequest(
+        url: url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        body: {}, // no body required
+        onSuccess: (json) => json,
+      );
+
+      if (response == null) return false;
+
+      return response["success"] == true;
+    } catch (e) {
+      log("requestAccountDeletion error: $e");
+      return false;
+    }
+  }
+
+  Future<DeleteAccountModel> getDeleteInfo() async {
+    final token = storage.read(AppConst.ACCESS_TOKEN);
+    final userId = storage.read(AppConst.USER_ID);
+
+    final uri = Uri.parse(
+      "${AppURLs.BASE_API}api/users/$userId/deletion-info",
+    );
+
+   // print("delete api: $uri");
+
+    final response = await http.get(
+      uri,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+    );
+
+    log("DELETE INFO STATUS => ${response.statusCode}");
+    log("DELETE INFO BODY => ${response.body}");
+
+    if (response.statusCode == 200) {
+      return DeleteAccountModel.fromJson(
+        jsonDecode(response.body),
+      );
+    } else {
+      throw Exception(
+        "Failed to load DELETE INFO (${response.statusCode})",
+      );
     }
   }
 }

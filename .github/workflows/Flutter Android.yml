@@ -9,7 +9,7 @@ permissions:
 on:
   push:
     tags:
-      - "v*"
+      - "android-v*"
 
   # pull_request:
   #   branches: [ main, developer ]

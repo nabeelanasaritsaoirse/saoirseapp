@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -38,7 +39,8 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-
+       // log("API URL ==> $url");
+        // log("Respose body : =====> ${response.body}");
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -120,7 +122,8 @@ class APIService {
               headers: headers ?? {"Content-Type": "application/json"},
             )
             .timeout(Duration(seconds: timeoutSeconds));
-
+        // log("API URL ==> $url");
+        // log("Respose body : =====> ${response.body}");
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -216,7 +219,8 @@ class APIService {
             .timeout(Duration(seconds: timeoutSeconds));
 
         ("Response [${response.statusCode}]: ${response.body}");
-
+        log("API URL ==> $url");
+        log("Respose body : =====> ${response.body}");
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -315,9 +319,10 @@ class APIService {
         final response = await http.Response.fromStream(
           await request.send().timeout(Duration(seconds: timeoutSeconds)),
         );
-
+        print(url);
         ("Response [${response.statusCode}]: ${response.body}");
-
+        print("data priiting");
+        print(response.body);
         switch (response.statusCode) {
           case 200:
           case 201:
@@ -328,10 +333,13 @@ class APIService {
             }
 
             final data = jsonDecode(response.body);
+            print("printing data");
+            print(data);
             if (data is! Map<String, dynamic>) {
               ("Invalid server response format.");
               return null;
             }
+            print(data);
             return onSuccess(data); // ✅ stop retry on success
 
           case 400:
@@ -458,8 +466,55 @@ class APIService {
     }
   }
 
+// Upload Multi Image request
+
+  static Future<http.Response?> uploadMultiImagesRequest({
+    required String url,
+    required List<http.MultipartFile> files,
+    Map<String, String>? headers,
+    int timeoutSeconds = 180,
+  }) async {
+    log("uri: $url");
+    log("Uploading ${files.length} file(s) with ${timeoutSeconds}s timeout");
+
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse(url));
+
+      request.files.addAll(files);
+
+      if (headers != null) {
+        request.headers.addAll(headers);
+      }
+
+      //  Apply timeout to the entire operation, not just .send()
+      final streamedResponse =
+          await request.send().timeout(Duration(seconds: timeoutSeconds));
+
+      // Also apply timeout to reading the response
+      final response = await http.Response.fromStream(streamedResponse).timeout(
+          Duration(seconds: 30)); // Additional 30s for reading response
+
+      log("UPLOAD STATUS: ${response.statusCode}");
+      log("UPLOAD BODY: ${response.body}");
+
+      return response;
+    } on TimeoutException catch (e) {
+      // Specific timeout error logging
+      log("UPLOAD TIMEOUT: $e");
+      log("Upload took longer than $timeoutSeconds seconds");
+      return null;
+    } on SocketException catch (e) {
+      // Network error logging
+      log("NETWORK ERROR: $e");
+      return null;
+    } catch (e) {
+      log("UPLOAD ERROR: $e");
+      return null;
+    }
+  }
+
   static Future<void> handleUnauthorized() async {
-    ("🚫 401 Unauthorized → Force out");
+    (" 401 Unauthorized → Force out");
 
     try {
       // Clear storage

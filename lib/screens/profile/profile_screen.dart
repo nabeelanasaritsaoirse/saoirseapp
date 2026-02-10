@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/my_review/my_review_screen.dart';
+import 'package:saoirse_app/screens/coupon_screen/coupon_screen.dart';
 
 import '../edit_profile/edit_profile_screen.dart';
 import '../faqs/faqs.dart';
@@ -25,7 +27,7 @@ import '../terms_and_privacy/terms_conditions.dart';
 import '../transaction_history/transaction_history.dart';
 import '../wishlist/wishlist_screen.dart';
 import 'profile_controller.dart';
-
+import '../autopay/autopay_dashboard_screen.dart';
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -249,6 +251,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Get.to(() => TransactionHistory());
                         } else if (index == 5) {
                           Get.to(() => OrderDeliveredScreen());
+                        } else if (index == 6) {
+                          Get.to(() => AutopayDashboardScreen());
+                        } else if (index == 7) {
+                          Get.to(() => MyReviewScreen());
+                          Get.to(() => CouponScreen());
                         } else {}
                       },
                     );
@@ -312,6 +319,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           break;
                         case "Log Out":
                           controller.confirmLogout();
+                          break;
+                        case "Delete\nAccount":
+                                                 
+                          controller.deleteAccount();
                           break;
                         case "Manage Address":
                           Get.to(() => ManageAddressScreen());

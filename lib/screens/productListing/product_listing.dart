@@ -85,8 +85,7 @@ class _ProductListingState extends State<ProductListing> {
                 clipBehavior: Clip.none,
                 children: [
                   IconBox(
-                    image: AppAssets.wish,
-                    padding: 8.w,
+                    image: AppAssets.likenew,
                     onTap: () {
                       Get.to(() => const WishlistScreen());
                     },

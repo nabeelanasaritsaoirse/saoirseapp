@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/review_resposne.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
+import '../../models/product_faq.dart';
 import '../../models/product_list_response.dart';
 import '../../services/product_service.dart';
 import '../../services/wishlist_service.dart';
@@ -49,6 +52,44 @@ class ProductDetailsController extends GetxController {
 
   RxBool showBottomButtons = false.obs;
   final ScrollController scrollController = ScrollController();
+
+  // FAQ
+  RxBool isFaqExpanded = true.obs;
+  RxBool isReviewExpanded = true.obs;
+  RxBool isFaqLoading = false.obs;
+
+  RxList<ProductFaq> faqs = <ProductFaq>[].obs;
+  RxInt expandedFaqIndex = (-1).obs;
+
+  RxDouble averageRating = 4.9.obs;
+  RxInt totalRatings = 83.obs;
+  RxInt totalReviews = 47.obs;
+
+  // ---------------- REVIEWS ----------------
+RxBool isReviewLoading = false.obs;
+
+RxList<Review> reviews = <Review>[].obs;
+
+
+
+RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
+
+
+// ---------------- WRITE REVIEW ----------------
+  final ImagePicker _reviewImagePicker = ImagePicker();
+
+  RxInt reviewRating = 0.obs;
+  RxList<XFile> reviewImages = <XFile>[].obs;
+  RxString reviewText = "".obs;
+  static const int maxReviewImages = 5;
+
+  final List<String> reviewRatingLabels = [
+    "Terrible",
+    "Bad",
+    "Okay",
+    "Good",
+    "Great",
+  ];
 
   @override
   void onInit() {
@@ -100,8 +141,9 @@ class ProductDetailsController extends GetxController {
           mergedImages[0] = firstVariant.images.first;
         }
       }
-
+      fetchFaqs();
       fetchSimilarProducts();
+      fetchProductReviews();
 
       // Reset page
       currentImageIndex.value = 0;
@@ -138,6 +180,60 @@ class ProductDetailsController extends GetxController {
       isSimilarLoading(false);
     }
   }
+
+  Future<void> fetchFaqs() async {
+    try {
+      isFaqLoading(true);
+
+      final List<ProductFaq> result =
+          await productService.fetchProductFaqs(productId);
+
+      faqs.assignAll(result);
+    } catch (e) {
+      debugPrint("❌ fetchFaqs controller error: $e");
+      faqs.clear();
+    } finally {
+      isFaqLoading(false);
+    }
+  }
+
+  Future<void> fetchProductReviews() async {
+  try {
+    isReviewLoading(true);
+
+    final ReviewResponse? response =
+        await productService.fetchProductReviews(
+      productId: "PROD185699527",
+      page: 1,
+      limit: 10,
+      sort: "mostHelpful",
+    );
+
+    if (response == null) return;
+
+    // Stats
+    averageRating.value =
+        response.data.ratingStats.averageRating;
+    totalReviews.value =
+        response.data.ratingStats.totalReviews;
+    totalRatings.value =
+        response.data.ratingStats.totalReviews;
+
+    // Reviews
+    reviews.assignAll(response.data.reviews);
+
+    // Image preview (first 3 images)
+    final images = response.data.reviews
+        .expand((r) => r.images)
+        .take(3)
+        .toList();
+
+    reviewImagesPreview.assignAll(images);
+  } finally {
+    isReviewLoading(false);
+  }
+}
+
 
   Future<void> checkIfInWishlist(String id) async {
     final exists = await wishlistService.checkWishlist(id);
@@ -443,5 +539,51 @@ class ProductDetailsController extends GetxController {
     pageController.dispose();
     scrollController.dispose();
     super.onClose();
+  }
+
+  // ================= WRITE REVIEW FUNCTIONS =================
+  void setReviewRating(int value) {
+    reviewRating.value = value;
+  }
+
+  Future<void> pickReviewImages() async {
+    final int remaining = maxReviewImages - reviewImages.length;
+
+    if (remaining <= 0) {
+      appToaster(
+        content: "You can upload a maximum of $maxReviewImages images",
+      );
+      return;
+    }
+
+    final picked = await _reviewImagePicker.pickMultiImage(
+      imageQuality: 70,
+    );
+
+    if (picked.isEmpty) return;
+
+    if (picked.length > remaining) {
+      reviewImages.addAll(picked.take(remaining));
+
+      appToaster(content: "Only $maxReviewImages images are allowed");
+    } else {
+      reviewImages.addAll(picked);
+    }
+  }
+
+  void removeReviewImage(int index) {
+    if (index >= 0 && index < reviewImages.length) {
+      reviewImages.removeAt(index);
+    }
+  }
+
+  void updateReviewText(String text) {
+    reviewText.value = text;
+  }
+
+  void resetReviewForm() {
+    reviewRating.value = 0;
+    reviewImages.clear();
+    reviewText.value = "";
   }
 }

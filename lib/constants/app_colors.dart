@@ -9,6 +9,7 @@ class AppColors {
   //  Neutral Colors
   static const Color transparent = Colors.transparent;
   static const Color white = Colors.white;
+  static const Color offWhite = Color.fromARGB(255, 232, 231, 231);
   static const Color transparentWhite = Color.fromRGBO(255, 255, 255, 0.5);
   static const Color black = Colors.black;
   static const Color white70 = Colors.white70;
@@ -22,6 +23,8 @@ class AppColors {
   static const Color shadowColor = Colors.black12;
   static const Color darkGray = Color(0x99000000);
   static const Color mediumGray = Color(0xFF757575);
+  static const Color lightBlue = Color(0xFF61BDE7);
+  static const Color shadeGray = Color(0xFFCBCBCB);
 
   //  Accent / Secondary Colors
   static const Color lightAmber = Color(0xFFF4BD46);
@@ -31,9 +34,11 @@ class AppColors {
   static const Color red = Colors.red;
   static const Color orange = Colors.orange;
   static const Color yellow = Colors.yellow;
+  static const Color purple = Colors.purple;
   static const Color blueshade = Color.fromARGB(255, 175, 214, 246);
   static const Color mediumBlue = Color.fromARGB(255, 29, 16, 211);
-  static const Color skyBlue = Color(0xFF9BBBFC);
+
+  static const Color skyBlue = Color.fromARGB(255, 57, 120, 248);
   static const Color lightGreen = Color(0xFFE8F5E9);
   static const Color buttonSecondary = Color(0xFF9BBEF4);
   static const Color mediumGreen = Color(0xFFA0D69A);

@@ -40,8 +40,7 @@ class CartScreen extends StatelessWidget {
             return Row(
               children: [
                 IconBox(
-                  image: AppAssets.delete,
-                  padding: 5.w,
+                  image: AppAssets.deletenew,
                   onTap: () {
                     controller.clearCartItems();
                   },

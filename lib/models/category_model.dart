@@ -7,10 +7,12 @@ class CategoryGroup {
   final bool isActive;
   final int displayOrder;
 
-  //  single image for parent category
-  final CategoryImage? image;
+  /// 🔹 Home screen image (illustration)
+  final CategoryImage? illustrationImage;
 
-  // sub categories
+  /// 🔹 Category screen image (normal UI image)
+  final CategoryImage? categoryImage;
+
   final List<SubCategory> subCategories;
 
   CategoryGroup({
@@ -22,7 +24,8 @@ class CategoryGroup {
     required this.isActive,
     required this.displayOrder,
     required this.subCategories,
-    this.image,
+    this.illustrationImage,
+    this.categoryImage,
   });
 
   factory CategoryGroup.fromJson(Map<String, dynamic> json) {
@@ -35,16 +38,32 @@ class CategoryGroup {
       isActive: json['isActive'] ?? false,
       displayOrder: json['displayOrder'] ?? 0,
 
-      // 🔹 only this one image used for UI
-      image: json['image'] != null
-          ? CategoryImage.fromJson(json['image'] as Map<String, dynamic>)
+      /// ✅ HOME SCREEN
+      illustrationImage: json['illustrationImage'] != null
+          ? CategoryImage.fromJson(json['illustrationImage'])
           : null,
 
+      /// ✅ CATEGORY SCREEN
+      categoryImage: _resolveCategoryImage(json),
+
       subCategories: (json['subCategories'] as List<dynamic>? ?? [])
-          .map((e) => SubCategory.fromJson(e as Map<String, dynamic>))
+          .map((e) => SubCategory.fromJson(e)) // ✅ use subcategory json
           .toList(),
     );
   }
+}
+
+CategoryImage? _resolveCategoryImage(Map<String, dynamic> json) {
+  if (json['iconImage'] != null) {
+    return CategoryImage.fromJson(json['iconImage']);
+  }
+  if (json['mainImage'] != null) {
+    return CategoryImage.fromJson(json['mainImage']);
+  }
+  if (json['image'] != null) {
+    return CategoryImage.fromJson(json['image']);
+  }
+  return null;
 }
 
 class SubCategory {
@@ -54,7 +73,7 @@ class SubCategory {
   final String slug;
   final int displayOrder;
 
-  //  single image for subcategory
+  /// ✅ Each subcategory has its OWN image
   final CategoryImage? image;
 
   SubCategory({
@@ -73,10 +92,29 @@ class SubCategory {
       name: json['name'] ?? '',
       slug: json['slug'] ?? '',
       displayOrder: json['displayOrder'] ?? 0,
-      image: json['image'] != null
-          ? CategoryImage.fromJson(json['image'] as Map<String, dynamic>)
-          : null,
+
+      /// ✅ IMPORTANT: resolve from SUBCATEGORY JSON ONLY
+      image: _resolveSubCategoryImage(json),
     );
+  }
+
+  static CategoryImage? _resolveSubCategoryImage(Map<String, dynamic> json) {
+    // ✅ 1. REAL subcategory image (MOST IMPORTANT)
+    if (json['image'] != null) {
+      return CategoryImage.fromJson(json['image']);
+    }
+
+    // ✅ 2. Optional icon image
+    if (json['iconImage'] != null) {
+      return CategoryImage.fromJson(json['iconImage']);
+    }
+
+    // ✅ 3. Fallback only (generic image)
+    if (json['mainImage'] != null) {
+      return CategoryImage.fromJson(json['mainImage']);
+    }
+
+    return null;
   }
 }
 
