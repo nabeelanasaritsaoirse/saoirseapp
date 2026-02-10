@@ -43,6 +43,7 @@ class CartService {
     // required int totalDays,
     // required double dailyAmount,
     int quantity = 1,
+    List<DateTime>? skipDates,
   }) async {
     try {
       final token = await _token();
@@ -51,7 +52,12 @@ class CartService {
 
       final body = {
         "quantity": quantity,
-        "variantId": variantId,
+        if (variantId != null) "variantId": variantId,
+        if (skipDates != null && skipDates.isNotEmpty)
+          "skipDates": skipDates
+              .map((d) =>
+                  "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}")
+              .toList(),
       };
 
       final response = await APIService.postRequest(

@@ -122,7 +122,7 @@ class AppStrings {
   static String FAQsTitle = "FAQs";
 
   // Autopay Dashboard page
-  static String AutopayDashboard_Title = "Autopay Dashboard";
+  static String AutopayDashboard_Title = "Auto Pay";
 
   //Cart page
   static String carttitle = "Cart";

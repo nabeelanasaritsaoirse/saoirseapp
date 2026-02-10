@@ -55,9 +55,9 @@ class AutopayDashboardData {
 // ================= WALLET =================
 
 class Wallet {
-  final int balance;
-  final int minimumLock;
-  final int availableForAutopay;
+  final num balance;
+  final num minimumLock;
+  final num availableForAutopay;
   final bool isLowBalance;
   final int lowBalanceThreshold;
 
@@ -210,7 +210,7 @@ class Suggestions {
 // ================= ORDERS =================
 
 class Order {
-  final String id;
+  final String id; 
   final String productName;
   final int dailyAmount;
   final int remainingAmount;
