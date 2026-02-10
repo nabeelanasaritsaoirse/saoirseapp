@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-# Accept PR body from workflow
-PR_BODY="${1:-$PR_BODY}"
+# Bump type passed from workflow
+INPUT_BUMP="${1:-auto}"
 
 PUBSPEC_FILE="pubspec.yaml"
 
@@ -18,45 +18,27 @@ MINOR=$(echo "$VERSION_NAME" | cut -d. -f2)
 PATCH=$(echo "$VERSION_NAME" | cut -d. -f3)
 
 echo "Current version: $MAJOR.$MINOR.$PATCH+$BUILD_NUMBER"
+echo "Workflow bump input: $INPUT_BUMP"
 
 # -------------------------------------------------------
-# Detect bump type from PR checkbox
-# -------------------------------------------------------
-BUMP=""
-CHECK_COUNT=0
-
-if [ -n "$PR_BODY" ]; then
-  echo "Checking PR body for manual bump selection..."
-
-  echo "$PR_BODY" | grep -iq "\[x\].*major" && { BUMP="major"; CHECK_COUNT=$((CHECK_COUNT+1)); }
-  echo "$PR_BODY" | grep -iq "\[x\].*minor" && { [ -z "$BUMP" ] && BUMP="minor"; CHECK_COUNT=$((CHECK_COUNT+1)); }
-  echo "$PR_BODY" | grep -iq "\[x\].*patch" && { [ -z "$BUMP" ] && BUMP="patch"; CHECK_COUNT=$((CHECK_COUNT+1)); }
-
-  # Fail if multiple selected
-  if [ "$CHECK_COUNT" -gt 1 ]; then
-    echo "❌ ERROR: Multiple version bump options selected"
-    exit 1
-  fi
-fi
-
-# -------------------------------------------------------
-# Fallback: Detect bump type from commits
+# Fallback detection from commits if auto
 # -------------------------------------------------------
 COMMITS=""
 
-if [ -z "$BUMP" ]; then
-  echo "No checkbox selection — falling back to commit detection"
+if [ "$INPUT_BUMP" = "auto" ]; then
+  echo "Auto mode — detecting from commits"
 
   COMMITS=$(git log --pretty=format:"%s" \
     $(git describe --tags --abbrev=0 2>/dev/null || echo "")..HEAD)
 
-  BUMP="patch"
+  INPUT_BUMP="patch"
 
-  echo "$COMMITS" | grep -q "BREAKING CHANGE\|feat!:\|fix!:" && BUMP="major"
-  echo "$COMMITS" | grep -q "^feat:" && [ "$BUMP" != "major" ] && BUMP="minor"
+  echo "$COMMITS" | grep -q "BREAKING CHANGE\|feat!:" && INPUT_BUMP="major"
+  echo "$COMMITS" | grep -q "^feat:" && [ "$INPUT_BUMP" != "major" ] && INPUT_BUMP="minor"
 fi
 
-echo "Detected bump type: $BUMP"
+BUMP="$INPUT_BUMP"
+echo "Final bump type: $BUMP"
 
 # -------------------------------------------------------
 # Apply bump
@@ -74,6 +56,10 @@ case $BUMP in
   patch)
     PATCH=$((PATCH + 1))
     ;;
+  *)
+    echo "❌ Invalid bump type"
+    exit 1
+    ;;
 esac
 
 # Always bump build number
@@ -83,7 +69,7 @@ NEW_VERSION="$MAJOR.$MINOR.$PATCH+$BUILD_NUMBER"
 echo "New version: $NEW_VERSION"
 
 # -------------------------------------------------------
-# Update pubspec.yaml (Linux-safe)
+# Update pubspec.yaml
 # -------------------------------------------------------
 sed -i.bak "s/^version:.*/version: $NEW_VERSION/" $PUBSPEC_FILE
 rm -f ${PUBSPEC_FILE}.bak
