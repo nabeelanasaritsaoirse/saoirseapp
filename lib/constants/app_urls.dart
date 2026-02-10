@@ -78,8 +78,7 @@ class AppURLs {
   //Autopay Api
   static String AUTOPAY_DASHBOARD_API =
       BASE_API + "api/installments/autopay/dashboard";
-  static String AUTOPAY_SETTINGS_API_PUT =
-      BASE_API + "api/installments/autopay/settings";
+  
   static String AUTOPAY_SETTINGS_API =
       BASE_API + "api/installments/autopay/settings";
   static String AUTOPAY_NOTIFICATION_PREFERENCES_API =

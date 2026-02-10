@@ -70,6 +70,9 @@ class AutopayController extends GetxController {
   late TextEditingController minBalanceCtrl;
   late TextEditingController reminderHoursCtrl;
 
+//----
+  bool isAddingNewSkipDate = false;
+
   @override
   void onInit() {
     super.onInit();
@@ -213,6 +216,8 @@ class AutopayController extends GetxController {
       suggestedTopUp.value = data.suggestions.suggestedTopUp;
 
       items.value = data.orders.map((order) {
+        print(
+            "items value mapping: ${order.id}, ${order.productName}, ${order.dailyAmount}, ${order.remainingAmount}, ${order.progress}, ${order.priority}, ${order.autopayEnabled}");
         return AutopayItem(
           orderId: order.id,
           title: order.productName,
@@ -223,6 +228,7 @@ class AutopayController extends GetxController {
           enabled: order.autopayEnabled,
         );
       }).toList();
+      print(items.value);
     } catch (e) {
       errorMessage.value = 'Failed to load dashboard';
     } finally {
@@ -318,9 +324,9 @@ class AutopayController extends GetxController {
         log("SKIP DATES SAVED SUCCESSFULLY");
 
         await fetchAutopayStatus();
-      
+        await fetchDashboard();
         applyAutopayStatusForOrder(orderId);
-
+        skipDates.clear();
         Get.back();
       } else {
         log("FAILED TO SAVE SKIP DATES");
@@ -358,7 +364,7 @@ class AutopayController extends GetxController {
             d.year == date.year && d.month == date.month && d.day == date.day);
 
         await fetchAutopayStatus();
-      
+        await fetchDashboard();
         applyAutopayStatusForOrder(orderId);
       } else {
         log("FAILED TO REMOVE SKIP DATE");
@@ -429,7 +435,7 @@ class AutopayController extends GetxController {
         log("AUTOPAY RESUMED SUCCESSFULLY");
 
         await fetchAutopayStatus();
-      
+        await fetchDashboard();
         applyAutopayStatusForOrder(orderId);
 
         return true;
@@ -612,7 +618,7 @@ class AutopayController extends GetxController {
       log("ORDER PRIORITY UPDATED TO $parsedPriority");
 
       await fetchAutopayStatus();
-      
+      await fetchDashboard();
       applyAutopayStatusForOrder(orderId);
     } else {
       log("FAILED TO UPDATE PRIORITY");

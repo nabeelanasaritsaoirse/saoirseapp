@@ -99,10 +99,14 @@ class AutopaySettingsSheet extends StatelessWidget {
                       controller.isSettingsLoading.value
                   ? () {}
                   : () async {
-                      
+                      print(
+                          "controller is adding new skip date ${controller.isAddingNewSkipDate}");
+                      if (!controller.isAddingNewSkipDate) {
+                        Get.back();
+                        return;
+                      }
                       await controller.saveOrderPriority();
 
-                   
                       final orderId = controller.selectedOrderId.value;
                       if (orderId.isNotEmpty) {
                         await controller.saveSkipDates(orderId);
@@ -110,7 +114,6 @@ class AutopaySettingsSheet extends StatelessWidget {
 
                       log("AutopaySettingsSheet: Save button tapped. isSettingsLoading=${controller.isSettingsLoading.value}, isSkipDateSaving=${controller.isSkipDateSaving.value}, selectedOrderId=${controller.selectedOrderId.value}");
 
-               
                       Get.back();
                     },
               buttonColor: controller.isSkipDateSaving.value ||
@@ -197,10 +200,8 @@ class AutopaySettingsSheet extends StatelessWidget {
             hintText: '85',
             hintColor: AppColors.textGray,
             onChanged: (value) async {
-          
               final parsed = int.tryParse(value);
               if (parsed != null && parsed >= 1 && parsed <= 100) {
-             
                 await Future.delayed(Duration(milliseconds: 500));
                 await controller.saveOrderPriority();
               }
@@ -211,11 +212,8 @@ class AutopaySettingsSheet extends StatelessWidget {
     );
   }
 
- 
-
   Widget pauseAutopay() {
     return Obx(() {
-      
       final isCurrentlyPaused = controller.pauseAutopay.value;
       final orderId = controller.selectedOrderId.value;
 
@@ -224,7 +222,6 @@ class AutopaySettingsSheet extends StatelessWidget {
         final order = controller.autopayStatus.value!.data.orders
             .firstWhereOrNull((o) => o.orderId == orderId);
         if (order != null && order.autopay.pausedUntil != null) {
-     
           if (order.autopay.pausedUntil is DateTime) {
             pauseUntilDate = order.autopay.pausedUntil as DateTime;
           } else if (order.autopay.pausedUntil is String) {
@@ -363,7 +360,7 @@ class AutopaySettingsSheet extends StatelessWidget {
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
-
+    controller.isAddingNewSkipDate = true;
     if (selectedDate != null) {
       controller.addSkipDate(selectedDate);
     }

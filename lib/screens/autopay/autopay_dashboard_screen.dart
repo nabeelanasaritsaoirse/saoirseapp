@@ -317,7 +317,8 @@ class AutopayDashboardScreen extends StatelessWidget {
                             final controller = Get.find<AutopayController>();
 
                             controller.selectedOrderId.value = item.orderId;
-
+                            print("order id");
+                            print(item.orderId);
                             controller.applyAutopayStatusForOrder(item.orderId);
 
                             log("Opening autopay settings for ${item.orderId}");

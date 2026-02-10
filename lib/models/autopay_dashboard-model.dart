@@ -210,7 +210,7 @@ class Suggestions {
 // ================= ORDERS =================
 
 class Order {
-  final String id; 
+  final String id;
   final String productName;
   final int dailyAmount;
   final int remainingAmount;
@@ -230,7 +230,7 @@ class Order {
 
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
-      id: json['id']?.toString() ?? '',
+      id: json['orderId']?.toString() ?? '',
       productName: json['productName'] ?? '',
       dailyAmount: json['dailyAmount'] ?? 0,
       remainingAmount: json['remainingAmount'] ?? 0,
