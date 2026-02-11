@@ -16,7 +16,6 @@ import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/profile_menu_card.dart';
 import '../manage_address/manage_address_screen.dart';
-import '../my_review/my_review_screen.dart';
 import '../order_delivered/order_delivered_screen.dart';
 import '../order_history/order_history_screen.dart';
 import '../orders_active/orders_active_screen.dart';
@@ -255,8 +254,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         } else if (index == 6) {
                           Get.to(() => AutopayDashboardScreen());
                         } else if (index == 7) {
-                          Get.to(() => MyReviewScreen());
-                        } else if (index == 8) {
                           Get.to(() => CouponScreen());
                         } else {}
                       },

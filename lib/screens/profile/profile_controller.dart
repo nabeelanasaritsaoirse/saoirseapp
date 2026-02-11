@@ -78,13 +78,10 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.transactions, "title": "Transactions"},
     {"icon": AppAssets.delivered, "title": "Delivered"},
     {"icon": AppAssets.autopay, "title": "Autopay"},
-    {"icon": AppAssets.autopay, "title": "My Reviews"},
     {"icon": AppAssets.coupons, "title": "Coupons"},
-    // {"icon": AppAssets.customer_care, "title": "Customer Care"},
   ];
 
   final settings = [
-    // {"icon": AppAssets.password_security, "title": "Password & security"},
     {"icon": AppAssets.kyc, "title": "KYC"},
     {"icon": AppAssets.manage_accounts, "title": "Manage Account"},
     {"icon": AppAssets.address, "title": "Manage Address"},
@@ -93,7 +90,7 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
     // {"icon": AppAssets.about, "title": "About EPI"},
     {"icon": AppAssets.logout, "title": "Log Out"},
-    {"icon": AppAssets.logout, "title": "Delete\nAccount"},
+    {"icon": AppAssets.delete_acc, "title": "Delete\nAccount"},
   ];
 
   Future<void> fetchWishlistCount() async {
@@ -148,9 +145,6 @@ class ProfileController extends GetxController {
 
 // ================== PICK PROFILE IMAGE ==================
   Future<void> pickProfileImage() async {
-    // bool granted = await _requestGalleryPermission();
-    // if (!granted) return;
-
     final XFile? image = await _picker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 85,
@@ -158,77 +152,8 @@ class ProfileController extends GetxController {
 
     if (image != null) {
       profileImage.value = File(image.path);
-      // await uploadUserProfilePicture(image.path);
     }
   }
-
-// // ================== NEW METHOD (fixed name) ==================
-//   // ================== UPLOAD USER PROFILE PICTURE ==================
-//   Future<void> uploadUserProfilePicture(String imagePath) async {
-//     if (imagePath.isEmpty) {
-//       appToast(
-//           error: true, title: "Error", content: "Invalid image selected");
-//       return;
-//     }
-
-//     // Show loader
-//     isLoading(true);
-
-//     try {
-//       final userId = profile.value?.user.id;
-
-//       if (userId == null) {
-
-//         appToast(error: true, title: "Error", content: "User not found");
-//         return;
-//       }
-
-//       final success =
-//           await _profileService.updateProfilePicture(userId, imagePath);
-
-//       if (success) {
-//         appToast(
-//           title: "Success",
-//           content: "Profile picture updated successfully",
-//         );
-
-//         await fetchUserProfile();
-//       } else {
-//         appToast(
-//           error: true,
-//           title: "Failed",
-//           content: "Unable to upload profile picture",
-//         );
-//       }
-//     } catch (e) {
-
-//       appToast(error: true, title: "Error", content: "Something went wrong");
-//     } finally {
-//       // hide loader after everything
-//       isLoading(false);
-//     }
-//   }
-
-  // ================== GALLERY PERMISSION ==================
-  // Future<bool> _requestGalleryPermission() async {
-  //   if (Platform.isAndroid) {
-  //     final photos = await Permission.photos.request();
-  //     final storage = await Permission.storage.request();
-
-  //     if (photos.isGranted || storage.isGranted) return true;
-
-  //     if (photos.isPermanentlyDenied || storage.isPermanentlyDenied) {
-  //       openAppSettings();
-  //     }
-  //     return false;
-  //   }
-
-  //   final ios = await Permission.photos.request();
-  //   if (ios.isGranted) return true;
-
-  //   if (ios.isPermanentlyDenied) openAppSettings();
-  //   return false;
-  // }
 
 // ------------------ COUNTRY SETUP ------------------
   void _setInitialCountryFromCode(String code) {
@@ -393,49 +318,6 @@ class ProfileController extends GetxController {
     }
   }
 
-  // void confirmLogout() {
-  //   Get.defaultDialog(
-  //     title: "Logout",
-  //     middleText: "Are you sure you want to exit?",
-  //     textConfirm: "Yes",
-  //     textCancel: "No",
-  //     confirmTextColor: Colors.white,
-  //     buttonColor: AppColors.primaryColor,
-  //     cancelTextColor: AppColors.primaryColor,
-  //     onConfirm: () async {
-  //       await Get.find<NotificationController>().removeFCM();
-  //       await FirebaseMessaging.instance.deleteToken();
-
-  //       Get.back(); // close dialog
-  //       await logoutUser();
-  //     },
-  //   );
-  // }
-
-  // Future<void> logoutUser() async {
-  //   try {
-  //     isLoading(true);
-
-  //     bool success = await _profileService.logout();
-
-  //     if (success) {
-  //       // CLEAR STORAGE
-  //       await storage.erase();
-  //       appToast(content: "Logged out successfully!");
-
-  //       // GO TO ONBOARD SCREEN
-  //       Get.offAll(() => OnBoardScreen());
-  //     } else {
-  //       appToast(content: "Logout failed!", error: true);
-  //     }
-  //   } catch (e) {
-
-  //     appToast(content: "Something went wrong", error: true);
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
-
   void confirmLogout() {
     Get.defaultDialog(
       title: "Logout",
@@ -485,29 +367,6 @@ class ProfileController extends GetxController {
     } catch (e) {}
   }
 
-  // ================== DELETE ACCOUNT  ==================
-  // void deleteAccount() {
-  //   Get.defaultDialog(
-  //     title: "Delete Account",
-  //     middleText: "Are you sure you want to Delete your account?",
-  //     textConfirm: "Yes",
-  //     textCancel: "No",
-  //     confirmTextColor: Colors.white,
-  //     buttonColor: AppColors.primaryColor,
-  //     cancelTextColor: AppColors.primaryColor,
-  //     onConfirm: () {
-  //       Get.back(); // close dialog
-  //       if (Get.isRegistered<DashboardController>()) {
-  //         Get.find<DashboardController>().selectedIndex.value = 0;
-  //       }
-  //       // Navigate immediately
-  //       Get.offAll(() => OnBoardScreen());
-
-  //       // Perform logout in background
-  //       logoutUserInBackground();
-  //     },
-  //   );
-  // }
   Future<void> deleteAccount() async {
     deleteAccountData.value = null;
 
