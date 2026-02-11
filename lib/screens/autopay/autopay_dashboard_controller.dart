@@ -26,7 +26,7 @@ class AutopayController extends GetxController {
   Rx<NextMilestone?> nextMilestone = Rx<NextMilestone?>(null);
 
   // ================= SUGGESTIONS =================
-  RxInt suggestedTopUp = 0.obs;
+  RxDouble suggestedTopUp = 0.0.obs;
   RxInt daysRequested = 7.obs;
 
   // ================= ORDERS =================
@@ -213,7 +213,7 @@ class AutopayController extends GetxController {
       dailyDeduction.value = data.autopay.totalDailyDeduction;
       daysBalanceLasts.value = data.autopay.daysBalanceLasts;
       isLowBalance.value = data.wallet.isLowBalance;
-      suggestedTopUp.value = data.suggestions.suggestedTopUp;
+      suggestedTopUp.value = data.suggestions.suggestedTopUp.toDouble();
 
       items.value = data.orders.map((order) {
         return AutopayItem(
@@ -400,7 +400,7 @@ class AutopayController extends GetxController {
     try {
       final response = await service.getSuggestedTopUp(days: days);
 
-      suggestedTopUp.value = response.data.suggestedTopUp;
+      suggestedTopUp.value = response.data.suggestedTopUp.toDouble();
       daysRequested.value = response.data.daysRequested;
 
       log("SUGGESTED TOPUP UPDATED: ₹${suggestedTopUp.value}");
