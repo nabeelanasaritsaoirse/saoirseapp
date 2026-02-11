@@ -1,0 +1,21 @@
+# fastlane/Deliverfile
+
+app_identifier("com.saoirse.epi")
+platform("ios")
+
+# We already uploaded binary via pilot
+skip_binary_upload(true)
+
+# CI safe
+skip_metadata(true)
+skip_screenshots(true)
+run_precheck_before_submit(false)
+
+# Submit behavior
+submit_for_review(true)
+automatic_release(false)
+
+# Export compliance
+submission_information({
+  export_compliance_uses_encryption: false
+})
