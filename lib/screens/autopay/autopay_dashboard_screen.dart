@@ -1,18 +1,21 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_assets.dart';
+import 'package:saoirse_app/constants/app_colors.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
-import '../../constants/app_assets.dart';
-import '../../constants/app_colors.dart';
-import '../../constants/app_strings.dart';
-import '../../widgets/app_button.dart';
-import '../../widgets/app_loader.dart';
-import '../../widgets/app_text.dart';
-import '../../widgets/app_text_field.dart';
-import '../../widgets/custom_appbar.dart';
+import 'package:saoirse_app/widgets/app_button.dart';
+import 'package:saoirse_app/widgets/app_loader.dart';
+import 'package:saoirse_app/widgets/app_text.dart';
+import 'package:saoirse_app/widgets/app_text_field.dart';
+import 'package:saoirse_app/widgets/custom_appbar.dart';
+
 import 'autopay_dashboard_controller.dart';
 import 'autopay_settings_preferences.dart';
 
@@ -53,14 +56,14 @@ class AutopayDashboardScreen extends StatelessWidget {
         if (controller.isLoading.value) {
           return appLoader();
         }
-        // if (controller.errorMessage.isNotEmpty) {
-        //   return Center(
-        //     child: appText(
-        //       controller.errorMessage.value,
-        //       color: AppColors.red,
-        //     ),
-        //   );
-        // }
+        if (controller.errorMessage.isNotEmpty) {
+          return Center(
+            child: appText(
+              controller.errorMessage.value,
+              color: AppColors.red,
+            ),
+          );
+        }
 
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -231,7 +234,13 @@ class AutopayDashboardScreen extends StatelessWidget {
               width: double.infinity,
               height: 44.h,
               child: appButton(
-                onTap: () {},
+                onTap: () {
+                  //   todo: open settings dialog                                                Quick Add Button
+                  print('Quick Add ₹${controller.suggestedTopUp.value}');
+                  print(controller.items[0].title);
+                  print(controller.items[1].title);
+                  print(controller.items[2].title);
+                },
                 buttonText: 'Quick Add ₹${controller.suggestedTopUp.value}',
                 buttonColor: AppColors.primaryColor,
                 textColor: AppColors.white,
@@ -263,9 +272,7 @@ class AutopayDashboardScreen extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color:
-            
-            AppColors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
           color: AppColors.offWhite,
@@ -308,10 +315,18 @@ class AutopayDashboardScreen extends StatelessWidget {
                           final controller = Get.find<AutopayController>();
 
                           controller.selectedOrderId.value = item.orderId;
+
+                          // IMPORTANT: load order data into controller
                           controller.applyAutopayStatusForOrder(item.orderId);
 
+                          log("Opening autopay settings for ${item.orderId}");
+                          log("Selected Order ID = ${controller.selectedOrderId.value}");
+                          log("Skip dates after prefill = ${controller.skipDates}");
+
                           // OPEN BOTTOM SHEET
-                          showAutopayPreferenceSheet(Get.context!);
+
+                          showAutopayPreferenceSheet(
+                              Get.context!, item.orderId);
                         },
                         child: Icon(
                           Icons.open_in_new_rounded,
@@ -382,6 +397,8 @@ Widget customGradientProgress({
       borderRadius: BorderRadius.circular(50),
       child: LayoutBuilder(
         builder: (context, constraints) {
+          log('Progress maxWidth: ${constraints.maxWidth}, value: $value');
+
           return Align(
             alignment: Alignment.centerLeft,
             child: Container(
@@ -406,7 +423,7 @@ Widget customGradientProgress({
   );
 }
 
-//                                                                                        AUTOPAY SETTINGS DIALOGBOX
+//  AUTOPAY SETTINGS DIALOGBOX
 class AutopaySettingsDialog extends StatelessWidget {
   AutopaySettingsDialog({super.key});
 
@@ -441,6 +458,9 @@ class AutopaySettingsDialog extends StatelessWidget {
                       SizedBox(height: 10.h),
                       timePreference(),
                       SizedBox(height: 14.h),
+
+//   WALLET RESERVES & REMINDER & NOTIFICATION
+
                       appText('Wallet Reserves', fontWeight: FontWeight.w600),
                       SizedBox(height: 8.h),
                       appTextField(
@@ -466,7 +486,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                       ),
                       SizedBox(height: 14.h),
 
-//                                                                                                   REMINDER
+//    REMINDER
 
                       appText('Reminder', fontWeight: FontWeight.w600),
                       SizedBox(height: 8.h),
@@ -489,7 +509,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                       ),
                       SizedBox(height: 14.h),
 
-//                                                                                   NOTIFICATION PREFERENCES
+//    NOTIFICATION PREFERENCES
 
                       appText('Notification Preferences',
                           fontWeight: FontWeight.w600),
@@ -520,7 +540,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                 ),
               ),
 
-//                                                                                SAVE & CANCEL BUTTONS
+//      SAVE & CANCEL BUTTONS
 
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -557,7 +577,7 @@ class AutopaySettingsDialog extends StatelessWidget {
     );
   }
 
-//                                                                                   AUTOPAY SETTINGS Title
+//   AUTOPAY SETTINGS Title
   Widget autopayTitle() {
     return Center(
       child: Padding(
@@ -579,7 +599,7 @@ class AutopaySettingsDialog extends StatelessWidget {
     );
   }
 
-//                                                                               TIME PREFERENCE DROPDOWN
+//  TIME PREFERENCE DROPDOWN
   Widget timePreference() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -628,7 +648,7 @@ class AutopaySettingsDialog extends StatelessWidget {
   }
 }
 
-void showAutopayPreferenceSheet(BuildContext context) {
+void showAutopayPreferenceSheet(BuildContext context, String orderId) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -637,7 +657,7 @@ void showAutopayPreferenceSheet(BuildContext context) {
       borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
     ),
     builder: (_) {
-      return AutopaySettingsSheet();
+      return AutopaySettingsSheet(orderId: orderId);
     },
   );
 }
