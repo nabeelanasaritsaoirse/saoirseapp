@@ -102,7 +102,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
             clipBehavior: Clip.none,
             children: [
               IconBox(
-                image: AppAssets.notificationnew,
+                image: AppAssets.notification_icon,
                 onTap: () {
                   Get.to(() => NotificationScreen());
                 },
@@ -115,10 +115,10 @@ class _ReferralScreenState extends State<ReferralScreen> {
                 if (count == 0) return const SizedBox();
 
                 return Positioned(
-                  right: -2,
-                  top: -2,
+                  right: 4,
+                  top: 4,
                   child: Container(
-                    padding: EdgeInsets.all(4.r),
+                    padding: EdgeInsets.all(2.r),
                     decoration: BoxDecoration(
                       color: AppColors.red,
                       shape: BoxShape.circle,
@@ -136,9 +136,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
               }),
             ],
           ),
-          SizedBox(width: 8.w),
           IconBox(
-            image: AppAssets.walletnew,
+            image: AppAssets.wallet_icon,
             onTap: () {
               Get.to(WalletScreen());
             },

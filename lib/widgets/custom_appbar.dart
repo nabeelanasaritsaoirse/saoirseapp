@@ -142,7 +142,8 @@ class IconBox extends StatelessWidget {
           height: 40.h,
           width: 20.w,
           child: SvgPicture.asset(
-            image,
+            // ignore: deprecated_member_use
+            image, color: AppColors.white,
             height: size.h,
             width: size.w,
             fit: BoxFit.contain,
