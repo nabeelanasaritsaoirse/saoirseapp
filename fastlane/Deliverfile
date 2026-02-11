@@ -1,5 +1,3 @@
-# fastlane/Deliverfile
-
 app_identifier("com.saoirse.epi")
 platform("ios")
 
@@ -14,6 +12,11 @@ run_precheck_before_submit(false)
 # Submit behavior
 submit_for_review(true)
 automatic_release(false)
+
+# ⭐ REQUIRED — Release Notes (fixes your error)
+release_notes({
+  "en-US" => "Bug fixes and performance improvements."
+})
 
 # Export compliance
 submission_information({
