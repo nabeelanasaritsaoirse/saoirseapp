@@ -36,20 +36,24 @@ jobs:
       - name: 🧠 Detect bump selection from PR
         id: detect
         run: |
-          BODY="${{ github.event.pull_request.body }}"
-
-          BUMP="auto"
-
-          if echo "$BODY" | grep -q "\- \[x\] major"; then
-            BUMP="major"
-          elif echo "$BODY" | grep -q "\- \[x\] minor"; then
-            BUMP="minor"
-          elif echo "$BODY" | grep -q "\- \[x\] patch"; then
-            BUMP="patch"
-          fi
-
-          echo "Selected bump: $BUMP"
-          echo "bump=$BUMP" >> $GITHUB_OUTPUT
+          BODY=$(cat <<'EOF'
+          ${{ github.event.pull_request.body }}
+          EOF
+          )
+          
+              BUMP="auto"
+          
+              if echo "$BODY" | grep -qi "\- \[x\] major"; then
+                BUMP="major"
+              elif echo "$BODY" | grep -qi "\- \[x\] minor"; then
+                BUMP="minor"
+              elif echo "$BODY" | grep -qi "\- \[x\] patch"; then
+                BUMP="patch"
+              fi
+          
+              echo "Selected bump: $BUMP"
+              echo "bump=$BUMP" >> $GITHUB_OUTPUT
+    
 
       # ⭐ Pass bump type into script
       - name: 🔢 Run version bump script
