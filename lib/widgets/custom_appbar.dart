@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -68,7 +70,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           "Welcome to EPI",
           fontSize: 12.sp,
           fontWeight: FontWeight.w400,
-          // ignore: deprecated_member_use
           color: AppColors.white.withOpacity(0.9),
         ),
       ],
@@ -143,6 +144,7 @@ class IconBox extends StatelessWidget {
           width: 20.w,
           child: SvgPicture.asset(
             image,
+            color: AppColors.white,
             height: size.h,
             width: size.w,
             fit: BoxFit.contain,

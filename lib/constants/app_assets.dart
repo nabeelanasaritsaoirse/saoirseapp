@@ -66,16 +66,14 @@ class AppAssets {
   static String coupons = "assets/svg/coupon.svg";
   static String manage_accounts = "assets/svg/account.svg";
   static String address = "assets/svg/address.svg";
-  static String like = "assets/svg/like.svg";
-  static String likenew = "assets/svg/likenew.svg";
-  static String searchh = "assets/svg/search.svg";
-  static String searchnew = "assets/svg/searchnew.svg";
-  static String notificationnew = "assets/svg/notificationnew.svg";
-  static String notificationicon = "assets/svg/notificationicon.svg";
-  static String wallett = "assets/svg/wallet.svg";
-  static String walletnew = "assets/svg/walletwallet.svg";
-  static String deletenew = "assets/svg/deletenew.svg";
   static String delete_acc = "assets/svg/delete_account.svg";
+
+  //other icons
+  static String like_icon = "assets/svg/likenew.svg";
+  static String search_icon = "assets/svg/searchnew.svg";
+  static String notification_icon = "assets/svg/notification.svg";
+  static String wallet_icon = "assets/svg/wallet.svg";
+  static String delete_icon = "assets/svg/delete.svg";
 
   //Dummy Assets for image needed response
   static String mobile = "assets/images/phone.png";
