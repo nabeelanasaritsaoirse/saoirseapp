@@ -229,6 +229,19 @@ class AutopayController extends GetxController {
         );
       }).toList();
       print(items.value);
+      print(items.value);
+      print(items.value);
+
+      print(items.value);
+      print(items.value);
+      print(items.value);
+      print(items.value);
+      print(items.value);
+      print(items.value);
+      print(items.value);
+      print(items.value);
+      print(items.value);
+      print(items.value);
     } catch (e) {
       errorMessage.value = 'Failed to load dashboard';
     } finally {

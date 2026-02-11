@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../constants/app_assets.dart';
@@ -92,7 +93,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         backgroundColor: AppColors.primaryColor,
         elevation: 0,
-        leadingWidth: showLogo ? 55.w : 45.w,
+        leadingWidth: showLogo ? 55.w : 25.w,
         leading: showBack
             ? _buildBackButton()
             : showLogo
@@ -120,32 +121,32 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
 class IconBox extends StatelessWidget {
   final String image;
-  final double padding;
+  final double size;
   final VoidCallback onTap;
 
   const IconBox({
     super.key,
     required this.image,
-    required this.padding,
     required this.onTap,
+    this.size = 40,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8.r),
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 6.h),
-        width: 33.w,
-        height: 29.h,
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(padding),
-          child: Image.asset(image),
+      borderRadius: BorderRadius.circular(20.r),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10.w),
+        child: SizedBox(
+          height: 40.h,
+          width: 20.w,
+          child: SvgPicture.asset(
+            image,
+            height: size.h,
+            width: size.w,
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );

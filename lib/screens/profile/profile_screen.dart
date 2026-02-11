@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:saoirse_app/screens/autopay/autopay_dashboard_screen.dart';
-
-
+import 'package:saoirse_app/screens/coupon_screen/coupon_screen.dart';
 
 import '../edit_profile/edit_profile_screen.dart';
 import '../faqs/faqs.dart';
@@ -254,6 +253,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Get.to(() => OrderDeliveredScreen());
                         } else if (index == 6) {
                           Get.to(() => AutopayDashboardScreen());
+                        } else if (index == 7) {
+                          Get.to(() => CouponScreen());
                         } else {}
                       },
                     );

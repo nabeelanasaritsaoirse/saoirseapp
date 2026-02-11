@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-
 import '../../constants/app_strings.dart';
 import '../../models/refferal_info_model.dart';
 import '../../screens/refferal/referral_controller.dart';
@@ -102,8 +101,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
             clipBehavior: Clip.none,
             children: [
               IconBox(
-                image: AppAssets.notification,
-                padding: 3.w,
+                image: AppAssets.notificationnew,
                 onTap: () {
                   Get.to(() => NotificationScreen());
                 },
@@ -139,8 +137,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
           ),
           SizedBox(width: 8.w),
           IconBox(
-            image: AppAssets.wallet,
-            padding: 5.w,
+            image: AppAssets.walletnew,
             onTap: () {
               Get.to(WalletScreen());
             },

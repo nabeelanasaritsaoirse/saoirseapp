@@ -272,7 +272,9 @@ class AutopayDashboardScreen extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: isDisabled ? AppColors.grey : AppColors.white,
+        color:
+        // isDisabled ? AppColors.grey :
+         AppColors.white,
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
           color: AppColors.offWhite,
