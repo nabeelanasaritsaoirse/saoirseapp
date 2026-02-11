@@ -401,6 +401,7 @@ class ProfileController extends GetxController {
                 padding: EdgeInsets.symmetric(vertical: 2.w),
                 child: appText(
                   "• $e",
+                  textAlign: TextAlign.left,
                   fontWeight: FontWeight.w600,
                   color: AppColors.mediumGray,
                 ),
@@ -410,6 +411,7 @@ class ProfileController extends GetxController {
             if (retention.isNotEmpty)
               appText(
                 "Data retention: $retention",
+                textAlign: TextAlign.left,
                 fontSize: 12.sp,
                 color: AppColors.grey,
               ),
@@ -417,6 +419,7 @@ class ProfileController extends GetxController {
               SizedBox(height: 4.h),
               appText(
                 note,
+                textAlign: TextAlign.left,
                 fontSize: 12.sp,
                 color: AppColors.grey,
               ),
@@ -424,7 +427,9 @@ class ProfileController extends GetxController {
             SizedBox(height: 16.h),
             appText(
               "This action is permanent. Are you sure you want to delete your account?",
-              //  fontSize: 12, color: AppColors.grey,
+              textAlign: TextAlign.left,
+              fontSize: 13.sp,
+              color: AppColors.textBlack,
             ),
           ],
         );
