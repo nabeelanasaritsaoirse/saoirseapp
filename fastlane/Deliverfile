@@ -1,24 +1,18 @@
 app_identifier("com.saoirse.epi")
 platform("ios")
 
-# We already uploaded binary via pilot
+# Binary already uploaded via pilot
 skip_binary_upload(true)
 
-# CI safe
-skip_metadata(true)
+# Upload metadata from folder
+skip_metadata(false)
 skip_screenshots(true)
+
 run_precheck_before_submit(false)
 
-# Submit behavior
 submit_for_review(true)
 automatic_release(false)
 
-# ⭐ REQUIRED — Release Notes (fixes your error)
-release_notes({
-  "en-US" => "Bug fixes and performance improvements."
-})
-
-# Export compliance
 submission_information({
   export_compliance_uses_encryption: false
 })
