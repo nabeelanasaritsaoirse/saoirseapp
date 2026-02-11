@@ -53,14 +53,14 @@ class AutopayDashboardScreen extends StatelessWidget {
         if (controller.isLoading.value) {
           return appLoader();
         }
-        if (controller.errorMessage.isNotEmpty) {
-          return Center(
-            child: appText(
-              controller.errorMessage.value,
-              color: AppColors.red,
-            ),
-          );
-        }
+        // if (controller.errorMessage.isNotEmpty) {
+        //   return Center(
+        //     child: appText(
+        //       controller.errorMessage.value,
+        //       color: AppColors.red,
+        //     ),
+        //   );
+        // }
 
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -264,108 +264,105 @@ class AutopayDashboardScreen extends StatelessWidget {
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color:
-            // isDisabled ? AppColors.grey :
+            
             AppColors.white,
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
           color: AppColors.offWhite,
         ),
       ),
-      child: Opacity(
-        opacity: isDisabled ? 0.55 : 1,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                    child: appText(
-                  item.title,
-                  maxLines: 2,
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  textAlign: TextAlign.start,
-                )),
-                SizedBox(width: 6.w),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Row(
-                      children: [
-                        appText(
-                          isDisabled ? 'Inactive' : 'Active',
-                          fontSize: 11.sp,
-                          color: isDisabled ? Colors.red : AppColors.green,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            final controller = Get.find<AutopayController>();
-
-                            controller.selectedOrderId.value = item.orderId;
-                            controller.applyAutopayStatusForOrder(item.orderId);
-
-                            // OPEN BOTTOM SHEET
-                            showAutopayPreferenceSheet(Get.context!);
-                          },
-                          child: Icon(
-                            Icons.open_in_new_rounded,
-                            size: 18.sp,
-                            color: AppColors.skyBlue,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: 6.h),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 2.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.lightAmber,
-                        borderRadius: BorderRadius.circular(5.r),
-                      ),
-                      child: appText(
-                        'Priority: ${item.priority}',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                  child: appText(
+                item.title,
+                maxLines: 2,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                textAlign: TextAlign.start,
+              )),
+              SizedBox(width: 6.w),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    children: [
+                      appText(
+                        isDisabled ? 'Inactive' : 'Active',
                         fontSize: 11.sp,
-                        color: AppColors.white,
+                        color: isDisabled ? Colors.red : AppColors.green,
                         fontWeight: FontWeight.w500,
                       ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          final controller = Get.find<AutopayController>();
+
+                          controller.selectedOrderId.value = item.orderId;
+                          controller.applyAutopayStatusForOrder(item.orderId);
+
+                          // OPEN BOTTOM SHEET
+                          showAutopayPreferenceSheet(Get.context!);
+                        },
+                        child: Icon(
+                          Icons.open_in_new_rounded,
+                          size: 18.sp,
+                          color: AppColors.skyBlue,
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 6.h),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 2.h,
                     ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 6.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                appText(
-                  '₹${item.perDay}/day',
-                  fontSize: 13.sp,
-                  color: AppColors.black,
-                ),
-                appText(
-                  'Remaining: ₹${item.remaining}',
-                  fontSize: 12.sp,
-                  color: AppColors.black,
-                ),
-              ],
-            ),
-            SizedBox(height: 8.h),
-            customGradientProgress(
-              value: item.progress / 100.0,
-            )
-          ],
-        ),
+                    decoration: BoxDecoration(
+                      color: AppColors.lightAmber,
+                      borderRadius: BorderRadius.circular(5.r),
+                    ),
+                    child: appText(
+                      'Priority: ${item.priority}',
+                      fontSize: 11.sp,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 6.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              appText(
+                '₹${item.perDay}/day',
+                fontSize: 13.sp,
+                color: AppColors.black,
+              ),
+              appText(
+                'Remaining: ₹${item.remaining}',
+                fontSize: 12.sp,
+                color: AppColors.black,
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          customGradientProgress(
+            value: item.progress / 100.0,
+          )
+        ],
       ),
     );
   }
