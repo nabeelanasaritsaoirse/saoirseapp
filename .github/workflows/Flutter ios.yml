@@ -349,7 +349,9 @@ jobs:
 
   ios-submit-review:
     name: 🚀 Submit to App Store Review
-    needs: ios-deploy
+    needs:
+     - ios-ci
+     - ios-deploy
     runs-on: macos-latest
 
     environment:
@@ -369,10 +371,12 @@ jobs:
       - name: 📤 Submit Build to Apple Review
         env:
           CI: true
+          VERSION_NAME: ${{ needs.ios-ci.outputs.version_name }}
         run: |
           fastlane deliver \
             --api_key_path api_key.json \
             --force
+
 
       - name: 🧾 Review Submission Summary
         run: |
