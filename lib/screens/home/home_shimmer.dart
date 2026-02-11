@@ -32,7 +32,7 @@ class CategoryChipShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 40.h,
+      height: 56.h,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -43,7 +43,7 @@ class CategoryChipShimmer extends StatelessWidget {
             highlightColor: Colors.grey.shade200,
             child: Container(
               margin: EdgeInsets.only(right: 8.w),
-              width: 90.w,
+              width: 50.w,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12.r),

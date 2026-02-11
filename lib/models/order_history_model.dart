@@ -23,7 +23,8 @@ class OrderHistoryResponse {
 }
 
 class OrderHistoryItem {
-  final String id;
+  final String id; // orderId (keep as-is)
+  final String productId; // ✅ NEW (for reviews)
   final String name;
   final String color;
   final String storage;
@@ -37,53 +38,59 @@ class OrderHistoryItem {
   final int invested;
   final String currency;
 
-  OrderHistoryItem(
-      {required this.id,
-      required this.name,
-      required this.color,
-      required this.storage,
-      required this.price,
-      required this.qty,
-      required this.image,
-      required this.dailyPlan,
-      required this.status,
-      required this.openDate,
-      required this.closeDate,
-      required this.invested,
-      required this.currency});
+  OrderHistoryItem({
+    required this.id,
+    required this.productId, // ✅
+    required this.name,
+    required this.color,
+    required this.storage,
+    required this.price,
+    required this.qty,
+    required this.image,
+    required this.dailyPlan,
+    required this.status,
+    required this.openDate,
+    required this.closeDate,
+    required this.invested,
+    required this.currency,
+  });
+
 
   factory OrderHistoryItem.fromJson(Map<String, dynamic> json) {
-    final product = json["product"] ?? {};
-    final pricing = product["pricing"] ?? {};
-    final images = (product["images"] as List?) ?? [];
-    final schedule = (json["paymentSchedule"] as List?) ?? [];
+  final product = json["product"] ?? {};
+  final pricing = product["pricing"] ?? {};
+  final images = (product["images"] as List?) ?? [];
+  final snapshot = json["productSnapshot"] ?? {};
+  final schedule = (json["paymentSchedule"] as List?) ?? [];
 
-    String imageUrl = "";
-    if (images.isNotEmpty && images[0]["url"] != null) {
-      imageUrl = images[0]["url"];
-    }
-
-    final String openDateValue =
-        schedule.isNotEmpty ? (schedule.first["dueDate"] ?? "") : "";
-
-    final String closeDateValue =
-        schedule.isNotEmpty ? (schedule.last["dueDate"] ?? "") : "";
-
-    return OrderHistoryItem(
-      id: json["orderId"] ?? "", // user-friendly ID
-      name: product["name"] ?? "",
-      color: "Not specified", // not provided
-      storage: "", // not provided
-      price: pricing["finalPrice"] ?? 0,
-      qty: json["quantity"] ?? 1,
-      image: imageUrl,
-      dailyPlan:
-          "₹${json["dailyPaymentAmount"] ?? 0}/${json["totalDays"] ?? 0} Days",
-      status: json["status"] ?? "",
-      openDate: openDateValue,
-      closeDate: closeDateValue,
-      invested: json["totalPaidAmount"] ?? 0,
-      currency: pricing["currency"] ?? "INR",
-    );
+  String imageUrl = "";
+  if (images.isNotEmpty && images[0]["url"] != null) {
+    imageUrl = images[0]["url"];
   }
+
+  final String openDateValue =
+      schedule.isNotEmpty ? (schedule.first["dueDate"] ?? "") : "";
+
+  final String closeDateValue =
+      schedule.isNotEmpty ? (schedule.last["dueDate"] ?? "") : "";
+
+  return OrderHistoryItem(
+    id: json["orderId"] ?? "",              // ✅ keep
+    productId: snapshot["productId"] ?? "", // ✅ FIX
+    name: product["name"] ?? "",
+    color: "Not specified",
+    storage: "",
+    price: pricing["finalPrice"] ?? 0,
+    qty: json["quantity"] ?? 1,
+    image: imageUrl,
+    dailyPlan:
+        "₹${json["dailyPaymentAmount"] ?? 0}/${json["totalDays"] ?? 0} Days",
+    status: json["status"] ?? "",
+    openDate: openDateValue,
+    closeDate: closeDateValue,
+    invested: json["totalPaidAmount"] ?? 0,
+    currency: pricing["currency"] ?? "INR",
+  );
+}
+
 }

@@ -1,7 +1,13 @@
 // ignore_for_file: unnecessary_nullable_for_final_variable_declarations, await_only_futures
 
+import 'dart:io';
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:crypto/crypto.dart';
 
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -90,16 +96,17 @@ class AuthService {
     }
   }
 
-  //google Login
   static Future<String?> googleLogin() async {
     try {
       final google = GoogleSignIn.instance;
 
       // Initialize Google Sign-In
-      await google.initialize(
-        serverClientId:
-            '486829564070-mkrkm4v9tji249t6u7gdfiefups09gs4.apps.googleusercontent.com',
-      );
+      if (Platform.isAndroid) {
+        await google.initialize(
+          serverClientId:
+              '486829564070-mkrkm4v9tji249t6u7gdfiefups09gs4.apps.googleusercontent.com',
+        );
+      }
 
       // Authenticate (opens Google account selector)
       final GoogleSignInAccount? account = await google.authenticate();
@@ -132,6 +139,57 @@ class AuthService {
       appToast(content: "Google Login Error: $e", error: true);
       return null;
     }
+  }
+
+  // Apple Login
+  static Future<String?> appleLogin() async {
+    try {
+      final rawNonce = generateNonce();
+      final nonce = sha256ofString(rawNonce);
+
+      // Request credential for the user
+      final AuthorizationCredentialAppleID appleCredential =
+          await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      // Create an `OAuthCredential` from the credential data
+      final OAuthProvider provider = OAuthProvider('apple.com');
+      final AuthCredential credential = provider.credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+        rawNonce: rawNonce,
+      );
+
+      // Sign in to Firebase with the Apple Credential
+      final UserCredential userCredential =
+          await auth.signInWithCredential(credential);
+
+      return userCredential.user?.getIdToken();
+    } catch (e) {
+      appToast(content: "Apple Login Error: $e", error: true);
+      return null;
+    }
+  }
+
+  /// Generate a random string for the nonce
+  static String generateNonce([int length = 32]) {
+    const charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
+        .join();
+  }
+
+  /// Returns the sha256 hash of [input] in hex notation.
+  static String sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
   }
 
   static Future<void> signOut() async {
