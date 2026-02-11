@@ -32,11 +32,35 @@ jobs:
         with:
           channel: stable
 
+    # ⭐ NEW — Detect manual checkbox selection
+      - name: 🧠 Detect bump selection from PR
+        id: detect
+        run: |
+          BODY=$(cat <<'EOF'
+          ${{ github.event.pull_request.body }}
+          EOF
+          )
+          
+              BUMP="auto"
+          
+              if echo "$BODY" | grep -qi "\- \[x\] major"; then
+                BUMP="major"
+              elif echo "$BODY" | grep -qi "\- \[x\] minor"; then
+                BUMP="minor"
+              elif echo "$BODY" | grep -qi "\- \[x\] patch"; then
+                BUMP="patch"
+              fi
+          
+              echo "Selected bump: $BUMP"
+              echo "bump=$BUMP" >> $GITHUB_OUTPUT
+    
+
+      # ⭐ Pass bump type into script
       - name: 🔢 Run version bump script
         id: bump
         run: |
           chmod +x tools/version.sh
-          tools/version.sh
+          tools/version.sh "${{ steps.detect.outputs.bump }}"
           VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
           echo "new_version=$VERSION" >> $GITHUB_OUTPUT
 
