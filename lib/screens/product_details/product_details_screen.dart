@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/models/review_resposne.dart';
 
 import '../../models/product_details_model.dart';
 import '../../widgets/app_button.dart';
@@ -886,6 +887,185 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
+  // Widget buildReviewSection() {
+  //   return Container(
+  //     margin: EdgeInsets.only(top: 10.h),
+  //     padding: EdgeInsets.symmetric(vertical: 14.h),
+  //     decoration: BoxDecoration(
+  //       borderRadius: BorderRadius.circular(12.r),
+  //     ),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         /// RATING ROW
+  //         Row(
+  //           crossAxisAlignment: CrossAxisAlignment.center,
+  //           children: [
+  //             Obx(() => appText(
+  //                   controller.averageRating.value.toStringAsFixed(1),
+  //                   fontSize: 30.sp,
+  //                   fontWeight: FontWeight.bold,
+  //                 )),
+  //             SizedBox(width: 6.w),
+  //             appText(
+  //               "OUT OF 5",
+  //               fontSize: 11.sp,
+  //               fontWeight: FontWeight.w600,
+  //               color: AppColors.grey,
+  //             ),
+  //             Spacer(),
+  //             Column(
+  //               crossAxisAlignment: CrossAxisAlignment.end,
+  //               children: [
+  //                 buildStarRow(controller.averageRating.value),
+  //                 SizedBox(height: 4.h),
+  //                 Obx(() => appText(
+  //                       "${controller.totalRatings.value} ratings",
+  //                       fontSize: 11.sp,
+  //                       fontWeight: FontWeight.w600,
+  //                       color: AppColors.grey,
+  //                     )),
+  //                 SizedBox(height: 4.h),
+  //               ],
+  //             )
+  //           ],
+  //         ),
+
+  //         SizedBox(height: 10.h),
+
+  //         /// REVIEW ACTION ROW
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             appText("${controller.totalReviews.value} Reviews",
+  //                 fontSize: 13.sp,
+  //                 fontWeight: FontWeight.w600,
+  //                 color: AppColors.lightBlue),
+  //           ],
+  //         ),
+  //         SizedBox(height: 10.h),
+  //         // Row(
+  //         //   mainAxisAlignment: MainAxisAlignment.start,
+  //         //   children: [
+  //         //     ClipRRect(
+  //         //       borderRadius: BorderRadius.circular(8.r),
+  //         //       child: Image.network(
+  //         //         "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D",
+  //         //         height: 65.h,
+  //         //         width: 140.w,
+  //         //         fit: BoxFit.cover,
+  //         //       ),
+  //         //     ),
+  //         //     SizedBox(width: 6.w),
+  //         //     Flexible(
+  //         //       child: ClipRRect(
+  //         //         borderRadius: BorderRadius.circular(8.r),
+  //         //         child: Image.network(
+  //         //           "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHByb2R1Y3R8ZW58MHx8MHx8fDA%3D",
+  //         //           height: 65.h,
+  //         //           width: 80.w,
+  //         //           fit: BoxFit.cover,
+  //         //         ),
+  //         //       ),
+  //         //     ),
+  //         //     SizedBox(width: 6.w),
+  //         //     Flexible(
+  //         //       child: ClipRRect(
+  //         //         borderRadius: BorderRadius.circular(8.r),
+  //         //         child: Image.network(
+  //         //           "https://images.unsplash.com/photo-1611048219784-ca687f9fe55d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDE0fHx8ZW58MHx8fHx8",
+  //         //           height: 65.h,
+  //         //           width: 80.w,
+  //         //           fit: BoxFit.cover,
+  //         //         ),
+  //         //       ),
+  //         //     ),
+  //         //   ],
+  //         // ),
+  //         Obx(() {
+  //           if (controller.reviewImagesPreview.isEmpty) {
+  //             return const SizedBox.shrink();
+  //           }
+
+  //           return Row(
+  //             children: controller.reviewImagesPreview.map((img) {
+  //               return Padding(
+  //                 padding: EdgeInsets.only(right: 6.w),
+  //                 child: ClipRRect(
+  //                   borderRadius: BorderRadius.circular(8.r),
+  //                   child: Image.network(
+  //                     img.url,
+  //                     height: 65.h,
+  //                     width: 80.w,
+  //                     fit: BoxFit.cover,
+  //                   ),
+  //                 ),
+  //               );
+  //             }).toList(),
+  //           );
+  //         }),
+
+  //         SizedBox(height: 12.h),
+
+  //         /// REVIEW CARDS
+  //         // SizedBox(
+  //         //   height: 90.h,
+  //         //   child: ListView.separated(
+  //         //     scrollDirection: Axis.horizontal,
+  //         //     itemCount: 3,
+  //         //     separatorBuilder: (_, __) => SizedBox(width: 10.w),
+  //         //     itemBuilder: (_, index) => buildReviewCard(),
+  //         //   ),
+  //         // ),
+  //         Obx(() {
+  //           if (controller.reviews.isEmpty) {
+  //             return appText(
+  //               "No reviews yet",
+  //               color: AppColors.grey,
+  //             );
+  //           }
+
+  //           return SizedBox(
+  //             height: 90.h,
+  //             child: ListView.separated(
+  //               scrollDirection: Axis.horizontal,
+  //               itemCount: controller.reviews.length.clamp(0, 3),
+  //               separatorBuilder: (_, __) => SizedBox(width: 10.w),
+  //               itemBuilder: (_, index) {
+  //                 final review = controller.reviews[index];
+  //                 return buildReviewCard(review);
+  //               },
+  //             ),
+  //           );
+  //         }),
+
+  //         SizedBox(height: 14.h),
+
+  //         /// SHOW ALL REVIEWS
+  //         InkWell(
+  //           onTap: () {
+  //             Get.to(() => AllReviewsScreen());
+  //           },
+  //           child: Container(
+  //             width: double.infinity,
+  //             padding: EdgeInsets.symmetric(vertical: 12.h),
+  //             decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(10.r),
+  //               border: Border.all(color: AppColors.black87),
+  //             ),
+  //             alignment: Alignment.center,
+  //             child: appText(
+  //               "Show all reviews",
+  //               fontWeight: FontWeight.w600,
+  //               fontSize: 13.sp,
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   Widget buildReviewSection() {
     return Container(
       margin: EdgeInsets.only(top: 10.h),
@@ -900,11 +1080,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              appText(
-                controller.averageRating.value.toStringAsFixed(1),
-                fontSize: 30.sp,
-                fontWeight: FontWeight.bold,
-              ),
+              Obx(() => appText(
+                    controller.averageRating.value.toStringAsFixed(1),
+                    fontSize: 30.sp,
+                    fontWeight: FontWeight.bold,
+                  )),
               SizedBox(width: 6.w),
               appText(
                 "OUT OF 5",
@@ -918,12 +1098,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 children: [
                   buildStarRow(controller.averageRating.value),
                   SizedBox(height: 4.h),
-                  appText(
-                    "${controller.totalRatings.value} ratings",
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.grey,
-                  ),
+                  Obx(() => appText(
+                        "${controller.totalRatings.value} ratings",
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.grey,
+                      )),
                   SizedBox(height: 4.h),
                 ],
               )
@@ -936,71 +1116,94 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              appText("${controller.totalReviews.value} Reviews",
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.lightBlue),
+              appText(
+                "${controller.totalReviews.value} Reviews",
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.lightBlue,
+              ),
             ],
           ),
+
           SizedBox(height: 10.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8.r),
-                child: Image.network(
-                  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D",
-                  height: 65.h,
-                  width: 140.w,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              SizedBox(width: 6.w),
-              Flexible(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8.r),
-                  child: Image.network(
-                    "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHByb2R1Y3R8ZW58MHx8MHx8fDA%3D",
-                    height: 65.h,
-                    width: 80.w,
-                    fit: BoxFit.cover,
+
+          /// REVIEW IMAGES PREVIEW (SAFE)
+          Obx(() {
+            if (controller.reviewImagesPreview.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            return Row(
+              children: controller.reviewImagesPreview.map((img) {
+                // 🔐 Safety: empty or null URL check
+                if (img.url.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return Padding(
+                  padding: EdgeInsets.only(right: 6.w),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.r),
+                    child: Image.network(
+                      img.url,
+                      height: 65.h,
+                      width: 80.w,
+                      fit: BoxFit.cover,
+
+                      /// 🔥 FIX: prevent red image error
+                      errorBuilder: (_, __, ___) {
+                        return Container(
+                          height: 65.h,
+                          width: 80.w,
+                          color: AppColors.lightGrey,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.image_not_supported,
+                            size: 18.sp,
+                            color: AppColors.grey,
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ),
-              SizedBox(width: 6.w),
-              Flexible(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8.r),
-                  child: Image.network(
-                    "https://images.unsplash.com/photo-1611048219784-ca687f9fe55d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDE0fHx8ZW58MHx8fHx8",
-                    height: 65.h,
-                    width: 80.w,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ],
-          ),
+                );
+              }).toList(),
+            );
+          }),
 
           SizedBox(height: 12.h),
 
           /// REVIEW CARDS
-          SizedBox(
-            height: 90.h,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: 3,
-              separatorBuilder: (_, __) => SizedBox(width: 10.w),
-              itemBuilder: (_, index) => buildReviewCard(),
-            ),
-          ),
+          Obx(() {
+            if (controller.reviews.isEmpty) {
+              return appText(
+                "No reviews yet",
+                color: AppColors.grey,
+              );
+            }
+
+            return SizedBox(
+              height: 90.h,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: controller.reviews.length.clamp(0, 3),
+                separatorBuilder: (_, __) => SizedBox(width: 10.w),
+                itemBuilder: (_, index) {
+                  final review = controller.reviews[index];
+                  return buildReviewCard(review);
+                },
+              ),
+            );
+          }),
 
           SizedBox(height: 14.h),
 
           /// SHOW ALL REVIEWS
           InkWell(
             onTap: () {
-              Get.to(() => AllReviewsScreen());
+              Get.to(() => AllReviewsScreen(
+                    productId: widget.productId,
+                  ));
             },
             child: Container(
               width: double.infinity,
@@ -1034,7 +1237,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
-  Widget buildReviewCard() {
+  Widget buildReviewCard(Review review) {
     return Container(
       width: 230.w,
       padding: EdgeInsets.all(10.w),
@@ -1044,62 +1247,45 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: [
-          /// IMAGE ROW
-
-          /// RATING + TITLE
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(5.w),
-                    decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(5.r)),
-                    child: Row(
-                      children: [
-                        Icon(Icons.star, color: Colors.amber, size: 11.sp),
-                        SizedBox(width: 3.w),
-                        appText(
-                          "4.0",
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ],
+              Container(
+                padding: EdgeInsets.all(5.w),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(5.r),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.star, color: Colors.amber, size: 11.sp),
+                    SizedBox(width: 3.w),
+                    appText(
+                      review.rating.toStringAsFixed(1),
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w600,
                     ),
-                  ),
-                  SizedBox(
-                    width: 5.w,
-                  ),
-                  appText(
-                    "Excellent",
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12.sp,
-                  ),
-                ],
+                  ],
+                ),
               ),
-              Spacer(),
-              appText(
-                "1 month ago",
-                fontSize: 10.sp,
-                color: AppColors.grey,
+              SizedBox(width: 5.w),
+              Expanded(
+                child: appText(
+                  review.title,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12.sp,
+                  maxLines: 2,
+                  textAlign: TextAlign.left,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
-
-          SizedBox(height: 4.h),
-
-          /// REVIEW TEXT
-
-          SizedBox(
-            height: 5.h,
-          ),
+          SizedBox(height: 6.h),
           appText(
-            "iPhone since forever 😍\nBest Camera",
+            review.comment,
             fontSize: 11.sp,
-            color: AppColors.textBlack,
             textAlign: TextAlign.left,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

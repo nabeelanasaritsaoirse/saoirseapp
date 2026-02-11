@@ -40,6 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
         Get.offAll(() => OnBoardScreen());
       }
     });
+   
   }
 
   @override

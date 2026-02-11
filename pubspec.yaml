@@ -40,7 +40,8 @@ dependencies:
   crypto: ^3.0.7
   cupertino_icons: ^1.0.8
   firebase_auth: ^6.1.2
-  firebase_core: ^4.2.1
+  firebase_core: ^4.3.0
+  firebase_crashlytics: ^5.0.5
   firebase_messaging: ^16.0.4
   flutter:
     sdk: flutter
