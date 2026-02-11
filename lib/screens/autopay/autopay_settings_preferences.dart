@@ -11,22 +11,28 @@ import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
 import 'autopay_dashboard_controller.dart';
 
-class AutopaySettingsSheet extends StatelessWidget {
-  AutopaySettingsSheet({super.key});
+class AutopaySettingsSheet extends StatefulWidget {
+  final String orderId;
 
+  const AutopaySettingsSheet({super.key, required this.orderId});
+
+  @override
+  State<AutopaySettingsSheet> createState() => _AutopaySettingsSheetState();
+}
+
+class _AutopaySettingsSheetState extends State<AutopaySettingsSheet> {
   final AutopayController controller = Get.find();
 
   @override
-  Widget build(BuildContext context) {
-    if (controller.selectedOrderId.value.isEmpty) {
-      final status = controller.autopayStatus.value;
-      if (status != null && status.data.orders.isNotEmpty) {
-        final fallbackOrderId = status.data.orders.first.orderId;
-        controller.selectedOrderId.value = fallbackOrderId;
-        controller.applyAutopayStatusForOrder(fallbackOrderId);
-      }
-    }
+  void initState() {
+    super.initState();
 
+    controller.selectedOrderId.value = widget.orderId;
+    controller.applyAutopayStatusForOrder(widget.orderId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 16.h),

@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -53,14 +55,14 @@ class AutopayDashboardScreen extends StatelessWidget {
         if (controller.isLoading.value) {
           return appLoader();
         }
-        // if (controller.errorMessage.isNotEmpty) {
-        //   return Center(
-        //     child: appText(
-        //       controller.errorMessage.value,
-        //       color: AppColors.red,
-        //     ),
-        //   );
-        // }
+        if (controller.errorMessage.isNotEmpty) {
+          return Center(
+            child: appText(
+              controller.errorMessage.value,
+              color: AppColors.red,
+            ),
+          );
+        }
 
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -306,10 +308,18 @@ class AutopayDashboardScreen extends StatelessWidget {
                           final controller = Get.find<AutopayController>();
 
                           controller.selectedOrderId.value = item.orderId;
+
+                          // IMPORTANT: load order data into controller
                           controller.applyAutopayStatusForOrder(item.orderId);
 
+                          log("Opening autopay settings for ${item.orderId}");
+                          log("Selected Order ID = ${controller.selectedOrderId.value}");
+                          log("Skip dates after prefill = ${controller.skipDates}");
+
                           // OPEN BOTTOM SHEET
-                          showAutopayPreferenceSheet(Get.context!);
+
+                          showAutopayPreferenceSheet(
+                              Get.context!, item.orderId);
                         },
                         child: Icon(
                           Icons.open_in_new_rounded,
@@ -380,6 +390,8 @@ Widget customGradientProgress({
       borderRadius: BorderRadius.circular(50),
       child: LayoutBuilder(
         builder: (context, constraints) {
+          log('Progress maxWidth: ${constraints.maxWidth}, value: $value');
+
           return Align(
             alignment: Alignment.centerLeft,
             child: Container(
@@ -439,6 +451,9 @@ class AutopaySettingsDialog extends StatelessWidget {
                       SizedBox(height: 10.h),
                       timePreference(),
                       SizedBox(height: 14.h),
+
+//   WALLET RESERVES & REMINDER & NOTIFICATION
+
                       appText('Wallet Reserves', fontWeight: FontWeight.w600),
                       SizedBox(height: 8.h),
                       appTextField(
@@ -623,7 +638,7 @@ class AutopaySettingsDialog extends StatelessWidget {
   }
 }
 
-void showAutopayPreferenceSheet(BuildContext context) {
+void showAutopayPreferenceSheet(BuildContext context, String orderId) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -632,7 +647,7 @@ void showAutopayPreferenceSheet(BuildContext context) {
       borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
     ),
     builder: (_) {
-      return AutopaySettingsSheet();
+      return AutopaySettingsSheet(orderId: orderId);
     },
   );
 }

@@ -72,6 +72,8 @@ class AutopayController extends GetxController {
   late TextEditingController minBalanceCtrl;
   late TextEditingController reminderHoursCtrl;
 
+  RxList<DateTime> newSkipDates = <DateTime>[].obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -180,6 +182,7 @@ class AutopayController extends GetxController {
 
     if (fromApi) {
       skipDates.clear();
+      newSkipDates.clear();
 
       if (order.autopay.skipDates.isNotEmpty) {
         skipDates.addAll(
@@ -345,9 +348,9 @@ class AutopayController extends GetxController {
     }
 
     skipDates.add(normalized);
-    skipDates.sort((a, b) => a.compareTo(b));
+    newSkipDates.add(normalized);
 
-    // Mark that skip dates were changed
+    skipDates.sort((a, b) => a.compareTo(b));
     hasSkipDateChanges.value = true;
 
     log("Skip date added: ${normalized.toString()}");
@@ -360,8 +363,9 @@ class AutopayController extends GetxController {
 
   Future<void> saveSkipDates(String orderId) async {
     log("SAVE BUTTON -> saveSkipDates() CALLED");
-    if (skipDates.isEmpty) {
-      log("No Dates: Please add at least one skip date");
+
+    if (newSkipDates.isEmpty) {
+      log("No new skip dates to save");
       return;
     }
 
@@ -373,23 +377,25 @@ class AutopayController extends GetxController {
     try {
       isSkipDateSaving.value = true;
 
-      log("SAVING SKIP DATES FOR ORDER: $orderId");
-      log("SKIP DATES COUNT: ${skipDates.length}");
-      log("SKIP DATES: ${skipDates.map((d) => d.toString()).toList()}");
+      log("SAVING NEW SKIP DATES FOR ORDER: $orderId");
+      log("NEW SKIP DATES COUNT: ${newSkipDates.length}");
+      log("NEW SKIP DATES: ${newSkipDates.map((d) => d.toString()).toList()}");
 
       final success = await service.addSkipDates(
         orderId: orderId,
-        dates: skipDates,
+        dates: newSkipDates,
       );
 
       if (success) {
         log("SKIP DATES SAVED SUCCESSFULLY");
 
-        // Refresh status from API
-        await fetchAutopayStatus();
+        // Clear newly added dates
+        newSkipDates.clear();
 
-        // Re-apply updated data to UI
+        // Refresh status
+        await fetchAutopayStatus();
         applyAutopayStatusForOrder(orderId);
+
         hasSkipDateChanges.value = false;
       } else {
         log("FAILED TO SAVE SKIP DATES");
