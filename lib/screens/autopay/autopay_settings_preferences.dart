@@ -92,17 +92,7 @@ class AutopaySettingsSheet extends StatelessWidget {
                       controller.isSettingsLoading.value
                   ? () {}
                   : () async {
-                      if (!controller.isAddingNewSkipDate) {
-                        Get.back();
-                        return;
-                      }
-                      await controller.saveOrderPriority();
-
-                      final orderId = controller.selectedOrderId.value;
-                      if (orderId.isNotEmpty) {
-                        await controller.saveSkipDates(orderId);
-                      }
-
+                      await controller.saveAllSettings();
                       Get.back();
                     },
               buttonColor: controller.isSkipDateSaving.value ||
@@ -133,17 +123,6 @@ class AutopaySettingsSheet extends StatelessWidget {
 
   Widget enableAutopay() {
     return Obx(() {
-      final orderId = controller.selectedOrderId.value;
-      bool isEnabled = controller.autopayEnabled.value;
-
-      if (controller.autopayStatus.value != null && orderId.isNotEmpty) {
-        final order = controller.autopayStatus.value!.data.orders
-            .firstWhereOrNull((o) => o.orderId == orderId);
-        if (order != null) {
-          isEnabled = order.autopay.enabled;
-        }
-      }
-
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -152,19 +131,15 @@ class AutopaySettingsSheet extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
           Switch(
-            value: isEnabled,
-            onChanged: orderId.isNotEmpty
-                ? (value) async {
-                    if (value) {
-                      final priority =
-                          int.tryParse(controller.priorityCtrl.text) ?? 1;
-                      await controller.enableAutopayForOrder(orderId,
-                          customPriority: priority);
-                    } else {
-                      await controller.disableAutopayForOrder(orderId);
-                    }
-                  }
-                : null,
+            value: controller.autopayEnabled.value,
+            onChanged: (value) {
+              controller.autopayEnabled.value = value;
+
+              // If autopay is disabled → pause must also be disabled
+              if (!value) {
+                controller.pauseAutopay.value = false;
+              }
+            },
             activeColor: AppColors.primaryColor,
           ),
         ],
@@ -188,11 +163,10 @@ class AutopaySettingsSheet extends StatelessWidget {
             textInputType: TextInputType.number,
             hintText: '85',
             hintColor: AppColors.textGray,
-            onChanged: (value) async {
+            onChanged: (value) {
               final parsed = int.tryParse(value);
               if (parsed != null && parsed >= 1 && parsed <= 100) {
-                await Future.delayed(Duration(milliseconds: 500));
-                await controller.saveOrderPriority();
+                controller.priority.value = parsed;
               }
             },
           ),
@@ -203,13 +177,18 @@ class AutopaySettingsSheet extends StatelessWidget {
 
   Widget pauseAutopay() {
     return Obx(() {
-      final isCurrentlyPaused = controller.pauseAutopay.value;
+      final isPaused = controller.pauseAutopay.value;
       final orderId = controller.selectedOrderId.value;
 
       DateTime? pauseUntilDate;
-      if (controller.autopayStatus.value != null && orderId.isNotEmpty) {
+
+      // Only read date if paused
+      if (isPaused &&
+          controller.autopayStatus.value != null &&
+          orderId.isNotEmpty) {
         final order = controller.autopayStatus.value!.data.orders
             .firstWhereOrNull((o) => o.orderId == orderId);
+
         if (order != null && order.autopay.pausedUntil != null) {
           if (order.autopay.pausedUntil is DateTime) {
             pauseUntilDate = order.autopay.pausedUntil as DateTime;
@@ -230,10 +209,10 @@ class AutopaySettingsSheet extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   appText(
-                    isCurrentlyPaused ? 'Autopay Paused' : 'Pause Autopay',
+                    isPaused ? 'Autopay Paused' : 'Pause Autopay',
                     fontWeight: FontWeight.w600,
                   ),
-                  if (pauseUntilDate != null && isCurrentlyPaused)
+                  if (isPaused && pauseUntilDate != null)
                     Padding(
                       padding: EdgeInsets.only(top: 4.h),
                       child: appText(
@@ -245,11 +224,12 @@ class AutopaySettingsSheet extends StatelessWidget {
                 ],
               ),
               Switch(
-                value: !isCurrentlyPaused,
-                onChanged: (v) async {
-                  final shouldPause = !v;
-                  await controller.togglePauseAutopay(shouldPause);
-                },
+                value: isPaused,
+                onChanged: controller.autopayEnabled.value
+                    ? (v) {
+                        controller.pauseAutopay.value = v;
+                      }
+                    : null, // disabled if autopay OFF
                 activeColor: AppColors.primaryColor,
               ),
             ],
@@ -349,7 +329,7 @@ class AutopaySettingsSheet extends StatelessWidget {
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
-    controller.isAddingNewSkipDate = true;
+
     if (selectedDate != null) {
       controller.addSkipDate(selectedDate);
     }
