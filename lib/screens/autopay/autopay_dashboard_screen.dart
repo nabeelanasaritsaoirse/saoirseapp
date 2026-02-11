@@ -263,9 +263,7 @@ class AutopayDashboardScreen extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color:
-            
-            AppColors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
           color: AppColors.offWhite,
@@ -406,7 +404,7 @@ Widget customGradientProgress({
   );
 }
 
-//                                                                                        AUTOPAY SETTINGS DIALOGBOX
+//AUTOPAY SETTINGS DIALOGBOX
 class AutopaySettingsDialog extends StatelessWidget {
   AutopaySettingsDialog({super.key});
 
@@ -466,8 +464,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                       ),
                       SizedBox(height: 14.h),
 
-//                                                                                                   REMINDER
-
+                      // REMINDER
                       appText('Reminder', fontWeight: FontWeight.w600),
                       SizedBox(height: 8.h),
                       appTextField(
@@ -489,8 +486,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                       ),
                       SizedBox(height: 14.h),
 
-//                                                                                   NOTIFICATION PREFERENCES
-
+                      // NOTIFICATION PREFERENCES
                       appText('Notification Preferences',
                           fontWeight: FontWeight.w600),
                       SizedBox(height: 10.h),
@@ -520,8 +516,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                 ),
               ),
 
-//                                                                                SAVE & CANCEL BUTTONS
-
+              // SAVE & CANCEL BUTTONS
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                 child: Row(
@@ -557,7 +552,7 @@ class AutopaySettingsDialog extends StatelessWidget {
     );
   }
 
-//                                                                                   AUTOPAY SETTINGS Title
+  //AUTOPAY SETTINGS Title
   Widget autopayTitle() {
     return Center(
       child: Padding(
@@ -579,7 +574,7 @@ class AutopaySettingsDialog extends StatelessWidget {
     );
   }
 
-//                                                                               TIME PREFERENCE DROPDOWN
+  // TIME PREFERENCE DROPDOWN
   Widget timePreference() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
