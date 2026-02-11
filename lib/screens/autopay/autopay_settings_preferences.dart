@@ -1,20 +1,14 @@
 // ignore_for_file: deprecated_member_use
 
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
-
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import 'package:saoirse_app/constants/app_colors.dart';
-
-import 'package:saoirse_app/widgets/app_button.dart';
-import 'package:saoirse_app/widgets/app_text.dart';
-import 'package:saoirse_app/widgets/app_text_field.dart';
-
+import '../../constants/app_colors.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_text.dart';
+import '../../widgets/app_text_field.dart';
 import 'autopay_dashboard_controller.dart';
 
 class AutopaySettingsSheet extends StatelessWidget {
@@ -30,7 +24,6 @@ class AutopaySettingsSheet extends StatelessWidget {
         final fallbackOrderId = status.data.orders.first.orderId;
         controller.selectedOrderId.value = fallbackOrderId;
         controller.applyAutopayStatusForOrder(fallbackOrderId);
-        log("AutopaySettingsSheet: fallback selectedOrderId = $fallbackOrderId");
       }
     }
 
@@ -99,8 +92,6 @@ class AutopaySettingsSheet extends StatelessWidget {
                       controller.isSettingsLoading.value
                   ? () {}
                   : () async {
-                      print(
-                          "controller is adding new skip date ${controller.isAddingNewSkipDate}");
                       if (!controller.isAddingNewSkipDate) {
                         Get.back();
                         return;
@@ -111,8 +102,6 @@ class AutopaySettingsSheet extends StatelessWidget {
                       if (orderId.isNotEmpty) {
                         await controller.saveSkipDates(orderId);
                       }
-
-                      log("AutopaySettingsSheet: Save button tapped. isSettingsLoading=${controller.isSettingsLoading.value}, isSkipDateSaving=${controller.isSkipDateSaving.value}, selectedOrderId=${controller.selectedOrderId.value}");
 
                       Get.back();
                     },

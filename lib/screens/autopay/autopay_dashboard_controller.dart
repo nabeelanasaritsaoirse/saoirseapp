@@ -1,10 +1,10 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/autopay_dashboard-model.dart';
-import 'package:saoirse_app/models/autopay_status_model.dart';
 
-import 'package:saoirse_app/services/autopay_service.dart';
+import '../../models/autopay_dashboard_model.dart';
+import '../../models/autopay_status_model.dart';
+import '../../services/autopay_service.dart';
 
 class AutopayController extends GetxController {
   final AutopayService service = AutopayService();
@@ -216,8 +216,6 @@ class AutopayController extends GetxController {
       suggestedTopUp.value = data.suggestions.suggestedTopUp;
 
       items.value = data.orders.map((order) {
-        print(
-            "items value mapping: ${order.id}, ${order.productName}, ${order.dailyAmount}, ${order.remainingAmount}, ${order.progress}, ${order.priority}, ${order.autopayEnabled}");
         return AutopayItem(
           orderId: order.id,
           title: order.productName,
@@ -228,20 +226,6 @@ class AutopayController extends GetxController {
           enabled: order.autopayEnabled,
         );
       }).toList();
-      print(items.value);
-      print(items.value);
-      print(items.value);
-
-      print(items.value);
-      print(items.value);
-      print(items.value);
-      print(items.value);
-      print(items.value);
-      print(items.value);
-      print(items.value);
-      print(items.value);
-      print(items.value);
-      print(items.value);
     } catch (e) {
       errorMessage.value = 'Failed to load dashboard';
     } finally {

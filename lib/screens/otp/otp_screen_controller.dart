@@ -195,28 +195,20 @@ class VerifyOtpController extends GetxController {
   // }
 
   Future<String?> getDeviceToken() async {
-  try {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    try {
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    // Request permission (important for iOS, safe for Android too)
-    await messaging.requestPermission();
+      // Request permission (important for iOS, safe for Android too)
+      await messaging.requestPermission();
 
-    String? token = await messaging.getToken();
+      String? token = await messaging.getToken();
 
-    if (token != null) {
-      log("FCM Token: $token");
-      print("FCM Token: $token");
-    } else {
-      log("FCM Token is null");
+      return token;
+    } catch (e) {
+      log("Error getting FCM token: $e");
+      return null;
     }
-
-    return token;
-  } catch (e) {
-    log("Error getting FCM token: $e");
-    return null;
   }
-}
-
 
   /// --- Resend OTP (Local mock) ---
   Future<void> resendOtp() async {

@@ -9,7 +9,7 @@ import 'package:saoirse_app/models/autopay_suggested_topup_model.dart';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
-import '../models/autopay_dashboard-model.dart';
+import '../models/autopay_dashboard_model.dart';
 import '../models/autopay_setting_dialog_model.dart';
 import 'api_service.dart';
 
@@ -242,142 +242,138 @@ class AutopayService {
     }
   }
 
-
 // ================= PAUSE / RESUME AUTOPAY =================
-Future<bool> pauseAutopay({
-  required String orderId,
-  required DateTime pauseUntil,
-}) async {
-  final token = box.read(AppConst.ACCESS_TOKEN);
+  Future<bool> pauseAutopay({
+    required String orderId,
+    required DateTime pauseUntil,
+  }) async {
+    final token = box.read(AppConst.ACCESS_TOKEN);
 
-  final body = {
-    "pauseUntil": pauseUntil.toUtc().toIso8601String(),
-  };
+    final body = {
+      "pauseUntil": pauseUntil.toUtc().toIso8601String(),
+    };
 
-  log("PAUSE AUTOPAY BODY: ${jsonEncode(body)}");
+    log("PAUSE AUTOPAY BODY: ${jsonEncode(body)}");
 
-  final result = await APIService.postRequest<bool>(
-    url: "${AppURLs.AUTOPAY_PAUSE_API}/$orderId",
-    body: body,
-    headers: {
-      "Authorization": "Bearer $token",
-      "Content-Type": "application/json",
-    },
-    onSuccess: (json) {
-      log("PAUSE AUTOPAY RESPONSE ==> $json");
-      return json["success"] == true;
-    },
-  );
+    final result = await APIService.postRequest<bool>(
+      url: "${AppURLs.AUTOPAY_PAUSE_API}/$orderId",
+      body: body,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (json) {
+        log("PAUSE AUTOPAY RESPONSE ==> $json");
+        return json["success"] == true;
+      },
+    );
 
-  return result ?? false;
-}
+    return result ?? false;
+  }
 
 // ================= RESUME AUTOPAY =================
-Future<bool> resumeAutopay({
-  required String orderId,
-}) async {
-  final token = box.read(AppConst.ACCESS_TOKEN);
+  Future<bool> resumeAutopay({
+    required String orderId,
+  }) async {
+    final token = box.read(AppConst.ACCESS_TOKEN);
 
-  // No body needed for resume, just orderId in URL
-  log("RESUME AUTOPAY REQUEST FOR ORDER: $orderId");
+    // No body needed for resume, just orderId in URL
+    log("RESUME AUTOPAY REQUEST FOR ORDER: $orderId");
 
-  final result = await APIService.postRequest<bool>(
-    url: "${AppURLs.AUTOPAY_RESUME_API}/$orderId",
-    body: {}, // Empty body or can send null
-    headers: {
-      "Authorization": "Bearer $token",
-      "Content-Type": "application/json",
-    },
-    onSuccess: (json) {
-      log("RESUME AUTOPAY RESPONSE ==> $json");
-      return json["success"] == true;
-    },
-  );
+    final result = await APIService.postRequest<bool>(
+      url: "${AppURLs.AUTOPAY_RESUME_API}/$orderId",
+      body: {}, // Empty body or can send null
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (json) {
+        log("RESUME AUTOPAY RESPONSE ==> $json");
+        return json["success"] == true;
+      },
+    );
 
-  return result ?? false;
-}
-
+    return result ?? false;
+  }
 
 // ================= ENABLE AUTOPAY FOR ORDER =================
-Future<bool> enableAutopayForOrder({
-  required String orderId,
-  int priority = 1,
-}) async {
-  final token = box.read(AppConst.ACCESS_TOKEN);
+  Future<bool> enableAutopayForOrder({
+    required String orderId,
+    int priority = 1,
+  }) async {
+    final token = box.read(AppConst.ACCESS_TOKEN);
 
-  final body = {
-    "priority": priority,
-  };
+    final body = {
+      "priority": priority,
+    };
 
-  log("ENABLE AUTOPAY FOR ORDER REQUEST: ${jsonEncode(body)}");
+    log("ENABLE AUTOPAY FOR ORDER REQUEST: ${jsonEncode(body)}");
 
-  final result = await APIService.postRequest<bool>(
-    url: "${AppURLs.AUTOPAY_ENABLE_FOR_ORDER_API}/$orderId",
-    body: body,
-    headers: {
-      "Authorization": "Bearer $token",
-      "Content-Type": "application/json",
-    },
-    onSuccess: (json) {
-      log("ENABLE AUTOPAY RESPONSE ==> $json");
-      return json["success"] == true;
-    },
-  );
+    final result = await APIService.postRequest<bool>(
+      url: "${AppURLs.AUTOPAY_ENABLE_FOR_ORDER_API}/$orderId",
+      body: body,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (json) {
+        log("ENABLE AUTOPAY RESPONSE ==> $json");
+        return json["success"] == true;
+      },
+    );
 
-  return result ?? false;
-}
+    return result ?? false;
+  }
 
 // ================= DISABLE AUTOPAY FOR ORDER =================
-Future<bool> disableAutopayForOrder({
-  required String orderId,
-}) async {
-  final token = box.read(AppConst.ACCESS_TOKEN);
+  Future<bool> disableAutopayForOrder({
+    required String orderId,
+  }) async {
+    final token = box.read(AppConst.ACCESS_TOKEN);
 
-  log("DISABLE AUTOPAY FOR ORDER REQUEST: $orderId");
+    log("DISABLE AUTOPAY FOR ORDER REQUEST: $orderId");
 
-  final result = await APIService.postRequest<bool>(
-    url: "${AppURLs.AUTOPAY_DISABLE_FOR_ORDER_API}/$orderId",
-    body: {}, // Empty body as per API
-    headers: {
-      "Authorization": "Bearer $token",
-      "Content-Type": "application/json",
-    },
-    onSuccess: (json) {
-      log("DISABLE AUTOPAY RESPONSE ==> $json");
-      return json["success"] == true;
-    },
-  );
+    final result = await APIService.postRequest<bool>(
+      url: "${AppURLs.AUTOPAY_DISABLE_FOR_ORDER_API}/$orderId",
+      body: {}, // Empty body as per API
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (json) {
+        log("DISABLE AUTOPAY RESPONSE ==> $json");
+        return json["success"] == true;
+      },
+    );
 
-  return result ?? false;
-}
+    return result ?? false;
+  }
 
-Future<bool> updateOrderPriority({
-  required String orderId,
-  required int priority,
-}) async {
-  final token = box.read(AppConst.ACCESS_TOKEN);
+  Future<bool> updateOrderPriority({
+    required String orderId,
+    required int priority,
+  }) async {
+    final token = box.read(AppConst.ACCESS_TOKEN);
 
-  final body = {
-    "priority": priority,
-  };
+    final body = {
+      "priority": priority,
+    };
 
-  log("UPDATE PRIORITY BODY: ${jsonEncode(body)}");
+    log("UPDATE PRIORITY BODY: ${jsonEncode(body)}");
 
-  final result = await APIService.putRequest<bool>(
-    url: "${AppURLs.AUTOPAY_PRIORITY_API}/$orderId",
-    body: body,
-    headers: {
-      "Authorization": "Bearer $token",
-      "Content-Type": "application/json",
-    },
-    onSuccess: (json) {
-      log("UPDATE PRIORITY RESPONSE ==> $json");
-      return json["success"] == true;
-    },
-  );
+    final result = await APIService.putRequest<bool>(
+      url: "${AppURLs.AUTOPAY_PRIORITY_API}/$orderId",
+      body: body,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (json) {
+        log("UPDATE PRIORITY RESPONSE ==> $json");
+        return json["success"] == true;
+      },
+    );
 
-  return result ?? false;
-}
-
-  
+    return result ?? false;
+  }
 }

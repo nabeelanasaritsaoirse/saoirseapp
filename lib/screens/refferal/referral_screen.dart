@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:saoirse_app/screens/login/login_page.dart';
 
 import '../../constants/app_strings.dart';
 import '../../models/refferal_info_model.dart';
@@ -44,7 +43,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
   late ScrollController scrollController;
 
   final double bannerHeight = 140.h;
-  bool _previousLoginState = false;
 
   @override
   void initState() {
@@ -1085,37 +1083,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
         ),
       ),
       isScrollControlled: true,
-    );
-  }
-
-  Widget _loginOnlyView() {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(20.w),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            appText(
-              "Please login to view Referral",
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
-            ),
-            SizedBox(height: 20.h),
-            appButton(
-              buttonColor: AppColors.primaryColor,
-              onTap: () {
-                Get.to(() => LoginPage());
-              },
-              child: appText(
-                "Login",
-                color: AppColors.white,
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

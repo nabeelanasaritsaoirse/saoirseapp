@@ -1,21 +1,18 @@
 // ignore_for_file: deprecated_member_use
 
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_assets.dart';
-import 'package:saoirse_app/constants/app_colors.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
-import 'package:saoirse_app/widgets/app_button.dart';
-import 'package:saoirse_app/widgets/app_loader.dart';
-import 'package:saoirse_app/widgets/app_text.dart';
-import 'package:saoirse_app/widgets/app_text_field.dart';
-import 'package:saoirse_app/widgets/custom_appbar.dart';
-
+import '../../constants/app_assets.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_loader.dart';
+import '../../widgets/app_text.dart';
+import '../../widgets/app_text_field.dart';
+import '../../widgets/custom_appbar.dart';
 import 'autopay_dashboard_controller.dart';
 import 'autopay_settings_preferences.dart';
 
@@ -234,13 +231,7 @@ class AutopayDashboardScreen extends StatelessWidget {
               width: double.infinity,
               height: 44.h,
               child: appButton(
-                onTap: () {
-                  //   todo: open settings dialog                                                Quick Add Button
-                  print('Quick Add ₹${controller.suggestedTopUp.value}');
-                  print(controller.items[0].title);
-                  print(controller.items[1].title);
-                  print(controller.items[2].title);
-                },
+                onTap: () {},
                 buttonText: 'Quick Add ₹${controller.suggestedTopUp.value}',
                 buttonColor: AppColors.primaryColor,
                 textColor: AppColors.white,
@@ -273,8 +264,8 @@ class AutopayDashboardScreen extends StatelessWidget {
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color:
-        // isDisabled ? AppColors.grey :
-         AppColors.white,
+            // isDisabled ? AppColors.grey :
+            AppColors.white,
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
           color: AppColors.offWhite,
@@ -319,13 +310,7 @@ class AutopayDashboardScreen extends StatelessWidget {
                             final controller = Get.find<AutopayController>();
 
                             controller.selectedOrderId.value = item.orderId;
-                            print("order id");
-                            print(item.orderId);
                             controller.applyAutopayStatusForOrder(item.orderId);
-
-                            log("Opening autopay settings for ${item.orderId}");
-                            log("Selected Order ID = ${controller.selectedOrderId.value}");
-                            log("Skip dates after prefill = ${controller.skipDates}");
 
                             // OPEN BOTTOM SHEET
                             showAutopayPreferenceSheet(Get.context!);
@@ -376,9 +361,6 @@ class AutopayDashboardScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: 8.h),
-            // customGradientProgress(value: item.progress.toDouble())
-            //                                                                                TODO        CUSTOM PROGRESS
-
             customGradientProgress(
               value: item.progress / 100.0,
             )
@@ -403,8 +385,6 @@ Widget customGradientProgress({
       borderRadius: BorderRadius.circular(50),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          log('Progress maxWidth: ${constraints.maxWidth}, value: $value');
-
           return Align(
             alignment: Alignment.centerLeft,
             child: Container(
@@ -464,9 +444,6 @@ class AutopaySettingsDialog extends StatelessWidget {
                       SizedBox(height: 10.h),
                       timePreference(),
                       SizedBox(height: 14.h),
-
-//                                                                                         WALLET RESERVES & REMINDER & NOTIFICATION
-
                       appText('Wallet Reserves', fontWeight: FontWeight.w600),
                       SizedBox(height: 8.h),
                       appTextField(

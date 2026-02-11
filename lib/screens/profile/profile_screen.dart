@@ -2,9 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/screens/my_review/my_review_screen.dart';
-import 'package:saoirse_app/screens/coupon_screen/coupon_screen.dart';
 
+import '../coupon_screen/coupon_screen.dart';
 import '../edit_profile/edit_profile_screen.dart';
 import '../faqs/faqs.dart';
 import '../kyc/kyc_controller.dart';
@@ -17,6 +16,7 @@ import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/profile_menu_card.dart';
 import '../manage_address/manage_address_screen.dart';
+import '../my_review/my_review_screen.dart';
 import '../order_delivered/order_delivered_screen.dart';
 import '../order_history/order_history_screen.dart';
 import '../orders_active/orders_active_screen.dart';

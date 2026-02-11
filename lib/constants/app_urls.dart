@@ -56,8 +56,9 @@ class AppURLs {
 
   // Product Review
   static String CAN_REVIEW_API = BASE_API + "api/reviews/can-review/";
-  static String UPLOAD_REVIEW_IMAGES_API = BASE_API + "api/reviews/upload-images";
-  static String CREATE_REVIEW_API =BASE_API + "api/reviews";
+  static String UPLOAD_REVIEW_IMAGES_API =
+      BASE_API + "api/reviews/upload-images";
+  static String CREATE_REVIEW_API = BASE_API + "api/reviews";
   static String GET_OWN_REVIEWs_API = BASE_API + "api/reviews/my-reviews";
   static String EDIT_REVIEW = BASE_API + "api/reviews/";
 
@@ -86,7 +87,7 @@ class AppURLs {
   //Autopay Api
   static String AUTOPAY_DASHBOARD_API =
       BASE_API + "api/installments/autopay/dashboard";
-  
+
   static String AUTOPAY_SETTINGS_API =
       BASE_API + "api/installments/autopay/settings";
   static String AUTOPAY_NOTIFICATION_PREFERENCES_API =
@@ -99,20 +100,16 @@ class AppURLs {
       BASE_API + "api/installments/autopay/skip-dates";
   static String AUTOPAY_SUGGESTED_TOPUP_API =
       BASE_API + "api/installments/autopay/suggested-topup";
-  static String AUTOPAY_PAUSE_API = 
-  BASE_API + "api/installments/autopay/pause";
+  static String AUTOPAY_PAUSE_API = BASE_API + "api/installments/autopay/pause";
   static String AUTOPAY_RESUME_API =
       BASE_API + "api/installments/autopay/resume";
-static String AUTOPAY_ENABLE_FOR_ORDER_API =
-  BASE_API + "api/installments/autopay/enable";
+  static String AUTOPAY_ENABLE_FOR_ORDER_API =
+      BASE_API + "api/installments/autopay/enable";
   static String AUTOPAY_DISABLE_FOR_ORDER_API =
-  BASE_API + "api/installments/autopay/disable";
+      BASE_API + "api/installments/autopay/disable";
 
   static String AUTOPAY_PRIORITY_API =
       BASE_API + "api/installments/autopay/priority";
-
-
-     
 
 //  Delete Account
   static String DELETE_ACCOUNT_GET_API =
