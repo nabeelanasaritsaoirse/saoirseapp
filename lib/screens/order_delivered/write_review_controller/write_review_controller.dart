@@ -157,147 +157,70 @@ class WriteReviewController extends GetxController {
   // STEP 2️⃣ SUBMIT REVIEW (CREATE OR UPDATE)
   // ======================================================
 
-  Future<bool> submitReview() async {
-    log("STEP 1: submitReview started");
+ Future<bool> submitReview() async {
+  log("STEP 1: submitReview started");
 
-    if (reviewRating.value == 0) {
-      Get.snackbar("Rating required", "Please select a star rating");
-      return false;
-    }
-
-    final text = reviewTextController.text.trim();
-
-    if (text.isEmpty) {
-      Get.snackbar("Review required", "Please write your feedback");
-      return false;
-    }
-
-    log("STEP 2: validation passed");
-
-    final uploaded = await uploadImagesIfNeeded();
-    log("STEP 3: uploadImagesIfNeeded result = $uploaded");
-
-    if (!uploaded) return false;
-
-    log("STEP 4: deciding create or update");
-
-    bool success = false;
-
-    if (isEditMode.value && editingReviewId != null) {
-      /// Convert uploaded images to ReviewImages model
-      // final convertedUploadedImages = uploadedImages
-      //     .map(
-      //       (e) => ReviewImages(
-      //         url: e.url,
-      //         thumbnail: e.thumbnail,
-      //         caption: e.caption,
-      //         isProcessed: true,
-      //         uploadedAt: DateTime.now(),
-      //       ),
-      //     )
-      //     .toList();
-
-      // /// ================= UPDATE REVIEW =================
-      // final response = await reviewService.updateReview(
-      //   reviewId: editingReviewId!,
-      //   rating: reviewRating.value,
-      //   title: _generateTitleFromRating(),
-      //   comment: text,
-      //   images: [
-      //     ...existingImages,
-      //     ...convertedUploadedImages,
-      //   ],
-      //   detailedRatings: {
-      //     "quality": reviewRating.value,
-      //     "valueForMoney": reviewRating.value,
-      //     "delivery": reviewRating.value,
-      //     "accuracy": reviewRating.value,
-      //   },
-      // );
-
-      /// Convert existing images → ReviewImage
-      final convertedExistingImages = existingImages
-          .map(
-            (e) => ReviewImage(
-              url: e.url,
-              thumbnail: e.thumbnail,
-              caption: e.caption,
-            ),
-          )
-          .toList();
-
-      /// Convert uploaded images → ReviewImage
-      final convertedUploadedImages = uploadedImages
-          .map(
-            (e) => ReviewImage(
-              url: e.url,
-              thumbnail: e.thumbnail,
-              caption: e.caption,
-            ),
-          )
-          .toList();
-
-      final response = await reviewService.updateReview(
-        reviewId: editingReviewId!,
-        rating: reviewRating.value,
-        title: _generateTitleFromRating(),
-        comment: text,
-        images: [
-          ...convertedExistingImages,
-          ...convertedUploadedImages,
-        ],
-        detailedRatings: {
-          "quality": reviewRating.value,
-          "valueForMoney": reviewRating.value,
-          "delivery": reviewRating.value,
-          "accuracy": reviewRating.value,
-        },
-      );
-
-      log("STEP 5: updateReview response = $response");
-
-      success = response != null && response.success == true;
-    } else {
-      /// ================= CREATE REVIEW =================
-      final response = await reviewService.createReview(
-        productId: productId,
-        rating: reviewRating.value,
-        title: _generateTitleFromRating(),
-        comment: text,
-        images: uploadedImages.toList(),
-        detailedRatings: {
-          "quality": reviewRating.value,
-          "valueForMoney": reviewRating.value,
-          "delivery": reviewRating.value,
-          "accuracy": reviewRating.value,
-        },
-      );
-
-      log("STEP 5: createReview response = $response");
-
-      success = response != null && response.success == true;
-    }
-
-    if (!success) {
-      Get.snackbar("Failed", "Failed to submit review");
-      return false;
-    }
-
-    /// Reset form
-    resetReviewForm();
-
-    /// Close dialog
-    if (Get.isDialogOpen == true) {
-      Get.back(result: true);
-    }
-
-    /// Refresh My Reviews screen if open
-    if (Get.isRegistered<MyReviewController>()) {
-      Get.find<MyReviewController>().fetchMyReviews();
-    }
-
-    return true;
+  if (reviewRating.value == 0) {
+    Get.snackbar("Rating required", "Please select a star rating");
+    return false;
   }
+
+  final text = reviewTextController.text.trim();
+
+  if (text.isEmpty) {
+    Get.snackbar("Review required", "Please write your feedback");
+    return false;
+  }
+
+  log("STEP 2: validation passed");
+
+  final uploaded = await uploadImagesIfNeeded();
+  log("STEP 3: uploadImagesIfNeeded result = $uploaded");
+
+  if (!uploaded) return false;
+
+  log("STEP 4: deciding create or update");
+
+  bool success = false;
+
+  /// ================= CREATE REVIEW =================
+  final response = await reviewService.createReview(
+    productId: productId,
+    rating: reviewRating.value,
+    title: _generateTitleFromRating(),
+    comment: text,
+    images: uploadedImages.toList(),
+    detailedRatings: {
+      "quality": reviewRating.value,
+      "valueForMoney": reviewRating.value,
+      "delivery": reviewRating.value,
+      "accuracy": reviewRating.value,
+    },
+  );
+
+  log("STEP 5: createReview response = $response");
+
+  success = response != null && response.success == true;
+
+  if (!success) {
+    Get.snackbar("Failed", "Failed to submit review");
+    return false;
+  }
+
+  /// Reset form
+  resetReviewForm();
+
+  /// Close dialog
+  if (Get.isDialogOpen == true) {
+    Get.back(result: true);
+  }
+
+
+  
+
+  return true;
+}
+
 
   // ================== TITLE GENERATOR ==================
   String _generateTitleFromRating() {

@@ -58,6 +58,7 @@ class AppAssets {
   // static String delivered = "assets/icons/delivered.png";
   static String customer_care = "assets/icons/customer_care.png";
   static String password_security = "assets/icons/security.png";
+  static String delete_account = "assets/icons/delete.jpeg";
   // static String privacy_policy = "assets/icons/privacy.png";
   // static String terms_condition = "assets/icons/terms.png";
 
@@ -78,7 +79,7 @@ class AppAssets {
   static String logout = "assets/svg/logout.svg";
   static String kyc = "assets/svg/kyc.svg";
   static String faq = "assets/svg/faq.svg";
-  static String autopay = "assets/svg/autopay.svg";
+  static String autopay = "assets/svg/trash_svg.svg";
   static String coupons = "assets/svg/coupon.svg";
   static String manage_accounts = "assets/svg/account.svg";
   static String address = "assets/svg/address.svg";
@@ -91,6 +92,7 @@ class AppAssets {
   static String wallett = "assets/svg/wallet.svg";
   static String walletnew = "assets/svg/walletwallet.svg";
   static String deletenew = "assets/svg/deletenew.svg";
+  static String delete_acc = "assets/svg/delete_account.svg";
 
   //Dummy Assets for image needed response
   static String mobile = "assets/images/phone.png";

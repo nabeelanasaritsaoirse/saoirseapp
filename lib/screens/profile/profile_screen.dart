@@ -254,10 +254,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         } else if (index == 6) {
                           Get.to(() => AutopayDashboardScreen());
                         } else if (index == 7) {
-                          Get.to(() => MyReviewScreen());
-                        
-                        }else if (index == 8) {
-                            Get.to(() => CouponScreen());
+                           Get.to(() => CouponScreen());
+                          }else if (index == 8) {
+                           
                         
                         } else {}
                       },
