@@ -113,8 +113,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
                 if (count == 0) return const SizedBox();
 
                 return Positioned(
-                  right: 4,
-                  top: 4,
+                  right: 5.w,
+                  top: 5.h,
                   child: Container(
                     padding: EdgeInsets.all(2.r),
                     decoration: BoxDecoration(

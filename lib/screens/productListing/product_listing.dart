@@ -94,8 +94,8 @@ class _ProductListingState extends State<ProductListing> {
                   // Show badge only if count > 0
                   if (count > 0)
                     Positioned(
-                      right: 4,
-                      top: 4,
+                      right: 4.w,
+                      top: 4.h,
                       child: Container(
                         padding: EdgeInsets.all(4.r),
                         decoration: BoxDecoration(

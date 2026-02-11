@@ -72,8 +72,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (count == 0) return const SizedBox();
 
                 return Positioned(
-                  right: 5,
-                  top: 5,
+                  right: 6.w,
+                  top: 6.h,
                   child: Container(
                     padding: EdgeInsets.all(2.r),
                     decoration: BoxDecoration(

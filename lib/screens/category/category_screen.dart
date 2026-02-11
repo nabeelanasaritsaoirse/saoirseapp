@@ -63,8 +63,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 ),
                 if (count > 0)
                   Positioned(
-                    right: 6,
-                    top: 6,
+                    right: 6.w,
+                    top: 5.h,
                     child: Container(
                       padding: EdgeInsets.all(4.r),
                       decoration: const BoxDecoration(
