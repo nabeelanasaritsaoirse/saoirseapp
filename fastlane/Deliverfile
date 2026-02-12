@@ -1,5 +1,5 @@
 app_identifier "com.saoirse.epi"
-platform :ios
+platform :"ios"
 
 app_version ENV["VERSION_NAME"]
 build_number ENV["BUILD_NUMBER"]
