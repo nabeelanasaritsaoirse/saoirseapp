@@ -51,19 +51,34 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
+      // body: SafeArea(
+      //   child: Obx(() {
+      //     /// LOADING
+      //     if (controller.isProductLoading.value) {
+      //       return Center(child: appLoader());
+      //     }
+
+      //     /// NO PRODUCT
+      //     if (controller.product.value == null) {
+      //       return Center(child: Text("Product not found"));
+      //     }
+
+      //     return buildBody(controller.product.value!);
+      //   }),
+      // ),
       body: SafeArea(
         child: Obx(() {
-          /// LOADING
-          if (controller.isProductLoading.value) {
+          final product = controller.product.value;
+
+          if (controller.isProductLoading.value && product == null) {
             return Center(child: appLoader());
           }
 
-          /// NO PRODUCT
-          if (controller.product.value == null) {
+          if (product == null) {
             return Center(child: Text("Product not found"));
           }
 
-          return buildBody(controller.product.value!);
+          return buildBody(product);
         }),
       ),
 
@@ -770,8 +785,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Widget _buildFaqContent() {
     if (controller.isFaqLoading.value) {
       return Padding(
-        padding: EdgeInsets.only(top: 10.h),
-        child: appLoader(),
+        padding: EdgeInsets.symmetric(vertical: 20.h),
+        child: Center(
+          child: SizedBox(
+            width: 22,
+            height: 22,
+            child: CupertinoActivityIndicator(color: AppColors.grey),
+          ),
+        ),
       );
     }
 
@@ -1067,6 +1088,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   // }
 
   Widget buildReviewSection() {
+    if (controller.isReviewLoading.value) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 20.h),
+        child: Center(
+          child: CupertinoActivityIndicator(
+            radius: 12,
+          ),
+        ),
+      );
+    }
     return Container(
       margin: EdgeInsets.only(top: 10.h),
       padding: EdgeInsets.symmetric(vertical: 14.h),

@@ -66,14 +66,11 @@ class ProductDetailsController extends GetxController {
   RxInt totalReviews = 47.obs;
 
   // ---------------- REVIEWS ----------------
-RxBool isReviewLoading = false.obs;
+  RxBool isReviewLoading = false.obs;
 
-RxList<Review> reviews = <Review>[].obs;
+  RxList<Review> reviews = <Review>[].obs;
 
-
-
-RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
-
+  RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
 
 // ---------------- WRITE REVIEW ----------------
   final ImagePicker _reviewImagePicker = ImagePicker();
@@ -120,38 +117,73 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
   //   }
   // }
 
+  // Future<void> fetchProductDetails() async {
+  //   try {
+  //     isProductLoading(true);
+
+  //     final result = await productService.fetchProductDetails(productId);
+  //     product.value = result;
+
+  //     if (result == null) return;
+
+  //     // Start with base images
+  //     mergedImages.assignAll(result.images);
+
+  //     // If it has variants → override only the first image
+  //     if (result.hasVariants && result.variants.isNotEmpty) {
+  //       final firstVariant = result.variants.first;
+  //       selectedVariantId.value = firstVariant.variantId;
+
+  //       if (firstVariant.images.isNotEmpty) {
+  //         mergedImages[0] = firstVariant.images.first;
+  //       }
+  //     }
+  //     fetchFaqs();
+  //     fetchSimilarProducts();
+  //     fetchProductReviews();
+
+  //     // Reset page
+  //     currentImageIndex.value = 0;
+  //     jumpToPageSafe(0);
+  //   } finally {
+  //     isProductLoading(false);
+  //   }
+  // }
+
   Future<void> fetchProductDetails() async {
-    try {
-      isProductLoading(true);
+  try {
+    isProductLoading(true);
 
-      final result = await productService.fetchProductDetails(productId);
-      product.value = result;
+    final result = await productService.fetchProductDetails(productId);
+    product.value = result;
 
-      if (result == null) return;
+    if (result == null) return;
 
-      // Start with base images
-      mergedImages.assignAll(result.images);
+    // Start with base images
+    mergedImages.assignAll(result.images);
 
-      // If it has variants → override only the first image
-      if (result.hasVariants && result.variants.isNotEmpty) {
-        final firstVariant = result.variants.first;
-        selectedVariantId.value = firstVariant.variantId;
+    if (result.hasVariants && result.variants.isNotEmpty) {
+      final firstVariant = result.variants.first;
+      selectedVariantId.value = firstVariant.variantId;
 
-        if (firstVariant.images.isNotEmpty) {
-          mergedImages[0] = firstVariant.images.first;
-        }
+      if (firstVariant.images.isNotEmpty) {
+        mergedImages[0] = firstVariant.images.first;
       }
-      fetchFaqs();
-      fetchSimilarProducts();
-      fetchProductReviews();
-
-      // Reset page
-      currentImageIndex.value = 0;
-      jumpToPageSafe(0);
-    } finally {
-      isProductLoading(false);
     }
+
+    // Reset page
+    currentImageIndex.value = 0;
+    jumpToPageSafe(0);
+  } finally {
+    isProductLoading(false);
   }
+
+  /// Load other sections AFTER product is ready
+  fetchFaqs();
+  fetchSimilarProducts();
+  fetchProductReviews();
+}
+
 
   // ========================================================
   // FETCH SIMILAR PRODUCTS (USES SAME getProducts API)
@@ -198,42 +230,35 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
   }
 
   Future<void> fetchProductReviews() async {
-  try {
-    isReviewLoading(true);
+    try {
+      isReviewLoading(true);
 
-    final ReviewResponse? response =
-        await productService.fetchProductReviews(
-      productId: productId,
-      page: 1,
-      limit: 10,
-      sort: "mostHelpful",
-    );
+      final ReviewResponse? response = await productService.fetchProductReviews(
+        productId: productId,
+        page: 1,
+        limit: 10,
+        sort: "mostHelpful",
+      );
 
-    if (response == null) return;
+      if (response == null) return;
 
-    // Stats
-    averageRating.value =
-        response.data.ratingStats.averageRating;
-    totalReviews.value =
-        response.data.ratingStats.totalReviews;
-    totalRatings.value =
-        response.data.ratingStats.totalReviews;
+      // Stats
+      averageRating.value = response.data.ratingStats.averageRating;
+      totalReviews.value = response.data.ratingStats.totalReviews;
+      totalRatings.value = response.data.ratingStats.totalReviews;
 
-    // Reviews
-    reviews.assignAll(response.data.reviews);
+      // Reviews
+      reviews.assignAll(response.data.reviews);
 
-    // Image preview (first 3 images)
-    final images = response.data.reviews
-        .expand((r) => r.images)
-        .take(3)
-        .toList();
+      // Image preview (first 3 images)
+      final images =
+          response.data.reviews.expand((r) => r.images).take(3).toList();
 
-    reviewImagesPreview.assignAll(images);
-  } finally {
-    isReviewLoading(false);
+      reviewImagesPreview.assignAll(images);
+    } finally {
+      isReviewLoading(false);
+    }
   }
-}
-
 
   Future<void> checkIfInWishlist(String id) async {
     final exists = await wishlistService.checkWishlist(id);
@@ -326,9 +351,9 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
     appLoader();
 
     // Fetch plans
-    isProductLoading.value = true;
+    isPageLoading.value = true;
     await loadPlans(product.value!.id);
-    isProductLoading.value = false;
+    isPageLoading.value = false;
 
     // Close loader
     if (Get.isDialogOpen ?? false) Get.back();
@@ -399,15 +424,13 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
     isUpdating = false;
   }
 
-  Future loadPlans(String productId) async {
-    isProductLoading.value = true;
+ Future loadPlans(String productId) async {
+  isPageLoading.value = true;
+  final result = await ProductService().fetchProductPlans(productId);
+  plans.assignAll(result);
+  isPageLoading.value = false;
+}
 
-    final result = await ProductService().fetchProductPlans(productId);
-
-    plans.assignAll(result);
-
-    isProductLoading.value = false;
-  }
 
   void selectApiPlan(int index) {
     selectedPlanIndex.value = index;

@@ -219,8 +219,8 @@ class APIService {
             .timeout(Duration(seconds: timeoutSeconds));
 
         ("Response [${response.statusCode}]: ${response.body}");
-        log("API URL ==> $url");
-        log("Respose body : =====> ${response.body}");
+        // log("API URL ==> $url");
+        // log("Respose body : =====> ${response.body}");
         switch (response.statusCode) {
           case 200:
           case 201:
