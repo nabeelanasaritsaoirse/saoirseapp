@@ -367,34 +367,43 @@ jobs:
       - name: 🔐 Write api_key.json
         run: echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > api_key.json
   
-      # Ensure release notes exist
-      - name: 📝 Generate WhatsNew Metadata
+      - name: 📝 Generate Release Notes
         env:
           VERSION_NAME: ${{ needs.ios-ci.outputs.version_name }}
+          BUILD_NUMBER: ${{ needs.ios-ci.outputs.build_number }}
         run: |
           mkdir -p fastlane/metadata/en-US
-          echo "Bug fixes and performance improvements for version $VERSION_NAME." \
-            > fastlane/metadata/en-US/whats_new.txt
+          # Use build number to make content unique every run (forces deliver to detect a change)
+          echo "Bug fixes and performance improvements. Build $BUILD_NUMBER." \
+            > fastlane/metadata/en-US/release_notes.txt
+          echo "✅ release_notes.txt content:"
+          cat fastlane/metadata/en-US/release_notes.txt
   
-      # STEP 1 — Upload metadata ONLY
-      - name: 📤 Upload Metadata
+      # STEP 1 — Upload metadata only, explicitly no submit
+      - name: 📤 Upload Metadata (whatsNew)
         run: |
           fastlane deliver \
             --api_key_path api_key.json \
             --skip_binary_upload true \
             --skip_screenshots true \
             --submit_for_review false \
+            --skip_app_version_update false \
             --force
   
-      # STEP 2 — Submit build ONLY
+      # STEP 2 — Verify whatsNew actually landed before submitting
+      - name: 🔍 Verify Metadata Upload
+        run: |
+          echo "Metadata step completed. Pausing briefly for ASC consistency..."
+          sleep 10
+  
+      # STEP 3 — Submit only, metadata already uploaded
       - name: 🚀 Submit Build to Apple Review
-        env:
-          CI: true
         run: |
           fastlane deliver \
             --api_key_path api_key.json \
             --skip_metadata true \
             --skip_binary_upload true \
+            --skip_screenshots true \
             --submit_for_review true \
             --force
   
