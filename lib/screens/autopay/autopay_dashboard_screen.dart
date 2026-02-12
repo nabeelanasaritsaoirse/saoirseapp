@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import '/screens/add_money/add_money_screen.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -54,14 +55,6 @@ class AutopayDashboardScreen extends StatelessWidget {
       body: Obx(() {
         if (controller.isLoading.value) {
           return appLoader();
-        }
-        if (controller.errorMessage.isNotEmpty) {
-          return Center(
-            child: appText(
-              controller.errorMessage.value,
-              color: AppColors.red,
-            ),
-          );
         }
 
         return SingleChildScrollView(
@@ -193,7 +186,7 @@ class AutopayDashboardScreen extends StatelessWidget {
           Icon(
             icon,
             size: 14.sp,
-            color: Colors.white,
+            color: AppColors.white,
           ),
           appText(
             text,
@@ -233,7 +226,13 @@ class AutopayDashboardScreen extends StatelessWidget {
               width: double.infinity,
               height: 44.h,
               child: appButton(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                      Get.context!,
+                      MaterialPageRoute(
+                        builder: (_) => AddMoneyScreen(),
+                      ));
+                },
                 buttonText: 'Quick Add ₹${controller.suggestedTopUp.value}',
                 buttonColor: AppColors.primaryColor,
                 textColor: AppColors.white,
@@ -297,7 +296,7 @@ class AutopayDashboardScreen extends StatelessWidget {
                       appText(
                         isDisabled ? 'Inactive' : 'Active',
                         fontSize: 11.sp,
-                        color: isDisabled ? Colors.red : AppColors.green,
+                        color: isDisabled ? AppColors.red : AppColors.green,
                         fontWeight: FontWeight.w500,
                       ),
                       SizedBox(
@@ -384,10 +383,10 @@ Widget customGradientProgress({
     width: double.infinity,
     decoration: BoxDecoration(
       color: const Color(0xFFE8EEFF),
-      borderRadius: BorderRadius.circular(50),
+      borderRadius: BorderRadius.circular(50.r),
     ),
     child: ClipRRect(
-      borderRadius: BorderRadius.circular(50),
+      borderRadius: BorderRadius.circular(50.r),
       child: LayoutBuilder(
         builder: (context, constraints) {
           log('Progress maxWidth: ${constraints.maxWidth}, value: $value');
@@ -406,7 +405,7 @@ Widget customGradientProgress({
                     Color(0xFF4A5BFF),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(50),
+                borderRadius: BorderRadius.circular(50.r),
               ),
             ),
           );

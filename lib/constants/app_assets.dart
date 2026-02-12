@@ -62,8 +62,8 @@ class AppAssets {
   static String logout = "assets/svg/logout.svg";
   static String kyc = "assets/svg/kyc.svg";
   static String faq = "assets/svg/faq.svg";
-  static String autopay = "assets/svg/autopay.svg";
-  static String coupons = "assets/svg/coupon.svg";
+  static String autopay = "assets/svg/auto_pay_final.svg";
+  static String coupons = "assets/svg/coupon _1.svg";
   static String manage_accounts = "assets/svg/account.svg";
   static String address = "assets/svg/address.svg";
   static String delete_acc = "assets/svg/delete_account.svg";
