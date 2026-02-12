@@ -407,9 +407,10 @@ jobs:
             --skip_screenshots true \
             --submit_for_review true \
             --force
-            - name: 🧾 Review Submission Summary
-              run: |
-                echo "## 🍎 App Store Submission" >> $GITHUB_STEP_SUMMARY
-                echo "- Bundle: ${{ env.BUNDLE_ID }}" >> $GITHUB_STEP_SUMMARY
-                echo "- Tag: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-                echo "- Status: Submitted to Apple Review ✅" >> $GITHUB_STEP_SUMMARY
+            
+      - name: 🧾 Review Submission Summary
+        run: |
+          echo "## 🍎 App Store Submission" >> $GITHUB_STEP_SUMMARY
+          echo "- Bundle: ${{ env.BUNDLE_ID }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Tag: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: Submitted to Apple Review ✅" >> $GITHUB_STEP_SUMMARY
