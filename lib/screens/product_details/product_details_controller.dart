@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/review_resposne.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -8,6 +7,7 @@ import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
 import '../../models/product_faq.dart';
 import '../../models/product_list_response.dart';
+import '../../models/review_resposne.dart';
 import '../../services/product_service.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_loader.dart';
@@ -66,14 +66,11 @@ class ProductDetailsController extends GetxController {
   RxInt totalReviews = 47.obs;
 
   // ---------------- REVIEWS ----------------
-RxBool isReviewLoading = false.obs;
+  RxBool isReviewLoading = false.obs;
 
-RxList<Review> reviews = <Review>[].obs;
+  RxList<Review> reviews = <Review>[].obs;
 
-
-
-RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
-
+  RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
 
 // ---------------- WRITE REVIEW ----------------
   final ImagePicker _reviewImagePicker = ImagePicker();
@@ -100,26 +97,6 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
     checkIfInWishlist(productId);
   }
 
-  // FETCH PRODUCT DETAILS
-  // Future<void> fetchProductDetails() async {
-  //   try {
-  //     isLoading(true);
-
-  //     final result = await productService.fetchProductDetails(productId);
-  //     product.value = result;
-
-  //     if (result != null && result.hasVariants && result.variants.isNotEmpty) {
-  //       selectedVariantId.value = result.variants.first.variantId;
-
-  //     }
-  //   } catch (e) {
-
-  //     appToast(content: "Failed to load product details");
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
-
   Future<void> fetchProductDetails() async {
     try {
       isProductLoading(true);
@@ -132,7 +109,6 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
       // Start with base images
       mergedImages.assignAll(result.images);
 
-      // If it has variants → override only the first image
       if (result.hasVariants && result.variants.isNotEmpty) {
         final firstVariant = result.variants.first;
         selectedVariantId.value = firstVariant.variantId;
@@ -141,9 +117,6 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
           mergedImages[0] = firstVariant.images.first;
         }
       }
-      fetchFaqs();
-      fetchSimilarProducts();
-      fetchProductReviews();
 
       // Reset page
       currentImageIndex.value = 0;
@@ -151,6 +124,11 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
     } finally {
       isProductLoading(false);
     }
+
+    /// Load other sections AFTER product is ready
+    fetchFaqs();
+    fetchSimilarProducts();
+    fetchProductReviews();
   }
 
   // ========================================================
@@ -198,42 +176,35 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
   }
 
   Future<void> fetchProductReviews() async {
-  try {
-    isReviewLoading(true);
+    try {
+      isReviewLoading(true);
 
-    final ReviewResponse? response =
-        await productService.fetchProductReviews(
-      productId: productId,
-      page: 1,
-      limit: 10,
-      sort: "mostHelpful",
-    );
+      final ReviewResponse? response = await productService.fetchProductReviews(
+        productId: productId,
+        page: 1,
+        limit: 10,
+        sort: "mostHelpful",
+      );
 
-    if (response == null) return;
+      if (response == null) return;
 
-    // Stats
-    averageRating.value =
-        response.data.ratingStats.averageRating;
-    totalReviews.value =
-        response.data.ratingStats.totalReviews;
-    totalRatings.value =
-        response.data.ratingStats.totalReviews;
+      // Stats
+      averageRating.value = response.data.ratingStats.averageRating;
+      totalReviews.value = response.data.ratingStats.totalReviews;
+      totalRatings.value = response.data.ratingStats.totalReviews;
 
-    // Reviews
-    reviews.assignAll(response.data.reviews);
+      // Reviews
+      reviews.assignAll(response.data.reviews);
 
-    // Image preview (first 3 images)
-    final images = response.data.reviews
-        .expand((r) => r.images)
-        .take(3)
-        .toList();
+      // Image preview (first 3 images)
+      final images =
+          response.data.reviews.expand((r) => r.images).take(3).toList();
 
-    reviewImagesPreview.assignAll(images);
-  } finally {
-    isReviewLoading(false);
+      reviewImagesPreview.assignAll(images);
+    } finally {
+      isReviewLoading(false);
+    }
   }
-}
-
 
   Future<void> checkIfInWishlist(String id) async {
     final exists = await wishlistService.checkWishlist(id);
@@ -293,30 +264,6 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
     currentImageIndex.value = index;
   }
 
-  // void openSelectPlanSheet() async {
-  //   if (product.value == null) return;
-
-  //   // Reset previous plan selection
-  //   resetPlanSelection();
-
-  //   appLoader();
-
-  //   // Fetch plans
-  //   isProductLoading.value = true;
-  //   await loadPlans(product.value!.id);
-  //   isProductLoading.value = false;
-
-  //   // Close loader
-  //   if (Get.isDialogOpen ?? false) Get.back();
-
-  //   // Open sheet
-  //   Get.bottomSheet(
-  //     const SelectPlanSheet(),
-  //     isScrollControlled: true,
-  //     backgroundColor: Colors.transparent,
-  //   );
-  // }
-
   void openSelectPlanSheet() async {
     if (product.value == null) return;
 
@@ -326,9 +273,9 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
     appLoader();
 
     // Fetch plans
-    isProductLoading.value = true;
+    isPageLoading.value = true;
     await loadPlans(product.value!.id);
-    isProductLoading.value = false;
+    isPageLoading.value = false;
 
     // Close loader
     if (Get.isDialogOpen ?? false) Get.back();
@@ -400,13 +347,10 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
   }
 
   Future loadPlans(String productId) async {
-    isProductLoading.value = true;
-
+    isPageLoading.value = true;
     final result = await ProductService().fetchProductPlans(productId);
-
     plans.assignAll(result);
-
-    isProductLoading.value = false;
+    isPageLoading.value = false;
   }
 
   void selectApiPlan(int index) {
@@ -481,17 +425,6 @@ RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
       }
     });
   }
-
-  // Variant? getSelectedVariant() {
-  //   if (selectedVariantId.value.isEmpty) return null;
-
-  //   for (final v in product.value?.variants ?? []) {
-  //     if (v.variantId == selectedVariantId.value) {
-  //       return v;
-  //     }
-  //   }
-  //   return null;
-  // }
 
   void clearSelectedVariant() {
     selectedVariantId.value = "";
