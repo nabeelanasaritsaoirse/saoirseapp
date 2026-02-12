@@ -353,37 +353,48 @@ jobs:
       - ios-ci
       - ios-deploy
     runs-on: macos-latest
-    
+  
     environment:
       name: ios-review
-    
+  
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
-    
+  
       - name: 🚀 Install Fastlane
         run: sudo gem install fastlane -N
-    
+  
       - name: 🔐 Write api_key.json
         run: echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > api_key.json
-    
+  
+      # Create WhatsNew (guaranteed metadata)
       - name: 📝 Force WhatsNew Metadata
         env:
           VERSION_NAME: ${{ needs.ios-ci.outputs.version_name }}
         run: |
           mkdir -p fastlane/metadata/en-US
           echo "Routine maintenance and performance improvements for version $VERSION_NAME." > fastlane/metadata/en-US/whats_new.txt
-    
-      - name: 📤 Submit Build to Apple Review
-        env:
-          CI: true
-          VERSION_NAME: ${{ needs.ios-ci.outputs.version_name }}
+  
+      # ⭐ STEP 1 — Upload metadata ONLY
+      - name: 📤 Upload Metadata
         run: |
           fastlane deliver \
             --api_key_path api_key.json \
-            --force \
-            --skip_metadata false
-
+            --skip_binary_upload true \
+            --skip_screenshots true \
+            --force
+  
+      # ⭐ STEP 2 — Submit build ONLY
+      - name: 🚀 Submit Build to Apple Review
+        env:
+          CI: true
+        run: |
+          fastlane deliver \
+            --api_key_path api_key.json \
+            --skip_metadata true \
+            --submit_for_review true \
+            --force
+  
       - name: 🧾 Review Submission Summary
         run: |
           echo "## 🍎 App Store Submission" >> $GITHUB_STEP_SUMMARY
