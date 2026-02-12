@@ -1,4 +1,4 @@
-## Version 1.5.17+66
+## Version 1.5.18+67
 
-- Merge pull request #375 from nabeelanasaritsaoirse/ci/nabeelanasaritsaoirse-patch-1-1
-- Fix formatting of platform declaration in Deliverfile
+- Merge pull request #377 from nabeelanasaritsaoirse/ci/nabeelanasaritsaoirse-patch-1-1
+- Update Deliverfile
