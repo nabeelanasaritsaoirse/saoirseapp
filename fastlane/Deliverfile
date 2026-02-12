@@ -1,15 +1,19 @@
-app_identifier "com.saoirse.epi"
-platform :"ios"
+app_identifier("com.saoirse.epi")
+platform("ios")
 
 app_version ENV["VERSION_NAME"]
 build_number ENV["BUILD_NUMBER"]
 
-skip_binary_upload true
-skip_screenshots true
-submit_for_review false       # default false — always override in CI
-automatic_release false
-run_precheck_before_submit false
+skip_binary_upload(true)
+skip_screenshots(true)
+
+submit_for_review(false)
+automatic_release(false)
+run_precheck_before_submit(false)
 
 submission_information({
   export_compliance_uses_encryption: false
 })
+
+
+
