@@ -77,12 +77,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget _buildBackButton() {
-    return IconButton(
-      onPressed: () => Get.back(),
-      icon: Icon(
-        Icons.arrow_back,
-        color: AppColors.white,
-        size: 25.sp,
+    return InkWell(
+      onTap: () => Get.back(),
+      child: Padding(
+        padding: EdgeInsets.all(8.r),
+        child: Icon(
+          Icons.arrow_back,
+          color: AppColors.white,
+          size: 25.sp,
+        ),
       ),
     );
   }
