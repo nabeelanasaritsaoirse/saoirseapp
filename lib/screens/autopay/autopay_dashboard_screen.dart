@@ -1,12 +1,11 @@
 // ignore_for_file: deprecated_member_use
 
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
+import '/screens/add_money/add_money_screen.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -54,14 +53,6 @@ class AutopayDashboardScreen extends StatelessWidget {
       body: Obx(() {
         if (controller.isLoading.value) {
           return appLoader();
-        }
-        if (controller.errorMessage.isNotEmpty) {
-          return Center(
-            child: appText(
-              controller.errorMessage.value,
-              color: AppColors.red,
-            ),
-          );
         }
 
         return SingleChildScrollView(
@@ -193,7 +184,7 @@ class AutopayDashboardScreen extends StatelessWidget {
           Icon(
             icon,
             size: 14.sp,
-            color: Colors.white,
+            color: AppColors.white,
           ),
           appText(
             text,
@@ -233,7 +224,9 @@ class AutopayDashboardScreen extends StatelessWidget {
               width: double.infinity,
               height: 44.h,
               child: appButton(
-                onTap: () {},
+                onTap: () {
+                  Get.to(() => AddMoneyScreen());
+                },
                 buttonText: 'Quick Add ₹${controller.suggestedTopUp.value}',
                 buttonColor: AppColors.primaryColor,
                 textColor: AppColors.white,
@@ -297,7 +290,7 @@ class AutopayDashboardScreen extends StatelessWidget {
                       appText(
                         isDisabled ? 'Inactive' : 'Active',
                         fontSize: 11.sp,
-                        color: isDisabled ? Colors.red : AppColors.green,
+                        color: isDisabled ? AppColors.red : AppColors.green,
                         fontWeight: FontWeight.w500,
                       ),
                       SizedBox(
@@ -312,12 +305,7 @@ class AutopayDashboardScreen extends StatelessWidget {
                           // IMPORTANT: load order data into controller
                           controller.applyAutopayStatusForOrder(item.orderId);
 
-                          log("Opening autopay settings for ${item.orderId}");
-                          log("Selected Order ID = ${controller.selectedOrderId.value}");
-                          log("Skip dates after prefill = ${controller.skipDates}");
-
                           // OPEN BOTTOM SHEET
-
                           showAutopayPreferenceSheet(
                               Get.context!, item.orderId);
                         },
@@ -384,14 +372,12 @@ Widget customGradientProgress({
     width: double.infinity,
     decoration: BoxDecoration(
       color: const Color(0xFFE8EEFF),
-      borderRadius: BorderRadius.circular(50),
+      borderRadius: BorderRadius.circular(50.r),
     ),
     child: ClipRRect(
-      borderRadius: BorderRadius.circular(50),
+      borderRadius: BorderRadius.circular(50.r),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          log('Progress maxWidth: ${constraints.maxWidth}, value: $value');
-
           return Align(
             alignment: Alignment.centerLeft,
             child: Container(
@@ -406,7 +392,7 @@ Widget customGradientProgress({
                     Color(0xFF4A5BFF),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(50),
+                borderRadius: BorderRadius.circular(50.r),
               ),
             ),
           );
@@ -452,8 +438,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                       timePreference(),
                       SizedBox(height: 14.h),
 
-//   WALLET RESERVES & REMINDER & NOTIFICATION
-
+                      // WALLET RESERVES & REMINDER & NOTIFICATION
                       appText('Wallet Reserves', fontWeight: FontWeight.w600),
                       SizedBox(height: 8.h),
                       appTextField(
