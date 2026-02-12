@@ -381,35 +381,35 @@ jobs:
   
       # STEP 1 — Upload metadata only, explicitly no submit
       - name: 📤 Upload Metadata (whatsNew)
+        env:
+          VERSION_NAME: ${{ needs.ios-ci.outputs.version_name }}
+          BUILD_NUMBER: ${{ needs.ios-ci.outputs.build_number }}
         run: |
           fastlane deliver \
             --api_key_path api_key.json \
+            --app_version "$VERSION_NAME" \
             --skip_binary_upload true \
             --skip_screenshots true \
             --submit_for_review false \
             --skip_app_version_update false \
             --force
-  
-      # STEP 2 — Verify whatsNew actually landed before submitting
-      - name: 🔍 Verify Metadata Upload
-        run: |
-          echo "Metadata step completed. Pausing briefly for ASC consistency..."
-          sleep 10
-  
-      # STEP 3 — Submit only, metadata already uploaded
-      - name: 🚀 Submit Build to Apple Review
+      
+      - name: 🚀 Submit to App Store Review
+        env:
+          VERSION_NAME: ${{ needs.ios-ci.outputs.version_name }}
+          BUILD_NUMBER: ${{ needs.ios-ci.outputs.build_number }}
         run: |
           fastlane deliver \
             --api_key_path api_key.json \
+            --app_version "$VERSION_NAME" \
             --skip_metadata true \
             --skip_binary_upload true \
             --skip_screenshots true \
             --submit_for_review true \
             --force
-  
-      - name: 🧾 Review Submission Summary
-        run: |
-          echo "## 🍎 App Store Submission" >> $GITHUB_STEP_SUMMARY
-          echo "- Bundle: ${{ env.BUNDLE_ID }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Tag: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Status: Submitted to Apple Review ✅" >> $GITHUB_STEP_SUMMARY
+            - name: 🧾 Review Submission Summary
+              run: |
+                echo "## 🍎 App Store Submission" >> $GITHUB_STEP_SUMMARY
+                echo "- Bundle: ${{ env.BUNDLE_ID }}" >> $GITHUB_STEP_SUMMARY
+                echo "- Tag: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+                echo "- Status: Submitted to Apple Review ✅" >> $GITHUB_STEP_SUMMARY
