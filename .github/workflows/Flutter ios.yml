@@ -382,8 +382,8 @@ jobs:
           fastlane deliver \
             --api_key_path api_key.json \
             --force \
-            --overwrite_metadata
-    
+            --skip_metadata false
+
       - name: 🧾 Review Submission Summary
         run: |
           echo "## 🍎 App Store Submission" >> $GITHUB_STEP_SUMMARY
