@@ -80,4 +80,7 @@ class AppAssets {
 
   //Payment Success Image
   static String payment_success = "assets/images/payment_Sucsess.1.jpg";
+
+  // FAQs
+  static String support_contact = "assets/images/supprot_contact.png";
 }
