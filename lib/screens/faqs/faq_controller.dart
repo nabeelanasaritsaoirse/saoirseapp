@@ -1,6 +1,8 @@
 import 'dart:developer';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/faq_model.dart';
 import '../../services/faq_service.dart';
@@ -28,14 +30,49 @@ class FaqController extends GetxController {
 
       faqList.assignAll(result);
     } catch (e) {
-      // Get.snackbar(
-      //   'Error',
-      //   e.toString(),
-      //   snackPosition: SnackPosition.BOTTOM,
-      // );
       log(e.toString());
     } finally {
       isLoading.value = false;
+    }
+  }
+
+//------------contact support call-----------------
+  Future<void> contactSupportCall() async {
+    try {
+      final String number = dotenv.env['CUSTOMER_SUPPORT_NUMBER'] ?? '';
+
+      if (number.isEmpty) {
+        return;
+      }
+
+      final Uri phoneUri = Uri.parse('tel:$number');
+
+      await launchUrl(phoneUri);
+    } catch (e) {
+      log('Error launching dialer: $e');
+    }
+  }
+
+  //------------contact support whatsapp-----------------
+  Future<void> openWhatsAppSupport() async {
+    try {
+      final String number = dotenv.env['CUSTOMER_SUPPORT_NUMBER'] ?? '';
+      const String message = "Hello, I need help regarding EPI services.";
+
+      if (number.isEmpty) {
+        return;
+      }
+
+      final Uri whatsappUri = Uri.parse(
+        "https://wa.me/$number?text=${Uri.encodeComponent(message)}",
+      );
+
+      await launchUrl(
+        whatsappUri,
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (e) {
+      log('Error launching WhatsApp: $e');
     }
   }
 

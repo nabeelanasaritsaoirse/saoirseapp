@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/review_resposne.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -8,6 +7,7 @@ import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
 import '../../models/product_faq.dart';
 import '../../models/product_list_response.dart';
+import '../../models/review_resposne.dart';
 import '../../services/product_service.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_loader.dart';
@@ -97,93 +97,39 @@ class ProductDetailsController extends GetxController {
     checkIfInWishlist(productId);
   }
 
-  // FETCH PRODUCT DETAILS
-  // Future<void> fetchProductDetails() async {
-  //   try {
-  //     isLoading(true);
-
-  //     final result = await productService.fetchProductDetails(productId);
-  //     product.value = result;
-
-  //     if (result != null && result.hasVariants && result.variants.isNotEmpty) {
-  //       selectedVariantId.value = result.variants.first.variantId;
-
-  //     }
-  //   } catch (e) {
-
-  //     appToast(content: "Failed to load product details");
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
-
-  // Future<void> fetchProductDetails() async {
-  //   try {
-  //     isProductLoading(true);
-
-  //     final result = await productService.fetchProductDetails(productId);
-  //     product.value = result;
-
-  //     if (result == null) return;
-
-  //     // Start with base images
-  //     mergedImages.assignAll(result.images);
-
-  //     // If it has variants → override only the first image
-  //     if (result.hasVariants && result.variants.isNotEmpty) {
-  //       final firstVariant = result.variants.first;
-  //       selectedVariantId.value = firstVariant.variantId;
-
-  //       if (firstVariant.images.isNotEmpty) {
-  //         mergedImages[0] = firstVariant.images.first;
-  //       }
-  //     }
-  //     fetchFaqs();
-  //     fetchSimilarProducts();
-  //     fetchProductReviews();
-
-  //     // Reset page
-  //     currentImageIndex.value = 0;
-  //     jumpToPageSafe(0);
-  //   } finally {
-  //     isProductLoading(false);
-  //   }
-  // }
-
   Future<void> fetchProductDetails() async {
-  try {
-    isProductLoading(true);
+    try {
+      isProductLoading(true);
 
-    final result = await productService.fetchProductDetails(productId);
-    product.value = result;
+      final result = await productService.fetchProductDetails(productId);
+      product.value = result;
 
-    if (result == null) return;
+      if (result == null) return;
 
-    // Start with base images
-    mergedImages.assignAll(result.images);
+      // Start with base images
+      mergedImages.assignAll(result.images);
 
-    if (result.hasVariants && result.variants.isNotEmpty) {
-      final firstVariant = result.variants.first;
-      selectedVariantId.value = firstVariant.variantId;
+      if (result.hasVariants && result.variants.isNotEmpty) {
+        final firstVariant = result.variants.first;
+        selectedVariantId.value = firstVariant.variantId;
 
-      if (firstVariant.images.isNotEmpty) {
-        mergedImages[0] = firstVariant.images.first;
+        if (firstVariant.images.isNotEmpty) {
+          mergedImages[0] = firstVariant.images.first;
+        }
       }
+
+      // Reset page
+      currentImageIndex.value = 0;
+      jumpToPageSafe(0);
+    } finally {
+      isProductLoading(false);
     }
 
-    // Reset page
-    currentImageIndex.value = 0;
-    jumpToPageSafe(0);
-  } finally {
-    isProductLoading(false);
+    /// Load other sections AFTER product is ready
+    fetchFaqs();
+    fetchSimilarProducts();
+    fetchProductReviews();
   }
-
-  /// Load other sections AFTER product is ready
-  fetchFaqs();
-  fetchSimilarProducts();
-  fetchProductReviews();
-}
-
 
   // ========================================================
   // FETCH SIMILAR PRODUCTS (USES SAME getProducts API)
@@ -318,30 +264,6 @@ class ProductDetailsController extends GetxController {
     currentImageIndex.value = index;
   }
 
-  // void openSelectPlanSheet() async {
-  //   if (product.value == null) return;
-
-  //   // Reset previous plan selection
-  //   resetPlanSelection();
-
-  //   appLoader();
-
-  //   // Fetch plans
-  //   isProductLoading.value = true;
-  //   await loadPlans(product.value!.id);
-  //   isProductLoading.value = false;
-
-  //   // Close loader
-  //   if (Get.isDialogOpen ?? false) Get.back();
-
-  //   // Open sheet
-  //   Get.bottomSheet(
-  //     const SelectPlanSheet(),
-  //     isScrollControlled: true,
-  //     backgroundColor: Colors.transparent,
-  //   );
-  // }
-
   void openSelectPlanSheet() async {
     if (product.value == null) return;
 
@@ -424,13 +346,12 @@ class ProductDetailsController extends GetxController {
     isUpdating = false;
   }
 
- Future loadPlans(String productId) async {
-  isPageLoading.value = true;
-  final result = await ProductService().fetchProductPlans(productId);
-  plans.assignAll(result);
-  isPageLoading.value = false;
-}
-
+  Future loadPlans(String productId) async {
+    isPageLoading.value = true;
+    final result = await ProductService().fetchProductPlans(productId);
+    plans.assignAll(result);
+    isPageLoading.value = false;
+  }
 
   void selectApiPlan(int index) {
     selectedPlanIndex.value = index;
@@ -504,17 +425,6 @@ class ProductDetailsController extends GetxController {
       }
     });
   }
-
-  // Variant? getSelectedVariant() {
-  //   if (selectedVariantId.value.isEmpty) return null;
-
-  //   for (final v in product.value?.variants ?? []) {
-  //     if (v.variantId == selectedVariantId.value) {
-  //       return v;
-  //     }
-  //   }
-  //   return null;
-  // }
 
   void clearSelectedVariant() {
     selectedVariantId.value = "";
