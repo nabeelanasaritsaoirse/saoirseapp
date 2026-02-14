@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import '../../constants/app_strings.dart';
 import '../../models/wallet_transcation_model.dart';
 import '../../widgets/app_loader.dart';
@@ -39,12 +38,15 @@ class _TransactionHistoryState extends State<TransactionHistory> {
         }
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          child: ListView.builder(
-            itemCount: controller.transactions.length,
-            itemBuilder: (context, index) {
-              final item = controller.transactions[index];
-              return _transactionCard(item);
-            },
+          child: RefreshIndicator(
+            onRefresh: controller.refreshAll,
+            child: ListView.builder(
+              itemCount: controller.transactions.length,
+              itemBuilder: (context, index) {
+                final item = controller.transactions[index];
+                return _transactionCard(item);
+              },
+            ),
           ),
         );
       }),
