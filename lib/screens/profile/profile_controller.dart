@@ -19,8 +19,8 @@ import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_controller.dart';
+import '../login/login_page.dart';
 import '../notification/notification_controller.dart';
-import '../onboard/onboard_screen.dart';
 
 class ProfileController extends GetxController {
   final WishlistService _wishlistService = WishlistService();
@@ -332,7 +332,7 @@ class ProfileController extends GetxController {
           Get.find<DashboardController>().selectedIndex.value = 0;
         }
         // Navigate immediately
-        Get.offAll(() => OnBoardScreen());
+        Get.offAll(() => LoginPage());
 
         // Perform logout in background
         logoutUserInBackground();
@@ -461,7 +461,7 @@ class ProfileController extends GetxController {
       if (success) {
         log("==========================>Your account deletion request has been submitted successfully.");
 
-        Get.offAll(() => OnBoardScreen());
+        Get.offAll(() => LoginPage());
         await logoutUserInBackground();
       } else {
         log("==========================>Unable to request account deletion");

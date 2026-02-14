@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
@@ -16,6 +17,7 @@ class WishlistScreen extends StatelessWidget {
     WishlistController controller = Get.find<WishlistController>();
 
     return Scaffold(
+      backgroundColor: AppColors.paperColor,
       appBar: CustomAppBar(
         title: AppStrings.wishlist,
         showBack: true,
