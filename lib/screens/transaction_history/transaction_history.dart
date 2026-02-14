@@ -21,6 +21,13 @@ class _TransactionHistoryState extends State<TransactionHistory> {
   final MyWalletController controller = Get.find<MyWalletController>();
 
   @override
+  void initState() {
+    controller.refreshAll();
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.paperColor,
