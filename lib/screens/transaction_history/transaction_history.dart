@@ -39,12 +39,15 @@ class _TransactionHistoryState extends State<TransactionHistory> {
         }
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          child: ListView.builder(
-            itemCount: controller.transactions.length,
-            itemBuilder: (context, index) {
-              final item = controller.transactions[index];
-              return _transactionCard(item);
-            },
+          child: RefreshIndicator(
+            onRefresh: controller.refreshAll,
+            child: ListView.builder(
+              itemCount: controller.transactions.length,
+              itemBuilder: (context, index) {
+                final item = controller.transactions[index];
+                return _transactionCard(item);
+              },
+            ),
           ),
         );
       }),
