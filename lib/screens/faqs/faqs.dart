@@ -80,10 +80,13 @@ class FaqScreen extends StatelessWidget {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                appText(
-                                  (index + 1).toString().padLeft(2, '0'),
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w600,
+                                Padding(
+                                  padding: EdgeInsets.only(top: 1.h),
+                                  child: appText(
+                                    (index + 1).toString().padLeft(2, '0'),
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                                 SizedBox(width: 10.w),
                                 Expanded(
@@ -91,8 +94,10 @@ class FaqScreen extends StatelessWidget {
                                     faq.question,
                                     fontSize: 15.sp,
                                     fontWeight: FontWeight.w500,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
+                                    overflow: isExpanded
+                                        ? TextOverflow.visible
+                                        : TextOverflow.ellipsis,
+                                    maxLines: isExpanded ? null : 2,
                                     textAlign: TextAlign.start,
                                   ),
                                 ),

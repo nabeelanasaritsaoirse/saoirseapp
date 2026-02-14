@@ -822,10 +822,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      appText(
-                        (index + 1).toString().padLeft(2, '0'),
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14.sp,
+                      Padding(
+                        padding: EdgeInsets.only(top: 1.h),
+                        child: appText(
+                          (index + 1).toString().padLeft(2, '0'),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12.sp,
+                        ),
                       ),
                       SizedBox(width: 12.w),
                       Expanded(
@@ -833,6 +836,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           faq.question,
                           fontWeight: FontWeight.w500,
                           textAlign: TextAlign.left,
+                          maxLines: isOpen ? null : 2,
+                          overflow: isOpen
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
                           fontSize: 13.sp,
                         ),
                       ),
