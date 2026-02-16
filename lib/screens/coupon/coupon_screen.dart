@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
+
 import '../../constants/app_colors.dart';
 import '../../models/coupon_model.dart';
 import '../../widgets/custom_appbar.dart';
-
-import 'package:get/get.dart';
 import 'coupon_controller.dart';
 
 class CouponScreen extends StatelessWidget {
@@ -104,7 +104,7 @@ class CouponCard extends StatelessWidget {
     return "₹${coupon.discountValue.toInt()} off your order";
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
@@ -114,17 +114,17 @@ class CouponCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(14.r),
           boxShadow: [
             BoxShadow(
-        color: Colors.black.withOpacity(0.06),
-        blurRadius: 24,
-        offset: const Offset(0, 2),
-        spreadRadius: 1,
-      ),
-      BoxShadow(
-        color: Colors.black.withOpacity(0.04),
-        blurRadius: 24,
-        offset: const Offset(0, 1),
-        spreadRadius: 0,
-      ),
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 24,
+              offset: const Offset(0, 2),
+              spreadRadius: 1,
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 24,
+              offset: const Offset(0, 1),
+              spreadRadius: 0,
+            ),
           ],
         ),
         child: ClipPath(

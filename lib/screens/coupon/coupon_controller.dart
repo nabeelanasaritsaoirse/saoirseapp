@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+
 import '../../models/coupon_model.dart';
 import '../../services/coupon_service.dart';
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../coupon_screen/coupon_screen.dart';
+import '../coupon/coupon_screen.dart';
 import '../edit_profile/edit_profile_screen.dart';
 import '../faqs/faqs.dart';
 import '../kyc/kyc_controller.dart';
