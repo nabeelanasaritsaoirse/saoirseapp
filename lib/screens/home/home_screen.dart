@@ -36,6 +36,13 @@ class _HomeScreenState extends State<HomeScreen> {
       Get.find<NotificationController>();
   InvestmentStatusController investmentController =
       Get.find<InvestmentStatusController>();
+  
+  @override
+  void initState() {
+    super.initState();
+    final ctrl = Get.find<PendingTransactionController>();
+    ctrl.getPendingTransactions();
+  }
 
   @override
   void didChangeDependencies() {
@@ -491,7 +498,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Get.isRegistered<PendingTransactionController>()
                       ? Get.find<PendingTransactionController>()
                       : Get.put(PendingTransactionController());
-              pendingCtrl.getPendingTransactions();
+              // pendingCtrl.getPendingTransactions();
               final pendingCount = pendingCtrl.pendingCount.value;
               debugPrint("🏠 [HOME] Checking blue box visibility");
               debugPrint("🏠 [HOME] pendingCount = $pendingCount");
