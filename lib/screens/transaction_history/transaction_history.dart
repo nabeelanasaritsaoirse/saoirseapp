@@ -22,9 +22,10 @@ class _TransactionHistoryState extends State<TransactionHistory> {
 
   @override
   void initState() {
-    controller.refreshAll();
-
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.refreshAll();
+    });
   }
 
   @override
