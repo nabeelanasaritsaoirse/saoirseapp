@@ -939,7 +939,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
             final code = extractReferral(value);
 
             onCodeSelected(code);
-            Get.back();
           },
         ));
   }
@@ -959,6 +958,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
       final code = extractReferral(value);
 
       onCodeSelected(code);
+      Get.back();
     } else {}
   }
 
