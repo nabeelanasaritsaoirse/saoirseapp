@@ -66,7 +66,6 @@ class ProfileController extends GetxController {
     _setInitialCountryFromCode('+91');
     fetchWishlistCount();
     fetchUserProfile();
-    fetchDeleteInfo();
 
     super.onInit();
   }
