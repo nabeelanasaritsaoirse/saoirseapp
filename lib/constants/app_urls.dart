@@ -1,6 +1,17 @@
 // ignore_for_file: non_constant_identifier_names, prefer_interpolation_to_compose_strings
 
 class AppURLs {
+  //privacy policy
+  static String PRIVACY_POLICY =
+      "https://admin.epielio.com/privacy_policy.html";
+
+  //terms and conditions
+  static String TERMS_AND_CONDITIONS =
+      "https://admin.epielio.com/terms_and_conditions.html";
+
+  //contact us
+  static String CONTACT_US = "https://admin.epielio.com/contact_us.html";
+
   //base api
   //static String BASE_API = 'https://api.epielio.com/';
   static String BASE_API = 'http://13.127.15.87:8080/';
@@ -111,12 +122,6 @@ class AppURLs {
   static String AUTOPAY_PRIORITY_API =
       BASE_API + "api/installments/autopay/priority";
 
-//  Delete Account
-  static String DELETE_ACCOUNT_GET_API =
-      BASE_API + "api/users/:userId/deletion-info";
-  static String DELETE_REQUEST_API =
-      BASE_API + "api/users/:userId/request-deletion";
-
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/installments/orders";
   static String CREATE_BULK_ORDER_API =
@@ -164,6 +169,12 @@ class AppURLs {
 
   //Log Out Api
   static String LOGOUT_API = BASE_API + "api/auth/logout";
+
+  //  Delete Account
+  static String DELETE_ACCOUNT_GET_API =
+      BASE_API + "api/users/:userId/deletion-info";
+  static String DELETE_REQUEST_API =
+      BASE_API + "api/users/:userId/request-deletion";
 
   // Pending Transaction (BEFORE PAYMENT METHOD API RESPONSE)
   static String PENDING_TRANSACTION_PAYMENT_RESPONSE =

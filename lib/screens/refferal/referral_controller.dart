@@ -47,6 +47,7 @@ class ReferralController extends GetxController {
     try {
       await Future.wait([
         fetchReferralStats(),
+        loadReferralFromStorage(),
         fetchReferralData(),
         fetchReferrerInfo(),
         loadReferralFromStorage()

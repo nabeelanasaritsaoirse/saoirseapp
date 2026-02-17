@@ -142,9 +142,7 @@ class MyApp extends StatelessWidget {
               Locale('hi'), // Hindi
               Locale('ml'), // Malayalam
             ],
-
             // optional - default locale
-
             fallbackLocale: const Locale('en'),
           ),
         );
@@ -161,6 +159,7 @@ class CustomScrollBehavior extends ScrollBehavior {
   }
 
   // Optional: remove overscroll glow on Android
+  // this code
   @override
   Widget buildOverscrollIndicator(
     BuildContext context,

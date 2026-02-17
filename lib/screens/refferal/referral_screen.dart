@@ -8,7 +8,9 @@ import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../constants/app_constant.dart';
 import '../../constants/app_strings.dart';
+import '../../main.dart';
 import '../../models/refferal_info_model.dart';
 import '../../screens/refferal/referral_controller.dart';
 import '../../constants/app_assets.dart';
@@ -22,6 +24,7 @@ import '../../widgets/custom_appbar.dart';
 import '../../widgets/referral_qr_popup.dart';
 import '../invite_friend/invite_friend_details_screen.dart';
 import '../login/login_controller.dart';
+import '../login/login_page.dart';
 import '../message/message_screen.dart';
 import '../my_wallet/my_wallet.dart';
 import '../notification/notification_controller.dart';
@@ -41,7 +44,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
   late TextEditingController searchController;
   late FocusNode searchFocusNode;
   late ScrollController scrollController;
-
+  bool _previousLoginState = false;
   final double bannerHeight = 140.h;
 
   @override
@@ -80,6 +83,24 @@ class _ReferralScreenState extends State<ReferralScreen> {
   String extractReferral(String qrData) {
     Uri uri = Uri.parse(qrData);
     return uri.queryParameters["deep_link_value"] ?? qrData;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final currentLoginState = isLoggedIn;
+
+    /// User just logged in → refresh referral data
+    if (!_previousLoginState && currentLoginState) {
+      controller.refreshAll();
+    }
+
+    _previousLoginState = currentLoginState;
+  }
+
+  bool get isLoggedIn {
+    return storage.read(AppConst.USER_ID) != null;
   }
 
   @override
@@ -142,65 +163,64 @@ class _ReferralScreenState extends State<ReferralScreen> {
           ),
           SizedBox(width: 12.w),
         ]),
-        body: _buildReferralBody());
+        body: isLoggedIn ? _buildReferralBody() : _buildLoginOnlyView());
   }
 
   NestedScrollView _buildReferralBody() {
     return NestedScrollView(
-      controller: scrollController,
-      headerSliverBuilder: (context, innerBoxIsScrolled) {
-        return [
-          SliverToBoxAdapter(
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 10.w),
-              height: bannerHeight,
-              color: AppColors.lightGrey,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  appText(
-                    AppStrings.referalBannerContent,
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  Image.asset(
-                    AppAssets.refferal,
-                    width: 120.w,
-                    height: 120.h,
-                  ),
-                ],
+        controller: scrollController,
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            SliverToBoxAdapter(
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                height: bannerHeight,
+                color: AppColors.lightGrey,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    appText(
+                      AppStrings.referalBannerContent,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    Image.asset(
+                      AppAssets.refferal,
+                      width: 120.w,
+                      height: 120.h,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ];
+        },
+        body: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(16.r),
+            ),
+          ),
+          child: RefreshIndicator(
+            onRefresh: controller.refreshAll,
+            color: AppColors.primaryColor, // spinner color
+            backgroundColor: AppColors.white,
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              padding: EdgeInsets.all(16.w),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: _buildContentSection(
+                loginController: loginController,
+                referralController: controller,
+                searchController: searchController,
+                focusNode: searchFocusNode,
               ),
             ),
           ),
-        ];
-      },
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(16.r),
-          ),
-        ),
-        child: RefreshIndicator(
-          onRefresh: controller.refreshAll,
-          color: AppColors.primaryColor, // spinner color
-          backgroundColor: AppColors.white,
-          child: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            padding: EdgeInsets.all(16.w),
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            child: _buildContentSection(
-              loginController: loginController,
-              referralController: controller,
-              searchController: searchController,
-              focusNode: searchFocusNode,
-            ),
-          ),
-        ),
-      ),
-    );
+        ));
   }
 
   Widget _buildContentSection({
@@ -1146,6 +1166,37 @@ Widget referredByCard(ReferrerInfoModel r) {
           ),
         ),
       ],
+    ),
+  );
+}
+
+Widget _buildLoginOnlyView() {
+  return Center(
+    child: Padding(
+      padding: EdgeInsets.all(20.w),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          appText(
+            "Please login to view Referral",
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w500,
+          ),
+          SizedBox(height: 20.h),
+          appButton(
+            buttonColor: AppColors.primaryColor,
+            onTap: () {
+              Get.to(() => LoginPage());
+            },
+            child: appText(
+              "Login",
+              color: AppColors.white,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }

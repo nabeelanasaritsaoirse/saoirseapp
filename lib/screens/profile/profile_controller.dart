@@ -13,6 +13,7 @@ import '../../constants/app_colors.dart';
 import '../../main.dart';
 import '../../models/delete_account_model.dart';
 import '../../models/profile_response.dart';
+import '../../services/api_service.dart';
 import '../../services/profile_service.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_loader.dart';
@@ -88,9 +89,32 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.faq, "title": "FAQs"},
     {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
     {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
+    {"icon": AppAssets.contact_us, "title": "Contact Us"},
     {"icon": AppAssets.logout, "title": "Log Out"},
-    {"icon": AppAssets.delete_acc, "title": "Delete\nAccount"},
+    {"icon": AppAssets.delete_account, "title": "Delete\nAccount"},
   ];
+
+  Future<DeleteAccountModel?> fetchDeleteInfo() async {
+    try {
+      isLoading.value = true;
+
+      final response = await _profileService.getDeleteInfo();
+
+      if (response.success) {
+        deleteAccountData.value = response;
+        return response;
+      }
+    } finally {
+      isLoading.value = false;
+    }
+
+    return null;
+  }
+
+  /// Retry handler (optional)
+  void retry() {
+    fetchDeleteInfo();
+  }
 
   Future<void> fetchWishlistCount() async {
     final count = await _wishlistService.getWishlistCount();
@@ -114,32 +138,6 @@ class ProfileController extends GetxController {
     } finally {
       isLoading(false);
     }
-  }
-
-  Future<DeleteAccountModel?> fetchDeleteInfo() async {
-    try {
-      isLoading.value = true;
-
-      final response = await _profileService.getDeleteInfo();
-
-      if (response.success) {
-        deleteAccountData.value = response;
-        return response;
-      }
-
-      log("Delete info API returned success=false");
-    } catch (e) {
-      log("DeleteAccountController error: $e");
-    } finally {
-      isLoading.value = false;
-    }
-
-    return null;
-  }
-
-  /// Retry handler (optional)
-  void retry() {
-    fetchDeleteInfo();
   }
 
 // ================== PICK PROFILE IMAGE ==================
@@ -366,10 +364,20 @@ class ProfileController extends GetxController {
     } catch (e) {}
   }
 
+  // Delete Account
   Future<void> deleteAccount() async {
-    deleteAccountData.value = null;
+    if (profile.value?.user.id == null) {
+      log("Profile not loaded yet, fetching profile...");
+      await fetchUserProfile();
+    }
 
-    fetchDeleteInfo();
+    if (profile.value?.user.id == null) {
+      Get.snackbar("Error", "User information not available");
+      return;
+    }
+
+    deleteAccountData.value = null;
+    await fetchDeleteInfo();
 
     Get.defaultDialog(
       title: "Delete Account",
@@ -435,7 +443,7 @@ class ProfileController extends GetxController {
       }),
       textConfirm: "Delete",
       textCancel: "Cancel",
-      confirmTextColor: Colors.white,
+      confirmTextColor: AppColors.white,
       buttonColor: AppColors.primaryColor,
       cancelTextColor: AppColors.primaryColor,
       onConfirm: () {
@@ -449,7 +457,7 @@ class ProfileController extends GetxController {
     final userId = profile.value?.user.id;
 
     if (userId == null) {
-      log("User not found=========User id is null");
+      log("User id is null");
       return;
     }
 
@@ -471,6 +479,12 @@ class ProfileController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  //open url
+  void openUrl(String url) async {
+    if (url.isEmpty) return;
+    await APIService.openUrl(url);
   }
 
 //-------------------------------------------------------------------------------------------------------------------------------------

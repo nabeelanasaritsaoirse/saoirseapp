@@ -9,6 +9,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../screens/onboard/onboard_screen.dart';
 
@@ -521,6 +522,23 @@ class APIService {
       Get.offAll(() => OnBoardScreen());
     } catch (e) {
       ("out handling error: $e");
+    }
+  }
+
+  //open url
+  static Future<void> openUrl(String url) async {
+    try {
+      Uri uri = Uri.parse(url);
+
+      if (internet) {
+        try {
+          launchUrl(uri);
+        } catch (e) {
+          return;
+        }
+      }
+    } catch (e) {
+      return;
     }
   }
 }

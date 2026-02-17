@@ -11,6 +11,9 @@ import '../../screens/product_details/product_details_controller.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/app_text.dart';
+import '../constants/app_constant.dart';
+import '../main.dart';
+import '../screens/login/login_page.dart';
 import 'app_loader.dart';
 import 'app_toast.dart';
 
@@ -168,6 +171,7 @@ class SelectPlanSheet extends StatelessWidget {
                       final double amount =
                           double.tryParse(amountController.text.trim()) ?? 0.0;
 
+                      // 🔹 VALIDATIONS (unchanged)
                       if (days <= 0 || amount <= 0) {
                         appToast(
                           error: true,
@@ -195,6 +199,16 @@ class SelectPlanSheet extends StatelessWidget {
                         return;
                       }
 
+                      // 🔐 LOGIN CHECK (ONLY HERE)
+                      final isLoggedIn = storage.read(AppConst.USER_ID) != null;
+
+                      if (!isLoggedIn) {
+                        Get.back(); // close bottom sheet first
+                        Get.to(() => LoginPage());
+                        return;
+                      }
+
+                      // ✅ ORIGINAL FLOW (unchanged)
                       controller.customDays.value = days;
                       controller.customAmount.value = amount;
                       Get.back();

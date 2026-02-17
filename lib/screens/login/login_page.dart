@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -8,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../constants/app_assets.dart';
+import '../../constants/app_urls.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_toast.dart';
@@ -399,6 +401,58 @@ class _LoginPageState extends State<LoginPage> {
                           width: 200.w,
                         ),
                       ),
+                      SizedBox(height: 20.h),
+                      Center(
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            text: AppStrings.by_logging_in,
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              color: AppColors.textBlack,
+                              fontFamily: "Poppins",
+                            ),
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: AppStrings.terms_conditions,
+                                style: TextStyle(
+                                  decoration: TextDecoration.underline,
+                                  color: AppColors.primaryColor,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    loginController
+                                        .openUrl(AppURLs.TERMS_AND_CONDITIONS);
+                                  },
+                              ),
+                              TextSpan(
+                                text: ' and ',
+                                style: TextStyle(
+                                  color: AppColors.textBlack,
+                                  fontSize: 13.sp,
+                                ),
+                              ),
+                              TextSpan(
+                                text: AppStrings.privacy_policy,
+                                style: TextStyle(
+                                  decoration: TextDecoration.underline,
+                                  color: AppColors.primaryColor,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    loginController
+                                        .openUrl(AppURLs.PRIVACY_POLICY);
+                                  },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
                     ],
                   ),
                 ),

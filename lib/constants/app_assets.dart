@@ -60,17 +60,18 @@ class AppAssets {
   static String privacy_policy = "assets/svg/privacy_policyy.svg";
   static String terms_condition = "assets/svg/terms_condition.svg";
   static String logout = "assets/svg/logout.svg";
+  static String delete_account = "assets/svg/delete_account.svg";
+  static String contact_us = "assets/svg/contact_us.svg";
   static String kyc = "assets/svg/kyc.svg";
   static String faq = "assets/svg/faq.svg";
   static String autopay = "assets/svg/autopay.svg";
   static String coupons = "assets/svg/coupon.svg";
   static String manage_accounts = "assets/svg/account.svg";
   static String address = "assets/svg/address.svg";
-  static String delete_acc = "assets/svg/delete_account.svg";
 
   //other icons
-  static String like_icon = "assets/svg/likenew.svg";
-  static String search_icon = "assets/svg/searchnew.svg";
+  static String like_icon = "assets/svg/like.svg";
+  static String search_icon = "assets/svg/search.svg";
   static String notification_icon = "assets/svg/notification.svg";
   static String wallet_icon = "assets/svg/wallet.svg";
   static String delete_icon = "assets/svg/delete.svg";

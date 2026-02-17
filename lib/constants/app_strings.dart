@@ -19,6 +19,9 @@ class AppStrings {
   static String Forgot_password = "Forgot Password..?";
   static String invalid_username = 'Please enter valid username';
   static String invalid_referral = 'Please enter valid referral code';
+  static String by_logging_in = "By logging in, you agree to our ";
+  static String terms_conditions = "Terms & Conditions";
+  static String privacy_policy = "Privacy Policy";
 
   //Onboard Screen
   static String onboard_note = "INVEST SMALL, DREAM BIG, \nOWN IT";
