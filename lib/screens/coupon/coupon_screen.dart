@@ -28,10 +28,6 @@ class CouponScreen extends StatelessWidget {
           return const CouponShimmer();
         }
 
-        if (controller.errorMessage.isNotEmpty) {
-          return Center(child: Text(controller.errorMessage.value));
-        }
-
         if (controller.coupons.isEmpty) {
           return const Center(child: Text("No coupons available"));
         }
