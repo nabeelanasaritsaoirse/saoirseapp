@@ -103,6 +103,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             : showLogo
                 ? _buildLogo()
                 : null,
+        centerTitle: false,
         titleSpacing: showLogo ? 6.w : 20.w,
         title: showGreeting
             ? _buildGreeting()

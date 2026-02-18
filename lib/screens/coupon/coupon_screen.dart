@@ -148,7 +148,7 @@ class CouponCard extends StatelessWidget {
                             discountLabel,
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 28.sp,
+                              fontSize: 26.sp,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
