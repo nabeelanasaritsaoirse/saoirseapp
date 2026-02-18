@@ -37,6 +37,27 @@ class HomeController extends GetxController {
   RxList<SuccessStoryItem> successStories = <SuccessStoryItem>[].obs;
   RxList<CategoryGroup> parentCategories = <CategoryGroup>[].obs;
   RxString userName = "".obs;
+  RxString selectedCategoryId = "".obs;
+  RxString selectedCategoryName = "".obs;
+
+  RxList<SubCategory> visibleSubCategories = <SubCategory>[].obs;
+
+  /// Called when parent category is tapped
+  void onParentCategoryTap(CategoryGroup cat) {
+    // 🟡 If same category tapped again → CLOSE sub-categories
+    if (selectedCategoryId.value == cat.id) {
+      selectedCategoryId.value = "";
+      selectedCategoryName.value = "";
+      visibleSubCategories.clear();
+      return;
+    }
+
+    // 🟢 New category tapped → OPEN sub-categories
+    selectedCategoryId.value = cat.id;
+    selectedCategoryName.value = cat.name;
+    visibleSubCategories.assignAll(cat.subCategories);
+  }
+
   @override
   void onInit() {
     super.onInit();

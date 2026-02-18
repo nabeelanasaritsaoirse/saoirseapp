@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../constants/app_constant.dart';
 import '../../main.dart';
 import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
+import '../../models/product_faq.dart';
+import '../../models/product_list_response.dart';
+import '../../models/review_resposne.dart';
 import '../../services/product_service.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_loader.dart';
@@ -45,8 +49,47 @@ class ProductDetailsController extends GetxController {
   RxInt customDays = 0.obs;
   RxDouble customAmount = 0.0.obs;
 
+  // ---------------- SIMILAR PRODUCTS (NEW) ----------------
+  RxList<Product> similarProducts = <Product>[].obs;
+  RxBool isSimilarLoading = false.obs;
+
   RxBool showBottomButtons = false.obs;
   final ScrollController scrollController = ScrollController();
+
+  // FAQ
+  RxBool isFaqExpanded = true.obs;
+  RxBool isReviewExpanded = true.obs;
+  RxBool isFaqLoading = false.obs;
+
+  RxList<ProductFaq> faqs = <ProductFaq>[].obs;
+  RxInt expandedFaqIndex = (-1).obs;
+
+  RxDouble averageRating = 4.9.obs;
+  RxInt totalRatings = 83.obs;
+  RxInt totalReviews = 47.obs;
+
+  // ---------------- REVIEWS ----------------
+  RxBool isReviewLoading = false.obs;
+
+  RxList<Review> reviews = <Review>[].obs;
+
+  RxList<ReviewImage> reviewImagesPreview = <ReviewImage>[].obs;
+
+// ---------------- WRITE REVIEW ----------------
+  final ImagePicker _reviewImagePicker = ImagePicker();
+
+  RxInt reviewRating = 0.obs;
+  RxList<XFile> reviewImages = <XFile>[].obs;
+  RxString reviewText = "".obs;
+  static const int maxReviewImages = 5;
+
+  final List<String> reviewRatingLabels = [
+    "Terrible",
+    "Bad",
+    "Okay",
+    "Good",
+    "Great",
+  ];
 
   @override
   void onInit() {
@@ -56,26 +99,6 @@ class ProductDetailsController extends GetxController {
     fetchProductDetails();
     checkIfInWishlist(productId);
   }
-
-  // FETCH PRODUCT DETAILS
-  // Future<void> fetchProductDetails() async {
-  //   try {
-  //     isLoading(true);
-
-  //     final result = await productService.fetchProductDetails(productId);
-  //     product.value = result;
-
-  //     if (result != null && result.hasVariants && result.variants.isNotEmpty) {
-  //       selectedVariantId.value = result.variants.first.variantId;
-
-  //     }
-  //   } catch (e) {
-
-  //     appToast(content: "Failed to load product details");
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
 
   Future<void> fetchProductDetails() async {
     try {
@@ -89,7 +112,6 @@ class ProductDetailsController extends GetxController {
       // Start with base images
       mergedImages.assignAll(result.images);
 
-      // If it has variants → override only the first image
       if (result.hasVariants && result.variants.isNotEmpty) {
         final firstVariant = result.variants.first;
         selectedVariantId.value = firstVariant.variantId;
@@ -104,6 +126,86 @@ class ProductDetailsController extends GetxController {
       jumpToPageSafe(0);
     } finally {
       isProductLoading(false);
+    }
+
+    /// Load other sections AFTER product is ready
+    fetchFaqs();
+    fetchSimilarProducts();
+    fetchProductReviews();
+  }
+
+  // ========================================================
+  // FETCH SIMILAR PRODUCTS (USES SAME getProducts API)
+  // ========================================================
+  Future<void> fetchSimilarProducts() async {
+    final data = product.value;
+    if (data == null) return;
+
+    final String categoryId = data.category.mainCategoryId;
+
+    try {
+      isSimilarLoading(true);
+
+      final ProductListResponse? response = await productService.getProducts(
+        1,
+        10,
+        categoryId: categoryId,
+      );
+
+      if (response != null && response.success) {
+        similarProducts.assignAll(
+          response.data.where((p) => p.id != data.id).toList(),
+        );
+      }
+    } finally {
+      isSimilarLoading(false);
+    }
+  }
+
+  Future<void> fetchFaqs() async {
+    try {
+      isFaqLoading(true);
+
+      final List<ProductFaq> result =
+          await productService.fetchProductFaqs(productId);
+
+      faqs.assignAll(result);
+    } catch (e) {
+      debugPrint("❌ fetchFaqs controller error: $e");
+      faqs.clear();
+    } finally {
+      isFaqLoading(false);
+    }
+  }
+
+  Future<void> fetchProductReviews() async {
+    try {
+      isReviewLoading(true);
+
+      final ReviewResponse? response = await productService.fetchProductReviews(
+        productId: productId,
+        page: 1,
+        limit: 10,
+        sort: "mostHelpful",
+      );
+
+      if (response == null) return;
+
+      // Stats
+      averageRating.value = response.data.ratingStats.averageRating;
+      totalReviews.value = response.data.ratingStats.totalReviews;
+      totalRatings.value = response.data.ratingStats.totalReviews;
+
+      // Reviews
+      reviews.assignAll(response.data.reviews);
+
+      // Image preview (first 3 images)
+      final images =
+          response.data.reviews.expand((r) => r.images).take(3).toList();
+
+      reviewImagesPreview.assignAll(images);
+    } finally {
+      isReviewLoading(false);
     }
   }
 
@@ -185,16 +287,15 @@ class ProductDetailsController extends GetxController {
     appLoader();
 
     // Fetch plans
-    isProductLoading.value = true;
+    isPageLoading.value = true;
     await loadPlans(product.value!.id);
-    isProductLoading.value = false;
+    isPageLoading.value = false;
 
     // Close loader
     if (Get.isDialogOpen ?? false) Get.back();
 
-    // Open sheet
     Get.bottomSheet(
-      const SelectPlanSheet(),
+      SelectPlanSheet(productId: productId),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );
@@ -260,13 +361,10 @@ class ProductDetailsController extends GetxController {
   }
 
   Future loadPlans(String productId) async {
-    isProductLoading.value = true;
-
+    isPageLoading.value = true;
     final result = await ProductService().fetchProductPlans(productId);
-
     plans.assignAll(result);
-
-    isProductLoading.value = false;
+    isPageLoading.value = false;
   }
 
   void selectApiPlan(int index) {
@@ -342,17 +440,6 @@ class ProductDetailsController extends GetxController {
     });
   }
 
-  Variant? getSelectedVariant() {
-    if (selectedVariantId.value.isEmpty) return null;
-
-    for (final v in product.value?.variants ?? []) {
-      if (v.variantId == selectedVariantId.value) {
-        return v;
-      }
-    }
-    return null;
-  }
-
   void clearSelectedVariant() {
     selectedVariantId.value = "";
   }
@@ -399,5 +486,51 @@ class ProductDetailsController extends GetxController {
     pageController.dispose();
     scrollController.dispose();
     super.onClose();
+  }
+
+  // ================= WRITE REVIEW FUNCTIONS =================
+  void setReviewRating(int value) {
+    reviewRating.value = value;
+  }
+
+  Future<void> pickReviewImages() async {
+    final int remaining = maxReviewImages - reviewImages.length;
+
+    if (remaining <= 0) {
+      appToaster(
+        content: "You can upload a maximum of $maxReviewImages images",
+      );
+      return;
+    }
+
+    final picked = await _reviewImagePicker.pickMultiImage(
+      imageQuality: 70,
+    );
+
+    if (picked.isEmpty) return;
+
+    if (picked.length > remaining) {
+      reviewImages.addAll(picked.take(remaining));
+
+      appToaster(content: "Only $maxReviewImages images are allowed");
+    } else {
+      reviewImages.addAll(picked);
+    }
+  }
+
+  void removeReviewImage(int index) {
+    if (index >= 0 && index < reviewImages.length) {
+      reviewImages.removeAt(index);
+    }
+  }
+
+  void updateReviewText(String text) {
+    reviewText.value = text;
+  }
+
+  void resetReviewForm() {
+    reviewRating.value = 0;
+    reviewImages.clear();
+    reviewText.value = "";
   }
 }

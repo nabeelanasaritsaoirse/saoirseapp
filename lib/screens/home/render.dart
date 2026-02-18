@@ -128,7 +128,7 @@ class Design2CompactList extends StatelessWidget {
                 ),
                 binding: ProductDetailsBinding(
                   productId: product.productId,
-                  id: product.productMongoId,
+                  // id: product.productMongoId,
                 ),
               ),
               child: Container(
@@ -217,7 +217,7 @@ class Design3Widget extends StatelessWidget {
               ),
               binding: ProductDetailsBinding(
                 productId: product.productId,
-                id: product.productMongoId,
+                // id: product.productMongoId,
               ),
             ),
             child: SizedBox(
@@ -336,7 +336,7 @@ Widget _productCard(FeaturedProduct p) {
         ),
         binding: ProductDetailsBinding(
           productId: p.productId,
-          id: p.productMongoId,
+          // id: p.productMongoId,
         ),
       ),
       child: Column(
@@ -497,7 +497,7 @@ Widget _design5ProductCard(FeaturedProduct p) {
       ),
       binding: ProductDetailsBinding(
         productId: p.productId,
-        id: p.productMongoId,
+        // id: p.productMongoId,
       ),
     ),
     child: Column(
