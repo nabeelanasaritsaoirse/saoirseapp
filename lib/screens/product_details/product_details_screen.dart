@@ -8,13 +8,19 @@ import 'package:get/get.dart';
 import '../../constants/app_constant.dart';
 import '../../main.dart';
 import '../../models/product_details_model.dart';
+import '../../models/review_resposne.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
+import '../../widgets/build_expandable_header.dart';
+import '../../widgets/product_card.dart';
 import '../../widgets/warning_dialog.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_text.dart';
+import '../all_review/all_review_screen.dart';
 import '../cart/cart_controller.dart';
+import '../productListing/product_listing.dart';
+import '../product_faq/product_faq_screen.dart';
 import '../login/login_page.dart';
 import '../select_address/select_address.dart';
 import 'product_details_controller.dart';
@@ -40,7 +46,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    controller = Get.find<ProductDetailsController>();
+    controller = Get.find<ProductDetailsController>(tag: widget.productId);
     controller.checkIfInWishlist(widget.productId);
   }
 
@@ -60,19 +66,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
+
       body: SafeArea(
         child: Obx(() {
-          /// LOADING
-          if (controller.isProductLoading.value) {
+          final product = controller.product.value;
+
+          if (controller.isProductLoading.value && product == null) {
             return Center(child: appLoader());
           }
 
-          /// NO PRODUCT
-          if (controller.product.value == null) {
+          if (product == null) {
             return Center(child: Text("Product not found"));
           }
 
-          return buildBody(controller.product.value!);
+          return buildBody(product);
         }),
       ),
 
@@ -192,8 +199,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ],
             ),
           ),
-
-          SizedBox(height: 50),
+          SizedBox(
+            height: 20.h,
+          ),
+          buildFaqAndReviewSection(),
+          SizedBox(
+            height: 20.h,
+          ),
+          buildSimilarProductsSection(),
         ],
       ),
     );
@@ -632,5 +645,514 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         ),
       );
     });
+  }
+
+  Widget buildSimilarProductsSection() {
+    return Obx(() {
+      /// ---------------- LOADING STATE ----------------
+      if (controller.isSimilarLoading.value) {
+        return appLoader();
+      }
+
+      /// ---------------- EMPTY STATE ----------------
+      if (controller.similarProducts.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      /// ---------------- DATA STATE ----------------
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// TITLE ROW (same as Home)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                appText(
+                  "Similar Products",
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+                InkWell(
+                  onTap: () {
+                    final product = controller.product.value;
+                    if (product == null) return;
+
+                    Get.to(
+                      () => const ProductListing(),
+                      arguments: {
+                        'categoryId': product.category.mainCategoryId,
+                        'title': product.category.mainCategoryName,
+                      },
+                    );
+                  },
+                  child: appText(
+                    AppStrings.see_all,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: 8.h),
+
+          /// HORIZONTAL LIST (KEY PART)
+          SizedBox(
+            height: 200.h, // 👈 must be fixed height
+            child: ListView.separated(
+              padding: EdgeInsets.symmetric(horizontal: 10.w),
+              scrollDirection: Axis.horizontal,
+              itemCount: controller.similarProducts.length,
+              separatorBuilder: (_, __) => SizedBox(width: 2.w),
+              itemBuilder: (context, index) {
+                final product = controller.similarProducts[index];
+
+                return SizedBox(
+                  width: 160.w,
+                  child: GestureDetector(
+                    child: ProductCard(
+                      margin: EdgeInsets.all(6),
+                      productId: product.productId,
+                      name: product.name,
+                      brand: product.brand,
+                      image: product.images.isNotEmpty
+                          ? product.images.last.url
+                          : "https://via.placeholder.com/200",
+                      price: product.pricing.finalPrice.toStringAsFixed(0),
+                      isFavorite: false,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          SizedBox(height: 14.h),
+        ],
+      );
+    });
+  }
+
+  Widget buildFaqAndReviewSection() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 14.w),
+      child: Column(
+        children: [
+          // FAQ BUTTON
+          Obx(() => ExpandableSectionHeader(
+                title: "FAQ",
+                isExpanded: controller.isFaqExpanded.value,
+                onTap: () => controller.isFaqExpanded.toggle(),
+              )),
+
+          Obx(() {
+            return AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: controller.isFaqExpanded.value
+                  ? _buildFaqContent()
+                  : const SizedBox.shrink(),
+            );
+          }),
+
+          SizedBox(height: 1.h),
+
+          // REVIEW BUTTON
+          Obx(() => ExpandableSectionHeader(
+                title: "Reviews",
+                isExpanded: controller.isReviewExpanded.value,
+                onTap: () => controller.isReviewExpanded.toggle(),
+              )),
+
+          Obx(() {
+            return AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: controller.isReviewExpanded.value
+                  ? buildReviewSection()
+                  : const SizedBox.shrink(),
+            );
+          }),
+
+          SizedBox(height: 20.h),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFaqContent() {
+    if (controller.isFaqLoading.value) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 20.h),
+        child: Center(
+          child: SizedBox(
+            width: 22,
+            height: 22,
+            child: CupertinoActivityIndicator(color: AppColors.grey),
+          ),
+        ),
+      );
+    }
+
+    if (controller.faqs.isEmpty) {
+      return Container(
+        margin: EdgeInsets.only(top: 10.h),
+        padding: EdgeInsets.symmetric(vertical: 20.h),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: AppColors.lightGrey,
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+        alignment: Alignment.center,
+        child: appText(
+          "No FAQs available",
+          fontSize: 13.sp,
+          fontWeight: FontWeight.w500,
+          color: AppColors.grey,
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        ...List.generate(
+          controller.faqs.length,
+          (index) {
+            final faq = controller.faqs[index];
+            final isOpen = controller.expandedFaqIndex.value == index;
+
+            return Container(
+              margin: EdgeInsets.only(top: 10.h),
+              padding: EdgeInsets.all(14.w),
+              decoration: BoxDecoration(
+                color: AppColors.lightGrey,
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 1.h),
+                        child: appText(
+                          (index + 1).toString().padLeft(2, '0'),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12.sp,
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: appText(
+                          faq.question,
+                          fontWeight: FontWeight.w500,
+                          textAlign: TextAlign.left,
+                          maxLines: isOpen ? null : 2,
+                          overflow: isOpen
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
+                          fontSize: 13.sp,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          controller.expandedFaqIndex.value =
+                              isOpen ? -1 : index;
+                        },
+                        child: Icon(
+                          isOpen ? Icons.remove : Icons.add,
+                          size: 20.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOut,
+                    child: isOpen
+                        ? Padding(
+                            padding: EdgeInsets.only(left: 22.w, top: 8.h),
+                            child: appText(
+                              faq.answer,
+                              textAlign: TextAlign.left,
+                              fontSize: 12.sp,
+                              color: AppColors.textBlack,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+        SizedBox(height: 12.h),
+        InkWell(
+          onTap: () {
+            Get.to(() => ProductFaqScreen(
+                  productId: widget.productId,
+                ));
+          },
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 12.h),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(color: AppColors.black87),
+            ),
+            alignment: Alignment.center,
+            child: appText(
+              "Show all FAQ",
+              fontWeight: FontWeight.w600,
+              fontSize: 13.sp,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildReviewSection() {
+    if (controller.isReviewLoading.value) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 20.h),
+        child: Center(
+          child: CupertinoActivityIndicator(
+            radius: 12,
+          ),
+        ),
+      );
+    }
+    return Container(
+      margin: EdgeInsets.only(top: 10.h),
+      padding: EdgeInsets.symmetric(vertical: 14.h),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// RATING ROW
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Obx(() => appText(
+                    controller.averageRating.value.toStringAsFixed(1),
+                    fontSize: 30.sp,
+                    fontWeight: FontWeight.bold,
+                  )),
+              SizedBox(width: 6.w),
+              appText(
+                "OUT OF 5",
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.grey,
+              ),
+              Spacer(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  buildStarRow(controller.averageRating.value),
+                  SizedBox(height: 4.h),
+                  Obx(() => appText(
+                        "${controller.totalRatings.value} ratings",
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.grey,
+                      )),
+                  SizedBox(height: 4.h),
+                ],
+              )
+            ],
+          ),
+
+          SizedBox(height: 10.h),
+
+          /// REVIEW ACTION ROW
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              appText(
+                "${controller.totalReviews.value} Reviews",
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.lightBlue,
+              ),
+            ],
+          ),
+
+          SizedBox(height: 10.h),
+
+          /// REVIEW IMAGES PREVIEW (SAFE)
+          Obx(() {
+            if (controller.reviewImagesPreview.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            return Row(
+              children: controller.reviewImagesPreview.map((img) {
+                // 🔐 Safety: empty or null URL check
+                if (img.url.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return Padding(
+                  padding: EdgeInsets.only(right: 6.w),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.r),
+                    child: Image.network(
+                      img.url,
+                      height: 65.h,
+                      width: 80.w,
+                      fit: BoxFit.cover,
+
+                      /// 🔥 FIX: prevent red image error
+                      errorBuilder: (_, __, ___) {
+                        return Container(
+                          height: 65.h,
+                          width: 80.w,
+                          color: AppColors.lightGrey,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            Icons.image_not_supported,
+                            size: 18.sp,
+                            color: AppColors.grey,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              }).toList(),
+            );
+          }),
+
+          SizedBox(height: 12.h),
+
+          /// REVIEW CARDS
+          Obx(() {
+            if (controller.reviews.isEmpty) {
+              return appText(
+                "No reviews yet",
+                color: AppColors.grey,
+              );
+            }
+
+            return SizedBox(
+              height: 90.h,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: controller.reviews.length.clamp(0, 3),
+                separatorBuilder: (_, __) => SizedBox(width: 10.w),
+                itemBuilder: (_, index) {
+                  final review = controller.reviews[index];
+                  return buildReviewCard(review);
+                },
+              ),
+            );
+          }),
+
+          SizedBox(height: 14.h),
+
+          /// SHOW ALL REVIEWS
+          InkWell(
+            onTap: () {
+              Get.to(() => AllReviewsScreen(
+                    productId: widget.productId,
+                  ));
+            },
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 12.h),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.r),
+                border: Border.all(color: AppColors.black87),
+              ),
+              alignment: Alignment.center,
+              child: appText(
+                "Show all reviews",
+                fontWeight: FontWeight.w600,
+                fontSize: 13.sp,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildStarRow(double rating) {
+    return Row(
+      children: List.generate(5, (index) {
+        return Icon(
+          index < rating.round() ? Icons.star : Icons.star_border,
+          color: Colors.amber,
+          size: 16.sp,
+        );
+      }),
+    );
+  }
+
+  Widget buildReviewCard(Review review) {
+    return Container(
+      width: 230.w,
+      padding: EdgeInsets.all(10.w),
+      decoration: BoxDecoration(
+        color: AppColors.lightGrey,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.all(5.w),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(5.r),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.star, color: Colors.amber, size: 11.sp),
+                    SizedBox(width: 3.w),
+                    appText(
+                      review.rating.toStringAsFixed(1),
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 5.w),
+              Expanded(
+                child: appText(
+                  review.title,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12.sp,
+                  maxLines: 2,
+                  textAlign: TextAlign.left,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 6.h),
+          appText(
+            review.comment,
+            fontSize: 11.sp,
+            textAlign: TextAlign.left,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -7,7 +7,7 @@ import 'package:http/http.dart';
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
-import '../models/delete_acc_model.dart';
+import '../models/delete_account_model.dart';
 import '../models/profile_response.dart';
 import 'api_service.dart';
 
@@ -131,23 +131,28 @@ class ProfileService {
     }
   }
 
-  // Delete Account
-  Future<Map<String, dynamic>?> requestAccountDeletion(String userId) async {
+  Future<bool> requestAccountDeletion(String userId) async {
     try {
       final token = storage.read(AppConst.ACCESS_TOKEN);
+
       final url = "${AppURLs.BASE_API}api/users/$userId/request-deletion";
 
-      return await APIService.postRequest(
+      final response = await APIService.postRequest(
         url: url,
         headers: {
           "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
         },
-        body: {"reason": "User requested account deletion"},
+        body: {}, // no body required
         onSuccess: (json) => json,
       );
+
+      if (response == null) return false;
+
+      return response["success"] == true;
     } catch (e) {
-      log("Delete account error: $e");
-      return null;
+      log("requestAccountDeletion error: $e");
+      return false;
     }
   }
 

@@ -50,6 +50,7 @@ class ReferralController extends GetxController {
         loadReferralFromStorage(),
         fetchReferralData(),
         fetchReferrerInfo(),
+        loadReferralFromStorage()
       ]);
     } finally {}
   }
@@ -364,12 +365,12 @@ class ReferralController extends GetxController {
       ClipboardData(text: referralCode.value),
     );
 
-    // Show success message
-    appToast(
-      error: false,
-      title: "Copied!",
-      content: "Referral code copied to clipboard",
-    );
+    if (Platform.isIOS) {
+      // Show success message
+      appToaster(
+        content: "Referral code copied to clipboard",
+      );
+    }
   }
 
   String formatAmount(double value) {

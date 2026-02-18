@@ -114,65 +114,56 @@ class _ReferralScreenState extends State<ReferralScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightGrey,
-      resizeToAvoidBottomInset: true,
-      appBar: CustomAppBar(
-        title: AppStrings.refferalTitle,
-        actions: isLoggedIn
-            ? [
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    IconBox(
-                      image: AppAssets.notification,
-                      padding: 3.w,
-                      onTap: () {
-                        Get.to(() => NotificationScreen());
-                      },
+        backgroundColor: AppColors.lightGrey,
+        resizeToAvoidBottomInset: true,
+        appBar: CustomAppBar(title: AppStrings.refferalTitle, actions: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconBox(
+                image: AppAssets.notification_icon,
+                onTap: () {
+                  Get.to(() => NotificationScreen());
+                },
+              ),
+
+              /// BADGE ONLY IF unreadCount > 0
+              Obx(() {
+                final count =
+                    Get.find<NotificationController>().unreadCount.value;
+                if (count == 0) return const SizedBox();
+
+                return Positioned(
+                  right: 5.w,
+                  top: 5.h,
+                  child: Container(
+                    padding: EdgeInsets.all(2.r),
+                    decoration: BoxDecoration(
+                      color: AppColors.red,
+                      shape: BoxShape.circle,
                     ),
-
-                    /// BADGE ONLY IF unreadCount > 0
-                    Obx(() {
-                      final count =
-                          Get.find<NotificationController>().unreadCount.value;
-                      if (count == 0) return const SizedBox();
-
-                      return Positioned(
-                        right: -2,
-                        top: -2,
-                        child: Container(
-                          padding: EdgeInsets.all(4.r),
-                          decoration: BoxDecoration(
-                            color: AppColors.red,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Text(
-                            count > 9 ? "9+" : count.toString(),
-                            style: TextStyle(
-                              color: AppColors.white,
-                              fontSize: 9.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-                SizedBox(width: 8.w),
-                IconBox(
-                  image: AppAssets.wallet,
-                  padding: 5.w,
-                  onTap: () {
-                    Get.to(WalletScreen());
-                  },
-                ),
-                SizedBox(width: 12.w),
-              ]
-            : [],
-      ),
-      body: isLoggedIn ? _buildReferralBody() : _loginOnlyView(),
-    );
+                    child: Text(
+                      count > 9 ? "9+" : count.toString(),
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 9.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+          IconBox(
+            image: AppAssets.wallet_icon,
+            onTap: () {
+              Get.to(WalletScreen());
+            },
+          ),
+          SizedBox(width: 12.w),
+        ]),
+        body: isLoggedIn ? _buildReferralBody() : _buildLoginOnlyView());
   }
 
   NestedScrollView _buildReferralBody() {
@@ -948,7 +939,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
             final code = extractReferral(value);
 
             onCodeSelected(code);
-            Get.back();
           },
         ));
   }
@@ -968,6 +958,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
       final code = extractReferral(value);
 
       onCodeSelected(code);
+      Get.back();
     } else {}
   }
 
@@ -1179,7 +1170,7 @@ Widget referredByCard(ReferrerInfoModel r) {
   );
 }
 
-Widget _loginOnlyView() {
+Widget _buildLoginOnlyView() {
   return Center(
     child: Padding(
       padding: EdgeInsets.all(20.w),

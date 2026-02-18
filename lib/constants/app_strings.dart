@@ -121,6 +121,12 @@ class AppStrings {
       "You must complete your KYC before processing withdrawal.";
   static String kyc_required = "KYC Required";
 
+  // FAQ page
+  static String FAQsTitle = "FAQs";
+
+  // Autopay Dashboard page
+  static String AutopayDashboard_Title = "Auto Pay";
+
   //Cart page
   static String carttitle = "Cart";
 

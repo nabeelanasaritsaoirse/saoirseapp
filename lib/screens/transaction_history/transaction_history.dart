@@ -21,6 +21,15 @@ class _TransactionHistoryState extends State<TransactionHistory> {
   final MyWalletController controller = Get.find<MyWalletController>();
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.refreshAll();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.paperColor,
@@ -39,12 +48,15 @@ class _TransactionHistoryState extends State<TransactionHistory> {
         }
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          child: ListView.builder(
-            itemCount: controller.transactions.length,
-            itemBuilder: (context, index) {
-              final item = controller.transactions[index];
-              return _transactionCard(item);
-            },
+          child: RefreshIndicator(
+            onRefresh: controller.refreshAll,
+            child: ListView.builder(
+              itemCount: controller.transactions.length,
+              itemBuilder: (context, index) {
+                final item = controller.transactions[index];
+                return _transactionCard(item);
+              },
+            ),
           ),
         );
       }),

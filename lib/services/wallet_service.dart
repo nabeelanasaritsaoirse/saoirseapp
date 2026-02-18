@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../models/wallet_transcation_model.dart';
 import '/constants/app_constant.dart';
 import '/constants/app_urls.dart';
@@ -35,7 +37,11 @@ class WalletService {
   Future<WalletTransactionsResponse?> fetchTransactions() async {
     try {
       final token = await _token();
-      if (token == null || token.isEmpty) return null;
+      debugPrint("🔑 Token exists: ${token != null && token.isNotEmpty}");
+      if (token == null || token.isEmpty) {
+        debugPrint("❌ Token missing → API not called");
+        return null;
+      }
 
       final response = await APIService.getRequest(
         url: AppURLs.WALLET_TRANSACTIONS,
@@ -44,7 +50,7 @@ class WalletService {
         },
         onSuccess: (data) => data,
       );
-
+      debugPrint("🌐 Raw API response: $response");
       if (response == null) return null;
       return WalletTransactionsResponse.fromJson(response);
     } catch (e) {

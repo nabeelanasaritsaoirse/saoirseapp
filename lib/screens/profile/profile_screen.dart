@@ -7,7 +7,9 @@ import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
 import '../../main.dart';
 import '../../widgets/app_button.dart';
+import '../coupon/coupon_screen.dart';
 import '../edit_profile/edit_profile_screen.dart';
+import '../faqs/faqs.dart';
 import '../kyc/kyc_controller.dart';
 import '../kyc/kyc_screen.dart';
 import '../../constants/app_assets.dart';
@@ -27,6 +29,7 @@ import '../select_account/managa_account.dart';
 import '../transaction_history/transaction_history.dart';
 import '../wishlist/wishlist_screen.dart';
 import 'profile_controller.dart';
+import '../autopay/autopay_dashboard_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -277,7 +280,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   },
                                 ));
                           }
-
                           // All other tiles do NOT use Obx
                           return ProfileMenuCard(
                             icon: controller.myOrders[index]["icon"]!,
@@ -295,12 +297,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Get.to(() => TransactionHistory());
                               } else if (index == 5) {
                                 Get.to(() => OrderDeliveredScreen());
+                              } else if (index == 6) {
+                                Get.to(() => AutopayDashboardScreen());
+                              } else if (index == 7) {
+                                Get.to(() => CouponScreen());
                               } else {}
                             },
                           );
                         },
                       )),
-
                   SizedBox(height: 20.h),
 
                   // -------------------- SETTINGS TITLE ---------------------
@@ -313,8 +318,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: AppColors.textBlack,
                     ),
                   ),
-
-                  SizedBox(height: 10.h),
 
                   // -------------------- SETTINGS GRID -----------------------
                   Padding(
@@ -345,6 +348,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               case "Manage Account":
                                 Get.to(() => ManageAccountScreen());
                                 break;
+                              case "Manage Address":
+                                Get.to(() => ManageAddressScreen());
+                              case "FAQs":
+                                Get.to(() => FaqScreen());
+                                break;
                               case "Privacy Policy":
                                 controller.openUrl(AppURLs.PRIVACY_POLICY);
                                 break;
@@ -361,8 +369,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               case "Delete\nAccount":
                                 controller.deleteAccount();
                                 break;
-                              case "Manage Address":
-                                Get.to(() => ManageAddressScreen());
 
                               default:
                             }
@@ -371,7 +377,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                     ),
                   ),
-
                   SizedBox(height: 20.h),
                 ],
               ),
