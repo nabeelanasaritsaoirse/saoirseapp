@@ -38,6 +38,13 @@ class _HomeScreenState extends State<HomeScreen> {
       Get.find<InvestmentStatusController>();
 
   @override
+  void initState() {
+    super.initState();
+    final ctrl = Get.find<PendingTransactionController>();
+    ctrl.getPendingTransactions();
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     Future.delayed(Duration(milliseconds: 200), () {
@@ -59,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
             clipBehavior: Clip.none,
             children: [
               IconBox(
-                image: AppAssets.notificationnew,
+                image: AppAssets.notification_icon,
                 onTap: () {
                   Get.to(() => NotificationScreen());
                 },
@@ -72,10 +79,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (count == 0) return const SizedBox();
 
                 return Positioned(
-                  right: -2,
-                  top: -2,
+                  right: 7.w,
+                  top: 6.h,
                   child: Container(
-                    padding: EdgeInsets.all(4.r),
+                    padding: EdgeInsets.all(2.r),
                     decoration: BoxDecoration(
                       color: AppColors.red,
                       shape: BoxShape.circle,
@@ -84,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       count > 9 ? "9+" : count.toString(),
                       style: TextStyle(
                         color: AppColors.white,
-                        fontSize: 9.sp,
+                        fontSize: 7.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -93,17 +100,15 @@ class _HomeScreenState extends State<HomeScreen> {
               }),
             ],
           ),
-          SizedBox(width: 8.w),
           IconBox(
-              image: AppAssets.searchnew,
+              image: AppAssets.search_icon,
               onTap: () {
                 Get.to(() => const ProductListing());
               }),
-          SizedBox(width: 8.w),
           IconBox(
-              image: AppAssets.walletnew,
+              image: AppAssets.wallet_icon,
               onTap: () => Get.to(() => WalletScreen())),
-          SizedBox(width: 12.w)
+          SizedBox(width: 8.w)
         ],
       ),
 
@@ -493,7 +498,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Get.isRegistered<PendingTransactionController>()
                       ? Get.find<PendingTransactionController>()
                       : Get.put(PendingTransactionController());
-              pendingCtrl.getPendingTransactions();
+              // pendingCtrl.getPendingTransactions();
               final pendingCount = pendingCtrl.pendingCount.value;
               debugPrint("🏠 [HOME] Checking blue box visibility");
               debugPrint("🏠 [HOME] pendingCount = $pendingCount");

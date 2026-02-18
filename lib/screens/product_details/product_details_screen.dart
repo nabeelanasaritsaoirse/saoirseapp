@@ -4,9 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/review_resposne.dart';
 
+import '../../constants/app_constant.dart';
+import '../../main.dart';
 import '../../models/product_details_model.dart';
+import '../../models/review_resposne.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/build_expandable_header.dart';
@@ -19,6 +21,7 @@ import '../all_review/all_review_screen.dart';
 import '../cart/cart_controller.dart';
 import '../productListing/product_listing.dart';
 import '../product_faq/product_faq_screen.dart';
+import '../login/login_page.dart';
 import '../select_address/select_address.dart';
 import 'product_details_controller.dart';
 
@@ -47,23 +50,36 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     controller.checkIfInWishlist(widget.productId);
   }
 
+  bool get isLoggedIn {
+    return storage.read(AppConst.USER_ID) != null;
+  }
+
+  void requireLogin(VoidCallback onAuthenticated) {
+    if (!isLoggedIn) {
+      Get.to(() => LoginPage());
+      return;
+    }
+    onAuthenticated();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
+
       body: SafeArea(
         child: Obx(() {
-          /// LOADING
-          if (controller.isProductLoading.value) {
+          final product = controller.product.value;
+
+          if (controller.isProductLoading.value && product == null) {
             return Center(child: appLoader());
           }
 
-          /// NO PRODUCT
-          if (controller.product.value == null) {
+          if (product == null) {
             return Center(child: Text("Product not found"));
           }
 
-          return buildBody(controller.product.value!);
+          return buildBody(product);
         }),
       ),
 
@@ -400,18 +416,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           /// Add to Cart
           Obx(() => appButton(
                 onTap: () {
-                  if (cartController.isAddToCartLoading.value)
-                    return; // ⛔ block tap
+                  requireLogin(() {
+                    if (cartController.isAddToCartLoading.value) return;
 
-                  final selectedVariantId =
-                      controller.selectedVariantId.value.isEmpty
-                          ? null
-                          : controller.selectedVariantId.value;
+                    final selectedVariantId =
+                        controller.selectedVariantId.value.isEmpty
+                            ? null
+                            : controller.selectedVariantId.value;
 
-                  cartController.addProductToCart(
-                    productId: controller.product.value!.id,
-                    variantId: selectedVariantId,
-                  );
+                    cartController.addProductToCart(
+                      productId: controller.product.value!.id,
+                      variantId: selectedVariantId,
+                    );
+                  });
                 },
                 width: 50.w,
                 height: 35.h,
@@ -478,42 +495,42 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 padding: EdgeInsets.symmetric(vertical: 10.h),
               ),
               onPressed: () {
-                bool hasPlan = controller.selectedPlanIndex.value != -1 ||
-                    (controller.customDays.value > 0 &&
-                        controller.customAmount.value > 0);
+                requireLogin(() {
+                  bool hasPlan = controller.selectedPlanIndex.value != -1 ||
+                      (controller.customDays.value > 0 &&
+                          controller.customAmount.value > 0);
 
-                if (!hasPlan) {
-                  WarningDialog.show(
-                    title: AppStrings.warning_label,
-                    message: AppStrings.checkout_warning_body,
+                  if (!hasPlan) {
+                    WarningDialog.show(
+                      title: AppStrings.warning_label,
+                      message: AppStrings.checkout_warning_body,
+                    );
+                    return;
+                  }
+
+                  int selectedDays;
+                  double selectedAmount;
+
+                  if (controller.selectedPlanIndex.value != -1) {
+                    final plan =
+                        controller.plans[controller.selectedPlanIndex.value];
+                    selectedDays = plan.days;
+                    selectedAmount = plan.perDayAmount;
+                  } else {
+                    selectedDays = controller.customDays.value;
+                    selectedAmount = controller.customAmount.value;
+                  }
+
+                  Get.to(
+                    () => SelectAddress(
+                      product: controller.product.value!,
+                      selectVarientId: controller.selectedVariantId.value,
+                      selectedDays: selectedDays,
+                      selectedAmount: selectedAmount,
+                      checkoutSource: CheckoutSource.product,
+                    ),
                   );
-                  return;
-                }
-
-                // COMPUTE FINAL SELECTED VALUES
-                int selectedDays;
-                double selectedAmount;
-
-                if (controller.selectedPlanIndex.value != -1) {
-                  final plan =
-                      controller.plans[controller.selectedPlanIndex.value];
-                  selectedDays = plan.days;
-                  selectedAmount = plan.perDayAmount;
-                } else {
-                  selectedDays = controller.customDays.value;
-                  selectedAmount = controller.customAmount.value;
-                }
-
-                // GO TO SELECT ADDRESS
-                Get.to(
-                  () => SelectAddress(
-                    product: controller.product.value!,
-                    selectVarientId: controller.selectedVariantId.value,
-                    selectedDays: selectedDays,
-                    selectedAmount: selectedAmount,
-                    checkoutSource: CheckoutSource.product,
-                  ),
-                );
+                });
               },
               child: Text(
                 AppStrings.checkout,
@@ -770,8 +787,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Widget _buildFaqContent() {
     if (controller.isFaqLoading.value) {
       return Padding(
-        padding: EdgeInsets.only(top: 10.h),
-        child: appLoader(),
+        padding: EdgeInsets.symmetric(vertical: 20.h),
+        child: Center(
+          child: SizedBox(
+            width: 22,
+            height: 22,
+            child: CupertinoActivityIndicator(color: AppColors.grey),
+          ),
+        ),
       );
     }
 
@@ -815,10 +838,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      appText(
-                        (index + 1).toString().padLeft(2, '0'),
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14.sp,
+                      Padding(
+                        padding: EdgeInsets.only(top: 1.h),
+                        child: appText(
+                          (index + 1).toString().padLeft(2, '0'),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12.sp,
+                        ),
                       ),
                       SizedBox(width: 12.w),
                       Expanded(
@@ -826,6 +852,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           faq.question,
                           fontWeight: FontWeight.w500,
                           textAlign: TextAlign.left,
+                          maxLines: isOpen ? null : 2,
+                          overflow: isOpen
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
                           fontSize: 13.sp,
                         ),
                       ),
@@ -887,186 +917,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
-  // Widget buildReviewSection() {
-  //   return Container(
-  //     margin: EdgeInsets.only(top: 10.h),
-  //     padding: EdgeInsets.symmetric(vertical: 14.h),
-  //     decoration: BoxDecoration(
-  //       borderRadius: BorderRadius.circular(12.r),
-  //     ),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         /// RATING ROW
-  //         Row(
-  //           crossAxisAlignment: CrossAxisAlignment.center,
-  //           children: [
-  //             Obx(() => appText(
-  //                   controller.averageRating.value.toStringAsFixed(1),
-  //                   fontSize: 30.sp,
-  //                   fontWeight: FontWeight.bold,
-  //                 )),
-  //             SizedBox(width: 6.w),
-  //             appText(
-  //               "OUT OF 5",
-  //               fontSize: 11.sp,
-  //               fontWeight: FontWeight.w600,
-  //               color: AppColors.grey,
-  //             ),
-  //             Spacer(),
-  //             Column(
-  //               crossAxisAlignment: CrossAxisAlignment.end,
-  //               children: [
-  //                 buildStarRow(controller.averageRating.value),
-  //                 SizedBox(height: 4.h),
-  //                 Obx(() => appText(
-  //                       "${controller.totalRatings.value} ratings",
-  //                       fontSize: 11.sp,
-  //                       fontWeight: FontWeight.w600,
-  //                       color: AppColors.grey,
-  //                     )),
-  //                 SizedBox(height: 4.h),
-  //               ],
-  //             )
-  //           ],
-  //         ),
-
-  //         SizedBox(height: 10.h),
-
-  //         /// REVIEW ACTION ROW
-  //         Row(
-  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //           children: [
-  //             appText("${controller.totalReviews.value} Reviews",
-  //                 fontSize: 13.sp,
-  //                 fontWeight: FontWeight.w600,
-  //                 color: AppColors.lightBlue),
-  //           ],
-  //         ),
-  //         SizedBox(height: 10.h),
-  //         // Row(
-  //         //   mainAxisAlignment: MainAxisAlignment.start,
-  //         //   children: [
-  //         //     ClipRRect(
-  //         //       borderRadius: BorderRadius.circular(8.r),
-  //         //       child: Image.network(
-  //         //         "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D",
-  //         //         height: 65.h,
-  //         //         width: 140.w,
-  //         //         fit: BoxFit.cover,
-  //         //       ),
-  //         //     ),
-  //         //     SizedBox(width: 6.w),
-  //         //     Flexible(
-  //         //       child: ClipRRect(
-  //         //         borderRadius: BorderRadius.circular(8.r),
-  //         //         child: Image.network(
-  //         //           "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHByb2R1Y3R8ZW58MHx8MHx8fDA%3D",
-  //         //           height: 65.h,
-  //         //           width: 80.w,
-  //         //           fit: BoxFit.cover,
-  //         //         ),
-  //         //       ),
-  //         //     ),
-  //         //     SizedBox(width: 6.w),
-  //         //     Flexible(
-  //         //       child: ClipRRect(
-  //         //         borderRadius: BorderRadius.circular(8.r),
-  //         //         child: Image.network(
-  //         //           "https://images.unsplash.com/photo-1611048219784-ca687f9fe55d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDE0fHx8ZW58MHx8fHx8",
-  //         //           height: 65.h,
-  //         //           width: 80.w,
-  //         //           fit: BoxFit.cover,
-  //         //         ),
-  //         //       ),
-  //         //     ),
-  //         //   ],
-  //         // ),
-  //         Obx(() {
-  //           if (controller.reviewImagesPreview.isEmpty) {
-  //             return const SizedBox.shrink();
-  //           }
-
-  //           return Row(
-  //             children: controller.reviewImagesPreview.map((img) {
-  //               return Padding(
-  //                 padding: EdgeInsets.only(right: 6.w),
-  //                 child: ClipRRect(
-  //                   borderRadius: BorderRadius.circular(8.r),
-  //                   child: Image.network(
-  //                     img.url,
-  //                     height: 65.h,
-  //                     width: 80.w,
-  //                     fit: BoxFit.cover,
-  //                   ),
-  //                 ),
-  //               );
-  //             }).toList(),
-  //           );
-  //         }),
-
-  //         SizedBox(height: 12.h),
-
-  //         /// REVIEW CARDS
-  //         // SizedBox(
-  //         //   height: 90.h,
-  //         //   child: ListView.separated(
-  //         //     scrollDirection: Axis.horizontal,
-  //         //     itemCount: 3,
-  //         //     separatorBuilder: (_, __) => SizedBox(width: 10.w),
-  //         //     itemBuilder: (_, index) => buildReviewCard(),
-  //         //   ),
-  //         // ),
-  //         Obx(() {
-  //           if (controller.reviews.isEmpty) {
-  //             return appText(
-  //               "No reviews yet",
-  //               color: AppColors.grey,
-  //             );
-  //           }
-
-  //           return SizedBox(
-  //             height: 90.h,
-  //             child: ListView.separated(
-  //               scrollDirection: Axis.horizontal,
-  //               itemCount: controller.reviews.length.clamp(0, 3),
-  //               separatorBuilder: (_, __) => SizedBox(width: 10.w),
-  //               itemBuilder: (_, index) {
-  //                 final review = controller.reviews[index];
-  //                 return buildReviewCard(review);
-  //               },
-  //             ),
-  //           );
-  //         }),
-
-  //         SizedBox(height: 14.h),
-
-  //         /// SHOW ALL REVIEWS
-  //         InkWell(
-  //           onTap: () {
-  //             Get.to(() => AllReviewsScreen());
-  //           },
-  //           child: Container(
-  //             width: double.infinity,
-  //             padding: EdgeInsets.symmetric(vertical: 12.h),
-  //             decoration: BoxDecoration(
-  //               borderRadius: BorderRadius.circular(10.r),
-  //               border: Border.all(color: AppColors.black87),
-  //             ),
-  //             alignment: Alignment.center,
-  //             child: appText(
-  //               "Show all reviews",
-  //               fontWeight: FontWeight.w600,
-  //               fontSize: 13.sp,
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Widget buildReviewSection() {
+    if (controller.isReviewLoading.value) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 20.h),
+        child: Center(
+          child: CupertinoActivityIndicator(
+            radius: 12,
+          ),
+        ),
+      );
+    }
     return Container(
       margin: EdgeInsets.only(top: 10.h),
       padding: EdgeInsets.symmetric(vertical: 14.h),

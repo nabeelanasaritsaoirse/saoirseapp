@@ -3,21 +3,20 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart';
-import 'package:saoirse_app/models/delete_account_model.dart';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
+import '../models/delete_account_model.dart';
 import '../models/profile_response.dart';
 import 'api_service.dart';
 
 import 'package:http/http.dart' as http;
 
 class ProfileService {
-  final token = storage.read(AppConst.ACCESS_TOKEN);
-
   Future<UserProfileModel?> fetchProfile() async {
     try {
+      final token = storage.read(AppConst.ACCESS_TOKEN); // FETCH DYNAMICALLY
       final url = AppURLs.MY_PROFILE;
 
       final response = await APIService.getRequest<UserProfileModel>(
@@ -42,6 +41,7 @@ class ProfileService {
   // -------- UPDATE PROFILE PICTURE --------
   Future<bool> updateProfilePicture(String userId, String imagePath) async {
     try {
+      final token = storage.read(AppConst.ACCESS_TOKEN); // FETCH DYNAMICALLY
       final url = "${AppURLs.BASE_API}api/users/$userId/profile-picture";
 
       // ---- FORCE NEW FILE NAME WITH .jpg ----
@@ -164,8 +164,6 @@ class ProfileService {
       "${AppURLs.BASE_API}api/users/$userId/deletion-info",
     );
 
-   // print("delete api: $uri");
-
     final response = await http.get(
       uri,
       headers: {
@@ -174,9 +172,6 @@ class ProfileService {
         "Content-Type": "application/json",
       },
     );
-
-    log("DELETE INFO STATUS => ${response.statusCode}");
-    log("DELETE INFO BODY => ${response.body}");
 
     if (response.statusCode == 200) {
       return DeleteAccountModel.fromJson(

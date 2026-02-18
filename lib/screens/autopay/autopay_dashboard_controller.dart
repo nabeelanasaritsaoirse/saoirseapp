@@ -1,10 +1,11 @@
 import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/models/autopay_dashboard-model.dart';
-import 'package:saoirse_app/models/autopay_status_model.dart';
 
-import 'package:saoirse_app/services/autopay_service.dart';
+import '../../models/autopay_dashboard_model.dart';
+import '../../models/autopay_status_model.dart';
+import '../../services/autopay_service.dart';
 
 class AutopayController extends GetxController {
   final AutopayService service = AutopayService();
@@ -26,7 +27,8 @@ class AutopayController extends GetxController {
   Rx<NextMilestone?> nextMilestone = Rx<NextMilestone?>(null);
 
   // ================= SUGGESTIONS =================
-  RxInt suggestedTopUp = 0.obs;
+  RxDouble suggestedTopUp = 0.0.obs;
+
   RxInt daysRequested = 7.obs;
 
   // ================= ORDERS =================
@@ -61,7 +63,7 @@ class AutopayController extends GetxController {
 
   RxList<DateTime> skipDates = <DateTime>[].obs;
   RxBool isSkipDateSaving = false.obs;
-
+  RxBool hasSkipDateChanges = false.obs;
 //=====================SelectOrderid===============================
   RxString selectedOrderId = ''.obs;
 
@@ -69,6 +71,8 @@ class AutopayController extends GetxController {
   late TextEditingController lowBalanceCtrl;
   late TextEditingController minBalanceCtrl;
   late TextEditingController reminderHoursCtrl;
+
+  RxList<DateTime> newSkipDates = <DateTime>[].obs;
 
   @override
   void onInit() {
@@ -97,7 +101,63 @@ class AutopayController extends GetxController {
     return true;
   }
 
-  void applyAutopayStatusForOrder(String orderId) {
+  Future<void> saveAllSettings() async {
+    final orderId = selectedOrderId.value;
+
+    if (orderId.isEmpty) {
+      log("SAVE FAILED: Order ID empty");
+      return;
+    }
+
+    try {
+      isSettingsLoading.value = true;
+
+      // 1. Enable/Disable autopay
+      if (autopayEnabled.value) {
+        await service.enableAutopayForOrder(
+          orderId: orderId,
+          priority: priority.value,
+        );
+      } else {
+        await service.disableAutopayForOrder(orderId: orderId);
+      }
+
+      // 2. Pause or resume
+      if (pauseAutopay.value) {
+        final pauseUntil = DateTime.now().add(const Duration(days: 7));
+        await service.pauseAutopay(
+          orderId: orderId,
+          pauseUntil: pauseUntil,
+        );
+      } else {
+        await service.resumeAutopay(orderId: orderId);
+      }
+
+      // 3. Priority update
+      await service.updateOrderPriority(
+        orderId: orderId,
+        priority: priority.value,
+      );
+
+      // 4. Skip dates (only if changed)
+      if (hasSkipDateChanges.value) {
+        await saveSkipDates(orderId);
+      }
+
+      // Refresh data
+      await fetchAutopayStatus();
+      await fetchDashboard();
+      applyAutopayStatusForOrder(orderId);
+
+      log("ALL SETTINGS SAVED SUCCESSFULLY");
+    } catch (e) {
+      log("SAVE ALL SETTINGS ERROR: $e");
+    } finally {
+      isSettingsLoading.value = false;
+    }
+  }
+
+  void applyAutopayStatusForOrder(String orderId, {bool fromApi = true}) {
     final status = autopayStatus.value;
     if (status == null) return;
 
@@ -108,25 +168,32 @@ class AutopayController extends GetxController {
     if (order == null) return;
 
     autopayEnabled.value = order.autopay.enabled;
-    pauseAutopay.value = !order.autopay.isActive;
+
+    // Enforce rule:
+    // If autopay disabled → pause must also be off
+    if (!autopayEnabled.value) {
+      pauseAutopay.value = false;
+    } else {
+      pauseAutopay.value = !order.autopay.isActive;
+    }
 
     priority.value = order.autopay.priority;
     priorityCtrl.text = order.autopay.priority.toString();
 
-    skipDates.clear();
+    if (fromApi) {
+      skipDates.clear();
+      newSkipDates.clear();
 
-    if (order.autopay.skipDates.isNotEmpty) {
-      skipDates.addAll(
-        order.autopay.skipDates
-            .map((d) => DateTime.parse(d.toString()))
-            .map((d) => DateTime(d.year, d.month, d.day))
-            .toList(),
-      );
+      if (order.autopay.skipDates.isNotEmpty) {
+        skipDates.addAll(
+          order.autopay.skipDates
+              .map((d) => DateTime.parse(d.toString()))
+              .map((d) => DateTime(d.year, d.month, d.day))
+              .toList(),
+        );
+      }
+      hasSkipDateChanges.value = false;
     }
-
-    log("AUTOPAY PREFILLED FOR ORDER $orderId");
-    log("SKIP DATES COUNT: ${skipDates.length}");
-    log("SKIP DATES: ${skipDates.map((d) => d.toIso8601String()).toList()}");
   }
 
   // ================= SAVE SETTINGS =================
@@ -210,7 +277,7 @@ class AutopayController extends GetxController {
       dailyDeduction.value = data.autopay.totalDailyDeduction;
       daysBalanceLasts.value = data.autopay.daysBalanceLasts;
       isLowBalance.value = data.wallet.isLowBalance;
-      suggestedTopUp.value = data.suggestions.suggestedTopUp;
+      suggestedTopUp.value = data.suggestions.suggestedTopUp.toDouble();
 
       items.value = data.orders.map((order) {
         return AutopayItem(
@@ -281,7 +348,10 @@ class AutopayController extends GetxController {
     }
 
     skipDates.add(normalized);
+    newSkipDates.add(normalized);
+
     skipDates.sort((a, b) => a.compareTo(b));
+    hasSkipDateChanges.value = true;
 
     log("Skip date added: ${normalized.toString()}");
     log("Total skip dates: ${skipDates.length}");
@@ -292,8 +362,10 @@ class AutopayController extends GetxController {
   }
 
   Future<void> saveSkipDates(String orderId) async {
-    if (skipDates.isEmpty) {
-      log("No Dates: Please add at least one skip date");
+    log("SAVE BUTTON -> saveSkipDates() CALLED");
+
+    if (newSkipDates.isEmpty) {
+      log("No new skip dates to save");
       return;
     }
 
@@ -305,29 +377,29 @@ class AutopayController extends GetxController {
     try {
       isSkipDateSaving.value = true;
 
-      log("SAVING SKIP DATES FOR ORDER: $orderId");
-      log("SKIP DATES COUNT: ${skipDates.length}");
-      log("SKIP DATES: ${skipDates.map((d) => d.toString()).toList()}");
+      log("SAVING NEW SKIP DATES FOR ORDER: $orderId");
+      log("NEW SKIP DATES COUNT: ${newSkipDates.length}");
+      log("NEW SKIP DATES: ${newSkipDates.map((d) => d.toString()).toList()}");
 
       final success = await service.addSkipDates(
         orderId: orderId,
-        dates: skipDates,
+        dates: newSkipDates,
       );
 
       if (success) {
         log("SKIP DATES SAVED SUCCESSFULLY");
 
+        // Clear newly added dates
+        newSkipDates.clear();
+
+        // Refresh status
         await fetchAutopayStatus();
-      
         applyAutopayStatusForOrder(orderId);
 
-        Get.back();
+        hasSkipDateChanges.value = false;
       } else {
         log("FAILED TO SAVE SKIP DATES");
       }
-
-      final AutopayController controller = Get.find();
-      controller.removeSkipDate();
     } catch (e) {
       log("SAVE SKIP DATES ERROR: $e");
     } finally {
@@ -358,7 +430,7 @@ class AutopayController extends GetxController {
             d.year == date.year && d.month == date.month && d.day == date.day);
 
         await fetchAutopayStatus();
-      
+
         applyAutopayStatusForOrder(orderId);
       } else {
         log("FAILED TO REMOVE SKIP DATE");
@@ -397,7 +469,7 @@ class AutopayController extends GetxController {
     try {
       final response = await service.getSuggestedTopUp(days: days);
 
-      suggestedTopUp.value = response.data.suggestedTopUp;
+      suggestedTopUp.value = response.data.suggestedTopUp.toDouble();
       daysRequested.value = response.data.daysRequested;
 
       log("SUGGESTED TOPUP UPDATED: ₹${suggestedTopUp.value}");
@@ -429,7 +501,7 @@ class AutopayController extends GetxController {
         log("AUTOPAY RESUMED SUCCESSFULLY");
 
         await fetchAutopayStatus();
-      
+
         applyAutopayStatusForOrder(orderId);
 
         return true;
@@ -612,7 +684,8 @@ class AutopayController extends GetxController {
       log("ORDER PRIORITY UPDATED TO $parsedPriority");
 
       await fetchAutopayStatus();
-      
+      await fetchDashboard();
+
       applyAutopayStatusForOrder(orderId);
     } else {
       log("FAILED TO UPDATE PRIORITY");

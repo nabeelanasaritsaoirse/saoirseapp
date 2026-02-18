@@ -1,11 +1,13 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
+
 import '../../constants/app_colors.dart';
 import '../../models/coupon_model.dart';
 import '../../widgets/custom_appbar.dart';
-
-import 'package:get/get.dart';
 import 'coupon_controller.dart';
 
 class CouponScreen extends StatelessWidget {
@@ -24,10 +26,6 @@ class CouponScreen extends StatelessWidget {
       body: Obx(() {
         if (controller.isLoading.value) {
           return const CouponShimmer();
-        }
-
-        if (controller.errorMessage.isNotEmpty) {
-          return Center(child: Text(controller.errorMessage.value));
         }
 
         if (controller.coupons.isEmpty) {
@@ -106,151 +104,164 @@ class CouponCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
-      child: ClipPath(
-        clipper: CouponClipper(),
-        child: Container(
-          height: 120.h,
-          decoration: BoxDecoration(
-            color: AppColors.offWhite,
-            borderRadius: BorderRadius.circular(14.r),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Stack(
-            children: [
-              Row(
-                children: [
-                  /// LEFT DISCOUNT BADGE
-                  Container(
-                    width: 120.w,
-                    padding: EdgeInsets.all(16.w),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor,
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Center(
-                        child: Text(
-                          discountLabel,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28.sp,
-                            fontWeight: FontWeight.bold,
+      child: Container(
+        height: 120.h,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 24,
+              offset: const Offset(0, 2),
+              spreadRadius: 1,
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 24,
+              offset: const Offset(0, 1),
+              spreadRadius: 0,
+            ),
+          ],
+        ),
+        child: ClipPath(
+          clipper: CouponClipper(),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14.r),
+            ),
+            child: Stack(
+              children: [
+                Row(
+                  children: [
+                    /// LEFT DISCOUNT BADGE
+                    Container(
+                      width: 120.w,
+                      padding: EdgeInsets.all(16.w),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Center(
+                          child: Text(
+                            discountLabel,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 26.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
 
-                  /// CENTER DETAILS
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          coupon.couponCode,
-                          style: TextStyle(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textBlack,
+                    /// CENTER DETAILS
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            coupon.couponCode,
+                            style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textBlack,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          discountText,
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            color: AppColors.grey,
+                          SizedBox(height: 4.h),
+                          Text(
+                            discountText,
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              color: AppColors.textGray,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 2.h),
-                        Text(
-                          "Minimum order value ₹${coupon.minOrderValue.toInt()}",
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: AppColors.grey,
+                          SizedBox(height: 2.h),
+                          Text(
+                            "Minimum order value ₹${coupon.minOrderValue.toInt()}",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: AppColors.textGray,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 6.h),
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Code: ",
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: AppColors.textBlack,
+                          SizedBox(height: 5.h),
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "Code: ",
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textBlack,
+                                  ),
                                 ),
-                              ),
-                              TextSpan(
-                                text: coupon.couponCode.toLowerCase(),
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textBlack,
+                                TextSpan(
+                                  text: coupon.couponCode.toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textBlack,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                  /// RIGHT EXPIRY
-                  Container(
-                    width: 80.w,
-                    padding: EdgeInsets.symmetric(vertical: 18.h),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Exp.",
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: Colors.grey[600],
+                    /// RIGHT EXPIRY
+                    Container(
+                      width: 80.w,
+                      padding: EdgeInsets.symmetric(vertical: 18.h),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Exp.",
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: AppColors.textGray,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 6.h),
-                        Text(
-                          expiryDay,
-                          style: TextStyle(
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF2C3E50),
+                          SizedBox(height: 9.h),
+                          Text(
+                            expiryDay,
+                            style: TextStyle(
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF2C3E50),
+                            ),
                           ),
-                        ),
-                        Text(
-                          expiryMonth,
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFF2C3E50),
+                          Text(
+                            expiryMonth,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF2C3E50),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-
-              /// DOTTED DIVIDER
-              Positioned(
-                right: 80.w,
-                top: 0,
-                bottom: 0,
-                child: CustomPaint(
-                  painter: DottedLinePainter(),
-                  size: Size(1.w, double.infinity),
+                  ],
                 ),
-              ),
-            ],
+
+                /// DOTTED DIVIDER
+                Positioned(
+                  right: 80.w,
+                  top: 0,
+                  bottom: 0,
+                  child: CustomPaint(
+                    painter: DottedLinePainter(),
+                    size: Size(1.w, double.infinity),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

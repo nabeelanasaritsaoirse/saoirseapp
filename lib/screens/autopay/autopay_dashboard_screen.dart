@@ -1,21 +1,19 @@
 // ignore_for_file: deprecated_member_use
 
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_assets.dart';
-import 'package:saoirse_app/constants/app_colors.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
-import 'package:saoirse_app/widgets/app_button.dart';
-import 'package:saoirse_app/widgets/app_loader.dart';
-import 'package:saoirse_app/widgets/app_text.dart';
-import 'package:saoirse_app/widgets/app_text_field.dart';
-import 'package:saoirse_app/widgets/custom_appbar.dart';
-
+import '/screens/add_money/add_money_screen.dart';
+import '../../constants/app_assets.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
+import '../../widgets/app_button.dart';
+import '../../widgets/app_loader.dart';
+import '../../widgets/app_text.dart';
+import '../../widgets/app_text_field.dart';
+import '../../widgets/custom_appbar.dart';
 import 'autopay_dashboard_controller.dart';
 import 'autopay_settings_preferences.dart';
 
@@ -23,6 +21,12 @@ class AutopayDashboardScreen extends StatelessWidget {
   AutopayDashboardScreen({super.key});
 
   final AutopayController controller = Get.put(AutopayController());
+
+  @override
+  StatelessElement createElement() {
+    controller.fetchDashboard();
+    return super.createElement();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,14 +59,6 @@ class AutopayDashboardScreen extends StatelessWidget {
       body: Obx(() {
         if (controller.isLoading.value) {
           return appLoader();
-        }
-        if (controller.errorMessage.isNotEmpty) {
-          return Center(
-            child: appText(
-              controller.errorMessage.value,
-              color: AppColors.red,
-            ),
-          );
         }
 
         return SingleChildScrollView(
@@ -194,7 +190,7 @@ class AutopayDashboardScreen extends StatelessWidget {
           Icon(
             icon,
             size: 14.sp,
-            color: Colors.white,
+            color: AppColors.white,
           ),
           appText(
             text,
@@ -235,11 +231,7 @@ class AutopayDashboardScreen extends StatelessWidget {
               height: 44.h,
               child: appButton(
                 onTap: () {
-                  //   todo: open settings dialog                                                Quick Add Button
-                  print('Quick Add ₹${controller.suggestedTopUp.value}');
-                  print(controller.items[0].title);
-                  print(controller.items[1].title);
-                  print(controller.items[2].title);
+                  Get.to(() => AddMoneyScreen());
                 },
                 buttonText: 'Quick Add ₹${controller.suggestedTopUp.value}',
                 buttonColor: AppColors.primaryColor,
@@ -272,115 +264,107 @@ class AutopayDashboardScreen extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: isDisabled ? AppColors.grey : AppColors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
           color: AppColors.offWhite,
         ),
       ),
-      child: Opacity(
-        opacity: isDisabled ? 0.55 : 1,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                    child: appText(
-                  item.title,
-                  maxLines: 2,
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  textAlign: TextAlign.start,
-                )),
-                SizedBox(width: 6.w),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Row(
-                      children: [
-                        appText(
-                          isDisabled ? 'Inactive' : 'Active',
-                          fontSize: 11.sp,
-                          color: isDisabled ? Colors.red : AppColors.green,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            final controller = Get.find<AutopayController>();
-
-                            controller.selectedOrderId.value = item.orderId;
-
-                            controller.applyAutopayStatusForOrder(item.orderId);
-
-                            log("Opening autopay settings for ${item.orderId}");
-                            log("Selected Order ID = ${controller.selectedOrderId.value}");
-                            log("Skip dates after prefill = ${controller.skipDates}");
-
-                            // OPEN BOTTOM SHEET
-                            showAutopayPreferenceSheet(Get.context!);
-                          },
-                          child: Icon(
-                            Icons.open_in_new_rounded,
-                            size: 18.sp,
-                            color: AppColors.skyBlue,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: 6.h),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 2.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.lightAmber,
-                        borderRadius: BorderRadius.circular(5.r),
-                      ),
-                      child: appText(
-                        'Priority: ${item.priority}',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                  child: appText(
+                item.title,
+                maxLines: 2,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                textAlign: TextAlign.start,
+              )),
+              SizedBox(width: 6.w),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    children: [
+                      appText(
+                        isDisabled ? 'Inactive' : 'Active',
                         fontSize: 11.sp,
-                        color: AppColors.white,
+                        color: isDisabled ? AppColors.red : AppColors.green,
                         fontWeight: FontWeight.w500,
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 6.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                appText(
-                  '₹${item.perDay}/day',
-                  fontSize: 13.sp,
-                  color: AppColors.black,
-                ),
-                appText(
-                  'Remaining: ₹${item.remaining}',
-                  fontSize: 12.sp,
-                  color: AppColors.black,
-                ),
-              ],
-            ),
-            SizedBox(height: 8.h),
-            // customGradientProgress(value: item.progress.toDouble())
-            //                                                                                TODO        CUSTOM PROGRESS
+                      SizedBox(
+                        width: 5,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          final controller = Get.find<AutopayController>();
 
-            customGradientProgress(
-              value: item.progress / 100.0,
-            )
-          ],
-        ),
+                          controller.selectedOrderId.value = item.orderId;
+
+                          // IMPORTANT: load order data into controller
+                          controller.applyAutopayStatusForOrder(item.orderId);
+
+                          // OPEN BOTTOM SHEET
+                          showAutopayPreferenceSheet(
+                              Get.context!, item.orderId);
+                        },
+                        child: Icon(
+                          Icons.open_in_new_rounded,
+                          size: 18.sp,
+                          color: AppColors.skyBlue,
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 6.h),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 2.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.lightAmber,
+                      borderRadius: BorderRadius.circular(5.r),
+                    ),
+                    child: appText(
+                      'Priority: ${item.priority}',
+                      fontSize: 11.sp,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 6.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              appText(
+                '₹${item.perDay}/day',
+                fontSize: 13.sp,
+                color: AppColors.black,
+              ),
+              appText(
+                'Remaining: ₹${item.remaining}',
+                fontSize: 12.sp,
+                color: AppColors.black,
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          customGradientProgress(
+            value: item.progress / 100.0,
+          )
+        ],
       ),
     );
   }
@@ -394,14 +378,12 @@ Widget customGradientProgress({
     width: double.infinity,
     decoration: BoxDecoration(
       color: const Color(0xFFE8EEFF),
-      borderRadius: BorderRadius.circular(50),
+      borderRadius: BorderRadius.circular(50.r),
     ),
     child: ClipRRect(
-      borderRadius: BorderRadius.circular(50),
+      borderRadius: BorderRadius.circular(50.r),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          log('Progress maxWidth: ${constraints.maxWidth}, value: $value');
-
           return Align(
             alignment: Alignment.centerLeft,
             child: Container(
@@ -416,7 +398,7 @@ Widget customGradientProgress({
                     Color(0xFF4A5BFF),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(50),
+                borderRadius: BorderRadius.circular(50.r),
               ),
             ),
           );
@@ -426,7 +408,7 @@ Widget customGradientProgress({
   );
 }
 
-//                                                                                        AUTOPAY SETTINGS DIALOGBOX
+//AUTOPAY SETTINGS DIALOGBOX
 class AutopaySettingsDialog extends StatelessWidget {
   AutopaySettingsDialog({super.key});
 
@@ -462,8 +444,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                       timePreference(),
                       SizedBox(height: 14.h),
 
-//                                                                                         WALLET RESERVES & REMINDER & NOTIFICATION
-
+                      // WALLET RESERVES & REMINDER & NOTIFICATION
                       appText('Wallet Reserves', fontWeight: FontWeight.w600),
                       SizedBox(height: 8.h),
                       appTextField(
@@ -489,8 +470,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                       ),
                       SizedBox(height: 14.h),
 
-//                                                                                                   REMINDER
-
+                      // REMINDER
                       appText('Reminder', fontWeight: FontWeight.w600),
                       SizedBox(height: 8.h),
                       appTextField(
@@ -512,8 +492,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                       ),
                       SizedBox(height: 14.h),
 
-//                                                                                   NOTIFICATION PREFERENCES
-
+                      // NOTIFICATION PREFERENCES
                       appText('Notification Preferences',
                           fontWeight: FontWeight.w600),
                       SizedBox(height: 10.h),
@@ -543,8 +522,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                 ),
               ),
 
-//                                                                                SAVE & CANCEL BUTTONS
-
+              // SAVE & CANCEL BUTTONS
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                 child: Row(
@@ -580,7 +558,7 @@ class AutopaySettingsDialog extends StatelessWidget {
     );
   }
 
-//                                                                                   AUTOPAY SETTINGS Title
+  //AUTOPAY SETTINGS Title
   Widget autopayTitle() {
     return Center(
       child: Padding(
@@ -602,7 +580,7 @@ class AutopaySettingsDialog extends StatelessWidget {
     );
   }
 
-//                                                                               TIME PREFERENCE DROPDOWN
+  // TIME PREFERENCE DROPDOWN
   Widget timePreference() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -651,7 +629,7 @@ class AutopaySettingsDialog extends StatelessWidget {
   }
 }
 
-void showAutopayPreferenceSheet(BuildContext context) {
+void showAutopayPreferenceSheet(BuildContext context, String orderId) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -660,7 +638,7 @@ void showAutopayPreferenceSheet(BuildContext context) {
       borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
     ),
     builder: (_) {
-      return AutopaySettingsSheet();
+      return AutopaySettingsSheet(orderId: orderId);
     },
   );
 }

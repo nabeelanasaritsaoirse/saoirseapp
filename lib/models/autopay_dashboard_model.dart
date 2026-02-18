@@ -46,7 +46,7 @@ class AutopayDashboardData {
       streak: Streak.fromJson(json['streak'] ?? {}),
       suggestions: Suggestions.fromJson(json['suggestions'] ?? {}),
       orders: (json['orders'] as List<dynamic>? ?? [])
-          .map((e) => Order.fromJson(e))
+          .map((e) => Order.fromJson(e ?? {}))
           .toList(),
     );
   }
@@ -71,9 +71,9 @@ class Wallet {
 
   factory Wallet.fromJson(Map<String, dynamic> json) {
     return Wallet(
-      balance: json['balance'] ?? 0,
-      minimumLock: json['minimumLock'] ?? 0,
-      availableForAutopay: json['availableForAutopay'] ?? 0,
+      balance: (json['balance'] ?? 0) as num,
+      minimumLock: (json['minimumLock'] ?? 0) as num,
+      availableForAutopay: (json['availableForAutopay'] ?? 0) as num,
       isLowBalance: json['isLowBalance'] ?? false,
       lowBalanceThreshold: json['lowBalanceThreshold'] ?? 0,
     );
@@ -140,7 +140,7 @@ class Stats {
 class Streak {
   final int current;
   final int longest;
-  final String? lastPaymentDate;
+  final DateTime? lastPaymentDate;
   final NextMilestone? nextMilestone;
 
   Streak({
@@ -154,7 +154,9 @@ class Streak {
     return Streak(
       current: json['current'] ?? 0,
       longest: json['longest'] ?? 0,
-      lastPaymentDate: json['lastPaymentDate'],
+      lastPaymentDate: json['lastPaymentDate'] != null
+          ? DateTime.tryParse(json['lastPaymentDate'])
+          : null,
       nextMilestone: json['nextMilestone'] != null &&
               (json['nextMilestone'] as Map).isNotEmpty
           ? NextMilestone.fromJson(json['nextMilestone'])
@@ -188,9 +190,9 @@ class NextMilestone {
 // ================= SUGGESTIONS =================
 
 class Suggestions {
-  final int suggestedTopUp;
-  final int topUpFor7Days;
-  final int topUpFor30Days;
+  final num suggestedTopUp;
+  final num topUpFor7Days;
+  final num topUpFor30Days;
 
   Suggestions({
     required this.suggestedTopUp,
@@ -200,9 +202,9 @@ class Suggestions {
 
   factory Suggestions.fromJson(Map<String, dynamic> json) {
     return Suggestions(
-      suggestedTopUp: json['suggestedTopUp'] ?? 0,
-      topUpFor7Days: json['topUpFor7Days'] ?? 0,
-      topUpFor30Days: json['topUpFor30Days'] ?? 0,
+      suggestedTopUp: (json['suggestedTopUp'] ?? 0) as num,
+      topUpFor7Days: (json['topUpFor7Days'] ?? 0) as num,
+      topUpFor30Days: (json['topUpFor30Days'] ?? 0) as num,
     );
   }
 }
@@ -210,7 +212,7 @@ class Suggestions {
 // ================= ORDERS =================
 
 class Order {
-  final String id; 
+  final String id;
   final String productName;
   final int dailyAmount;
   final int remainingAmount;
@@ -230,7 +232,7 @@ class Order {
 
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
-      id: json['id']?.toString() ?? '',
+      id: json['orderId']?.toString() ?? '',
       productName: json['productName'] ?? '',
       dailyAmount: json['dailyAmount'] ?? 0,
       remainingAmount: json['remainingAmount'] ?? 0,

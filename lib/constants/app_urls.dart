@@ -1,9 +1,20 @@
 // ignore_for_file: non_constant_identifier_names, prefer_interpolation_to_compose_strings
 
 class AppURLs {
+  //privacy policy
+  static String PRIVACY_POLICY =
+      "https://admin.epielio.com/privacy_policy.html";
+
+  //terms and conditions
+  static String TERMS_AND_CONDITIONS =
+      "https://admin.epielio.com/terms_and_conditions.html";
+
+  //contact us
+  static String CONTACT_US = "https://admin.epielio.com/contact_us.html";
+
   //base api
-  //static String BASE_API = 'https://api.epielio.com/';
-  static String BASE_API = 'http://13.127.15.87:8080/';
+  static String BASE_API = 'https://api.epielio.com/';
+  // static String BASE_API = 'http://13.127.15.87:8080/';
 
   //login api
   static String LOGIN_API = BASE_API + 'api/auth/login';
@@ -56,8 +67,9 @@ class AppURLs {
 
   // Product Review
   static String CAN_REVIEW_API = BASE_API + "api/reviews/can-review/";
-  static String UPLOAD_REVIEW_IMAGES_API = BASE_API + "api/reviews/upload-images";
-  static String CREATE_REVIEW_API =BASE_API + "api/reviews";
+  static String UPLOAD_REVIEW_IMAGES_API =
+      BASE_API + "api/reviews/upload-images";
+  static String CREATE_REVIEW_API = BASE_API + "api/reviews";
   static String GET_OWN_REVIEWs_API = BASE_API + "api/reviews/my-reviews";
   static String EDIT_REVIEW = BASE_API + "api/reviews/";
 
@@ -86,8 +98,7 @@ class AppURLs {
   //Autopay Api
   static String AUTOPAY_DASHBOARD_API =
       BASE_API + "api/installments/autopay/dashboard";
-  static String AUTOPAY_SETTINGS_API_PUT =
-      BASE_API + "api/installments/autopay/settings";
+
   static String AUTOPAY_SETTINGS_API =
       BASE_API + "api/installments/autopay/settings";
   static String AUTOPAY_NOTIFICATION_PREFERENCES_API =
@@ -100,26 +111,16 @@ class AppURLs {
       BASE_API + "api/installments/autopay/skip-dates";
   static String AUTOPAY_SUGGESTED_TOPUP_API =
       BASE_API + "api/installments/autopay/suggested-topup";
-  static String AUTOPAY_PAUSE_API = 
-  BASE_API + "api/installments/autopay/pause";
+  static String AUTOPAY_PAUSE_API = BASE_API + "api/installments/autopay/pause";
   static String AUTOPAY_RESUME_API =
       BASE_API + "api/installments/autopay/resume";
-static String AUTOPAY_ENABLE_FOR_ORDER_API =
-  BASE_API + "api/installments/autopay/enable";
+  static String AUTOPAY_ENABLE_FOR_ORDER_API =
+      BASE_API + "api/installments/autopay/enable";
   static String AUTOPAY_DISABLE_FOR_ORDER_API =
-  BASE_API + "api/installments/autopay/disable";
+      BASE_API + "api/installments/autopay/disable";
 
   static String AUTOPAY_PRIORITY_API =
       BASE_API + "api/installments/autopay/priority";
-
-
-     
-
-//  Delete Account
-  static String DELETE_ACCOUNT_GET_API =
-      BASE_API + "api/users/:userId/deletion-info";
-  static String DELETE_REQUEST_API =
-      BASE_API + "api/users/:userId/request-deletion";
 
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/installments/orders";
@@ -168,6 +169,12 @@ static String AUTOPAY_ENABLE_FOR_ORDER_API =
 
   //Log Out Api
   static String LOGOUT_API = BASE_API + "api/auth/logout";
+
+  //  Delete Account
+  static String DELETE_ACCOUNT_GET_API =
+      BASE_API + "api/users/:userId/deletion-info";
+  static String DELETE_REQUEST_API =
+      BASE_API + "api/users/:userId/request-deletion";
 
   // Pending Transaction (BEFORE PAYMENT METHOD API RESPONSE)
   static String PENDING_TRANSACTION_PAYMENT_RESPONSE =

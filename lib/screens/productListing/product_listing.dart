@@ -85,7 +85,7 @@ class _ProductListingState extends State<ProductListing> {
                 clipBehavior: Clip.none,
                 children: [
                   IconBox(
-                    image: AppAssets.likenew,
+                    image: AppAssets.like_icon,
                     onTap: () {
                       Get.to(() => const WishlistScreen());
                     },
@@ -94,8 +94,8 @@ class _ProductListingState extends State<ProductListing> {
                   // Show badge only if count > 0
                   if (count > 0)
                     Positioned(
-                      right: -2,
-                      top: -2,
+                      right: 4.w,
+                      top: 4.h,
                       child: Container(
                         padding: EdgeInsets.all(4.r),
                         decoration: BoxDecoration(
