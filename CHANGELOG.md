@@ -1,4 +1,6 @@
-## Version 1.5.19+68
+## Version 1.5.20+69
 
-- Merge pull request #379 from nabeelanasaritsaoirse/ci/nabeelanasaritsaoirse-patch-1-1
-- Update Flutter ios.yml
+- Merge pull request #385 from nabeelanasaritsaoirse/deep-ios
+- fix: env change
+- Merge pull request #384 from nabeelanasaritsaoirse/deep-ios
+- fea: latest code
