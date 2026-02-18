@@ -23,6 +23,12 @@ class AutopayDashboardScreen extends StatelessWidget {
   final AutopayController controller = Get.put(AutopayController());
 
   @override
+  StatelessElement createElement() {
+    controller.fetchDashboard();
+    return super.createElement();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.offWhite,

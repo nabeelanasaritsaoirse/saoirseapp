@@ -329,7 +329,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                           : '',
                                       width: 55.w,
                                       height: 55.h,
-                                      fit: BoxFit.cover,
+                                      fit: BoxFit.contain,
                                       loadingBuilder:
                                           (context, child, loadingProgress) {
                                         if (loadingProgress == null) {

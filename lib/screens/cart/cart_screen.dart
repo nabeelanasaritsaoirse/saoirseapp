@@ -133,7 +133,7 @@ class CartScreen extends StatelessWidget {
                                                       item.images.first.url,
                                                       width: 80.w,
                                                       height: 80.h,
-                                                      fit: BoxFit.cover,
+                                                      fit: BoxFit.contain,
                                                       loadingBuilder: (context,
                                                           child,
                                                           loadingProgress) {
