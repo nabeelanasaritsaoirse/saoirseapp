@@ -63,6 +63,13 @@ post_install do |installer|
         needs_update = true
       end
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0' if needs_update
+
+      # Fix for arm64 simulator support on Apple Silicon Macs
+      # Remove arm64 from EXCLUDED_ARCHS for simulator builds
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'i386'
+
+      # Enable building for arm64 simulator (Apple Silicon)
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
     end
   end
 end

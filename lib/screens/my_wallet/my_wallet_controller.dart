@@ -1,5 +1,8 @@
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
+import '../../constants/app_constant.dart';
+import '../../main.dart';
 import '../../models/wallet_transcation_model.dart';
 import '/services/wallet_service.dart';
 
@@ -19,16 +22,29 @@ class MyWalletController extends GetxController {
   /// Internal counters to avoid loader flicker
   int _apiCallCount = 0;
 
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   fetchWallet();
-  //   fetchWalletTransactions();
-  // }
+  @override
+  void onInit() {
+    super.onInit();
+    _waitForTokenAndLoad();
+  }
+
+  Future<void> _waitForTokenAndLoad() async {
+    while (true) {
+      final token = storage.read(AppConst.ACCESS_TOKEN);
+
+      if (token != null && token.isNotEmpty) {
+        debugPrint("🟢 Token detected → loading wallet");
+        await fetchWallet();
+        await fetchWalletTransactions();
+        break;
+      }
+
+      debugPrint("⏳ Waiting for token...");
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+  }
 
   Future<void> refreshAll() async {
-    if (isLoading.value) return;
-
     errorMessage.value = '';
     isLoading.value = true;
 
@@ -74,18 +90,31 @@ class MyWalletController extends GetxController {
   /// -------------------- WALLET TRANSACTIONS --------------------
   Future<void> fetchWalletTransactions() async {
     try {
+      debugPrint("📡 fetchWalletTransactions() called");
       _startLoading();
       errorMessage.value = '';
 
       final response = await serviceData.fetchTransactions();
+      debugPrint("📥 API response received: ${response != null}");
+      if (response == null) {
+        debugPrint("❌ Response is NULL");
+        errorMessage.value = 'Failed to load transactions';
+        return;
+      }
 
-      if (response == null || response.success != true) {
+      debugPrint("✅ API success flag: ${response.success}");
+      debugPrint(
+          "📊 Transactions count from API: ${response.transactions.length}");
+
+      if (response.success != true) {
         errorMessage.value = 'Failed to load transactions';
         return;
       }
 
       transactions.assignAll(response.transactions);
       summary.value = response.summary;
+      debugPrint(
+          "🎉 Transactions updated in controller: ${transactions.length}");
     } catch (e) {
       errorMessage.value = 'Something went wrong while fetching transactions';
     } finally {

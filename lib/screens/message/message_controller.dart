@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -162,11 +163,12 @@ class MessageController extends GetxController {
       ClipboardData(text: referralCode.value),
     );
 
-    // Show success toast
-    appToaster(
-      error: false,
-      content: "Referral code copied to clipboard",
-    );
+    if (Platform.isIOS) {
+      // Show success toast
+      appToaster(
+        content: "Referral code copied to clipboard",
+      );
+    }
   }
 
   // ---------------------------------------------------------------------------

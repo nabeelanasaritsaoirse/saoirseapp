@@ -11,15 +11,25 @@ import '../../screens/product_details/product_details_controller.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/app_text.dart';
+import '../constants/app_constant.dart';
+import '../main.dart';
+import '../screens/login/login_page.dart';
 import 'app_loader.dart';
 import 'app_toast.dart';
 
 class SelectPlanSheet extends StatelessWidget {
-  const SelectPlanSheet({super.key});
+  final String productId;
+
+  const SelectPlanSheet({
+    super.key,
+    required this.productId,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final ProductDetailsController controller = Get.find();
+    /// ✅ FIX: Find controller USING TAG
+    final ProductDetailsController controller =
+        Get.find<ProductDetailsController>(tag: productId);
 
     final TextEditingController dayController = TextEditingController();
     final TextEditingController amountController = TextEditingController();
@@ -73,7 +83,7 @@ class SelectPlanSheet extends StatelessWidget {
 
               SizedBox(height: 10.h),
 
-              /// --- Customize My Plan ----
+              /// --- Customize My Plan ---
               Align(
                 alignment: Alignment.centerLeft,
                 child: appText(
@@ -161,33 +171,41 @@ class SelectPlanSheet extends StatelessWidget {
                       final double amount =
                           double.tryParse(amountController.text.trim()) ?? 0.0;
 
+                      // 🔹 VALIDATIONS (unchanged)
                       if (days <= 0 || amount <= 0) {
-                        appToast(
-                          error: true,
-                          title: "Invalid Input",
-                          content: "Please enter valid days and amount",
-                        );
+                        appToaster(
+                            error: true,
+                            content: "Please enter valid days and amount");
+
                         return;
                       }
 
                       if (days < 5) {
-                        appToast(
+                        appToaster(
                           error: true,
-                          title: "Invalid Days",
                           content: "Days cannot be less than 5",
                         );
                         return;
                       }
 
                       if (amount < 50) {
-                        appToast(
+                        appToaster(
                           error: true,
-                          title: "Invalid Amount",
                           content: "Amount cannot be more less 50",
                         );
                         return;
                       }
 
+                      // 🔐 LOGIN CHECK (ONLY HERE)
+                      final isLoggedIn = storage.read(AppConst.USER_ID) != null;
+
+                      if (!isLoggedIn) {
+                        Get.back(); // close bottom sheet first
+                        Get.to(() => LoginPage());
+                        return;
+                      }
+
+                      // ✅ ORIGINAL FLOW (unchanged)
                       controller.customDays.value = days;
                       controller.customAmount.value = amount;
                       Get.back();
@@ -214,6 +232,7 @@ class SelectPlanSheet extends StatelessWidget {
 
               SizedBox(height: 10.h),
 
+              /// --- Plans List ---
               Obx(() {
                 if (controller.isProductLoading.value) {
                   return Center(child: appLoader());
@@ -274,7 +293,6 @@ class SelectPlanSheet extends StatelessWidget {
                                                   index
                                               ? FontWeight.w700
                                               : FontWeight.w600,
-                                          color: AppColors.textBlack,
                                         ),
                                         if (plan.isRecommended)
                                           Container(
@@ -360,6 +378,7 @@ class SelectPlanSheet extends StatelessWidget {
                   ),
                 );
               }),
+
               SizedBox(height: 13.h),
             ],
           ),

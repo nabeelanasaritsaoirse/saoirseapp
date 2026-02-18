@@ -13,9 +13,16 @@ class NotificationServiceHelper {
   static Future<void> initializeLocalNotifications() async {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
+    const DarwinInitializationSettings initializationSettingsDarwin =
+        DarwinInitializationSettings(
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
+    );
 
     const initSettings = InitializationSettings(
       android: androidSettings,
+      iOS: initializationSettingsDarwin,
     );
 
     await _plugin.initialize(

@@ -45,29 +45,26 @@ class _CategoryScreenState extends State<CategoryScreen> {
         title: AppStrings.category_title,
         actions: [
           IconBox(
-            image: AppAssets.search,
-            padding: 9.w,
+            image: AppAssets.search_icon,
             onTap: () {
               Get.to(() => const ProductListing());
             },
           ),
-          SizedBox(width: 8.w),
           Obx(() {
             final count = profileController.wishlistCount.value;
             return Stack(
               clipBehavior: Clip.none,
               children: [
                 IconBox(
-                  image: AppAssets.wish,
-                  padding: 8.w,
+                  image: AppAssets.like_icon,
                   onTap: () {
                     Get.to(() => const WishlistScreen());
                   },
                 ),
                 if (count > 0)
                   Positioned(
-                    right: -2,
-                    top: -2,
+                    right: 6.w,
+                    top: 5.h,
                     child: Container(
                       padding: EdgeInsets.all(4.r),
                       decoration: const BoxDecoration(
@@ -191,7 +188,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       ),
                       padding: EdgeInsets.all(12.w),
                       child: Image.network(
-                        category.image?.url ?? '',
+                        category.categoryImage?.url ?? '',
                         fit: BoxFit.contain,
                         errorBuilder: (_, __, ___) => Icon(
                           Icons.image_outlined,

@@ -12,7 +12,7 @@
   <key>provisioningProfiles</key>
   <dict>
     <key>${BUNDLE_ID}</key>
-    <string>sig_com.saoirse.epi_appstore</string>
+    <string>${PROFILE_NAME}</string>
   </dict>
 </dict>
 </plist>

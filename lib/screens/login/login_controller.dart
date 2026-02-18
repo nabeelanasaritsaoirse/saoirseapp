@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
@@ -169,6 +169,76 @@ class LoginController extends GetxController {
     }
   }
 
+  // Apple Login
+  Future<void> appleLogin() async {
+    loading.value = true;
+
+    try {
+      // await AuthService.signOut(); // Optional: Clear previous session
+
+      String? idToken = await AuthService.appleLogin();
+
+      if (idToken == null) {
+        loading.value = false;
+        return;
+      }
+
+      final res = await AuthService.loginWithIdToken(idToken);
+
+      if (res == null || res.success != true) {
+        appToast(content: "Login failed", error: true);
+        loading.value = false;
+        return;
+      }
+
+      final data = res.data!;
+
+      storage.write(AppConst.USER_ID, data.userId);
+      storage.write(AppConst.ACCESS_TOKEN, data.accessToken);
+      storage.write(AppConst.REFRESH_TOKEN, data.refreshToken);
+      storage.write(AppConst.REFERRAL_CODE, data.referralCode);
+      storage.write(AppConst.USER_NAME, data.name);
+      storage.write(AppConst.CACHE_CLEANUP, true);
+      if (Get.isRegistered<HomeController>()) {
+        Get.find<HomeController>().loadUserName();
+      }
+      final notif = Get.find<NotificationController>();
+      notif.updateToken(data.accessToken!);
+
+      final String displayName =
+          (data.name != null && data.name!.isNotEmpty) ? data.name! : "User";
+
+      await notif.sendWelcomeNotification(displayName);
+
+      final fcmToken = await getDeviceToken();
+      if (fcmToken != null) {
+        notif.registerFCM(fcmToken);
+      }
+
+      bool updated = await updateUser(data.userId!);
+
+      final referralText = referreltextController.text.trim();
+      if (referralText.isNotEmpty) {
+        await applyReferral(referralText);
+      }
+
+      final referralCtrl = Get.isRegistered<ReferralController>()
+          ? Get.find<ReferralController>()
+          : Get.put(ReferralController());
+
+      await referralCtrl.fetchReferrerInfo();
+
+      if (updated) {
+        Get.offAll(() => DashboardScreen());
+        appToast(content: "Login Successful!");
+      }
+    } catch (e) {
+      appToast(content: "Something went wrong", error: true);
+    } finally {
+      loading.value = false;
+    }
+  }
+
   bool validateInputs() {
     String username = emailController.text.trim();
     String phone = phoneController.text.trim();
@@ -196,11 +266,7 @@ class LoginController extends GetxController {
   Future<String?> getDeviceToken() async {
     try {
       String? fcmtoken;
-      if (Platform.isAndroid) {
-        fcmtoken = await FirebaseMessaging.instance.getToken();
-      } else {
-        fcmtoken = await FirebaseMessaging.instance.getAPNSToken();
-      }
+      fcmtoken = await FirebaseMessaging.instance.getToken();
       return fcmtoken;
     } catch (e) {
       return null;
@@ -275,5 +341,11 @@ class LoginController extends GetxController {
     }
 
     return false;
+  }
+
+  //open url
+  void openUrl(String url) async {
+    if (url.isEmpty) return;
+    await APIService.openUrl(url);
   }
 }

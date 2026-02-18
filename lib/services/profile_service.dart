@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart';
@@ -5,16 +7,16 @@ import 'package:http/http.dart';
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
+import '../models/delete_account_model.dart';
 import '../models/profile_response.dart';
 import 'api_service.dart';
 
 import 'package:http/http.dart' as http;
 
 class ProfileService {
-  final token = storage.read(AppConst.ACCESS_TOKEN);
-
   Future<UserProfileModel?> fetchProfile() async {
     try {
+      final token = storage.read(AppConst.ACCESS_TOKEN); // FETCH DYNAMICALLY
       final url = AppURLs.MY_PROFILE;
 
       final response = await APIService.getRequest<UserProfileModel>(
@@ -39,6 +41,7 @@ class ProfileService {
   // -------- UPDATE PROFILE PICTURE --------
   Future<bool> updateProfilePicture(String userId, String imagePath) async {
     try {
+      final token = storage.read(AppConst.ACCESS_TOKEN); // FETCH DYNAMICALLY
       final url = "${AppURLs.BASE_API}api/users/$userId/profile-picture";
 
       // ---- FORCE NEW FILE NAME WITH .jpg ----
@@ -125,6 +128,59 @@ class ProfileService {
       return response["success"] == true;
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<bool> requestAccountDeletion(String userId) async {
+    try {
+      final token = storage.read(AppConst.ACCESS_TOKEN);
+
+      final url = "${AppURLs.BASE_API}api/users/$userId/request-deletion";
+
+      final response = await APIService.postRequest(
+        url: url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        body: {}, // no body required
+        onSuccess: (json) => json,
+      );
+
+      if (response == null) return false;
+
+      return response["success"] == true;
+    } catch (e) {
+      log("requestAccountDeletion error: $e");
+      return false;
+    }
+  }
+
+  Future<DeleteAccountModel> getDeleteInfo() async {
+    final token = storage.read(AppConst.ACCESS_TOKEN);
+    final userId = storage.read(AppConst.USER_ID);
+
+    final uri = Uri.parse(
+      "${AppURLs.BASE_API}api/users/$userId/deletion-info",
+    );
+
+    final response = await http.get(
+      uri,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return DeleteAccountModel.fromJson(
+        jsonDecode(response.body),
+      );
+    } else {
+      throw Exception(
+        "Failed to load DELETE INFO (${response.statusCode})",
+      );
     }
   }
 }

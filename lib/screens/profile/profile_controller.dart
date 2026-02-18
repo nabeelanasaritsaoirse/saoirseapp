@@ -1,21 +1,27 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../main.dart';
+import '../../models/delete_account_model.dart';
 import '../../models/profile_response.dart';
+import '../../services/api_service.dart';
 import '../../services/profile_service.dart';
 import '../../services/wishlist_service.dart';
+import '../../widgets/app_loader.dart';
+import '../../widgets/app_text.dart';
 import '../../widgets/app_toast.dart';
 import '../dashboard/dashboard_controller.dart';
+import '../login/login_page.dart';
 import '../notification/notification_controller.dart';
-import '../onboard/onboard_screen.dart';
 
 class ProfileController extends GetxController {
   final WishlistService _wishlistService = WishlistService();
@@ -42,11 +48,25 @@ class ProfileController extends GetxController {
   var isLoading = false.obs;
   var errorMessage = "".obs;
 
+  /// API response holder for delete-account info
+  final deleteAccountData = Rxn<DeleteAccountModel>();
+
+  /// Internal flag to avoid multiple delete-info calls while dialog rebuilds
+  final hasRequestedDeleteInfo = false.obs;
+
+  /// Convenient getters for UI
+  bool get isDeleteInfoSuccess => deleteAccountData.value?.success ?? false;
+
+  DeletionInfo? get deletionInfo => deleteAccountData.value?.deletionInfo;
+
+  DataCounts? get dataCounts => deletionInfo?.dataCounts;
+
   @override
   void onInit() {
     _setInitialCountryFromCode('+91');
     fetchWishlistCount();
     fetchUserProfile();
+
     super.onInit();
   }
 
@@ -57,21 +77,43 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.active_oders, "title": "Active Orders"},
     {"icon": AppAssets.transactions, "title": "Transactions"},
     {"icon": AppAssets.delivered, "title": "Delivered"},
-    // {"icon": AppAssets.customer_care, "title": "Customer Care"},
+    {"icon": AppAssets.autopay, "title": "Autopay"},
+    {"icon": AppAssets.coupons, "title": "Coupons"},
   ];
 
   final settings = [
-    // {"icon": AppAssets.password_security, "title": "Password & security"},
     {"icon": AppAssets.kyc, "title": "KYC"},
     {"icon": AppAssets.manage_accounts, "title": "Manage Account"},
     {"icon": AppAssets.address, "title": "Manage Address"},
+    {"icon": AppAssets.faq, "title": "FAQs"},
     {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
     {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
-    // {"icon": AppAssets.faq, "title": "FAQ"},
-    // {"icon": AppAssets.about, "title": "About EPI"},
-
+    {"icon": AppAssets.contact_us, "title": "Contact Us"},
     {"icon": AppAssets.logout, "title": "Log Out"},
+    {"icon": AppAssets.delete_account, "title": "Delete\nAccount"},
   ];
+
+  Future<DeleteAccountModel?> fetchDeleteInfo() async {
+    try {
+      isLoading.value = true;
+
+      final response = await _profileService.getDeleteInfo();
+
+      if (response.success) {
+        deleteAccountData.value = response;
+        return response;
+      }
+    } finally {
+      isLoading.value = false;
+    }
+
+    return null;
+  }
+
+  /// Retry handler (optional)
+  void retry() {
+    fetchDeleteInfo();
+  }
 
   Future<void> fetchWishlistCount() async {
     final count = await _wishlistService.getWishlistCount();
@@ -99,9 +141,6 @@ class ProfileController extends GetxController {
 
 // ================== PICK PROFILE IMAGE ==================
   Future<void> pickProfileImage() async {
-    // bool granted = await _requestGalleryPermission();
-    // if (!granted) return;
-
     final XFile? image = await _picker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 85,
@@ -109,77 +148,8 @@ class ProfileController extends GetxController {
 
     if (image != null) {
       profileImage.value = File(image.path);
-      // await uploadUserProfilePicture(image.path);
     }
   }
-
-// // ================== NEW METHOD (fixed name) ==================
-//   // ================== UPLOAD USER PROFILE PICTURE ==================
-//   Future<void> uploadUserProfilePicture(String imagePath) async {
-//     if (imagePath.isEmpty) {
-//       appToast(
-//           error: true, title: "Error", content: "Invalid image selected");
-//       return;
-//     }
-
-//     // Show loader
-//     isLoading(true);
-
-//     try {
-//       final userId = profile.value?.user.id;
-
-//       if (userId == null) {
-
-//         appToast(error: true, title: "Error", content: "User not found");
-//         return;
-//       }
-
-//       final success =
-//           await _profileService.updateProfilePicture(userId, imagePath);
-
-//       if (success) {
-//         appToast(
-//           title: "Success",
-//           content: "Profile picture updated successfully",
-//         );
-
-//         await fetchUserProfile();
-//       } else {
-//         appToast(
-//           error: true,
-//           title: "Failed",
-//           content: "Unable to upload profile picture",
-//         );
-//       }
-//     } catch (e) {
-
-//       appToast(error: true, title: "Error", content: "Something went wrong");
-//     } finally {
-//       // hide loader after everything
-//       isLoading(false);
-//     }
-//   }
-
-  // ================== GALLERY PERMISSION ==================
-  // Future<bool> _requestGalleryPermission() async {
-  //   if (Platform.isAndroid) {
-  //     final photos = await Permission.photos.request();
-  //     final storage = await Permission.storage.request();
-
-  //     if (photos.isGranted || storage.isGranted) return true;
-
-  //     if (photos.isPermanentlyDenied || storage.isPermanentlyDenied) {
-  //       openAppSettings();
-  //     }
-  //     return false;
-  //   }
-
-  //   final ios = await Permission.photos.request();
-  //   if (ios.isGranted) return true;
-
-  //   if (ios.isPermanentlyDenied) openAppSettings();
-  //   return false;
-  // }
 
 // ------------------ COUNTRY SETUP ------------------
   void _setInitialCountryFromCode(String code) {
@@ -344,49 +314,6 @@ class ProfileController extends GetxController {
     }
   }
 
-  // void confirmLogout() {
-  //   Get.defaultDialog(
-  //     title: "Logout",
-  //     middleText: "Are you sure you want to exit?",
-  //     textConfirm: "Yes",
-  //     textCancel: "No",
-  //     confirmTextColor: Colors.white,
-  //     buttonColor: AppColors.primaryColor,
-  //     cancelTextColor: AppColors.primaryColor,
-  //     onConfirm: () async {
-  //       await Get.find<NotificationController>().removeFCM();
-  //       await FirebaseMessaging.instance.deleteToken();
-
-  //       Get.back(); // close dialog
-  //       await logoutUser();
-  //     },
-  //   );
-  // }
-
-  // Future<void> logoutUser() async {
-  //   try {
-  //     isLoading(true);
-
-  //     bool success = await _profileService.logout();
-
-  //     if (success) {
-  //       // CLEAR STORAGE
-  //       await storage.erase();
-  //       appToast(content: "Logged out successfully!");
-
-  //       // GO TO ONBOARD SCREEN
-  //       Get.offAll(() => OnBoardScreen());
-  //     } else {
-  //       appToast(content: "Logout failed!", error: true);
-  //     }
-  //   } catch (e) {
-
-  //     appToast(content: "Something went wrong", error: true);
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
-
   void confirmLogout() {
     Get.defaultDialog(
       title: "Logout",
@@ -402,7 +329,7 @@ class ProfileController extends GetxController {
           Get.find<DashboardController>().selectedIndex.value = 0;
         }
         // Navigate immediately
-        Get.offAll(() => OnBoardScreen());
+        Get.offAll(() => LoginPage());
 
         // Perform logout in background
         logoutUserInBackground();
@@ -418,7 +345,9 @@ class ProfileController extends GetxController {
       }
 
       // Delete local FCM token
-      await FirebaseMessaging.instance.deleteToken();
+      if (Platform.isAndroid) {
+        await FirebaseMessaging.instance.deleteToken();
+      }
 
       // Call logout API (optional but recommended)
 
@@ -432,6 +361,129 @@ class ProfileController extends GetxController {
 
       // ignore: empty_catches
     } catch (e) {}
+  }
+
+  // Delete Account
+  Future<void> deleteAccount() async {
+    if (profile.value?.user.id == null) {
+      log("Profile not loaded yet, fetching profile...");
+      await fetchUserProfile();
+    }
+
+    if (profile.value?.user.id == null) {
+      Get.snackbar("Error", "User information not available");
+      return;
+    }
+
+    deleteAccountData.value = null;
+    await fetchDeleteInfo();
+
+    Get.defaultDialog(
+      title: "Delete Account",
+      content: Obx(() {
+        final info = deletionInfo;
+
+        if (info == null) {
+          return appLoader();
+        }
+
+        final items = info.dataToBeDeleted;
+        final note = info.note;
+        final retention = info.retentionPeriod;
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            appText(
+              "The following data will be deleted:",
+              fontWeight: FontWeight.w600,
+              color: AppColors.grey,
+            ),
+            SizedBox(height: 8.h),
+            ...items.map(
+              (e) => Padding(
+                padding: EdgeInsets.symmetric(vertical: 2.w),
+                child: appText(
+                  "• $e",
+                  textAlign: TextAlign.left,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.mediumGray,
+                ),
+              ),
+            ),
+            SizedBox(height: 12.h),
+            if (retention.isNotEmpty)
+              appText(
+                "Data retention: $retention",
+                textAlign: TextAlign.left,
+                fontSize: 12.sp,
+                color: AppColors.grey,
+              ),
+            if (note.isNotEmpty) ...[
+              SizedBox(height: 4.h),
+              appText(
+                note,
+                textAlign: TextAlign.left,
+                fontSize: 12.sp,
+                color: AppColors.grey,
+              ),
+            ],
+            SizedBox(height: 16.h),
+            appText(
+              "This action is permanent. Are you sure you want to delete your account?",
+              textAlign: TextAlign.left,
+              fontSize: 13.sp,
+              color: AppColors.textBlack,
+            ),
+          ],
+        );
+      }),
+      textConfirm: "Delete",
+      textCancel: "Cancel",
+      confirmTextColor: AppColors.white,
+      buttonColor: AppColors.primaryColor,
+      cancelTextColor: AppColors.primaryColor,
+      onConfirm: () {
+        Get.back();
+        confirmDeleteAccount();
+      },
+    );
+  }
+
+  Future<void> confirmDeleteAccount() async {
+    final userId = profile.value?.user.id;
+
+    if (userId == null) {
+      log("User id is null");
+      return;
+    }
+
+    try {
+      isLoading(true);
+
+      final success = await _profileService.requestAccountDeletion(userId);
+
+      if (success) {
+        log("==========================>Your account deletion request has been submitted successfully.");
+
+        Get.offAll(() => LoginPage());
+        await logoutUserInBackground();
+      } else {
+        log("==========================>Unable to request account deletion");
+      }
+    } catch (e) {
+      log("==========================>Something went wrong");
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  //open url
+  void openUrl(String url) async {
+    if (url.isEmpty) return;
+    await APIService.openUrl(url);
   }
 
 //-------------------------------------------------------------------------------------------------------------------------------------

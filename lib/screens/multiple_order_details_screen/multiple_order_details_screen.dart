@@ -1186,7 +1186,7 @@ class _MultipleOrderDetailsScreenState
               borderRadius: BorderRadius.circular(8.r),
               child: Image.network(
                 imageUrl,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) => Container(
                   color: Colors.grey.shade200,
                   child: Icon(Icons.broken_image, size: 28.sp),

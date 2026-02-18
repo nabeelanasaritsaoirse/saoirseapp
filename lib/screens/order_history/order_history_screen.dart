@@ -56,7 +56,9 @@ class OrderHistoryScreen extends StatelessWidget {
                   : const SizedBox.shrink();
             }
             final order = controller.orders[index];
-            return OrderCard(order: order);
+            return OrderCard(
+              order: order,
+            );
           },
         );
       }),

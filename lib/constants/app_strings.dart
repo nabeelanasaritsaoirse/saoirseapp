@@ -13,11 +13,15 @@ class AppStrings {
   static String sign_up = "SIGN UP";
   static String Referral_code = "Referrel code";
   static String LoginWithGoogle = "Login with Google";
+  static String LoginWithApple = "Login with Apple";
   static String login_title = "Let’s you log in";
   static String login_note = "Welcome back you have been missed";
   static String Forgot_password = "Forgot Password..?";
   static String invalid_username = 'Please enter valid username';
   static String invalid_referral = 'Please enter valid referral code';
+  static String by_logging_in = "By logging in, you agree to our ";
+  static String terms_conditions = "Terms & Conditions";
+  static String privacy_policy = "Privacy Policy";
 
   //Onboard Screen
   static String onboard_note = "INVEST SMALL, DREAM BIG, \nOWN IT";
@@ -116,6 +120,12 @@ class AppStrings {
   static String kyc_required_discription =
       "You must complete your KYC before processing withdrawal.";
   static String kyc_required = "KYC Required";
+
+  // FAQ page
+  static String FAQsTitle = "FAQs";
+
+  // Autopay Dashboard page
+  static String AutopayDashboard_Title = "Auto Pay";
 
   //Cart page
   static String carttitle = "Cart";
