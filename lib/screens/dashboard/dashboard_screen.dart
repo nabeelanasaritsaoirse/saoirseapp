@@ -37,7 +37,7 @@ class DashboardScreen extends StatelessWidget {
         final shouldExit = controller.handleBackPress();
 
         if (shouldExit) {
-          SystemNavigator.pop();
+          Get.back();
         }
       },
       child: Scaffold(

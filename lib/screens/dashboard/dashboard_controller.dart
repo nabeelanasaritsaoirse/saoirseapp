@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
-import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../services/deep_link_navigation_service.dart';
+import '../../widgets/app_toast.dart';
 import '../cart/cart_controller.dart';
 import '../category/category_controller.dart';
 import '../home/home_controller.dart';
@@ -89,13 +88,9 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
         now.difference(lastBackPressed!) > const Duration(seconds: 2)) {
       lastBackPressed = now;
 
-      Fluttertoast.showToast(
-        msg: AppStrings.exit_message,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: AppColors.black,
-        textColor: AppColors.white,
-        fontSize: 14.0,
+      appToaster(
+        content: AppStrings.exit_message,
+        error: true,
       );
 
       return false;
