@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_constant.dart';
 import '../../main.dart';
 import '../../models/delete_account_model.dart';
 import '../../models/profile_response.dart';
@@ -133,6 +134,7 @@ class ProfileController extends GetxController {
         fullNameController.text = result.user.name;
         emailController.text = result.user.email;
         phoneNumberController.text = result.user.phoneNumber;
+        storage.write(AppConst.USER_NAME, result.user.name);
       }
     } finally {
       isLoading(false);
