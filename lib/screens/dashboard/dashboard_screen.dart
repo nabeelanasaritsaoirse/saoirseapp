@@ -32,16 +32,8 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, // we control back manually
-      // onPopInvoked: (didPop) {
-      //   final currentIndex = controller.selectedIndex.value;
-
-      //   if (currentIndex != 0) {
-      //     controller.changeTab(0);
-      //   } else {
-      //     SystemNavigator.pop();
-      //   }
-      // },
+      canPop: false, 
+    
      onPopInvoked: (didPop) async {
     final shouldExit = controller.handleBackPress();
 
