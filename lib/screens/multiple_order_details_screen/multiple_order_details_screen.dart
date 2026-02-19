@@ -861,12 +861,20 @@ class _MultipleOrderDetailsScreenState
 
               return GestureDetector(
                 onTap: () {
-                  if (walletBalance < orderController.selectedAmount.value) {
+                  final walletBalance =
+                      walletController.wallet.value?.walletBalance ?? 0.0;
+
+                  final payNowAmount = orderController
+                          .previewData.value?.summary.totalFirstPayment ??
+                      0.0;
+
+                  if (walletBalance < payNowAmount) {
                     appToaster(
                       content: "Insufficient wallet balance",
                       error: true,
                     );
-                    return;
+
+                    return; 
                   }
 
                   // ✅ TEMP selection only
@@ -1071,7 +1079,27 @@ class _MultipleOrderDetailsScreenState
                 child: ElevatedButton(
                   onPressed: canConfirm
                       ? () {
-                          // ✅ FINAL COMMIT
+                          // ================= WALLET VALIDATION =================
+                          if (tempPaymentMethod.value == PaymentMethod.wallet) {
+                            final walletBalance =
+                                walletController.wallet.value?.walletBalance ??
+                                    0.0;
+
+                            final payNowAmount = orderController.previewData
+                                    .value?.summary.totalFirstPayment ??
+                                0.0;
+
+                            if (walletBalance < payNowAmount) {
+                              appToaster(
+                                error: true,
+                                content: "Insufficient wallet balance",
+                              );
+
+                              return;
+                            }
+                          }
+
+                          // ================= FINAL COMMIT =================
                           orderController.selectPaymentMethod(
                             tempPaymentMethod.value,
                           );

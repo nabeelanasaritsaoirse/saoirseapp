@@ -559,6 +559,29 @@ class MultipleOrderDetailsController extends GetxController {
   Future<void> placeBulkOrder({
     required Map<String, dynamic> deliveryAddress,
   }) async {
+
+     // ================= WALLET VALIDATION =================
+  if (selectedPaymentMethod.value == PaymentMethod.wallet) {
+
+    final walletBalance =
+        walletController.wallet.value?.walletBalance ?? 0.0;
+
+    final payNowAmount =
+        previewData.value?.summary.totalFirstPayment ?? 0.0;
+
+    log("💰 Wallet Balance: ₹$walletBalance");
+    log("🧾 Pay Now Amount: ₹$payNowAmount");
+
+    if (walletBalance < payNowAmount) {
+
+      appToaster(
+        error: true,
+        content: "Insufficient wallet balance",
+      );
+
+      return; // 🚫 STOP ORDER CREATION
+    }
+  }
     // 🔒 PREVENT MULTIPLE CALLS
     if (_placeOrderLock != null) {
       log("⛔ [BULK ORDER] Already running — ignored");
