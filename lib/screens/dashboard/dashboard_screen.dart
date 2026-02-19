@@ -33,15 +33,23 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false, // we control back manually
-      onPopInvoked: (didPop) {
-        final currentIndex = controller.selectedIndex.value;
+      // onPopInvoked: (didPop) {
+      //   final currentIndex = controller.selectedIndex.value;
 
-        if (currentIndex != 0) {
-          controller.changeTab(0);
-        } else {
-          SystemNavigator.pop();
-        }
-      },
+      //   if (currentIndex != 0) {
+      //     controller.changeTab(0);
+      //   } else {
+      //     SystemNavigator.pop();
+      //   }
+      // },
+     onPopInvoked: (didPop) async {
+    final shouldExit = controller.handleBackPress();
+
+    if (shouldExit) {
+      SystemNavigator.pop();
+    }
+  },
+      
       child: Scaffold(
         body: Obx(() => pages[controller.selectedIndex.value]),
         bottomNavigationBar: Obx(

@@ -219,4 +219,7 @@ class AppStrings {
 
   // Transaction History
   static String transaction_history_label = "Transaction History";
+
+  // dashboard text
+  static String exit_message = "Press again to exit";
 }
