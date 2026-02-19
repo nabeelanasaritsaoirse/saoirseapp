@@ -38,6 +38,8 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     withdrawController.confirmAccController.text = widget.account.accountNumber;
 
     withdrawController.ifscController.text = widget.account.ifscCode;
+
+    withdrawController.bankNameController.text = widget.account.bankName!;
   }
 
   @override
@@ -49,6 +51,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     withdrawController.nameController.text = selectedAccount.accountHolderName;
     withdrawController.accController.text = selectedAccount.accountNumber;
     withdrawController.ifscController.text = selectedAccount.ifscCode;
+    withdrawController.bankNameController.text = selectedAccount.bankName!;
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
       appBar: CustomAppBar(

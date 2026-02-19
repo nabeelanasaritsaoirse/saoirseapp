@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../services/withdrawal_service.dart';
 import '../../widgets/app_toast.dart';
 import '../../widgets/warning_dialog.dart';
@@ -12,6 +11,7 @@ class WithdrawController extends GetxController {
   TextEditingController confirmAccController = TextEditingController();
   TextEditingController ifscController = TextEditingController();
   TextEditingController amountController = TextEditingController();
+  TextEditingController bankNameController = TextEditingController();
 
   var isLoading = false.obs;
   var showSuffix = false.obs;
@@ -23,12 +23,15 @@ class WithdrawController extends GetxController {
       final body = {
         "amount": int.tryParse(amountController.text) ?? 0,
         "paymentMethod": "bank_transfer",
-        "bankName": "HDFC Bank",
+        "bankName": bankNameController.text.trim(),
         "accountNumber": accController.text.trim(),
         "ifscCode": ifscController.text.trim(),
         "accountHolderName": nameController.text.trim(),
       };
+      debugPrint("📤 Withdrawal Request Body: $body");
 
+      /// 🔹 GETX LOG
+      Get.log("📤 Withdrawal Request Body => $body");
       final res = await WithdrawalService.submitWithdrawal(body);
 
       isLoading.value = false;
@@ -37,7 +40,7 @@ class WithdrawController extends GetxController {
         appToast(
             title: "Success",
             content: "Withdrawal request submitted successfully!");
-        Get.off(WalletScreen());
+         Get.off(WalletScreen());
       } else {
         appToast(title: "Error", content: "Something went wrong");
       }
