@@ -230,10 +230,8 @@ class PendingTransactionController extends GetxController {
       );
     } finally {
       // 🔓 unlock ONLY if still on this screen
-      if (Get.currentRoute.contains("PendingTransaction")) {
-        isPlacingOrder.value = false;
+      isPlacingOrder.value = false;
         debugPrint("🔓 [PAY NOW] UNLOCKED");
-      }
     }
   }
 
