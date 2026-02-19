@@ -874,7 +874,7 @@ class _MultipleOrderDetailsScreenState
                       error: true,
                     );
 
-                    return; 
+                    return;
                   }
 
                   // ✅ TEMP selection only
