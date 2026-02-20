@@ -1,7 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -32,14 +31,12 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, // we control back manually
-      onPopInvoked: (didPop) {
-        final currentIndex = controller.selectedIndex.value;
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        final shouldExit = controller.handleBackPress();
 
-        if (currentIndex != 0) {
-          controller.changeTab(0);
-        } else {
-          SystemNavigator.pop();
+        if (shouldExit) {
+          Get.back();
         }
       },
       child: Scaffold(
