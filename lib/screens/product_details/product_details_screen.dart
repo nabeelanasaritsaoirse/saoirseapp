@@ -66,7 +66,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-
       body: SafeArea(
         child: Obx(() {
           final product = controller.product.value;
@@ -79,12 +78,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             return Center(child: Text("Product not found"));
           }
 
-          return buildBody(product);
+          return Column(
+            children: [
+              Expanded(
+                child: buildBody(product),
+              ),
+              buildBottomBar(),
+            ],
+          );
         }),
       ),
-
-      /// Bottom Bar Stays Same
-      bottomNavigationBar: buildBottomBar(),
     );
   }
 
