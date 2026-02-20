@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_constant.dart';
@@ -155,21 +154,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               fit: BoxFit.cover,
                                               width: 84,
                                               height: 84,
-                                              loadingBuilder: (context, child,
-                                                  loadingProgress) {
+                                              loadingBuilder: (context, child, loadingProgress) {
                                                 if (loadingProgress == null) {
                                                   return child;
                                                 }
                                                 return Center(
-                                                  child:
-                                                      CupertinoActivityIndicator(
+                                                  child: CupertinoActivityIndicator(
                                                     radius: 10.0,
                                                     color: AppColors.textGray,
                                                   ),
                                                 );
                                               },
-                                              errorBuilder: (_, __, ___) =>
-                                                  ClipOval(
+                                              errorBuilder: (_, __, ___) => ClipOval(
                                                 child: Image.asset(
                                                   AppAssets.user_img,
                                                   fit: BoxFit.cover,
@@ -270,8 +266,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             return Obx(() => ProfileMenuCard(
                                   icon: controller.myOrders[index]["icon"]!,
                                   title: controller.myOrders[index]["title"]!,
-                                  count: controller
-                                      .wishlistCount.value, // 🔥 reactive
+                                  count: controller.wishlistCount.value, // 🔥 reactive
                                   onTap: () {
                                     Get.to(WishlistScreen())?.then((_) {
                                       controller.fetchWishlistCount();
@@ -300,7 +295,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Get.to(() => AutopayDashboardScreen());
                               } else if (index == 7) {
                                 Get.to(() => CouponScreen());
-                              } else {}
+                              } else if (index == 8) {
+                                Get.to(() => ManageAddressScreen());
+                              }
                             },
                           );
                         },
@@ -347,21 +344,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               case "Manage Account":
                                 Get.to(() => ManageAccountScreen());
                                 break;
-                              case "Manage Address":
-                                Get.to(() => ManageAddressScreen());
+                              // case "Manage Address":
+                              //   Get.to(() => ManageAddressScreen());
+                              //   break;
                               case "FAQs":
                                 Get.to(() => FaqScreen());
                                 break;
-                              case "Privacy Policy":
-                                controller.openUrl(AppURLs.PRIVACY_POLICY);
-                                break;
-                              case "Terms & Condition":
-                                controller
-                                    .openUrl(AppURLs.TERMS_AND_CONDITIONS);
-                                break;
-                              case "Contact Us":
-                                controller.openUrl(AppURLs.CONTACT_US);
-                                break;
+                              // case "Privacy Policy":
+                              //   controller.openUrl(AppURLs.PRIVACY_POLICY);
+                              //   break;
+                              // case "Terms & Condition":
+                              //   controller.openUrl(AppURLs.TERMS_AND_CONDITIONS);
+                              //   break;
+                              // case "Contact Us":
+                              //   controller.openUrl(AppURLs.CONTACT_US);
+                              //   break;
                               // case "Log Out":
                               //   controller.confirmLogout();
                               //   break;
@@ -387,7 +384,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return CustomAppBar(
       title: AppStrings.profile_title,
       showBack: false,
-      actions: [
+      actions: isLoggedIn
+        ? [
         PopupMenuButton<String>(
           icon: const Icon(
             Icons.more_vert,
@@ -399,33 +397,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           onSelected: (value) {
-            if (value == "logout") {
-              controller.confirmLogout();
+            if (value == "contactus") {
+              controller.openUrl(AppURLs.CONTACT_US);
+            } else if (value == "privacypolicy") {
+              controller.openUrl(AppURLs.PRIVACY_POLICY);
+            } else if (value == "termsandconditions") {
+              controller.openUrl(AppURLs.TERMS_AND_CONDITIONS);
             } else if (value == "delete") {
               controller.deleteAccount();
+            } else if (value == "logout") {
+              controller.confirmLogout();
             }
           },
           itemBuilder: (context) => [
             _menuItem(
-              value: "logout",
-              title: "Logout",
-              iconPath: AppAssets.logout_menu,
+              value: "contactus",
+              title: "Contact Us",
+              icon: Icons.call
+            ),
+            _menuItem(
+              value: "privacypolicy",
+              title: "Privacy Policy",
+              icon: Icons.privacy_tip
+            ),
+            _menuItem(
+              value: "termsandconditions",
+              title: "Terms & Conditions",
+              icon: Icons.description
             ),
             _menuItem(
               value: "delete",
               title: "Delete Account",
-              iconPath: AppAssets.delete_menu,
+              icon: Icons.delete
+            ),
+            _menuItem(
+              value: "logout",
+              title: "Logout",
+              icon: Icons.logout
             ),
           ],
         ),
-      ],
+      ]:[],
     );
   }
 
   PopupMenuItem<String> _menuItem({
     required String value,
     required String title,
-    required String iconPath,
+    required IconData icon,
     Color? bgColor,
   }) {
     return PopupMenuItem<String>(
@@ -440,12 +459,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: bgColor,
               shape: BoxShape.circle,
             ),
-            child: ClipOval(
-              child: SvgPicture.asset(
-                iconPath,
-                fit: BoxFit.cover,
-              ),
-            ),
+            child: Icon(
+            icon,
+            size: 20,
+            color:  AppColors.primaryColor,
+          ),
           ),
           const SizedBox(width: 8),
           Text(
