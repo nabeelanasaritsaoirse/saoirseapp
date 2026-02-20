@@ -88,4 +88,7 @@ class AppAssets {
   // Profile App Bar Menu Images
   static String logout_menu = "assets/svg/logout_menu.svg";
   static String delete_menu = "assets/svg/delete_menu.svg";
+  static String privacypolicy_menu = "assets/svg/privacypolicy_menu.svg";
+  static String termsandconditions_menu = "assets/svg/termsandconditions_menu.svg";
+  static String contactus_menu = "assets/svg/contactus_menu.svg";
 }

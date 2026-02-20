@@ -80,16 +80,16 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.delivered, "title": "Delivered"},
     {"icon": AppAssets.autopay, "title": "Autopay"},
     {"icon": AppAssets.coupons, "title": "Coupons"},
+    {"icon": AppAssets.address, "title": "Manage Address"},
   ];
 
   final settings = [
     {"icon": AppAssets.kyc, "title": "KYC"},
     {"icon": AppAssets.manage_accounts, "title": "Manage Account"},
-    {"icon": AppAssets.address, "title": "Manage Address"},
     {"icon": AppAssets.faq, "title": "FAQs"},
-    {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
-    {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
-    {"icon": AppAssets.contact_us, "title": "Contact Us"},
+    // {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
+    // {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
+    // {"icon": AppAssets.contact_us, "title": "Contact Us"},
     // {"icon": AppAssets.logout, "title": "Log Out"},
     // {"icon": AppAssets.delete_account, "title": "Delete\nAccount"},
   ];
