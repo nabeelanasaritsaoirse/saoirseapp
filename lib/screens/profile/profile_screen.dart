@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
 import '../../main.dart';
@@ -105,7 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Obx(() {
                     if (controller.isLoading.value) {
                       return SizedBox(
-                        height: 200,
+                        height: 200.h,
                         child: Center(child: appLoader()),
                       );
                     }
@@ -114,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     if (profile == null) {
                       return SizedBox(
-                        height: 200,
+                        height: 200.h,
                         child: Center(child: Text("Failed to load profile")),
                       );
                     }
@@ -145,22 +144,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 children: [
                                   // Profile image
                                   CircleAvatar(
-                                    radius: 42,
+                                    radius: 42.r,
                                     backgroundColor: Colors.grey.shade300,
                                     child: user.profilePicture.isNotEmpty
                                         ? ClipOval(
                                             child: Image.network(
                                               user.profilePicture,
                                               fit: BoxFit.cover,
-                                              width: 84,
-                                              height: 84,
+                                              width: 84.w,
+                                              height: 84.h,
                                               loadingBuilder: (context, child, loadingProgress) {
                                                 if (loadingProgress == null) {
                                                   return child;
                                                 }
                                                 return Center(
                                                   child: CupertinoActivityIndicator(
-                                                    radius: 10.0,
+                                                    radius: 10.r,
                                                     color: AppColors.textGray,
                                                   ),
                                                 );
@@ -169,8 +168,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 child: Image.asset(
                                                   AppAssets.user_img,
                                                   fit: BoxFit.cover,
-                                                  width: 84,
-                                                  height: 84,
+                                                  width: 84.w,
+                                                  height: 84.h,
                                                 ),
                                               ),
                                             ),
@@ -179,8 +178,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             child: Image.asset(
                                               AppAssets.user_img,
                                               fit: BoxFit.cover,
-                                              width: 84,
-                                              height: 84,
+                                              width: 84.w,
+                                              height: 84.h,
                                             ),
                                           ),
                                   ),
@@ -194,14 +193,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       },
                                       child: Container(
                                         width: 28.w,
-                                        height: 28.w,
+                                        height: 28.h,
                                         decoration: BoxDecoration(
                                           color: AppColors.primaryColor,
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
                                               color: Colors.black12,
-                                              blurRadius: 2,
+                                              blurRadius: 2.r,
                                               offset: Offset(0, 1),
                                             ),
                                           ],
@@ -394,7 +393,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           offset: const Offset(0, 45),
           elevation: 8,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
           ),
           onSelected: (value) {
             if (value == "contactus") {
@@ -449,27 +448,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }) {
     return PopupMenuItem<String>(
       value: value,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       child: Row(
         children: [
           Container(
-            width: 28,
-            height: 28,
+            width: 28.w,
+            height: 28.h,
             decoration: BoxDecoration(
               color: bgColor,
               shape: BoxShape.circle,
             ),
             child: Icon(
             icon,
-            size: 20,
+            size: 20.sp,
             color:  AppColors.primaryColor,
           ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 15,
+            style: TextStyle(
+              fontSize: 15.sp,
               fontWeight: FontWeight.w500,
             ),
           ),
