@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -20,9 +21,6 @@ class ReferralQrPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String code = controller.referralCode.value;
-    final String link = controller.referralLink;
-
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
       shape: RoundedRectangleBorder(
@@ -58,63 +56,80 @@ class ReferralQrPopup extends StatelessWidget {
                   SizedBox(height: 16.h),
 
                   // Code box
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 10.h,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.shadowColor),
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        appText(
-                          "Code:  $code",
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textBlack,
-                        ),
-                        SizedBox(width: 8.w),
-                        InkWell(
-                          onTap: controller.copyReferralCode,
-                          child: Icon(
-                            Icons.copy,
-                            size: 18.sp,
-                            color: AppColors.grey,
+                  Obx(() {
+                    final code = controller.referralCode.value;
+
+                    if (code.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.all(20),
+                        child: CupertinoActivityIndicator(),
+                      );
+                    }
+                    return Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 10.h,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.shadowColor),
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          appText(
+                            "Code:  $code",
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textBlack,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
+                          SizedBox(width: 8.w),
+                          InkWell(
+                            onTap: controller.copyReferralCode,
+                            child: Icon(
+                              Icons.copy,
+                              size: 18.sp,
+                              color: AppColors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
 
                   SizedBox(height: 16.h),
 
                   // QR Code
-                  Container(
-                    padding: EdgeInsets.all(14.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(16.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.shadowColor.withOpacity(0.2),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: RepaintBoundary(
-                      key: _qrKey,
-                      child: QrImageView(
-                        data: link,
-                        size: 200.w,
-                        version: QrVersions.auto,
-                        backgroundColor: Colors.white,
+                  Obx(() {
+                    final link = controller.referralLink;
+
+                    if (controller.referralCode.value.isEmpty) {
+                      return const SizedBox();
+                    }
+                    return Container(
+                      padding: EdgeInsets.all(14.w),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(16.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.shadowColor.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
+                      child: RepaintBoundary(
+                        key: _qrKey,
+                        child: QrImageView(
+                          data: link,
+                          size: 200.w,
+                          version: QrVersions.auto,
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+                    );
+                  }),
 
                   SizedBox(height: 16.h),
 
@@ -130,89 +145,96 @@ class ReferralQrPopup extends StatelessWidget {
                   ),
                   SizedBox(height: 10.h),
 
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _buildSocialButton(
-                          image: AppAssets.whatsapp,
-                          label: AppStrings.whatsapp,
-                          onTap: () => controller.shareQrImage(
-                            qrKey: _qrKey,
-                            message:
-                                "Join this app! Use my referral link: $link",
+                  Obx(() {
+                    final link = controller.referralLink;
+
+                    if (controller.referralCode.value.isEmpty) {
+                      return const SizedBox();
+                    }
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          _buildSocialButton(
+                            image: AppAssets.whatsapp,
+                            label: AppStrings.whatsapp,
+                            onTap: () => controller.shareQrImage(
+                              qrKey: _qrKey,
+                              message:
+                                  "Join this app! Use my referral link: $link",
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 12.w),
-                        _buildSocialButton(
-                          image: AppAssets.facebook,
-                          label: AppStrings.facebook,
-                          onTap: () => controller.shareQrImage(
-                            qrKey: _qrKey,
-                            message:
-                                "Join this app! Use my referral link: $link",
+                          SizedBox(width: 12.w),
+                          _buildSocialButton(
+                            image: AppAssets.facebook,
+                            label: AppStrings.facebook,
+                            onTap: () => controller.shareQrImage(
+                              qrKey: _qrKey,
+                              message:
+                                  "Join this app! Use my referral link: $link",
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 12.w),
-                        _buildSocialButton(
-                          image: AppAssets.telegram,
-                          label: AppStrings.telegram,
-                          onTap: () => controller.shareQrImage(
-                            qrKey: _qrKey,
-                            message:
-                                "Join this app! Use my referral link: $link",
+                          SizedBox(width: 12.w),
+                          _buildSocialButton(
+                            image: AppAssets.telegram,
+                            label: AppStrings.telegram,
+                            onTap: () => controller.shareQrImage(
+                              qrKey: _qrKey,
+                              message:
+                                  "Join this app! Use my referral link: $link",
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 12.w),
-                        _buildSocialButton(
-                          image: AppAssets.x,
-                          label: AppStrings.twitter,
-                          onTap: () => controller.shareQrImage(
-                            qrKey: _qrKey,
-                            message:
-                                "Join this app! Use my referral link: $link",
+                          SizedBox(width: 12.w),
+                          _buildSocialButton(
+                            image: AppAssets.x,
+                            label: AppStrings.twitter,
+                            onTap: () => controller.shareQrImage(
+                              qrKey: _qrKey,
+                              message:
+                                  "Join this app! Use my referral link: $link",
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 12.w),
-                        _buildSocialButton(
-                          image: AppAssets.gmail,
-                          label: AppStrings.gmail,
-                          onTap: () => controller.shareQrImage(
-                            qrKey: _qrKey,
-                            message:
-                                "Join this app! Use my referral link: $link",
+                          SizedBox(width: 12.w),
+                          _buildSocialButton(
+                            image: AppAssets.gmail,
+                            label: AppStrings.gmail,
+                            onTap: () => controller.shareQrImage(
+                              qrKey: _qrKey,
+                              message:
+                                  "Join this app! Use my referral link: $link",
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 12.w),
-                        InkWell(
-                          onTap: () => controller.shareQrImage(
-                            qrKey: _qrKey,
-                            message:
-                                "Join this app! Use my referral link: $link",
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                width: 40.h,
-                                height: 40.h,
-                                decoration: BoxDecoration(
-                                  color: AppColors.grey,
-                                  shape: BoxShape.circle,
+                          SizedBox(width: 12.w),
+                          InkWell(
+                            onTap: () => controller.shareQrImage(
+                              qrKey: _qrKey,
+                              message:
+                                  "Join this app! Use my referral link: $link",
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: 40.h,
+                                  height: 40.h,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.grey,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(Icons.more_horiz),
                                 ),
-                                child: Icon(Icons.more_horiz),
-                              ),
-                              SizedBox(height: 6.h),
-                              appText(
-                                AppStrings.more,
-                                fontSize: 12.sp,
-                                color: AppColors.darkGray,
-                              ),
-                            ],
+                                SizedBox(height: 6.h),
+                                appText(
+                                  AppStrings.more,
+                                  fontSize: 12.sp,
+                                  color: AppColors.darkGray,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
+                        ],
+                      ),
+                    );
+                  }),
 
                   SizedBox(height: 16.h),
                 ],
