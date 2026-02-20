@@ -1,13 +1,11 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_constant.dart';
@@ -90,8 +88,8 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
     {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
     {"icon": AppAssets.contact_us, "title": "Contact Us"},
-    {"icon": AppAssets.logout, "title": "Log Out"},
-    {"icon": AppAssets.delete_account, "title": "Delete\nAccount"},
+    // {"icon": AppAssets.logout, "title": "Log Out"},
+    // {"icon": AppAssets.delete_account, "title": "Delete\nAccount"},
   ];
 
   Future<DeleteAccountModel?> fetchDeleteInfo() async {
