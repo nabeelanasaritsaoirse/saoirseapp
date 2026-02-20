@@ -447,19 +447,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }) {
     return PopupMenuItem<String>(
       value: value,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+      padding: EdgeInsets.only(left: 10.w, right: 5.w, top: 5.h, bottom: 5.h),
       child: Row(
         children: [
           Container(
-            width: 28.w,
-            height: 28.h,
+            width: 15.w,
+            height: 15.h,
             decoration: BoxDecoration(
               color: bgColor,
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
-              size: 20.sp,
+              size: 18.sp,
               color: AppColors.primaryColor,
             ),
           ),
@@ -467,7 +467,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(
             title,
             style: TextStyle(
-              fontSize: 15.sp,
+              fontSize: 13.sp,
               fontWeight: FontWeight.w500,
             ),
           ),
