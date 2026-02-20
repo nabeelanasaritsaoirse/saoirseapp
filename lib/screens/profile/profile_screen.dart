@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_constant.dart';
@@ -92,10 +93,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.paperColor,
-      appBar: CustomAppBar(
-        title: AppStrings.profile_title,
-        showBack: false,
-      ),
+      //
+      appBar: _profileAppBar(),
       body: !isLoggedIn
           ? _loginOnlyView()
           : SingleChildScrollView(
@@ -363,12 +362,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               case "Contact Us":
                                 controller.openUrl(AppURLs.CONTACT_US);
                                 break;
-                              case "Log Out":
-                                controller.confirmLogout();
-                                break;
-                              case "Delete\nAccount":
-                                controller.deleteAccount();
-                                break;
+                              // case "Log Out":
+                              //   controller.confirmLogout();
+                              //   break;
+                              // case "Delete\nAccount":
+                              //   controller.deleteAccount();
+                              //   break;
 
                               default:
                             }
@@ -381,6 +380,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
+    );
+  }
+
+  PreferredSizeWidget _profileAppBar() {
+    return CustomAppBar(
+      title: AppStrings.profile_title,
+      showBack: false,
+      actions: [
+        PopupMenuButton<String>(
+          icon: const Icon(
+            Icons.more_vert,
+            color: AppColors.white,
+          ),
+          offset: const Offset(0, 45),
+          elevation: 8,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          onSelected: (value) {
+            if (value == "logout") {
+              controller.confirmLogout();
+            } else if (value == "delete") {
+              controller.deleteAccount();
+            }
+          },
+          itemBuilder: (context) => [
+            _menuItem(
+              value: "logout",
+              title: "Logout",
+              iconPath: AppAssets.logout_menu,
+            ),
+            _menuItem(
+              value: "delete",
+              title: "Delete Account",
+              iconPath: AppAssets.delete_menu,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  PopupMenuItem<String> _menuItem({
+    required String value,
+    required String title,
+    required String iconPath,
+    Color? bgColor,
+  }) {
+    return PopupMenuItem<String>(
+      value: value,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: bgColor,
+              shape: BoxShape.circle,
+            ),
+            child: ClipOval(
+              child: SvgPicture.asset(
+                iconPath,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

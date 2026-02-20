@@ -90,8 +90,8 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
     {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
     {"icon": AppAssets.contact_us, "title": "Contact Us"},
-    {"icon": AppAssets.logout, "title": "Log Out"},
-    {"icon": AppAssets.delete_account, "title": "Delete\nAccount"},
+    // {"icon": AppAssets.logout, "title": "Log Out"},
+    // {"icon": AppAssets.delete_account, "title": "Delete\nAccount"},
   ];
 
   Future<DeleteAccountModel?> fetchDeleteInfo() async {

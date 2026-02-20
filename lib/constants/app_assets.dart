@@ -84,4 +84,8 @@ class AppAssets {
 
   // FAQs
   static String support_contact = "assets/images/supprot_contact.png";
+
+  // Profile App Bar Menu Images
+  static String logout_menu = "assets/svg/logout_menu.svg";
+  static String delete_menu = "assets/svg/delete_menu.svg";
 }
