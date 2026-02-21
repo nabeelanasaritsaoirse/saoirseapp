@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
+import 'package:saoirse_app/services/deep_link_navigation_service.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_constant.dart';
@@ -38,6 +38,9 @@ class _SplashScreenState extends State<SplashScreen> {
       // } else {
       //   Get.offAll(() => const OnBoardScreen());
       // }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        DeepLinkNavigationService.handleProductNavigation();
+      });
     });
   }
 

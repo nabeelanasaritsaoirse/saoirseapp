@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../constants/app_strings.dart';
 import '../../services/deep_link_navigation_service.dart';
 import '../../widgets/app_toast.dart';
@@ -25,7 +24,7 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     super.onReady();
 
     Get.find<CartController>().fetchCartCount();
-    DeepLinkNavigationService.handleProductNavigation();
+    // DeepLinkNavigationService.handleProductNavigation();
   }
 
   @override
