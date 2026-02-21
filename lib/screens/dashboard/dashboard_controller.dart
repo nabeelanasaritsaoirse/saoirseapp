@@ -25,7 +25,6 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     super.onReady();
 
     Get.find<CartController>().fetchCartCount();
-    DeepLinkNavigationService.handleProductNavigation();
   }
 
   @override
