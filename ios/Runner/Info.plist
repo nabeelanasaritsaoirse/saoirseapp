@@ -55,6 +55,8 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
     <key>GIDClientID</key>
     <string>486829564070-c6hh2o5qd20omheki4qlkkhhg4u4625q.apps.googleusercontent.com</string>
 	<!-- Google Sign In config -->

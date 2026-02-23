@@ -286,38 +286,6 @@ class CartScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                  // Align(
-                                  //   alignment: AlignmentGeometry.centerRight,
-                                  //   child: GestureDetector(
-                                  //     onTap: () {
-                                  //       final productDetails =
-                                  //           controller.convertCartToProductDetails(item);
-
-                                  //       Get.to(() => SelectAddress(
-                                  //             product: productDetails,
-                                  //             selectVarientId:
-                                  //                 item.variant?.variantId ?? "",
-                                  //             selectedDays:
-                                  //                 item.installmentPlan.totalDays,
-                                  //             selectedAmount:
-                                  //                 item.installmentPlan.dailyAmount,
-                                  //             quantity: item.quantity,
-                                  //           ));
-                                  //     },
-                                  //     child: Container(
-                                  //       width: 120.w,
-                                  //       height: 30.h,
-                                  //       decoration: BoxDecoration(
-                                  //           color: AppColors.primaryColor,
-                                  //           borderRadius: BorderRadius.circular(10.r)),
-                                  //       child: Center(
-                                  //         child: appText("Buy Now",
-                                  //             color: AppColors.white,
-                                  //             fontWeight: FontWeight.w600),
-                                  //       ),
-                                  //     ),
-                                  //   ),
-                                  // )
                                 ],
                               ),
                             );
