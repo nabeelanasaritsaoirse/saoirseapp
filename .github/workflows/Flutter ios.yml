@@ -4,8 +4,8 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 on:
   push:
     tags:
-      - "ios-v*"
-  workflow_dispatch:
+      - "v*"
+ 
 
 concurrency:
   group: ios-build-${{ github.ref }}
@@ -373,12 +373,11 @@ jobs:
           VERSION_NAME: ${{ needs.ios-ci.outputs.version_name }}
           BUILD_NUMBER: ${{ needs.ios-ci.outputs.build_number }}
         run: |
-          mkdir -p fastlane/metadata/en-US
-          # Use build number to make content unique every run (forces deliver to detect a change)
+          mkdir -p ios/fastlane/metadata/en-US
           echo "Bug fixes and performance improvements. Build $BUILD_NUMBER." \
-            > fastlane/metadata/en-US/release_notes.txt
+            > ios/fastlane/metadata/en-US/release_notes.txt
           echo "✅ release_notes.txt content:"
-          cat fastlane/metadata/en-US/release_notes.txt
+          cat ios/fastlane/metadata/en-US/release_notes.txt
   
       # STEP 1 — Upload metadata only, explicitly no submit
       - name: 📤 Upload Metadata (whatsNew)
@@ -386,6 +385,7 @@ jobs:
           VERSION_NAME: ${{ needs.ios-ci.outputs.version_name }}
           BUILD_NUMBER: ${{ needs.ios-ci.outputs.build_number }}
         run: |
+          cd ios
           fastlane deliver \
             --api_key_path api_key.json \
             --app_version "$VERSION_NAME" \
@@ -400,6 +400,7 @@ jobs:
           VERSION_NAME: ${{ needs.ios-ci.outputs.version_name }}
           BUILD_NUMBER: ${{ needs.ios-ci.outputs.build_number }}
         run: |
+          cd ios
           fastlane deliver \
             --api_key_path api_key.json \
             --app_version "$VERSION_NAME" \
