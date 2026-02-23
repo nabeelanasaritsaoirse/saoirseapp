@@ -1,4 +1,5 @@
 import 'package:get_storage/get_storage.dart';
+import 'package:saoirse_app/models/wallet_withdrawal_response.dart';
 
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
@@ -47,4 +48,29 @@ class WithdrawalService {
     );
     return res;
   }
+
+
+  static Future<WalletWithdrawalStatusResponse?> 
+    getWalletWithdrawalStatus() async {
+  try {
+    final token = GetStorage().read(AppConst.ACCESS_TOKEN);
+    final url = AppURLs.WITHDRAWAL_STATUS_API;
+
+    final res = await APIService.getRequest(
+      url: url,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (json) {
+        return WalletWithdrawalStatusResponse.fromJson(json);
+      },
+    );
+
+    return res;
+  } catch (e) {
+    return null;
+  }
+}
+
 }

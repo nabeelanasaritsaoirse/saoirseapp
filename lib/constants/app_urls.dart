@@ -2,12 +2,10 @@
 
 class AppURLs {
   //privacy policy
-  static String PRIVACY_POLICY =
-      "https://admin.epielio.com/privacy_policy.html";
+  static String PRIVACY_POLICY = "https://admin.epielio.com/privacy_policy.html";
 
   //terms and conditions
-  static String TERMS_AND_CONDITIONS =
-      "https://admin.epielio.com/terms_and_conditions.html";
+  static String TERMS_AND_CONDITIONS = "https://admin.epielio.com/terms_and_conditions.html";
 
   //contact us
   static String CONTACT_US = "https://admin.epielio.com/contact_us.html";
@@ -54,10 +52,10 @@ class AppURLs {
   static String ADD_MONEY_WALLET = BASE_API + "api/wallet/add-money";
   static String VERIFY_PAYMENT = BASE_API + "api/wallet/verify-payment";
   static String WITHDRAWAL_API = BASE_API + "api/wallet/withdraw";
+  static String WITHDRAWAL_STATUS_API = BASE_API + "api/wallet/withdrawal-status";
 
   // Category api
-  static String CATEGORY_API =
-      BASE_API + "api/categories?parentCategoryId=null&isActive=true";
+  static String CATEGORY_API = BASE_API + "api/categories?parentCategoryId=null&isActive=true";
 
   // Product Details
   static String PRODUCT_DETAILS_API = BASE_API + "api/products/";
@@ -67,8 +65,7 @@ class AppURLs {
 
   // Product Review
   static String CAN_REVIEW_API = BASE_API + "api/reviews/can-review/";
-  static String UPLOAD_REVIEW_IMAGES_API =
-      BASE_API + "api/reviews/upload-images";
+  static String UPLOAD_REVIEW_IMAGES_API = BASE_API + "api/reviews/upload-images";
   static String CREATE_REVIEW_API = BASE_API + "api/reviews";
   static String GET_OWN_REVIEWs_API = BASE_API + "api/reviews/my-reviews";
   static String EDIT_REVIEW = BASE_API + "api/reviews/";
@@ -96,73 +93,51 @@ class AppURLs {
   static String FAQ_API = BASE_API + "api/faqs/app";
 
   //Autopay Api
-  static String AUTOPAY_DASHBOARD_API =
-      BASE_API + "api/installments/autopay/dashboard";
+  static String AUTOPAY_DASHBOARD_API = BASE_API + "api/installments/autopay/dashboard";
 
-  static String AUTOPAY_SETTINGS_API =
-      BASE_API + "api/installments/autopay/settings";
-  static String AUTOPAY_NOTIFICATION_PREFERENCES_API =
-      BASE_API + "api/installments/autopay/notification-preferences";
-  static String AUTOPAY_SKIP_DATES_ADD_API =
-      BASE_API + "api/installments/autopay/skip-dates";
-  static String AUTOPAY_STATUS_API =
-      BASE_API + "api/installments/autopay/status";
-  static String AUTOPAY_SKIPDATE_DELET_API =
-      BASE_API + "api/installments/autopay/skip-dates";
-  static String AUTOPAY_SUGGESTED_TOPUP_API =
-      BASE_API + "api/installments/autopay/suggested-topup";
+  static String AUTOPAY_SETTINGS_API = BASE_API + "api/installments/autopay/settings";
+  static String AUTOPAY_NOTIFICATION_PREFERENCES_API = BASE_API + "api/installments/autopay/notification-preferences";
+  static String AUTOPAY_SKIP_DATES_ADD_API = BASE_API + "api/installments/autopay/skip-dates";
+  static String AUTOPAY_STATUS_API = BASE_API + "api/installments/autopay/status";
+  static String AUTOPAY_SKIPDATE_DELET_API = BASE_API + "api/installments/autopay/skip-dates";
+  static String AUTOPAY_SUGGESTED_TOPUP_API = BASE_API + "api/installments/autopay/suggested-topup";
   static String AUTOPAY_PAUSE_API = BASE_API + "api/installments/autopay/pause";
-  static String AUTOPAY_RESUME_API =
-      BASE_API + "api/installments/autopay/resume";
-  static String AUTOPAY_ENABLE_FOR_ORDER_API =
-      BASE_API + "api/installments/autopay/enable";
-  static String AUTOPAY_DISABLE_FOR_ORDER_API =
-      BASE_API + "api/installments/autopay/disable";
+  static String AUTOPAY_RESUME_API = BASE_API + "api/installments/autopay/resume";
+  static String AUTOPAY_ENABLE_FOR_ORDER_API = BASE_API + "api/installments/autopay/enable";
+  static String AUTOPAY_DISABLE_FOR_ORDER_API = BASE_API + "api/installments/autopay/disable";
 
-  static String AUTOPAY_PRIORITY_API =
-      BASE_API + "api/installments/autopay/priority";
+  static String AUTOPAY_PRIORITY_API = BASE_API + "api/installments/autopay/priority";
 
   // Order api
   static String CREATE_ORDER_API = BASE_API + "api/installments/orders";
-  static String CREATE_BULK_ORDER_API =
-      BASE_API + "api/installments/orders/bulk";
-  static String INSTALLMENT_ORDER_PREVIEW_API =
-      BASE_API + "api/installments/orders/preview";
-  static String BULK_ORDER_PREVIEW =
-      BASE_API + "api/installments/orders/bulk/preview";
+  static String CREATE_BULK_ORDER_API = BASE_API + "api/installments/orders/bulk";
+  static String INSTALLMENT_ORDER_PREVIEW_API = BASE_API + "api/installments/orders/preview";
+  static String BULK_ORDER_PREVIEW = BASE_API + "api/installments/orders/bulk/preview";
 
   // Payment Api
-  static String PAYMENT_PROCESS_API =
-      BASE_API + "api/installments/payments/process";
-  static String PAYMENT_VERIFY_API =
-      BASE_API + "api/installments/orders/bulk/verify-payment";
+  static String PAYMENT_PROCESS_API = BASE_API + "api/installments/payments/process";
+  static String PAYMENT_VERIFY_API = BASE_API + "api/installments/orders/bulk/verify-payment";
 
   // Notifications
   static String NOTIFICATIONS = BASE_API + "api/notifications";
-  static String UNREAD_NOTIFICATIONS =
-      BASE_API + "api/notifications/unread-count";
+  static String UNREAD_NOTIFICATIONS = BASE_API + "api/notifications/unread-count";
   static String ENABLE_AUTOPAY = BASE_API + "api/installments/autopay/enable";
 
   // Orders History
   static String ORDER_HISTORY_API = BASE_API + "api/installments/orders";
-  static String ORDER_DELIVERED_HISTORY_API = BASE_API +
-      "api/installments/orders"; // same endpoint with different status filter only
+  static String ORDER_DELIVERED_HISTORY_API = BASE_API + "api/installments/orders"; // same endpoint with different status filter only
 
   // Pending Transactions Api
-  static String PENDING_TRANSACTIONS_API =
-      BASE_API + "api/installments/payments/daily-pending";
+  static String PENDING_TRANSACTIONS_API = BASE_API + "api/installments/payments/daily-pending";
 
   // Investment Status Api
-  static String INVESTMENT_STATUS_API =
-      BASE_API + "api/installments/orders/overall-status";
+  static String INVESTMENT_STATUS_API = BASE_API + "api/installments/orders/overall-status";
 
   // Success Story Banner API
-  static String SUCCESS_STORY_BANNER_API =
-      BASE_API + "api/success-stories/public/active";
+  static String SUCCESS_STORY_BANNER_API = BASE_API + "api/success-stories/public/active";
 
   // Home Screen Top Banner API
-  static String HOME_SCREEN_TOP_BANNER_API =
-      BASE_API + "api/banners/public/active";
+  static String HOME_SCREEN_TOP_BANNER_API = BASE_API + "api/banners/public/active";
 
   // Profile Api
   static String MY_PROFILE = BASE_API + "api/users/me/profile";
@@ -171,31 +146,24 @@ class AppURLs {
   static String LOGOUT_API = BASE_API + "api/auth/logout";
 
   //  Delete Account
-  static String DELETE_ACCOUNT_GET_API =
-      BASE_API + "api/users/:userId/deletion-info";
-  static String DELETE_REQUEST_API =
-      BASE_API + "api/users/:userId/request-deletion";
+  static String DELETE_ACCOUNT_GET_API = BASE_API + "api/users/:userId/deletion-info";
+  static String DELETE_REQUEST_API = BASE_API + "api/users/:userId/request-deletion";
 
   // Pending Transaction (BEFORE PAYMENT METHOD API RESPONSE)
-  static String PENDING_TRANSACTION_PAYMENT_RESPONSE =
-      BASE_API + "api/installments/payments/create-combined-razorpay";
+  static String PENDING_TRANSACTION_PAYMENT_RESPONSE = BASE_API + "api/installments/payments/create-combined-razorpay";
 
   // Pending Transaction (AFTER PAYMENT METHOD API )
-  static String PENDING_TRANSACTION_PAY_DAILY_SELECTED =
-      BASE_API + "api/installments/payments/pay-daily-selected";
+  static String PENDING_TRANSACTION_PAY_DAILY_SELECTED = BASE_API + "api/installments/payments/pay-daily-selected";
 
   // Sub Category Order Listing Page
-  static String PRODUCT_LISTING_SUBCATEGORY =
-      BASE_API + "api/products/category/";
+  static String PRODUCT_LISTING_SUBCATEGORY = BASE_API + "api/products/category/";
 
   //Get all coupons from api
   static String GET_ALL_COUPONS = BASE_API + "api/coupons";
 
   //Chat messages
-  static String CREATE_INDIVIDUAL_CHAT_FROM_REFFERAL =
-      BASE_API + "api/chat/conversations/individual";
+  static String CREATE_INDIVIDUAL_CHAT_FROM_REFFERAL = BASE_API + "api/chat/conversations/individual";
 
   //Post request for Coupon Validation after this API will send the response
-  static String POST_RQ_COUPONS_VALIDATION =
-      BASE_API + "api/installments/validate-coupon";
+  static String POST_RQ_COUPONS_VALIDATION = BASE_API + "api/installments/validate-coupon";
 }
