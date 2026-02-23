@@ -1,4 +1,4 @@
-## Version 1.5.2+110
+## Version 1.6.5+74
 
-- Merge pull request #316 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-2
-- Fix release workflow for platform tagging and notes
+- Merge pull request #408 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-2
+- Update Flutter ios.yml
