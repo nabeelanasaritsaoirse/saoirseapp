@@ -165,7 +165,4 @@ version: 1.2.3+45
 
 Saoirse Engineering Team  
 Built with clean CI/CD, safety, and scalability in mind.
-```
 
-
-Just tell me 👍
