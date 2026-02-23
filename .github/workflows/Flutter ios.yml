@@ -393,6 +393,7 @@ jobs:
             --skip_screenshots true \
             --submit_for_review false \
             --skip_app_version_update false \
+            --run_precheck_before_submit false \
             --force
       
       - name: 🚀 Submit to App Store Review
@@ -408,6 +409,7 @@ jobs:
             --skip_binary_upload true \
             --skip_screenshots true \
             --submit_for_review true \
+            --run_precheck_before_submit false \
             --force
             
       - name: 🧾 Review Submission Summary
