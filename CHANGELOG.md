@@ -1,56 +1,6 @@
-## Version 1.6.1+112
+## Version 1.6.2+71
 
-- Merge pull request #382 from nabeelanasaritsaoirse/deep
-- fix: changed base url
-- Update Flutter ios.yml
-- Update Flutter Android.yml
-- fix: product image & autopay data refresh issue
-- fix: title issue in appbar & font size in coupon screen
-- fix: referral code scan issue
-- Merge remote-tracking branch 'origin/sahir' into deep
-- Added toaster and removed unused commented code in selectplan sheet
-- fix: delete info function calling issue
-- fea: merged ios code
-- fix: removed errorr msg in coupon screen
-- fix: change coupon folder name
-- coupon ui design modified
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- pending transaction radio button issue is fixed
-- Merge remote-tracking branch 'origin/sahir' into deep
-- Fix wallet controller initialization for transaction history screen
-- fix: reduce notification count size
-- fix: navigation & scaffold color issue
-- fix: transmission not update
-- Merge remote-tracking branch 'origin/sahir' into deep
-- Merge remote-tracking branch 'origin/shadin' into deep
-- transcation history api calling issue completed
-- fix: faqs ui issue
-- pushed again
-- svg icons  deleted
-- Merge remote-tracking branch 'origin/akash' into deep
-- fea: toaster for referral code copy
-- Faqs support button
-- Merge remote-tracking branch 'origin/sahir' into deep
-- Fixed loading issue in proudct details screen
-- Merge remote-tracking branch 'origin/akash' into deep
-- autopay svg
-- fix: back button issue
-- fix: new google json
-- Merge remote-tracking branch 'origin/akash' into deep
-- autopay settingd function changed on savebutton
-- Merge remote-tracking branch 'origin/akash' into deep
-- autopay settingd function changed on savebutton
-- icon size and all re changed
-- Merge remote-tracking branch 'origin/shadin' into deep
-- icon changes on app bar
-- fix: delete account box alignment issue
-- Merge remote-tracking branch 'origin/akash' into deep
-- Merge remote-tracking branch 'origin/sahir' into deep
-- autopay error message issue
-- Update profile icons, modify delivered screen app bar, and remove review edit functionality
-- fix: comments issue
-- autopay error message issue
-- fix: lint issues
-- autopay issue big fix
-- Import issue
-- Fix: Botttom sheet data parsing issue
+- Merge pull request #391 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-1
+- Update README.md
+- Remove .env from tracking
+- Remove .env from tracking
