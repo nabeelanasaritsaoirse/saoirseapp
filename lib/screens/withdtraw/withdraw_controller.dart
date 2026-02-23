@@ -17,6 +17,10 @@ class WithdrawController extends GetxController {
   var isLoading = false.obs;
   var showSuffix = false.obs;
 
+  var canWithdraw = true.obs;
+  var withdrawalMessage = ''.obs;
+  var isCheckingStatus = false.obs;
+
   Future<void> submitWithdrawal() async {
     try {
       isLoading.value = true;
@@ -91,6 +95,23 @@ class WithdrawController extends GetxController {
     } finally {
       isLoading.value = false;
       debugPrint("🔵 [KYC] Loading finished");
+    }
+  }
+
+  Future<void> fetchWithdrawalStatus() async {
+    try {
+      isCheckingStatus.value = true;
+
+      final response = await WithdrawalService.getWalletWithdrawalStatus();
+
+      if (response != null) {
+        canWithdraw.value = response.canWithdraw;
+        withdrawalMessage.value = response.message;
+      }
+    } catch (e) {
+      debugPrint("❌ Withdrawal status error: $e");
+    } finally {
+      isCheckingStatus.value = false;
     }
   }
 
