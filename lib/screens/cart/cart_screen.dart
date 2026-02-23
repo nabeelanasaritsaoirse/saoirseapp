@@ -192,16 +192,23 @@ class CartScreen extends StatelessWidget {
                                               fontWeight: FontWeight.w600,
                                               textAlign: TextAlign.start,
                                             ),
-                                            SizedBox(height: 3.h),
-                                            if (variantText.isNotEmpty)
-                                              appText(variantText,
-                                                  fontSize: 13.sp,
-                                                  color: AppColors.black54),
-                                            SizedBox(height: 3.h),
-                                            appText("₹ ${item.finalPrice}",
-                                                fontSize: 14.sp,
-                                                fontWeight: FontWeight.bold),
-                                            SizedBox(height: 3.h),
+                                            SizedBox(height: 2.h),
+                                            if (variantText.isNotEmpty) ...[
+                                              appText(
+                                                variantText,
+                                                fontSize: 13.sp,
+                                                color: AppColors.black54,
+                                                textAlign: TextAlign.start,
+                                              ),
+                                              SizedBox(height: 2.h),
+                                            ],
+                                            appText(
+                                              "₹ ${item.finalPrice}",
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.bold,
+                                              textAlign: TextAlign.start,
+                                            ),
+                                            SizedBox(height: 2.h),
                                             Obx(() {
                                               if (!controller.isCartPlanApplied
                                                       .value ||
@@ -216,6 +223,7 @@ class CartScreen extends StatelessWidget {
                                                 "${item.installmentPlan.totalDays} days",
                                                 fontSize: 12.sp,
                                                 color: AppColors.primaryColor,
+                                                textAlign: TextAlign.start,
                                               );
                                             }),
                                           ],
@@ -354,7 +362,7 @@ class CartScreen extends StatelessWidget {
                                   fontSize: 12.sp,
                                   color: AppColors.grey,
                                 ),
-                                SizedBox(height: 4.h),
+                                SizedBox(height: 2.h),
                                 appText(
                                   "₹ ${controller.totalAmount.toStringAsFixed(0)}",
                                   fontSize: 18.sp,
