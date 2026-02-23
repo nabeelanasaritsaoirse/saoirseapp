@@ -2,7 +2,7 @@ name: 📌 Auto Version & Tag
 
 on:
   pull_request:
-    branches: [ test ]
+    branches: [ main ]
     types: [ closed ]
 
 permissions:
