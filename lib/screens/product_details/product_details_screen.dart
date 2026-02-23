@@ -66,7 +66,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-
       body: SafeArea(
         child: Obx(() {
           final product = controller.product.value;
@@ -79,12 +78,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             return Center(child: Text("Product not found"));
           }
 
-          return buildBody(product);
+          return Column(
+            children: [
+              Expanded(
+                child: buildBody(product),
+              ),
+              buildBottomBar(),
+            ],
+          );
         }),
       ),
-
-      /// Bottom Bar Stays Same
-      bottomNavigationBar: buildBottomBar(),
     );
   }
 
@@ -137,13 +140,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 /// PRODUCT NAME
                 appText(
                   product.name,
-                  fontSize: 24.sp,
+                  fontSize: 17.sp,
                   textAlign: TextAlign.left,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textBlack,
                 ),
 
-                SizedBox(height: 8.h),
+                SizedBox(height: 4.h),
 
                 /// PRICE
                 Row(
@@ -167,7 +170,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ],
                 ),
 
-                SizedBox(height: 10),
+                SizedBox(height: 5.h),
 
                 /// VARIANTS
                 if (product.hasVariants) buildVariantOptions(product),
@@ -189,7 +192,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
                 SizedBox(height: 8.h),
                 appText(
-                  product.description.long,
+                  product.description.short,
                   textAlign: TextAlign.left,
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w500,
@@ -200,11 +203,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             ),
           ),
           SizedBox(
-            height: 20.h,
+            height: 2.h,
           ),
           buildFaqAndReviewSection(),
           SizedBox(
-            height: 20.h,
+            height: 10.h,
           ),
           buildSimilarProductsSection(),
         ],
@@ -731,7 +734,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             ),
           ),
 
-          SizedBox(height: 14.h),
+          SizedBox(height: 10.h),
         ],
       );
     });
@@ -759,8 +762,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             );
           }),
 
-          SizedBox(height: 1.h),
-
           // REVIEW BUTTON
           Obx(() => ExpandableSectionHeader(
                 title: "Reviews",
@@ -778,7 +779,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             );
           }),
 
-          SizedBox(height: 20.h),
+          SizedBox(height: 5.h),
         ],
       ),
     );
@@ -801,7 +802,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     if (controller.faqs.isEmpty) {
       return Container(
         margin: EdgeInsets.only(top: 10.h),
-        padding: EdgeInsets.symmetric(vertical: 20.h),
+        padding: EdgeInsets.symmetric(vertical: 15.h),
         width: double.infinity,
         decoration: BoxDecoration(
           color: AppColors.lightGrey,
@@ -930,7 +931,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     }
     return Container(
       margin: EdgeInsets.only(top: 10.h),
-      padding: EdgeInsets.symmetric(vertical: 14.h),
+      padding: EdgeInsets.symmetric(vertical: 10.h),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
       ),

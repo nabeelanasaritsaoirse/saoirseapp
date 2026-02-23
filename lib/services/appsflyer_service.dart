@@ -67,7 +67,6 @@ class AppsFlyerService {
         final productId = uri.pathSegments.last;
 
         storage.write("pending_product_id", productId);
-        // DeepLinkNavigationService.handleProductNavigation();
       }
     });
 
@@ -81,7 +80,6 @@ class AppsFlyerService {
         final productId = uri.pathSegments.last;
 
         storage.write("pending_product_id", productId);
-        // DeepLinkNavigationService.handleProductNavigation();
       }
     });
 
