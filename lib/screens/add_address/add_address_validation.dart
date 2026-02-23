@@ -54,9 +54,9 @@ class AddAddressValidation {
 
   // Zip Code Validation
   static String? zipValidation({required String zip}) {
-    if (zip.trim().isEmpty) return "Zip code is required";
+    if (zip.trim().isEmpty) return "Pin code is required";
     if (!RegExp(r"^[0-9]{4,10}$").hasMatch(zip)) {
-      return "Enter valid zip code";
+      return "Enter valid pin code";
     }
     return null;
   }
