@@ -4,8 +4,8 @@ run-name: "🚀 Release note"
 on:
   push:
     tags:
-      - 'android-v*'
-      - 'ios-v*'
+      - 'v*'
+     
 
 permissions:
   contents: write
