@@ -42,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     final ctrl = Get.find<PendingTransactionController>();
     ctrl.getPendingTransactions();
+    homeController.loadUserName();
   }
 
   @override

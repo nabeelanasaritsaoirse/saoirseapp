@@ -54,6 +54,8 @@ class AppURLs {
   static String ADD_MONEY_WALLET = BASE_API + "api/wallet/add-money";
   static String VERIFY_PAYMENT = BASE_API + "api/wallet/verify-payment";
   static String WITHDRAWAL_API = BASE_API + "api/wallet/withdraw";
+  static String WITHDRAWAL_STATUS_API =
+      BASE_API + "api/wallet/withdrawal-status";
 
   // Category api
   static String CATEGORY_API =
@@ -98,7 +100,6 @@ class AppURLs {
   //Autopay Api
   static String AUTOPAY_DASHBOARD_API =
       BASE_API + "api/installments/autopay/dashboard";
-
   static String AUTOPAY_SETTINGS_API =
       BASE_API + "api/installments/autopay/settings";
   static String AUTOPAY_NOTIFICATION_PREFERENCES_API =
@@ -118,7 +119,6 @@ class AppURLs {
       BASE_API + "api/installments/autopay/enable";
   static String AUTOPAY_DISABLE_FOR_ORDER_API =
       BASE_API + "api/installments/autopay/disable";
-
   static String AUTOPAY_PRIORITY_API =
       BASE_API + "api/installments/autopay/priority";
 

@@ -8,6 +8,7 @@ import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_constant.dart';
 import '../../main.dart';
+import '../../services/deep_link_navigation_service.dart';
 import '../dashboard/dashboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -25,7 +26,6 @@ class _SplashScreenState extends State<SplashScreen> {
       await storage.erase();
       await storage.write(AppConst.CACHE_CLEANUP, true);
     }
-    // bool isLogin = !(storage.read(AppConst.USER_ID) == null);
 
     print("✔ SAVED userId: ${storage.read(AppConst.USER_ID)}");
     print("✔ SAVED accessToken: ${storage.read(AppConst.ACCESS_TOKEN)}");
@@ -33,11 +33,11 @@ class _SplashScreenState extends State<SplashScreen> {
     print("✔ SAVED referralCode: ${storage.read(AppConst.REFERRAL_CODE)}");
 
     Future.delayed(const Duration(seconds: 2), () async {
-      // if (isLogin) {
       Get.offAll(() => DashboardScreen());
-      // } else {
-      //   Get.offAll(() => const OnBoardScreen());
-      // }
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        DeepLinkNavigationService.handleProductNavigation();
+      });
     });
   }
 

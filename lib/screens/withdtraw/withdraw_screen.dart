@@ -30,6 +30,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
   void initState() {
     super.initState();
 
+    withdrawController.fetchWithdrawalStatus();
     // 🔥 PREFILL ACCOUNT DETAILS
     withdrawController.nameController.text = widget.account.accountHolderName;
 
@@ -38,6 +39,8 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     withdrawController.confirmAccController.text = widget.account.accountNumber;
 
     withdrawController.ifscController.text = widget.account.ifscCode;
+
+    withdrawController.bankNameController.text = widget.account.bankName!;
   }
 
   @override
@@ -49,6 +52,8 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     withdrawController.nameController.text = selectedAccount.accountHolderName;
     withdrawController.accController.text = selectedAccount.accountNumber;
     withdrawController.ifscController.text = selectedAccount.ifscCode;
+    withdrawController.bankNameController.text = selectedAccount.bankName!;
+
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
       appBar: CustomAppBar(
@@ -250,6 +255,22 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                 ),
               ),
 
+              Obx(() {
+                if (withdrawController.withdrawalMessage.value.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return Padding(
+                  padding: EdgeInsets.only(top: 12.h),
+                  child: appText(
+                    withdrawController.withdrawalMessage.value,
+                    fontSize: 13.sp,
+                    color: withdrawController.canWithdraw.value ? AppColors.green : AppColors.red,
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              }),
+
               SizedBox(height: 40.h),
 
               // TRANSFER BUTTON
@@ -265,19 +286,20 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                     onTap: () async {
                       if (_formKey.currentState!.validate()) {
                         /// ❗ Validate amount
-                        if (withdrawController.amountController.text
-                                .trim()
-                                .isEmpty ||
-                            (int.tryParse(withdrawController
-                                        .amountController.text) ??
-                                    0) <=
-                                0) {
-                          appToast(
-                              title: "Error",
-                              content: "Please enter a valid amount");
+                        if (withdrawController.amountController.text.trim().isEmpty ||
+                            (int.tryParse(withdrawController.amountController.text) ?? 0) <= 0) {
+                          appToaster(error: true, content: "Please enter a valid amount");
                           return;
                         }
 
+                        if (!withdrawController.canWithdraw.value) {
+                              appToaster(
+                               error: true,
+                               content: withdrawController.withdrawalMessage.value,
+                              );
+                           return;
+                        }
+                        
                         /// 🔍 SERVER-DRIVEN KYC + BANK CHECK
                         final eligible = await withdrawController
                             .checkWithdrawalEligibility();
@@ -314,8 +336,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          appText("Selected Account",
-              fontSize: 16.sp, fontWeight: FontWeight.w700),
+          appText("Selected Account", fontSize: 16.sp, fontWeight: FontWeight.w700),
           SizedBox(height: 12.h),
           detailRow("Account Holder", account.accountHolderName),
           detailRow("Account Number", account.accountNumber),
@@ -332,17 +353,11 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
         children: [
           Expanded(
             flex: 4,
-            child: appText(label,
-                color: AppColors.grey,
-                fontSize: 13.sp,
-                textAlign: TextAlign.left),
+            child: appText(label, color: AppColors.grey, fontSize: 13.sp, textAlign: TextAlign.left),
           ),
           Expanded(
             flex: 5,
-            child: appText(value,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                textAlign: TextAlign.left),
+            child: appText(value, fontSize: 14.sp, fontWeight: FontWeight.w600, textAlign: TextAlign.left),
           ),
         ],
       ),

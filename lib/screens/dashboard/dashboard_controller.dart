@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../constants/app_strings.dart';
 import '../../services/deep_link_navigation_service.dart';
+import '../../widgets/app_toast.dart';
 import '../cart/cart_controller.dart';
 import '../category/category_controller.dart';
 import '../home/home_controller.dart';
@@ -9,6 +11,8 @@ import '../profile/profile_controller.dart';
 import '../refferal/referral_controller.dart';
 
 class DashboardController extends GetxController with WidgetsBindingObserver {
+  DateTime? lastBackPressed;
+
 //-----------------------ONLY FOR PRODUCT SHARING-------------------------
   @override
   void onInit() {
@@ -21,7 +25,6 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
     super.onReady();
 
     Get.find<CartController>().fetchCartCount();
-    DeepLinkNavigationService.handleProductNavigation();
   }
 
   @override
@@ -70,5 +73,28 @@ class DashboardController extends GetxController with WidgetsBindingObserver {
       Get.find<ProfileController>().fetchWishlistCount();
       Get.find<ProfileController>().fetchUserProfile();
     }
+  }
+
+  bool handleBackPress() {
+    if (selectedIndex.value != 0) {
+      changeTab(0);
+      return false;
+    }
+
+    final now = DateTime.now();
+
+    if (lastBackPressed == null ||
+        now.difference(lastBackPressed!) > const Duration(seconds: 2)) {
+      lastBackPressed = now;
+
+      appToaster(
+        content: AppStrings.exit_message,
+        error: true,
+      );
+
+      return false;
+    }
+
+    return true;
   }
 }

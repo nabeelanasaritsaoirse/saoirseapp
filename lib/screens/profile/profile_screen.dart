@@ -92,10 +92,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.paperColor,
-      appBar: CustomAppBar(
-        title: AppStrings.profile_title,
-        showBack: false,
-      ),
+      //
+      appBar: _profileAppBar(),
       body: !isLoggedIn
           ? _loginOnlyView()
           : SingleChildScrollView(
@@ -107,7 +105,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Obx(() {
                     if (controller.isLoading.value) {
                       return SizedBox(
-                        height: 200,
+                        height: 200.h,
                         child: Center(child: appLoader()),
                       );
                     }
@@ -116,7 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     if (profile == null) {
                       return SizedBox(
-                        height: 200,
+                        height: 200.h,
                         child: Center(child: Text("Failed to load profile")),
                       );
                     }
@@ -147,15 +145,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 children: [
                                   // Profile image
                                   CircleAvatar(
-                                    radius: 42,
+                                    radius: 42.r,
                                     backgroundColor: Colors.grey.shade300,
                                     child: user.profilePicture.isNotEmpty
                                         ? ClipOval(
                                             child: Image.network(
                                               user.profilePicture,
                                               fit: BoxFit.cover,
-                                              width: 84,
-                                              height: 84,
+                                              width: 84.w,
+                                              height: 84.h,
                                               loadingBuilder: (context, child,
                                                   loadingProgress) {
                                                 if (loadingProgress == null) {
@@ -164,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 return Center(
                                                   child:
                                                       CupertinoActivityIndicator(
-                                                    radius: 10.0,
+                                                    radius: 10.r,
                                                     color: AppColors.textGray,
                                                   ),
                                                 );
@@ -174,8 +172,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 child: Image.asset(
                                                   AppAssets.user_img,
                                                   fit: BoxFit.cover,
-                                                  width: 84,
-                                                  height: 84,
+                                                  width: 84.w,
+                                                  height: 84.h,
                                                 ),
                                               ),
                                             ),
@@ -184,8 +182,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             child: Image.asset(
                                               AppAssets.user_img,
                                               fit: BoxFit.cover,
-                                              width: 84,
-                                              height: 84,
+                                              width: 84.w,
+                                              height: 84.h,
                                             ),
                                           ),
                                   ),
@@ -199,14 +197,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       },
                                       child: Container(
                                         width: 28.w,
-                                        height: 28.w,
+                                        height: 28.h,
                                         decoration: BoxDecoration(
                                           color: AppColors.primaryColor,
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
                                               color: Colors.black12,
-                                              blurRadius: 2,
+                                              blurRadius: 2.r,
                                               offset: Offset(0, 1),
                                             ),
                                           ],
@@ -301,7 +299,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Get.to(() => AutopayDashboardScreen());
                               } else if (index == 7) {
                                 Get.to(() => CouponScreen());
-                              } else {}
+                              } else if (index == 8) {
+                                Get.to(() => ManageAddressScreen());
+                              }
                             },
                           );
                         },
@@ -348,27 +348,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               case "Manage Account":
                                 Get.to(() => ManageAccountScreen());
                                 break;
-                              case "Manage Address":
-                                Get.to(() => ManageAddressScreen());
+                              // case "Manage Address":
+                              //   Get.to(() => ManageAddressScreen());
+                              //   break;
                               case "FAQs":
                                 Get.to(() => FaqScreen());
                                 break;
-                              case "Privacy Policy":
-                                controller.openUrl(AppURLs.PRIVACY_POLICY);
-                                break;
-                              case "Terms & Condition":
-                                controller
-                                    .openUrl(AppURLs.TERMS_AND_CONDITIONS);
-                                break;
-                              case "Contact Us":
-                                controller.openUrl(AppURLs.CONTACT_US);
-                                break;
-                              case "Log Out":
-                                controller.confirmLogout();
-                                break;
-                              case "Delete\nAccount":
-                                controller.deleteAccount();
-                                break;
+                              // case "Privacy Policy":
+                              //   controller.openUrl(AppURLs.PRIVACY_POLICY);
+                              //   break;
+                              // case "Terms & Condition":
+                              //   controller.openUrl(AppURLs.TERMS_AND_CONDITIONS);
+                              //   break;
+                              // case "Contact Us":
+                              //   controller.openUrl(AppURLs.CONTACT_US);
+                              //   break;
+                              // case "Log Out":
+                              //   controller.confirmLogout();
+                              //   break;
+                              // case "Delete\nAccount":
+                              //   controller.deleteAccount();
+                              //   break;
 
                               default:
                             }
@@ -381,6 +381,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
+    );
+  }
+
+  PreferredSizeWidget _profileAppBar() {
+    return CustomAppBar(
+      title: AppStrings.profile_title,
+      showBack: false,
+      actions: isLoggedIn
+          ? [
+              PopupMenuButton<String>(
+                icon: const Icon(
+                  Icons.more_vert,
+                  color: AppColors.white,
+                ),
+                offset: const Offset(0, 45),
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                onSelected: (value) {
+                  if (value == "contactus") {
+                    controller.openUrl(AppURLs.CONTACT_US);
+                  } else if (value == "privacypolicy") {
+                    controller.openUrl(AppURLs.PRIVACY_POLICY);
+                  } else if (value == "termsandconditions") {
+                    controller.openUrl(AppURLs.TERMS_AND_CONDITIONS);
+                  } else if (value == "delete") {
+                    controller.deleteAccount();
+                  } else if (value == "logout") {
+                    controller.confirmLogout();
+                  }
+                },
+                itemBuilder: (context) => [
+                  _menuItem(
+                      value: "contactus",
+                      title: "Contact Us",
+                      icon: Icons.call),
+                  _menuItem(
+                      value: "privacypolicy",
+                      title: "Privacy Policy",
+                      icon: Icons.privacy_tip),
+                  _menuItem(
+                      value: "termsandconditions",
+                      title: "Terms & Conditions",
+                      icon: Icons.description),
+                  _menuItem(
+                      value: "delete",
+                      title: "Delete Account",
+                      icon: Icons.delete),
+                  _menuItem(
+                      value: "logout", title: "Logout", icon: Icons.logout),
+                ],
+              ),
+            ]
+          : [],
+    );
+  }
+
+  PopupMenuItem<String> _menuItem({
+    required String value,
+    required String title,
+    required IconData icon,
+    Color? bgColor,
+  }) {
+    return PopupMenuItem<String>(
+      value: value,
+      padding: EdgeInsets.only(left: 10.w, right: 5.w, top: 5.h, bottom: 5.h),
+      child: Row(
+        children: [
+          Container(
+            width: 15.w,
+            height: 15.h,
+            decoration: BoxDecoration(
+              color: bgColor,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              size: 18.sp,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          SizedBox(width: 8.w),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
