@@ -1,38 +1,14 @@
-## Version 1.7.0+75
+## Version 1.7.1+76
 
-- Merge pull request #412 from nabeelanasaritsaoirse/developer
-- Merge pull request #411 from nabeelanasaritsaoirse/deep
-- Merge pull request #409 from nabeelanasaritsaoirse/deep
+- Merge pull request #415 from nabeelanasaritsaoirse/deep
 - Merge branch 'main' of https://github.com/nishantitsaoirse-head/saoirseapp into deep
-- fix: change base url
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- new api added in withdrswal wallet..for status checking
-- fix: changed zip code to pin code
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- product sharing issue resolved,updated code
-- fix: double back to exit not working
-- fix: popup menu item size
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- added screen util added in profil page
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- added condition and additional options in profile screen menu botton,svg removed
-- Merge remote-tracking branch 'origin/sahir' into deep
-- Changed description logn to short and reduced spaced in product details screen
-- Merge remote-tracking branch 'origin/meganathan' into deep
-- added menu functionality in profile screen,updated ui
-- fix: android button overlap issue
-- Fixed referral code not displaying in QR popup on initial load after login
-- Merge branch 'deep' of https://github.com/nishantitsaoirse-head/saoirseapp into meganathan
-- Remove .env from tracking
-- fix: referral scanning & user name update issue
+- fix: base url
+- Merge pull request #414 from nabeelanasaritsaoirse/ci/nabeelanasaritsaoirse-patch-1-1
+- Update Flutter Android.yml
 - Merge remote-tracking branch 'origin/shadin' into deep
-- withdraw screen and withdraww controller bank name issue
+- home screen category name isue
+- fix: category screen padding issue
 - fix:
-- feat: add wallet balance validation toast on payment method selection
-- fix: changed to appToaster
-- Merge remote-tracking branch 'origin/sahir' into deep
-- pushed again
-- Implemented double back press to exit with safety toast on Dashboard
-- Remove .env from tracking
-- Remove .env from tracking
-- resolved loading issue in pendingtransaction screen
+- fix: withdrawal status check issue
+- fix: changed base url, ios automated line, cart screen alignment
+- cart alignment issue done
