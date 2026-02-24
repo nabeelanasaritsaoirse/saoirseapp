@@ -1,4 +1,5 @@
-## Version 1.7.2+77
+## Version 1.7.3+78
 
-- Merge pull request #417 from nabeelanasaritsaoirse/ci/nabeelanasaritsaoirse-patch-1-1
+- Merge pull request #419 from nabeelanasaritsaoirse/ci/nabeelanasaritsaoirse-patch-1-1
+- Rename android/fastlane/metadata/regions.txt to fastlane/metadata/regions.txt
 - Update Flutter Android.yml
