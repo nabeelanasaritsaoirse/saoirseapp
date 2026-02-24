@@ -58,6 +58,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     Obx(() {
                       final user = controller.profile.value?.user;
                       final localImage = controller.profileImage.value;
+                      final isMarked = controller.isImageMarkedForDeletion.value;
                       return Container(
                         width: 120.w,
                         height: 120.w,
@@ -72,8 +73,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   fit: BoxFit.cover,
                                   width: 120.w,
                                   height: 120.w,
-                                )
-                              : (user?.profilePicture.isNotEmpty ?? false
+                                ): isMarked
+              ? Image.asset(
+                  AppAssets.user_img,
+                  fit: BoxFit.cover,
+                  width: 120.w,
+                  height: 120.w,
+                )
+              :(user?.profilePicture.isNotEmpty ?? false
                                   ? Image.network(
                                       user!.profilePicture,
                                       fit: BoxFit.cover,
@@ -149,7 +156,56 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ),
 
-              SizedBox(height: 40.h),
+              SizedBox(height: 30.h),
+
+// REMOVE IMAGE BUTTON
+Center(
+  child: Obx(() {
+    final user = controller.profile.value?.user;
+    final hasImage =
+        (user?.profilePicture.isNotEmpty ?? false);
+
+    if (!hasImage ||
+        controller.isImageMarkedForDeletion.value) {
+      return const SizedBox.shrink();
+    }
+
+    return GestureDetector(
+      onTap: controller.isLoading.value
+          ? null
+          : () {
+              controller.removeProfileImage();
+            },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.red, width: 1.w),
+          borderRadius: BorderRadius.circular(6.r),
+          color: Colors.transparent,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.delete_outline,
+              color: AppColors.red,
+              size: 16.sp,
+            ),
+            SizedBox(width: 6.w),
+            appText(
+              "Remove Image",
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.red,
+            ),
+          ],
+        ),
+      ),
+    );
+  }),
+),
+
+SizedBox(height: 20.h),
 
               // Full Name
               Padding(
