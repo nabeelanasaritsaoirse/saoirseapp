@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../services/address_service.dart';
@@ -98,21 +99,67 @@ class ManageAddressController extends GetxController {
   }
 
   // ---------------- DELETE ADDRESS ----------------
+  // Future<bool> deleteAddress(String addressId) async {
+  //   try {
+  //     isLoading.value = true;
+
+  //     final success = await AddressService.deleteAddress(addressId: addressId);
+
+  //     if (success) {
+  //       addressList.removeWhere((a) => a.id == addressId);
+  //       return true;
+  //     }
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  //   return false;
+  // }
+
   Future<bool> deleteAddress(String addressId) async {
-    try {
-      isLoading.value = true;
+  try {
+    isLoading.value = true;
 
-      final success = await AddressService.deleteAddress(addressId: addressId);
+    /// 🔍 CHECK IF DELETED ADDRESS IS DEFAULT
+    final deletedAddress = addressList
+        .firstWhereOrNull((element) => element.id == addressId);
 
-      if (success) {
-        addressList.removeWhere((a) => a.id == addressId);
-        return true;
+    final wasDefault = deletedAddress?.isDefault ?? false;
+
+    final success = await AddressService.deleteAddress(
+      addressId: addressId,
+    );
+
+    if (success) {
+
+      /// REMOVE FROM LOCAL LIST
+      addressList.removeWhere((a) => a.id == addressId);
+
+      /// 🚨 IF DEFAULT ADDRESS DELETED
+      if (wasDefault && addressList.isNotEmpty) {
+
+        /// MAKE FIRST ADDRESS DEFAULT
+        await editAddress(
+          addressId: addressList.first.id,
+          body: {
+            "isDefault": true,
+          },
+        );
+
+        /// 🔥 REFRESH UI
+        await fetchAddresses();
       }
-    } finally {
-      isLoading.value = false;
+
+      return true;
     }
-    return false;
+
+  } catch (e) {
+    debugPrint("Delete Address Error: $e");
+  } finally {
+    isLoading.value = false;
   }
+
+  return false;
+}
 
   // ---------------- REFRESH ----------------
   Future<void> refreshAddresses() async {

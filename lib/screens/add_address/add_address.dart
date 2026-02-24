@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/app_toast.dart';
 
 import '../../constants/app_strings.dart';
 import '../../models/address_response.dart';
@@ -29,7 +30,6 @@ class _AddAddressState extends State<AddAddress> {
     super.initState();
     addAddressController = Get.find<AddAddressController>();
 
-    // ✅ PREFILL DATA
     if (widget.address != null) {
       addAddressController.setEditAddress(widget.address!);
     }
@@ -67,12 +67,12 @@ class _AddAddressState extends State<AddAddress> {
                 hintText: AppStrings.Name,
                 hintColor: AppColors.grey,
                 contentPadding:
-                    EdgeInsets.symmetric(vertical: 13.h, horizontal: 10.w),
+                    EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
                 validator: (value) =>
                     AddAddressValidation.nameValidation(name: value ?? ""),
               ),
               SizedBox(height: 10.h),
-              appText(AppStrings.StreetName,
+              appText("Address Line 1",
                   fontSize: 14.sp, fontWeight: FontWeight.w600),
               SizedBox(
                 height: 5.h,
@@ -84,9 +84,34 @@ class _AddAddressState extends State<AddAddress> {
                 textInputType: TextInputType.streetAddress,
                 hintColor: AppColors.grey,
                 contentPadding:
-                    EdgeInsets.symmetric(vertical: 13.h, horizontal: 10.w),
+                    EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
                 validator: (value) =>
                     AddAddressValidation.streetValidation(street: value ?? ""),
+              ),
+              SizedBox(height: 10.h),
+              appText("Address Line 2 (Optional)",
+                  fontSize: 14.sp, fontWeight: FontWeight.w600),
+              SizedBox(height: 5.h),
+              appTextField(
+                controller: addAddressController.addressLine2Controller,
+                textColor: AppColors.black,
+                hintText: "Address Line 2",
+                textInputType: TextInputType.streetAddress,
+                hintColor: AppColors.grey,
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
+              ),
+              SizedBox(height: 10.h),
+              appText("Landmark (Optional)",
+                  fontSize: 14.sp, fontWeight: FontWeight.w600),
+              SizedBox(height: 5.h),
+              appTextField(
+                controller: addAddressController.landmarkController,
+                textColor: AppColors.black,
+                hintText: "Landmark",
+                hintColor: AppColors.grey,
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
               ),
               SizedBox(height: 10.h),
               appText(AppStrings.City,
@@ -101,7 +126,7 @@ class _AddAddressState extends State<AddAddress> {
                 hintText: AppStrings.City,
                 hintColor: AppColors.grey,
                 contentPadding:
-                    EdgeInsets.symmetric(vertical: 13.h, horizontal: 10.w),
+                    EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
                 validator: (value) =>
                     AddAddressValidation.cityValidation(city: value ?? ""),
               ),
@@ -118,7 +143,7 @@ class _AddAddressState extends State<AddAddress> {
                 textInputType: TextInputType.text,
                 hintColor: AppColors.grey,
                 contentPadding:
-                    EdgeInsets.symmetric(vertical: 13.h, horizontal: 10.w),
+                    EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
                 validator: (value) =>
                     AddAddressValidation.stateValidation(state: value ?? ""),
               ),
@@ -141,7 +166,7 @@ class _AddAddressState extends State<AddAddress> {
                           hintText: AppStrings.Country,
                           hintColor: AppColors.grey,
                           contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.h, horizontal: 10.w),
+                              vertical: 10.h, horizontal: 10.w),
                           validator: (value) =>
                               AddAddressValidation.countryValidation(
                                   country: value ?? ""),
@@ -166,7 +191,7 @@ class _AddAddressState extends State<AddAddress> {
                           hintText: AppStrings.PinCode,
                           hintColor: AppColors.grey,
                           contentPadding: EdgeInsets.symmetric(
-                              vertical: 13.h, horizontal: 10.w),
+                              vertical: 10.h, horizontal: 10.w),
                           validator: (value) =>
                               AddAddressValidation.zipValidation(
                                   zip: value ?? ""),
@@ -180,7 +205,7 @@ class _AddAddressState extends State<AddAddress> {
               appText(AppStrings.phoneNumber,
                   fontSize: 14.sp, fontWeight: FontWeight.w600),
               SizedBox(
-                height: 5.h,
+                height: 10.h,
               ),
               appTextField(
                 controller: addAddressController.phoneController,
@@ -189,11 +214,64 @@ class _AddAddressState extends State<AddAddress> {
                 hintText: AppStrings.phoneNumber,
                 hintColor: AppColors.grey,
                 contentPadding:
-                    EdgeInsets.symmetric(vertical: 13.h, horizontal: 10.w),
+                    EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
                 validator: (value) => AddAddressValidation.phoneValidation(
                     phone: value?.trim() ?? ""),
               ),
-              SizedBox(height: 25.h),
+              SizedBox(height: 15.h),
+              appText("Address Type",
+                  fontSize: 14.sp, fontWeight: FontWeight.w600),
+              SizedBox(height: 5.h),
+              Row(
+                children: [
+                  _typeChip("home"),
+                  SizedBox(width: 10.w),
+                  _typeChip("work"),
+                  SizedBox(width: 10.w),
+                  _typeChip("other"),
+                ],
+              ),
+              SizedBox(height: 10.h),
+              Obx(() => Row(
+                    children: [
+                      // Checkbox(
+                      //   activeColor: AppColors.primaryColor,
+                      //   value: addAddressController.isDefaultAddress.value,
+                      //   onChanged: (value) {
+                      //     addAddressController.isDefaultAddress.value =
+                      //         value ?? false;
+                      //   },
+                      // ),
+                      Checkbox(
+                        activeColor: AppColors.primaryColor,
+                        value: addAddressController.isDefaultAddress.value,
+                        onChanged: (value) {
+                          /// 🚨 USER TRYING TO UNCHECK DEFAULT ADDRESS
+                          if (addAddressController.isEdit.value &&
+                              addAddressController.initialIsDefault == true &&
+                              value == false) {
+                            appToaster(
+                              error: true,
+                              content:
+                                  "At least 1 address should be set as default",
+                            );
+
+                            return; // ⛔ DON'T CHANGE VALUE
+                          }
+
+                          /// ✅ OTHERWISE ALLOW
+                          addAddressController.isDefaultAddress.value =
+                              value ?? false;
+                        },
+                      ),
+                      appText(
+                        "Save as Default",
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ],
+                  )),
+              SizedBox(height: 10.h),
               appButton(
                 buttonColor: AppColors.primaryColor,
                 onTap: () {
@@ -227,5 +305,65 @@ class _AddAddressState extends State<AddAddress> {
         ),
       ),
     );
+  }
+
+  Widget _typeChip(String type) {
+    final controller = Get.find<AddAddressController>();
+
+    IconData icon;
+    switch (type) {
+      case "home":
+        icon = Icons.home_rounded;
+        break;
+      case "work":
+        icon = Icons.work_rounded;
+        break;
+      default:
+        icon = Icons.location_on_rounded;
+    }
+
+    return Obx(() {
+      final isSelected = controller.addressType.value == type;
+
+      return GestureDetector(
+        onTap: () => controller.addressType.value = type,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+          decoration: BoxDecoration(
+            color:
+                isSelected ? AppColors.primaryColor : const Color(0xFFF5F5F5),
+            borderRadius: BorderRadius.circular(12.r),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: AppColors.primaryColor.withOpacity(0.30),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 17.sp,
+                color: isSelected ? Colors.white : Colors.grey.shade500,
+              ),
+              SizedBox(width: 6.w),
+              appText(
+                type.capitalizeFirst!,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+                color: isSelected ? Colors.white : Colors.grey.shade600,
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 }

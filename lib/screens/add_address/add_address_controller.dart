@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -16,9 +18,34 @@ class AddAddressController extends GetxController {
   TextEditingController pinController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
+  TextEditingController addressLine2Controller = TextEditingController();
+  TextEditingController landmarkController = TextEditingController();
+  RxString addressType = "home".obs;
+  RxBool isDefaultAddress = false.obs;
+  bool initialIsDefault = false;
+
   RxBool isLoading = false.obs;
   RxBool isEdit = false.obs;
   String? addressId;
+
+  // void setEditAddress(Address address) {
+  //   isEdit.value = true;
+  //   addressId = address.id;
+
+  //   nameController.text = address.name;
+  //   streetNameController.text = address.addressLine1;
+  //   cityController.text = address.city;
+  //   stateController.text = address.state;
+  //   countryController.text = address.country;
+  //   pinController.text = address.pincode;
+  //   phoneController.text = address.phoneNumber;
+  // }
+
+  @override
+  void onInit() {
+    super.onInit();
+    countryController.text = "India";
+  }
 
   void setEditAddress(Address address) {
     isEdit.value = true;
@@ -26,103 +53,60 @@ class AddAddressController extends GetxController {
 
     nameController.text = address.name;
     streetNameController.text = address.addressLine1;
+    addressLine2Controller.text = address.addressLine2;
+    landmarkController.text = address.landmark;
     cityController.text = address.city;
     stateController.text = address.state;
-    countryController.text = address.country;
+    countryController.text =
+        address.country.isEmpty ? "India" : address.country;
     pinController.text = address.pincode;
     phoneController.text = address.phoneNumber;
+
+    addressType.value = address.addressType ?? "home";
+
+    
+    isDefaultAddress.value = address.isDefault ?? false;
+
+    initialIsDefault = address.isDefault ?? false;
   }
 
-  // Future<void> saveAddress() async {
-  //   isLoading.value = true;
-
-  //   final body = {
-  //     "name": nameController.text.trim(),
-  //     "addressLine1": streetNameController.text.trim(),
-  //     "city": cityController.text.trim(),
-  //     "state": stateController.text.trim(),
-  //     "country": countryController.text.trim(),
-  //     "pincode": zipController.text.trim(),
-  //     "phoneNumber": phoneController.text.trim(),
-  //     "isDefault": true,
-  //   };
-
-  //   try {
-  //     // ✅ SAFE CONTROLLER ACCESS (THIS FIXES THE ERROR)
-  //     final ManageAddressController manageController =
-  //         Get.isRegistered<ManageAddressController>()
-  //             ? Get.find<ManageAddressController>()
-  //             : Get.put(ManageAddressController());
-  //     final SelectAddressController selectAddressController =
-  //         Get.isRegistered<SelectAddressController>()
-  //             ? Get.find<SelectAddressController>()
-  //             : Get.put(SelectAddressController());
-
-  //     bool success;
-
-  //     // ---------- EDIT ----------
-  //     if (isEdit.value && addressId != null) {
-  //       success = await manageController.editAddress(
-  //         addressId: addressId!,
-  //         body: body,
-  //       );
-  //       await manageController.fetchAddresses();
-  //     }
-  //     // ---------- ADD ----------
-  //     else {
-  //       success = await manageController.addAddress(body);
-  //       await selectAddressController.fetchAddresses();
-  //     }
-
-  //     if (success) {
-  //       appToast(
-  //         title: "Success",
-  //         content: isEdit.value
-  //             ? "Address updated successfully"
-  //             : "Address added successfully",
-  //       );
-
-  //       clearForm();
-  //       Get.back();
-  //     } else {
-  //       appToast(
-  //         error: true,
-  //         title: "Error",
-  //         content: isEdit.value
-  //             ? "Failed to update address"
-  //             : "Failed to add address",
-  //       );
-  //     }
-  //   } catch (e) {
-  //     appToast(
-  //       error: true,
-  //       title: "Error",
-  //       content: "Something went wrong",
-  //     );
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
+  
 
   Future<void> saveAddress() async {
-    // 🔒 PREVENT MULTIPLE CALLS
+   
     if (isLoading.value) {
       debugPrint("⛔ Save address already in progress");
       return;
     }
 
+    
+
     isLoading.value = true;
+   
+   
+    
 
     final body = {
       "name": nameController.text.trim(),
       "addressLine1": streetNameController.text.trim(),
+      "addressLine2": addressLine2Controller.text.trim().isEmpty
+          ? ""
+          : addressLine2Controller.text.trim(),
       "city": cityController.text.trim(),
       "state": stateController.text.trim(),
-      "country": countryController.text.trim(),
+      "country": countryController.text.trim().isEmpty
+          ? "India"
+          : countryController.text.trim(),
       "pincode": pinController.text.trim(),
       "phoneNumber": phoneController.text.trim(),
-      "isDefault": true,
+      "landmark": landmarkController.text.trim().isEmpty
+          ? ""
+          : landmarkController.text.trim(),
+      "addressType": addressType.value,
+      "isDefault": isDefaultAddress.value,
     };
+
+   
 
     try {
       final ManageAddressController manageController =
@@ -181,15 +165,32 @@ class AddAddressController extends GetxController {
     }
   }
 
+  // void clearForm() {
+  //   nameController.clear();
+  //   streetNameController.clear();
+  //   cityController.clear();
+  //   stateController.clear();
+  //   countryController.clear();
+  //   pinController.clear();
+  //   phoneController.clear();
+
+  //   isEdit.value = false;
+  //   addressId = null;
+  // }
+
   void clearForm() {
     nameController.clear();
     streetNameController.clear();
+    addressLine2Controller.clear();
+    landmarkController.clear();
     cityController.clear();
     stateController.clear();
-    countryController.clear();
     pinController.clear();
     phoneController.clear();
 
+    countryController.text = "India"; // ✅ DEFAULT INDIA AGAIN
+    addressType.value = "home";
+    isDefaultAddress.value = false;
     isEdit.value = false;
     addressId = null;
   }
