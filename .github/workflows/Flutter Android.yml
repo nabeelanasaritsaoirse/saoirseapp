@@ -271,7 +271,6 @@ jobs:
           PACKAGE_NAME: ${{ secrets.PACKAGE_NAME }}
         run: |
           echo "$JSON_KEY" > service_account.json
-          cd android
           fastlane supply \
             --aab app-release.aab \
             --json_key service_account.json \
