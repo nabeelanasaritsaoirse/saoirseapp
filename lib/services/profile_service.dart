@@ -42,7 +42,7 @@ class ProfileService {
   Future<bool> updateProfilePicture(String userId, String imagePath) async {
     try {
       final token = storage.read(AppConst.ACCESS_TOKEN); // FETCH DYNAMICALLY
-      final url = "${AppURLs.BASE_API}api/users/$userId/profile-picture";
+      final url = "${AppURLs.PROFILE_UPDATE_API}$userId/profile-picture";
 
       // ---- FORCE NEW FILE NAME WITH .jpg ----
       final originalFile = File(imagePath);
