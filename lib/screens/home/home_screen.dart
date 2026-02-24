@@ -371,7 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisCount: 4,
                     mainAxisSpacing: 12.h,
                     crossAxisSpacing: 12.w,
-                    childAspectRatio: 0.78,
+                    childAspectRatio: 0.75.sp,
                   ),
                   itemBuilder: (context, index) {
                     // VIEW ALL
@@ -900,18 +900,26 @@ class _CategoryItem extends StatelessWidget {
   }
 }
 
-String twoLineName(String text, {int perLine = 6}) {
-  final clean = text.trim();
+String twoLineName(String text, {int secondLineMax = 8}) {
+  final words = text.trim().split(" ");
 
-  if (clean.length <= perLine) {
-    return clean;
+  if (words.isEmpty) return "";
+
+  final firstWord = words[0];
+
+  // No second word
+  if (words.length == 1) {
+    return firstWord;
   }
 
-  if (clean.length <= perLine * 2) {
-    return "${clean.substring(0, perLine)}\n${clean.substring(perLine)}";
+  String secondWord = words[1];
+
+  // Trim second word if too long
+  if (secondWord.length > secondLineMax) {
+    secondWord = "${secondWord.substring(0, secondLineMax)}...";
   }
 
-  return "${clean.substring(0, perLine)}\n${clean.substring(perLine, perLine * 2)}...";
+  return "$firstWord\n$secondWord";
 }
 
 // ignore: unused_element
@@ -952,16 +960,24 @@ class _ViewAllCategory extends StatelessWidget {
   }
 }
 
-String formatTwoLineName(String text) {
-  final clean = text.trim();
+String formatTwoLineName(String text, {int secondLineLimit = 8}) {
+  final words = text.trim().split(RegExp(r'\s+'));
 
-  if (clean.length <= 7) {
-    return clean;
+  // No words
+  if (words.isEmpty) return "";
+
+  // Only one word
+  if (words.length == 1) {
+    return words.first;
   }
 
-  if (clean.length <= 10) {
-    return "${clean.substring(0, 7)}\n${clean.substring(7)}";
+  final firstWord = words[0];
+  String secondWord = words[1];
+
+  // Trim second word if long
+  if (secondWord.length > secondLineLimit) {
+    secondWord = "${secondWord.substring(0, secondLineLimit)}...";
   }
 
-  return "${clean.substring(0, 7)}\n${clean.substring(7, 10)}...";
+  return "$firstWord\n$secondWord";
 }
