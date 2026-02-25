@@ -13,6 +13,7 @@ import '../../constants/app_urls.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_toast.dart';
+import '../dashboard/dashboard_screen.dart';
 import '../otp/otp_screen.dart';
 import '../refferal/qr_scanner.dart';
 import '/constants/app_colors.dart';
@@ -70,7 +71,23 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 30.h),
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: InkWell(
+                          onTap: () {
+                            Get.offAll(() => DashboardScreen());
+                            // Get.back();
+                          },
+                          child: appText(
+                            AppStrings.skip,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primaryColor,
+                            fontSize: 13.sp,
+                            fontFamily: "Poppins",
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15.h),
                       appText(
                         AppStrings.login_title,
                         fontWeight: FontWeight.w600,

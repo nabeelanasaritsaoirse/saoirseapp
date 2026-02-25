@@ -158,760 +158,817 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             title: AppStrings.order_details,
             showBack: true,
           ),
-          body: SingleChildScrollView(
-              child: Padding(
-            padding: EdgeInsets.all(10.0.w),
-            child: Column(
-              spacing: 10.h,
-              children: [
-                // -------------------- ADDRESS SECTION -----------------------
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(15.w),
-                  decoration: BoxDecoration(
-                      color: AppColors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.shadowColor,
-                          blurRadius: 6.r,
-                          offset: Offset(0, 2),
-                        )
-                      ],
-                      borderRadius: BorderRadius.circular(8.r)),
-                  child: Obx(() {
-                    final address =
-                        orderController.orderPreview.value?.deliveryAddress;
-
-                    return Column(
-                      spacing: 5.h,
+          body: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.all(10.w),
+                    child: Column(
+                      spacing: 10.h,
                       children: [
-                        // ---------------- NAME ----------------
-                        Row(
-                          spacing: 15.w,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 15.w, vertical: 4.h),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: AppColors.grey),
-                                borderRadius: BorderRadius.circular(4.r),
-                              ),
-                              child: appText(
-                                AppStrings.address,
-                                fontSize: 11.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
+                        // -------------------- ADDRESS SECTION -----------------------
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(15.w),
+                          decoration: BoxDecoration(
+                              color: AppColors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.shadowColor,
+                                  blurRadius: 6.r,
+                                  offset: Offset(0, 2),
+                                )
+                              ],
+                              borderRadius: BorderRadius.circular(8.r)),
+                          child: Obx(() {
+                            final address = orderController
+                                .orderPreview.value?.deliveryAddress;
+
+                            return Column(
+                              spacing: 5.h,
+                              children: [
+                                // ---------------- NAME ----------------
+                                Row(
+                                  spacing: 15.w,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 15.w, vertical: 4.h),
+                                      decoration: BoxDecoration(
+                                        border:
+                                            Border.all(color: AppColors.grey),
+                                        borderRadius:
+                                            BorderRadius.circular(4.r),
+                                      ),
+                                      child: appText(
+                                        AppStrings.address,
+                                        fontSize: 11.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    appText(
+                                      address?.name ?? '',
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ],
+                                ),
+
+                                // ---------------- ADDRESS DETAILS ----------------
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        spacing: 2.h,
+                                        children: [
+                                          // Address line
+                                          appText(
+                                            address?.addressLine1 ?? '',
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w600,
+                                            textAlign: TextAlign.left,
+                                            softWrap: true,
+                                            maxLines: null,
+                                          ),
+
+                                          if (address?.addressLine2 != null &&
+                                              address!.addressLine2!
+                                                  .trim()
+                                                  .isNotEmpty)
+                                            appText(
+                                              address.addressLine2!,
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+
+                                          if (address?.landmark != null &&
+                                              address!.landmark!
+                                                  .trim()
+                                                  .isNotEmpty)
+                                            appText(
+                                              address.landmark!,
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+
+                                          // City + Pincode
+                                          Row(
+                                            spacing: 5.w,
+                                            children: [
+                                              appText(
+                                                address?.city != null
+                                                    ? "${address!.city},"
+                                                    : '',
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w600,
+                                                height: 1.3.h,
+                                              ),
+                                              appText(
+                                                address?.pincode ?? '',
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w600,
+                                                height: 1.3.h,
+                                              ),
+                                            ],
+                                          ),
+
+                                          // Country
+                                          appText(
+                                            address?.country ?? '',
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w600,
+                                            height: 1.3.h,
+                                          ),
+
+                                          // Phone
+                                          Row(
+                                            children: [
+                                              appText(
+                                                AppStrings.phone,
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColors.grey,
+                                              ),
+                                              SizedBox(width: 4.w),
+                                              appText(
+                                                address?.phoneNumber ?? '',
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    // ---------------- CHANGE BUTTON ----------------
+                                    Column(
+                                      children: [
+                                        appButton(
+                                          width: 75.w,
+                                          height: 27.h,
+                                          onTap: () {
+                                            Get.back();
+                                          },
+                                          padding: EdgeInsets.zero,
+                                          buttonColor: AppColors.primaryColor,
+                                          borderRadius:
+                                              BorderRadius.circular(8.r),
+                                          child: Center(
+                                            child: appText(
+                                              AppStrings.change,
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          }),
+                        ),
+
+                        // -------------------- PRODUCT DETAILS -----------------------
+                        Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(15.w),
+                            constraints: BoxConstraints(
+                              minHeight: 130.h,
                             ),
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.shadowColor,
+                                  blurRadius: 6.r,
+                                  offset: Offset(0, 2),
+                                )
+                              ],
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: Obx(() {
+                              final preview =
+                                  orderController.orderPreview.value;
+                              final product = preview?.product;
+                              return Column(
+                                spacing: 6.h,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  appText(
+                                    AppStrings.item,
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+
+                                  // MAIN PRODUCT BOX
+                                  Container(
+                                    width: double.infinity,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 15.w, vertical: 5.h),
+                                    constraints:
+                                        BoxConstraints(minHeight: 80.h),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      border: Border.all(color: AppColors.grey),
+                                    ),
+                                    child: Row(
+                                      spacing: 15.w,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // ----------- PRODUCT IMAGE --------------
+                                        SizedBox(
+                                          width: 55.w,
+                                          height: 55.h,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8.r),
+                                            child: Image.network(
+                                              product?.images.isNotEmpty == true
+                                                  ? product!.images.first.url
+                                                  : '',
+                                              width: 55.w,
+                                              height: 55.h,
+                                              fit: BoxFit.contain,
+                                              loadingBuilder: (context, child,
+                                                  loadingProgress) {
+                                                if (loadingProgress == null) {
+                                                  return child;
+                                                }
+                                                return Center(
+                                                  child:
+                                                      CupertinoActivityIndicator(
+                                                    radius: 10.0,
+                                                    color: AppColors.textGray,
+                                                  ),
+                                                );
+                                              },
+                                              errorBuilder: (_, __, ___) =>
+                                                  Container(
+                                                color: Colors.grey.shade200,
+                                                child: Icon(Icons.broken_image,
+                                                    size: 28.sp),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+
+                                        // ----------- PRODUCT DETAILS --------------
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // NAME + QTY
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: appText(
+                                                      product?.name ?? '',
+                                                      fontSize: 12.sp,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      textAlign: TextAlign.left,
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  // appText(
+                                                  //   "${AppStrings.qty} ${quantity ?? 1}",
+                                                  //   fontSize: 13.sp,
+                                                  //   fontWeight: FontWeight.w700,
+                                                  // ),
+                                                ],
+                                              ),
+
+                                              // ----------- VARIANT (COLOR / SIZE) --------------
+                                              if (product?.variant.variantId
+                                                      .isNotEmpty ==
+                                                  true)
+                                                appText(
+                                                  "Variant: ${product!.variant.variantId}",
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+
+                                              // ----------- PRICE --------------
+                                              appText(
+                                                "₹ ${preview?.pricing.finalProductPrice ?? 0}",
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+
+                                              // ----------- PLAN (Daily Amount / Days) ----------
+                                              Obx(() {
+                                                return appText(
+                                                  "Plan - ₹${orderController.selectedAmount.value} / ${orderController.selectedDays.value} Days",
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                );
+                                              }),
+
+                                              SizedBox(height: 2.h),
+                                              // ----------- QUANTITY SELECTOR ----------
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Obx(() {
+                                                    return Row(
+                                                      children: [
+                                                        // MINUS BUTTON
+                                                        GestureDetector(
+                                                          onTap: () =>
+                                                              orderController
+                                                                  .decreaseQty(),
+                                                          child: Container(
+                                                            width: 22.w,
+                                                            height: 22.w,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          6.r),
+                                                              border: Border.all(
+                                                                  color:
+                                                                      AppColors
+                                                                          .grey),
+                                                            ),
+                                                            child: Icon(
+                                                                Icons.remove,
+                                                                size: 15.sp,
+                                                                color: AppColors
+                                                                    .textBlack),
+                                                          ),
+                                                        ),
+
+                                                        SizedBox(width: 10.w),
+
+                                                        // QUANTITY TEXT
+                                                        Container(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      9.w,
+                                                                  vertical:
+                                                                      4.h),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        6.r),
+                                                            border: Border.all(
+                                                                color: AppColors
+                                                                    .grey),
+                                                          ),
+                                                          child: appText(
+                                                            "${orderController.quantity.value}",
+                                                            fontSize: 10.sp,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                          ),
+                                                        ),
+
+                                                        SizedBox(width: 10.w),
+
+                                                        // PLUS BUTTON
+                                                        GestureDetector(
+                                                          onTap: () =>
+                                                              orderController
+                                                                  .increaseQty(),
+                                                          child: Container(
+                                                            width: 22.w,
+                                                            height: 22.w,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          6.r),
+                                                              border: Border.all(
+                                                                  color:
+                                                                      AppColors
+                                                                          .grey),
+                                                            ),
+                                                            child: Icon(
+                                                                Icons.add,
+                                                                size: 15.sp,
+                                                                color: AppColors
+                                                                    .textBlack),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  }),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              );
+                            })),
+
+                        // -------------------- PRODUCT DETAILS -----------------------
+
+                        // // -------------------- COUPON SECTION -----------------------
+                        Column(
+                          spacing: 10.h,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             appText(
-                              address?.name ?? '',
+                              AppStrings.apply_coupen,
                               fontSize: 13.sp,
                               fontWeight: FontWeight.w700,
                             ),
-                          ],
-                        ),
-
-                        // ---------------- ADDRESS DETAILS ----------------
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(15.w),
+                              constraints: BoxConstraints(
+                                minHeight: 65.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.shadowColor,
+                                    blurRadius: 6.r,
+                                    offset: Offset(0, 2),
+                                  )
+                                ],
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
                               child: Column(
+                                spacing: 10.h,
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                spacing: 2.h,
                                 children: [
-                                  // Address line
-                                  appText(
-                                    address?.addressLine1 ?? '',
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w600,
-                                    textAlign: TextAlign.left,
-                                    softWrap: true,
-                                    maxLines: null,
-                                  ),
-
-                                  if (address?.addressLine2 != null &&
-                                      address!.addressLine2!.trim().isNotEmpty)
-                                    appText(
-                                      address.addressLine2!,
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-
-                                  if (address?.landmark != null &&
-                                      address!.landmark!.trim().isNotEmpty)
-                                    appText(
-                                      address.landmark!,
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-
-                                  // City + Pincode
                                   Row(
-                                    spacing: 5.w,
+                                    spacing: 10.w,
                                     children: [
-                                      appText(
-                                        address?.city != null
-                                            ? "${address!.city},"
-                                            : '',
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w600,
-                                        height: 1.3.h,
+                                      SizedBox(
+                                        width: 180.w,
+                                        child: appTextField(
+                                          borderRadius:
+                                              BorderRadius.circular(15.w),
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 8.h, horizontal: 8.w),
+                                          controller: couponController,
+                                          hintText: AppStrings.coupen_hint,
+                                          hintSize: 13.sp,
+                                          textColor: AppColors.textBlack,
+                                          hintColor: AppColors.grey,
+                                        ),
                                       ),
-                                      appText(
-                                        address?.pincode ?? '',
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w600,
-                                        height: 1.3.h,
-                                      ),
+                                      appButton(
+                                          onTap: () {
+                                            //added coupon edit
+                                            orderController.applyCouponApi(
+                                              couponCode:
+                                                  couponController.text.trim(),
+                                              productId: widget.product!.id,
+                                              totalDays: orderController
+                                                  .selectedDays.value,
+                                              dailyAmount: orderController
+                                                  .selectedAmount.value,
+                                              variantId:
+                                                  widget.selectVarientId ?? "",
+                                              quantity: 1,
+                                            );
+                                          },
+                                          width: 90.w,
+                                          height: 35.h,
+                                          buttonColor: AppColors.primaryColor,
+                                          padding: EdgeInsets.all(0.w),
+                                          child: Center(
+                                            child: appText(AppStrings.apply,
+                                                fontSize: 13.sp,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColors.white),
+                                          )),
                                     ],
                                   ),
+                                  // Added this for Coupon edit---------------------------------------
+                                  Obx(() {
+                                    if (orderController.coupons.isEmpty) {
+                                      return SizedBox.shrink();
+                                    }
 
-                                  // Country
-                                  appText(
-                                    address?.country ?? '',
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.3.h,
-                                  ),
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        appText(
+                                          "Available Coupons",
+                                          fontSize: 13.sp,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                        SizedBox(height: 8.h),
+                                        Wrap(
+                                          spacing: 12.w,
+                                          runSpacing: 8.h,
+                                          children: orderController.coupons
+                                              .map((coupon) {
+                                            return GestureDetector(
+                                              onTap: () {
+                                                orderController.selectCoupon(
+                                                    coupon, couponController);
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 15.w,
+                                                    vertical: 8.h),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: AppColors.grey,
+                                                      width: 1.w),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          5.r),
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  spacing: 4.h,
+                                                  children: [
+                                                    appText(
+                                                      coupon.couponCode,
+                                                      fontSize: 13.sp,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                    appText(
+                                                      "Min : ₹${coupon.minOrderValue.toStringAsFixed(0)}",
+                                                      fontSize: 11.sp,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: AppColors.grey,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                        //---------------------IF USER APPLIED COUPON THIS DATA WILL APPEAR IN THE SCREEN------------------------------------------//
+                                        Obx(() {
+                                          final preview = orderController
+                                              .orderPreview.value;
 
-                                  // Phone
-                                  Row(
-                                    children: [
-                                      appText(
-                                        AppStrings.phone,
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.grey,
-                                      ),
-                                      SizedBox(width: 4.w),
-                                      appText(
-                                        address?.phoneNumber ?? '',
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ],
-                                  ),
+                                          if (preview == null ||
+                                              preview.coupon == null) {
+                                            return const SizedBox.shrink();
+                                          }
+
+                                          // Pricing info
+                                          final coupon = preview.coupon!;
+                                          final pricing = preview.pricing;
+                                          final ins = preview.installment;
+                                          final benefits = coupon.benefits;
+
+                                          return Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(height: 10.h),
+
+                                              // Savings message (short)
+                                              if (benefits
+                                                  .savingsMessage.isNotEmpty)
+                                                Container(
+                                                  width: double.infinity,
+                                                  alignment: Alignment.center,
+                                                  child: appText(
+                                                    benefits.savingsMessage,
+                                                    fontSize: 13.sp,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: AppColors.green,
+                                                  ),
+                                                ),
+
+                                              SizedBox(height: 6.h),
+
+                                              // How it works (longer explanation)
+                                              if (benefits
+                                                  .howItWorksMessage.isNotEmpty)
+                                                appText(
+                                                    benefits.howItWorksMessage,
+                                                    fontSize: 12.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppColors.textBlack),
+
+                                              SizedBox(height: 10.h),
+
+                                              // Price details from server (use your buildPriceInfo helper)
+                                              buildPriceInfo(
+                                                  label: "Original Price",
+                                                  content:
+                                                      "₹ ${pricing.originalPrice.toStringAsFixed(0)}"),
+                                              buildPriceInfo(
+                                                  label: "Discount",
+                                                  content:
+                                                      "- ₹ ${pricing.couponDiscount.toStringAsFixed(0)}"),
+                                              buildPriceInfo(
+                                                  label: "Final Price",
+                                                  content:
+                                                      "₹ ${pricing.finalProductPrice.toStringAsFixed(0)}"),
+
+                                              // Installment details
+                                              buildPriceInfo(
+                                                  label: "Installment Days",
+                                                  content: "${ins.totalDays}"),
+                                              buildPriceInfo(
+                                                  label: "Daily Amount",
+                                                  content:
+                                                      "₹ ${ins.dailyAmount.toStringAsFixed(0)}"),
+                                              if (ins.freeDays > 0)
+                                                buildPriceInfo(
+                                                    label: "Free Days",
+                                                    content: "${ins.freeDays}"),
+                                              // if (ins.reducedDays != null)
+                                              buildPriceInfo(
+                                                  label: "Reduced Days",
+                                                  content:
+                                                      "${ins.reducedDays}"),
+
+                                              SizedBox(height: 8.h),
+
+                                              // Small label showing coupon type & applied code
+                                              appText(
+                                                  "Applied Coupon: ${orderController.appliedCouponCode.value.isNotEmpty ? orderController.appliedCouponCode.value : couponController.text.trim()}",
+                                                  fontSize: 11.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: AppColors.grey),
+                                            ],
+                                          );
+                                        }),
+                                        Obx(() {
+                                          final preview = orderController
+                                              .orderPreview.value;
+
+                                          if (preview == null ||
+                                              preview.coupon == null) {
+                                            return const SizedBox.shrink();
+                                          }
+
+                                          return Align(
+                                            alignment: Alignment.centerRight,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                orderController
+                                                    .appliedCouponCode
+                                                    .value = "";
+                                                orderController
+                                                    .fetchOrderPreview(
+                                                  productId: widget.product!.id,
+                                                  variantId:
+                                                      widget.selectVarientId ??
+                                                          "",
+                                                  quantity: orderController
+                                                      .quantity.value,
+                                                  totalDays: orderController
+                                                      .selectedDays.value,
+                                                  deliveryAddress:
+                                                      orderController
+                                                          .previewAddress,
+                                                );
+                                                couponController.clear();
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 10.w,
+                                                    vertical: 5.h),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red.shade100,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          5.r),
+                                                ),
+                                                child: appText(
+                                                  "Remove Coupon",
+                                                  color: Colors.red,
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        })
+                                      ],
+                                    );
+                                  })
                                 ],
                               ),
                             ),
-
-                            // ---------------- CHANGE BUTTON ----------------
-                            Column(
-                              children: [
-                                appButton(
-                                  width: 75.w,
-                                  height: 27.h,
-                                  onTap: () {
-                                    Get.back();
-                                  },
-                                  padding: EdgeInsets.zero,
-                                  buttonColor: AppColors.primaryColor,
-                                  borderRadius: BorderRadius.circular(8.r),
-                                  child: Center(
-                                    child: appText(
-                                      AppStrings.change,
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
                           ],
                         ),
-                      ],
-                    );
-                  }),
-                ),
+                        // -------------------- COUPON SECTION END --------------------------
 
-                // -------------------- PRODUCT DETAILS -----------------------
-                Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(15.w),
-                    constraints: BoxConstraints(
-                      minHeight: 130.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.shadowColor,
-                          blurRadius: 6.r,
-                          offset: Offset(0, 2),
-                        )
-                      ],
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Obx(() {
-                      final preview = orderController.orderPreview.value;
-                      final product = preview?.product;
-                      return Column(
-                        spacing: 6.h,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          appText(
-                            AppStrings.item,
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w700,
-                          ),
-
-                          // MAIN PRODUCT BOX
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 15.w, vertical: 5.h),
-                            constraints: BoxConstraints(minHeight: 80.h),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.r),
-                              border: Border.all(color: AppColors.grey),
-                            ),
-                            child: Row(
-                              spacing: 15.w,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // ----------- PRODUCT IMAGE --------------
-                                SizedBox(
-                                  width: 55.w,
-                                  height: 55.h,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.r),
-                                    child: Image.network(
-                                      product?.images.isNotEmpty == true
-                                          ? product!.images.first.url
-                                          : '',
-                                      width: 55.w,
-                                      height: 55.h,
-                                      fit: BoxFit.contain,
-                                      loadingBuilder:
-                                          (context, child, loadingProgress) {
-                                        if (loadingProgress == null) {
-                                          return child;
-                                        }
-                                        return Center(
-                                          child: CupertinoActivityIndicator(
-                                            radius: 10.0,
-                                            color: AppColors.textGray,
-                                          ),
-                                        );
-                                      },
-                                      errorBuilder: (_, __, ___) => Container(
-                                        color: Colors.grey.shade200,
-                                        child: Icon(Icons.broken_image,
-                                            size: 28.sp),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                // ----------- PRODUCT DETAILS --------------
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // NAME + QTY
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: appText(
-                                              product?.name ?? '',
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.w600,
-                                              textAlign: TextAlign.left,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          // appText(
-                                          //   "${AppStrings.qty} ${quantity ?? 1}",
-                                          //   fontSize: 13.sp,
-                                          //   fontWeight: FontWeight.w700,
-                                          // ),
-                                        ],
-                                      ),
-
-                                      // ----------- VARIANT (COLOR / SIZE) --------------
-                                      if (product
-                                              ?.variant.variantId.isNotEmpty ==
-                                          true)
-                                        appText(
-                                          "Variant: ${product!.variant.variantId}",
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-
-                                      // ----------- PRICE --------------
-                                      appText(
-                                        "₹ ${preview?.pricing.finalProductPrice ?? 0}",
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-
-                                      // ----------- PLAN (Daily Amount / Days) ----------
-                                      Obx(() {
-                                        return appText(
-                                          "Plan - ₹${orderController.selectedAmount.value} / ${orderController.selectedDays.value} Days",
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w600,
-                                        );
-                                      }),
-
-                                      SizedBox(height: 2.h),
-                                      // ----------- QUANTITY SELECTOR ----------
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Obx(() {
-                                            return Row(
-                                              children: [
-                                                // MINUS BUTTON
-                                                GestureDetector(
-                                                  onTap: () => orderController
-                                                      .decreaseQty(),
-                                                  child: Container(
-                                                    width: 22.w,
-                                                    height: 22.w,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              6.r),
-                                                      border: Border.all(
-                                                          color:
-                                                              AppColors.grey),
-                                                    ),
-                                                    child: Icon(Icons.remove,
-                                                        size: 15.sp,
-                                                        color: AppColors
-                                                            .textBlack),
-                                                  ),
-                                                ),
-
-                                                SizedBox(width: 10.w),
-
-                                                // QUANTITY TEXT
-                                                Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 9.w,
-                                                      vertical: 4.h),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            6.r),
-                                                    border: Border.all(
-                                                        color: AppColors.grey),
-                                                  ),
-                                                  child: appText(
-                                                    "${orderController.quantity.value}",
-                                                    fontSize: 10.sp,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-
-                                                SizedBox(width: 10.w),
-
-                                                // PLUS BUTTON
-                                                GestureDetector(
-                                                  onTap: () => orderController
-                                                      .increaseQty(),
-                                                  child: Container(
-                                                    width: 22.w,
-                                                    height: 22.w,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              6.r),
-                                                      border: Border.all(
-                                                          color:
-                                                              AppColors.grey),
-                                                    ),
-                                                    child: Icon(Icons.add,
-                                                        size: 15.sp,
-                                                        color: AppColors
-                                                            .textBlack),
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          }),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                        // -------------------- ORDER INFORMATION SECTION -----------------------
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(15.w),
+                          decoration: BoxDecoration(
+                              color: AppColors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.shadowColor,
+                                  blurRadius: 6.r,
+                                  offset: Offset(0, 2),
+                                )
                               ],
-                            ),
-                          ),
-                        ],
-                      );
-                    })),
-
-                // -------------------- PRODUCT DETAILS -----------------------
-
-                // // -------------------- COUPON SECTION -----------------------
-                Column(
-                  spacing: 10.h,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    appText(
-                      AppStrings.apply_coupen,
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(15.w),
-                      constraints: BoxConstraints(
-                        minHeight: 65.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.shadowColor,
-                            blurRadius: 6.r,
-                            offset: Offset(0, 2),
-                          )
-                        ],
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Column(
-                        spacing: 10.h,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            spacing: 10.w,
-                            children: [
-                              SizedBox(
-                                width: 180.w,
-                                child: appTextField(
-                                  borderRadius: BorderRadius.circular(15.w),
-                                  contentPadding: EdgeInsets.symmetric(
-                                      vertical: 8.h, horizontal: 8.w),
-                                  controller: couponController,
-                                  hintText: AppStrings.coupen_hint,
-                                  hintSize: 13.sp,
-                                  textColor: AppColors.textBlack,
-                                  hintColor: AppColors.grey,
-                                ),
-                              ),
-                              appButton(
-                                  onTap: () {
-                                    //added coupon edit
-                                    orderController.applyCouponApi(
-                                      couponCode: couponController.text.trim(),
-                                      productId: widget.product!.id,
-                                      totalDays:
-                                          orderController.selectedDays.value,
-                                      dailyAmount:
-                                          orderController.selectedAmount.value,
-                                      variantId: widget.selectVarientId ?? "",
-                                      quantity: 1,
-                                    );
-                                  },
-                                  width: 90.w,
-                                  height: 35.h,
-                                  buttonColor: AppColors.primaryColor,
-                                  padding: EdgeInsets.all(0.w),
-                                  child: Center(
-                                    child: appText(AppStrings.apply,
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.white),
-                                  )),
-                            ],
-                          ),
-                          // Added this for Coupon edit---------------------------------------
-                          Obx(() {
-                            if (orderController.coupons.isEmpty) {
-                              return SizedBox.shrink();
-                            }
+                              borderRadius: BorderRadius.circular(8.r)),
+                          child: Obx(() {
+                            final preview = orderController.orderPreview.value;
+                            final pricing = preview?.pricing;
+                            final installment = preview?.installment;
+                            final product = preview?.product;
 
                             return Column(
+                              spacing: 5.h,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                appText(
-                                  "Available Coupons",
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w700,
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: appText(
+                                    "Price Details",
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                                SizedBox(height: 8.h),
-                                Wrap(
-                                  spacing: 12.w,
-                                  runSpacing: 8.h,
-                                  children:
-                                      orderController.coupons.map((coupon) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        orderController.selectCoupon(
-                                            coupon, couponController);
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 15.w, vertical: 8.h),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: AppColors.grey,
-                                              width: 1.w),
-                                          borderRadius:
-                                              BorderRadius.circular(5.r),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          spacing: 4.h,
-                                          children: [
-                                            appText(
-                                              coupon.couponCode,
-                                              fontSize: 13.sp,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                            appText(
-                                              "Min : ₹${coupon.minOrderValue.toStringAsFixed(0)}",
-                                              fontSize: 11.sp,
-                                              fontWeight: FontWeight.w600,
-                                              color: AppColors.grey,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-//---------------------IF USER APPLIED COUPON THIS DATA WILL APPEAR IN THE SCREEN------------------------------------------//
-                                Obx(() {
-                                  final preview =
-                                      orderController.orderPreview.value;
 
-                                  if (preview == null ||
-                                      preview.coupon == null) {
-                                    return const SizedBox.shrink();
-                                  }
-
-                                  // Pricing info
-                                  final coupon = preview.coupon!;
-                                  final pricing = preview.pricing;
-                                  final ins = preview.installment;
-                                  final benefits = coupon.benefits;
-
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(height: 10.h),
-
-                                      // Savings message (short)
-                                      if (benefits.savingsMessage.isNotEmpty)
-                                        Container(
-                                          width: double.infinity,
-                                          alignment: Alignment.center,
-                                          child: appText(
-                                            benefits.savingsMessage,
-                                            fontSize: 13.sp,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColors.green,
-                                          ),
-                                        ),
-
-                                      SizedBox(height: 6.h),
-
-                                      // How it works (longer explanation)
-                                      if (benefits.howItWorksMessage.isNotEmpty)
-                                        appText(benefits.howItWorksMessage,
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColors.textBlack),
-
-                                      SizedBox(height: 10.h),
-
-                                      // Price details from server (use your buildPriceInfo helper)
-                                      buildPriceInfo(
-                                          label: "Original Price",
-                                          content:
-                                              "₹ ${pricing.originalPrice.toStringAsFixed(0)}"),
-                                      buildPriceInfo(
-                                          label: "Discount",
-                                          content:
-                                              "- ₹ ${pricing.couponDiscount.toStringAsFixed(0)}"),
-                                      buildPriceInfo(
-                                          label: "Final Price",
-                                          content:
-                                              "₹ ${pricing.finalProductPrice.toStringAsFixed(0)}"),
-
-                                      // Installment details
-                                      buildPriceInfo(
-                                          label: "Installment Days",
-                                          content: "${ins.totalDays}"),
-                                      buildPriceInfo(
-                                          label: "Daily Amount",
-                                          content:
-                                              "₹ ${ins.dailyAmount.toStringAsFixed(0)}"),
-                                      if (ins.freeDays > 0)
-                                        buildPriceInfo(
-                                            label: "Free Days",
-                                            content: "${ins.freeDays}"),
-                                      // if (ins.reducedDays != null)
-                                      buildPriceInfo(
-                                          label: "Reduced Days",
-                                          content: "${ins.reducedDays}"),
-
-                                      SizedBox(height: 8.h),
-
-                                      // Small label showing coupon type & applied code
-                                      appText(
-                                          "Applied Coupon: ${orderController.appliedCouponCode.value.isNotEmpty ? orderController.appliedCouponCode.value : couponController.text.trim()}",
-                                          fontSize: 11.sp,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.grey),
-                                    ],
-                                  );
-                                }),
-                                Obx(() {
-                                  final preview =
-                                      orderController.orderPreview.value;
-
-                                  if (preview == null ||
-                                      preview.coupon == null) {
-                                    return const SizedBox.shrink();
-                                  }
-
-                                  return Align(
-                                    alignment: Alignment.centerRight,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        orderController
-                                            .appliedCouponCode.value = "";
-                                        orderController.fetchOrderPreview(
-                                          productId: widget.product!.id,
-                                          variantId:
-                                              widget.selectVarientId ?? "",
-                                          quantity:
-                                              orderController.quantity.value,
-                                          totalDays: orderController
-                                              .selectedDays.value,
-                                          deliveryAddress:
-                                              orderController.previewAddress,
-                                        );
-                                        couponController.clear();
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10.w, vertical: 5.h),
-                                        decoration: BoxDecoration(
-                                          color: Colors.red.shade100,
-                                          borderRadius:
-                                              BorderRadius.circular(5.r),
-                                        ),
-                                        child: appText(
-                                          "Remove Coupon",
-                                          color: Colors.red,
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
+                                // ---------- PRICE BREAKUP (FROM PREVIEW API) ----------
+                                if (pricing != null) ...[
+                                  buildPriceInfo(
+                                    label: product?.name ?? '',
+                                    content:
+                                        "₹ ${pricing.originalPrice.toStringAsFixed(1)}",
+                                  ),
+                                  buildPriceInfo(
+                                    label: AppStrings.shipping_charge,
+                                    content: "Free",
+                                  ),
+                                  if (pricing.couponDiscount > 0)
+                                    buildPriceInfo(
+                                      label: "Discount",
+                                      content:
+                                          "- ₹ ${pricing.couponDiscount.toStringAsFixed(1)}",
                                     ),
-                                  );
-                                })
+                                  Divider(color: AppColors.grey),
+                                  buildPriceInfo(
+                                    label: AppStrings.total_amount,
+                                    content:
+                                        "₹ ${pricing.finalProductPrice.toStringAsFixed(1)}",
+                                  ),
+                                ],
+
+                                // ---------- PLAN DETAILS ----------
+                                if (installment != null)
+                                  buildPriceInfo(
+                                    label: AppStrings.your_plan,
+                                    content:
+                                        "₹${installment.dailyAmount.toStringAsFixed(1)} / ${installment.totalDays} Days",
+                                  ),
+
+                                // ---------- PAY NOW ----------
+                                if (installment != null)
+                                  buildPriceInfo(
+                                    label: AppStrings.pay_now,
+                                    content:
+                                        "₹${installment.dailyAmount.toStringAsFixed(1)}",
+                                  ),
                               ],
                             );
-                          })
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                // -------------------- COUPON SECTION END --------------------------
-
-// -------------------- ORDER INFORMATION SECTION -----------------------
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(15.w),
-                  decoration: BoxDecoration(
-                      color: AppColors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.shadowColor,
-                          blurRadius: 6.r,
-                          offset: Offset(0, 2),
-                        )
-                      ],
-                      borderRadius: BorderRadius.circular(8.r)),
-                  child: Obx(() {
-                    final preview = orderController.orderPreview.value;
-                    final pricing = preview?.pricing;
-                    final installment = preview?.installment;
-                    final product = preview?.product;
-
-                    return Column(
-                      spacing: 5.h,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: appText(
-                            "Price Details",
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          }),
                         ),
-
-                        // ---------- PRICE BREAKUP (FROM PREVIEW API) ----------
-                        if (pricing != null) ...[
-                          buildPriceInfo(
-                            label: product?.name ?? '',
-                            content:
-                                "₹ ${pricing.originalPrice.toStringAsFixed(1)}",
-                          ),
-                          buildPriceInfo(
-                            label: AppStrings.shipping_charge,
-                            content: "Free",
-                          ),
-                          if (pricing.couponDiscount > 0)
-                            buildPriceInfo(
-                              label: "Discount",
-                              content:
-                                  "- ₹ ${pricing.couponDiscount.toStringAsFixed(1)}",
-                            ),
-                          Divider(color: AppColors.grey),
-                          buildPriceInfo(
-                            label: AppStrings.total_amount,
-                            content:
-                                "₹ ${pricing.finalProductPrice.toStringAsFixed(1)}",
-                          ),
-                        ],
-
-                        // ---------- PLAN DETAILS ----------
-                        if (installment != null)
-                          buildPriceInfo(
-                            label: AppStrings.your_plan,
-                            content:
-                                "₹${installment.dailyAmount.toStringAsFixed(1)} / ${installment.totalDays} Days",
-                          ),
-
-                        // ---------- PAY NOW ----------
-                        if (installment != null)
-                          buildPriceInfo(
-                            label: AppStrings.pay_now,
-                            content:
-                                "₹${installment.dailyAmount.toStringAsFixed(1)}",
-                          ),
                       ],
-                    );
-                  }),
+                    ),
+                  ),
                 ),
-// -------------------- ORDER INFORMATION SECTION -----------------------
-
-                // -------------------- PAY NOW BUTTON SECTION -----------------------
-              ],
-            ),
-          )),
-          bottomNavigationBar: _buildBottomBar(),
+              ),
+              _buildBottomBar(),
+            ],
+          ),
         ),
         Obx(() {
           if (!orderController.isLoading.value &&
