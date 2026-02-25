@@ -161,6 +161,10 @@ class OrderDetailsController extends GetxController {
     );
   }
 
+  void updateDeliveryAddress(Map<String, dynamic> newAddress) {
+    _previewAddress = newAddress;
+  }
+
   // ------------------------- CENTRAL RECALCULATION ---------------------------
   void recalculatePricing() {
     final qty = quantity.value;

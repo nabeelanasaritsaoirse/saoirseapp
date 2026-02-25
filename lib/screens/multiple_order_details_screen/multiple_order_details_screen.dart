@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_to_list_in_spreads, deprecated_member_use
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -47,24 +48,26 @@ class _MultipleOrderDetailsScreenState
     extends State<MultipleOrderDetailsScreen> {
   final orderController = Get.find<MultipleOrderDetailsController>();
   final walletController = Get.find<MyWalletController>();
+
   @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        orderController.fetchBulkOrderPreview(
-          deliveryAddress: widget.addresses,
-        );
-      });
-      // 🔥 THIS IS MANDATORY
+    Future.microtask(() async {
+      orderController.previewData.value = null;
+
+      await Future.delayed(const Duration(milliseconds: 10));
+
+      orderController.fetchBulkOrderPreviewWithLoader(
+        deliveryAddress: widget.addresses,
+      );
+
       orderController.initProductPricing(
         finalPrice: widget.product!.pricing.finalPrice,
         dailyAmount: widget.selectedAmount,
         days: widget.selectedDays,
       );
 
-      // also sync initial quantity if passed
       if (widget.quantity != null && widget.quantity! > 1) {
         orderController.quantity.value = widget.quantity!;
         orderController.recalculatePricing();
@@ -96,7 +99,8 @@ class _MultipleOrderDetailsScreenState
                   // -------------------- ADDRESS SECTION -----------------------
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.all(15.w),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
                     decoration: BoxDecoration(
                         color: AppColors.white,
                         boxShadow: [
@@ -109,123 +113,153 @@ class _MultipleOrderDetailsScreenState
                         borderRadius: BorderRadius.circular(8.r)),
                     child: Obx(() {
                       final address = orderController.previewAddress;
+                      final isLoading = orderController.isPreviewLoading.value;
 
-                      if (address == null) {
-                        return const SizedBox.shrink();
-                      }
-
-                      return Column(
-                        spacing: 5.h,
-                        children: [
-                          Row(
-                            spacing: 15.w,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 15.w,
-                                  vertical: 4.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: AppColors.grey),
-                                  borderRadius: BorderRadius.circular(4.r),
-                                ),
-                                child: appText(
-                                  AppStrings.address,
-                                  fontSize: 11.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              appText(
-                                address.name,
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
+                      return ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: 100.h,
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            /// 🔹 ADDRESS CONTENT (dynamic height)
+                            if (address != null)
+                              Opacity(
+                                opacity: isLoading ? 0.3 : 1,
                                 child: Column(
+                                  mainAxisSize:
+                                      MainAxisSize.min, // 🔥 IMPORTANT
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  spacing: 2.h,
                                   children: [
-                                    appText(
-                                      address.addressLine1,
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w600,
-                                      textAlign: TextAlign.left,
-                                      softWrap: true,
-                                      maxLines: null,
-                                    ),
                                     Row(
-                                      spacing: 5.w,
                                       children: [
-                                        appText(
-                                          "${address.city},",
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.3.h,
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 15.w,
+                                            vertical: 4.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: AppColors.grey),
+                                            borderRadius:
+                                                BorderRadius.circular(4.r),
+                                          ),
+                                          child: appText(
+                                            AppStrings.address,
+                                            fontSize: 11.sp,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
+                                        SizedBox(width: 15.w),
                                         appText(
-                                          address.pincode,
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.3.h,
+                                          address.name,
+                                          fontSize: 13.sp,
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ],
                                     ),
-                                    appText(
-                                      address.country,
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.3.h,
-                                    ),
+                                    SizedBox(height: 5.h),
                                     Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        appText(
-                                          AppStrings.phone,
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.grey,
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize
+                                                .min, // 🔥 IMPORTANT
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              appText(
+                                                address.addressLine1,
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w600,
+                                                softWrap: true,
+                                              ),
+                                              if (address
+                                                  .addressLine2.isNotEmpty)
+                                                appText(
+                                                  address.addressLine2,
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  softWrap: true,
+                                                ),
+                                              if (address.landmark.isNotEmpty)
+                                                appText(
+                                                  address.landmark,
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  softWrap: true,
+                                                ),
+                                              Row(
+                                                children: [
+                                                  Flexible(
+                                                    child: appText(
+                                                      "${address.city}, ",
+                                                      fontSize: 12.sp,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                  appText(
+                                                    address.pincode,
+                                                    fontSize: 12.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ],
+                                              ),
+                                              appText(
+                                                address.country,
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              Row(
+                                                children: [
+                                                  appText(
+                                                    AppStrings.phone,
+                                                    fontSize: 12.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: AppColors.grey,
+                                                  ),
+                                                  appText(
+                                                    " ${address.phoneNumber}",
+                                                    fontSize: 12.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                        appText(
-                                          " ${address.phoneNumber}",
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w600,
+                                        SizedBox(width: 10.w),
+                                        appButton(
+                                          width: 75.w,
+                                          height: 27.h,
+                                          onTap: () => Get.back(),
+                                          padding: EdgeInsets.zero,
+                                          buttonColor: AppColors.primaryColor,
+                                          borderRadius:
+                                              BorderRadius.circular(8.r),
+                                          child: Center(
+                                            child: appText(
+                                              AppStrings.change,
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.white,
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ],
                                 ),
                               ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  appButton(
-                                    width: 75.w,
-                                    height: 27.h,
-                                    onTap: () {
-                                      Get.back();
-                                    },
-                                    padding: EdgeInsets.zero,
-                                    buttonColor: AppColors.primaryColor,
-                                    borderRadius: BorderRadius.circular(8.r),
-                                    child: Center(
-                                      child: appText(
-                                        AppStrings.change,
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
+
+                            /// 🔹 LOADER
+                            if (isLoading && address == null)
+                              const CupertinoActivityIndicator(),
+                          ],
+                        ),
                       );
                     }),
                   ),

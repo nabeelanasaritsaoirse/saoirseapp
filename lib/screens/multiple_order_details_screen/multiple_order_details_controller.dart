@@ -105,12 +105,12 @@ class MultipleOrderDetailsController extends GetxController {
     }
   }
 
-// ---------------- PREVIEW ITEMS ----------------
+  // ---------------- PREVIEW ITEMS ----------------
   List<PreviewItem> get previewItems {
     return previewData.value?.items ?? [];
   }
 
-// ---------------- PREVIEW ADDRESS (SAFE MAPPING) ----------------
+  // ---------------- PREVIEW ADDRESS (SAFE MAPPING) ----------------
   Address? get previewAddress {
     final data = previewData.value;
     if (data == null) return null;
@@ -118,65 +118,79 @@ class MultipleOrderDetailsController extends GetxController {
     final a = data.deliveryAddress;
 
     return Address(
-      id: "", // preview does not return id
+      id: "",
       name: a.name,
       phoneNumber: a.phoneNumber,
       addressLine1: a.addressLine1,
-      addressLine2: "", // not provided by preview
+      addressLine2: a.addressLine2 ?? "",
       city: a.city,
       state: a.state,
       pincode: a.pincode,
       country: a.country,
-      landmark: "", // optional in preview
-      isDefault: false, // preview address is not default
-      addressType: "", // HOME / WORK not sent by preview
-      createdAt: DateTime.now(), // safe fallback
-      updatedAt: DateTime.now(), // safe fallback
+      landmark: a.landmark ?? "",
+      isDefault: false,
+      addressType: "",
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
   }
 
   /* ===============================================================
      BULK ORDER PREVIEW
      =============================================================== */
-
-  Future<void> fetchBulkOrderPreview({
+  Future<void> fetchBulkOrderPreviewWithLoader({
     required Address deliveryAddress,
   }) async {
+    final oldPreview = previewData.value;
+
     isPreviewLoading.value = true;
 
     try {
       final body = {
         "items": buildBulkItems(),
-        "deliveryAddress": {
-          "name": deliveryAddress.name,
-          "phoneNumber": deliveryAddress.phoneNumber,
-          "addressLine1": deliveryAddress.addressLine1,
-          "city": deliveryAddress.city,
-          "state": deliveryAddress.state,
-          "pincode": deliveryAddress.pincode,
-          "country": deliveryAddress.country,
-        },
+        "deliveryAddress": buildDeliveryAddress(deliveryAddress),
       };
-
-      log("📤 [PREVIEW] Request: $body");
 
       final response = await OrderService.bulkOrderPreview(body);
 
       if (response == null) {
-        appToast(error: true, content: "Failed to load order preview");
+        appToast(error: true, content: "Preview failed");
+
+        previewData.value = oldPreview;
         return;
       }
 
       final preview = BulkOrderPreviewResponse.fromJson(response);
       previewData.value = preview.data;
-
-      log("📥 [PREVIEW] Loaded successfully");
     } catch (e) {
-      log("❌ [PREVIEW] Error: $e");
+      previewData.value = oldPreview;
+
       appToast(error: true, content: "Unable to load order preview");
     } finally {
       isPreviewLoading.value = false;
     }
+  }
+
+  Map<String, dynamic> buildDeliveryAddress(Address address) {
+    final map = {
+      "name": address.name,
+      "phoneNumber": address.phoneNumber,
+      "addressLine1": address.addressLine1,
+      "city": address.city,
+      "state": address.state,
+      "pincode": address.pincode,
+      "country": address.country,
+    };
+
+    if (address.addressLine2.trim().isNotEmpty) {
+      map["addressLine2"] = address.addressLine2;
+    }
+
+    if (address.landmark.trim().isNotEmpty) {
+      map["landmark"] = address.landmark;
+    }
+
+    return map;
   }
 
   void updatePlan({
@@ -238,7 +252,7 @@ class MultipleOrderDetailsController extends GetxController {
           // 🔥 3. REFRESH PREVIEW
           final address = previewAddress;
           if (address != null) {
-            await fetchBulkOrderPreview(deliveryAddress: address);
+            await fetchBulkOrderPreviewWithLoader(deliveryAddress: address);
           }
         },
       ),
@@ -368,7 +382,7 @@ class MultipleOrderDetailsController extends GetxController {
     );
 
     // 🔁 REFRESH PREVIEW
-    fetchBulkOrderPreview(deliveryAddress: address);
+    fetchBulkOrderPreviewWithLoader(deliveryAddress: address);
   }
 
   void decreasePreviewQty(PreviewItem item, Address address) {
@@ -401,7 +415,7 @@ class MultipleOrderDetailsController extends GetxController {
       installmentPlan: updatedPlan,
     );
 
-    fetchBulkOrderPreview(deliveryAddress: address);
+    fetchBulkOrderPreviewWithLoader(deliveryAddress: address);
   }
 
   // ------------------------- FETCH COUPONS -----------------------------------
@@ -449,7 +463,7 @@ class MultipleOrderDetailsController extends GetxController {
       previewCouponCode.value = couponCode.trim();
       isCouponApplied.value = true;
 
-      await fetchBulkOrderPreview(
+      await fetchBulkOrderPreviewWithLoader(
         deliveryAddress: deliveryAddress,
       );
 
@@ -475,7 +489,7 @@ class MultipleOrderDetailsController extends GetxController {
     isCouponApplied.value = false;
 
     //  Reload preview WITHOUT coupon
-    await fetchBulkOrderPreview(
+    await fetchBulkOrderPreviewWithLoader(
       deliveryAddress: deliveryAddress,
     );
 
