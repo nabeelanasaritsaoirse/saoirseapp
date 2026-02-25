@@ -154,16 +154,16 @@ class _AddAddressState extends State<AddAddress> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        appText(AppStrings.ZipCode,
+                        appText(AppStrings.PinCode,
                             fontSize: 14.sp, fontWeight: FontWeight.w600),
                         SizedBox(
                           height: 5.h,
                         ),
                         appTextField(
-                          controller: addAddressController.zipController,
+                          controller: addAddressController.pinController,
                           textColor: AppColors.black,
                           textInputType: TextInputType.number,
-                          hintText: AppStrings.ZipCode,
+                          hintText: AppStrings.PinCode,
                           hintColor: AppColors.grey,
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 13.h, horizontal: 10.w),

@@ -168,7 +168,7 @@ class AppStrings {
   static String City = 'City';
   static String State = 'State / Province';
   static String Country = 'Country';
-  static String ZipCode = 'Zip Code';
+  static String PinCode = 'Pin Code';
   static String PhoneNumber = 'Phone Number';
   static String Save = 'Save';
   static String profile_title = "My Profile";
@@ -219,4 +219,7 @@ class AppStrings {
 
   // Transaction History
   static String transaction_history_label = "Transaction History";
+
+  // dashboard text
+  static String exit_message = "Press again to exit";
 }

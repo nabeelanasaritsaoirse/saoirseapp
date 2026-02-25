@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_constant.dart';
 import '../../main.dart';
 import '../../models/delete_account_model.dart';
 import '../../models/profile_response.dart';
@@ -39,6 +40,7 @@ class ProfileController extends GetxController {
   // ================== IMAGE PICKER ==================
   final ImagePicker _picker = ImagePicker();
   Rx<File?> profileImage = Rx<File?>(null);
+  RxBool isImageMarkedForDeletion = false.obs;
 
   // ------------------ COUNTRY ------------------
   Rx<Country?> country = Rx<Country?>(null);
@@ -79,18 +81,18 @@ class ProfileController extends GetxController {
     {"icon": AppAssets.delivered, "title": "Delivered"},
     {"icon": AppAssets.autopay, "title": "Autopay"},
     {"icon": AppAssets.coupons, "title": "Coupons"},
+    {"icon": AppAssets.address, "title": "Manage Address"},
   ];
 
   final settings = [
     {"icon": AppAssets.kyc, "title": "KYC"},
     {"icon": AppAssets.manage_accounts, "title": "Manage Account"},
-    {"icon": AppAssets.address, "title": "Manage Address"},
     {"icon": AppAssets.faq, "title": "FAQs"},
-    {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
-    {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
-    {"icon": AppAssets.contact_us, "title": "Contact Us"},
-    {"icon": AppAssets.logout, "title": "Log Out"},
-    {"icon": AppAssets.delete_account, "title": "Delete\nAccount"},
+    // {"icon": AppAssets.privacy_policy, "title": "Privacy Policy"},
+    // {"icon": AppAssets.terms_condition, "title": "Terms & Condition"},
+    // {"icon": AppAssets.contact_us, "title": "Contact Us"},
+    // {"icon": AppAssets.logout, "title": "Log Out"},
+    // {"icon": AppAssets.delete_account, "title": "Delete\nAccount"},
   ];
 
   Future<DeleteAccountModel?> fetchDeleteInfo() async {
@@ -133,6 +135,7 @@ class ProfileController extends GetxController {
         fullNameController.text = result.user.name;
         emailController.text = result.user.email;
         phoneNumberController.text = result.user.phoneNumber;
+        storage.write(AppConst.USER_NAME, result.user.name);
       }
     } finally {
       isLoading(false);
@@ -225,6 +228,7 @@ class ProfileController extends GetxController {
       phoneNumberController.text = user.phoneNumber;
     }
     profileImage.value = null;
+    isImageMarkedForDeletion.value = false;
   }
 
   // This method updates both the username and profile picture if (provided)
@@ -244,6 +248,21 @@ class ProfileController extends GetxController {
 
     try {
       isLoading(true);
+
+      // -------- DELETE IMAGE --------
+      if (isImageMarkedForDeletion.value) {
+        final deleted = await _profileService.removeProfilePicture(userId);
+
+        if (!deleted) {
+          appToaster(
+            error: true,
+            content: "Unable to remove profile picture",
+          );
+          return;
+        }
+
+        isImageMarkedForDeletion.value = false;
+      }
 
       // Upload image if selected
       if (profileImage.value != null) {
@@ -487,6 +506,19 @@ class ProfileController extends GetxController {
   }
 
 //-------------------------------------------------------------------------------------------------------------------------------------
+
+// ---------------- REMOVE PROFILE IMAGE (LOCAL ONLY) ----------------
+  void removeProfileImage() {
+    profileImage.value = null;
+
+    final hasServerImage =
+        profile.value?.user.profilePicture.isNotEmpty ?? false;
+
+    if (hasServerImage) {
+      isImageMarkedForDeletion.value = true;
+    }
+  }
+
   // ================== CLEANUP ==================
   @override
   void onClose() {

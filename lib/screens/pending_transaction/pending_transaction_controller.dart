@@ -230,10 +230,8 @@ class PendingTransactionController extends GetxController {
       );
     } finally {
       // 🔓 unlock ONLY if still on this screen
-      if (Get.currentRoute.contains("PendingTransaction")) {
-        isPlacingOrder.value = false;
-        debugPrint("🔓 [PAY NOW] UNLOCKED");
-      }
+      isPlacingOrder.value = false;
+      debugPrint("🔓 [PAY NOW] UNLOCKED");
     }
   }
 
@@ -284,303 +282,316 @@ class PendingTransactionController extends GetxController {
 
   ///------------------------DROP DOWN------------------
   void showPaymentMethodSheet() {
-    final walletBalance =
-        Get.find<MyWalletController>().wallet.value?.walletBalance ?? 0.0;
-    final bool isWalletEnabled = walletBalance > 0;
     // 🔹 TEMP AutoPay state
     tempEnableAutoPay = enableAutoPay.value.obs;
     Get.bottomSheet(
-      Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 25.h),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24.r),
-            topRight: Radius.circular(24.r),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ---------------- HEADER ----------------
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                appText(
-                  "Select Payment Method",
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryColor,
-                ),
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: Icon(Icons.close, size: 24.sp),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-              ],
+      Obx(() {
+        final walletBalance =
+            Get.find<MyWalletController>().wallet.value?.walletBalance ?? 0.0;
+
+        final payableAmount = totalAmount.value.toDouble();
+
+        final bool isWalletEnabled = walletBalance >= payableAmount;
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 25.h),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24.r),
+              topRight: Radius.circular(24.r),
             ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ---------------- HEADER ----------------
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  appText(
+                    "Select Payment Method",
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryColor,
+                  ),
+                  IconButton(
+                    onPressed: () => Get.back(),
+                    icon: Icon(Icons.close, size: 24.sp),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
 
-            SizedBox(height: 15.h),
+              SizedBox(height: 15.h),
 
-            // ================= WALLET OPTION =================
-            Obx(() => GestureDetector(
-                  onTap: isWalletEnabled
-                      ? () {
-                          selectedPaymentMethod.value = "WALLET";
-                        }
-                      : null,
-                  child: Opacity(
-                    opacity: isWalletEnabled ? 1.0 : 0.5,
+              // ================= WALLET OPTION =================
+              Obx(() => GestureDetector(
+                    onTap: () {
+                      if (!isWalletEnabled) {
+                        appToast(
+                          error: true,
+                          content: "Insufficient wallet balance",
+                        );
+
+                        return;
+                      }
+
+                      selectedPaymentMethod.value = "WALLET";
+                    },
+                    child: Opacity(
+                      opacity: isWalletEnabled ? 1.0 : 0.5,
+                      child: Container(
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: selectedPaymentMethod.value == "WALLET"
+                              ? AppColors.primaryColor.withOpacity(0.08)
+                              : AppColors.white,
+                          border: Border.all(
+                            color: isWalletEnabled
+                                ? (selectedPaymentMethod.value == "WALLET"
+                                    ? AppColors.primaryColor
+                                    : AppColors.grey.withOpacity(0.5))
+                                : AppColors.grey.withOpacity(0.3),
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                // Icon container
+                                Container(
+                                  padding: EdgeInsets.all(10.w),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        AppColors.primaryColor.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(10.r),
+                                  ),
+                                  child: Icon(
+                                    Icons.account_balance_wallet_rounded,
+                                    color: AppColors.primaryColor,
+                                    size: 24.sp,
+                                  ),
+                                ),
+
+                                SizedBox(width: 12.w),
+
+                                // Text
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Wallet Payment",
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      appText(
+                                        walletBalance == 0
+                                            ? "Wallet balance is 0"
+                                            : walletBalance < payableAmount
+                                                ? "Balance: ₹${walletBalance.toStringAsFixed(1)} (Insufficient)"
+                                                : "Balance: ₹${walletBalance.toStringAsFixed(1)}",
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.grey,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                // this Show check only if wallet is enabled
+                                if (isWalletEnabled)
+                                  _buildCheckIndicator(
+                                      selectedPaymentMethod.value == "WALLET"),
+                              ],
+                            ),
+                            SizedBox(height: 6.h),
+                            Padding(
+                              padding: EdgeInsets.only(left: 3.w),
+                              child: Obx(() {
+                                final show =
+                                    selectedPaymentMethod.value == "WALLET";
+
+                                return AnimatedOpacity(
+                                  duration: const Duration(milliseconds: 250),
+                                  opacity: show ? 1 : 0,
+                                  child: AnimatedSlide(
+                                    duration: const Duration(milliseconds: 250),
+                                    offset: show
+                                        ? Offset.zero
+                                        : const Offset(0, -0.1),
+                                    child: show
+                                        ? Padding(
+                                            padding: EdgeInsets.only(
+                                                left: 3.w, top: 6.h),
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 18.w,
+                                                  height: 18.w,
+                                                  child: Checkbox(
+                                                    value:
+                                                        tempEnableAutoPay.value,
+                                                    onChanged: (val) {
+                                                      tempEnableAutoPay.value =
+                                                          val ?? true;
+                                                    },
+                                                    activeColor:
+                                                        AppColors.primaryColor,
+                                                    materialTapTargetSize:
+                                                        MaterialTapTargetSize
+                                                            .shrinkWrap,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 8.w),
+                                                Text(
+                                                  "Enable AutoPay for future payments",
+                                                  style: TextStyle(
+                                                    fontSize: 12.5.sp,
+                                                    color: AppColors.grey,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : const SizedBox.shrink(),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )),
+
+              SizedBox(height: 12.h),
+
+              // ================= RAZORPAY OPTION =================
+              Obx(() => GestureDetector(
+                    onTap: () {
+                      selectedPaymentMethod.value = "RAZORPAY";
+                    },
                     child: Container(
                       padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
-                        color: selectedPaymentMethod.value == "WALLET"
+                        color: selectedPaymentMethod.value == "RAZORPAY"
                             ? AppColors.primaryColor.withOpacity(0.08)
                             : AppColors.white,
                         border: Border.all(
-                          color: isWalletEnabled
-                              ? (selectedPaymentMethod.value == "WALLET"
-                                  ? AppColors.primaryColor
-                                  : AppColors.grey.withOpacity(0.5))
-                              : AppColors.grey.withOpacity(0.3),
+                          color: selectedPaymentMethod.value == "RAZORPAY"
+                              ? AppColors.primaryColor
+                              : AppColors.grey.withOpacity(0.5),
                           width: 1.5,
                         ),
                         borderRadius: BorderRadius.circular(12.r),
                       ),
-                      child: Column(
+                      child: Row(
                         children: [
-                          Row(
-                            children: [
-                              // Icon container
-                              Container(
-                                padding: EdgeInsets.all(10.w),
-                                decoration: BoxDecoration(
-                                  color:
-                                      AppColors.primaryColor.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                                child: Icon(
-                                  Icons.account_balance_wallet_rounded,
-                                  color: AppColors.primaryColor,
-                                  size: 24.sp,
-                                ),
-                              ),
-
-                              SizedBox(width: 12.w),
-
-                              // Text
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Wallet Payment",
-                                      style: TextStyle(
-                                        fontSize: 15.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4.h),
-                                    Text(
-                                      isWalletEnabled
-                                          ? "Balance: ₹${walletBalance.toStringAsFixed(1)}"
-                                          : "Wallet balance is 0",
-                                      style: TextStyle(
-                                        fontSize: 13.sp,
-                                        color: AppColors.grey,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // this Show check only if wallet is enabled
-                              if (isWalletEnabled)
-                                _buildCheckIndicator(
-                                    selectedPaymentMethod.value == "WALLET"),
-                            ],
+                          // Icon container
+                          Container(
+                            padding: EdgeInsets.all(10.w),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            child: Icon(
+                              Icons.payment_rounded,
+                              color: AppColors.primaryColor,
+                              size: 24.sp,
+                            ),
                           ),
-                          SizedBox(height: 6.h),
-                          Padding(
-                            padding: EdgeInsets.only(left: 3.w),
-                            child: Obx(() {
-                              final show =
-                                  selectedPaymentMethod.value == "WALLET";
 
-                              return AnimatedOpacity(
-                                duration: const Duration(milliseconds: 250),
-                                opacity: show ? 1 : 0,
-                                child: AnimatedSlide(
-                                  duration: const Duration(milliseconds: 250),
-                                  offset: show
-                                      ? Offset.zero
-                                      : const Offset(0, -0.1),
-                                  child: show
-                                      ? Padding(
-                                          padding: EdgeInsets.only(
-                                              left: 3.w, top: 6.h),
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 18.w,
-                                                height: 18.w,
-                                                child: Checkbox(
-                                                  value:
-                                                      tempEnableAutoPay.value,
-                                                  onChanged: (val) {
-                                                    tempEnableAutoPay.value =
-                                                        val ?? true;
-                                                  },
-                                                  activeColor:
-                                                      AppColors.primaryColor,
-                                                  materialTapTargetSize:
-                                                      MaterialTapTargetSize
-                                                          .shrinkWrap,
-                                                ),
-                                              ),
-                                              SizedBox(width: 8.w),
-                                              Text(
-                                                "Enable AutoPay for future payments",
-                                                style: TextStyle(
-                                                  fontSize: 12.5.sp,
-                                                  color: AppColors.grey,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : const SizedBox.shrink(),
+                          SizedBox(width: 12.w),
+
+                          // Text
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Razorpay Payment",
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
                                 ),
-                              );
-                            }),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  "UPI, Card, Net Banking & More",
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    color: AppColors.grey,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+
+                          // Check indicator
+                          _buildCheckIndicator(
+                              selectedPaymentMethod.value == "RAZORPAY"),
                         ],
                       ),
                     ),
-                  ),
-                )),
+                  )),
 
-            SizedBox(height: 12.h),
+              SizedBox(height: 20.h),
 
-            // ================= RAZORPAY OPTION =================
-            Obx(() => GestureDetector(
-                  onTap: () {
-                    selectedPaymentMethod.value = "RAZORPAY";
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: selectedPaymentMethod.value == "RAZORPAY"
-                          ? AppColors.primaryColor.withOpacity(0.08)
-                          : AppColors.white,
-                      border: Border.all(
-                        color: selectedPaymentMethod.value == "RAZORPAY"
-                            ? AppColors.primaryColor
-                            : AppColors.grey.withOpacity(0.5),
-                        width: 1.5,
-                      ),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Row(
-                      children: [
-                        // Icon container
-                        Container(
-                          padding: EdgeInsets.all(10.w),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          child: Icon(
-                            Icons.payment_rounded,
-                            color: AppColors.primaryColor,
-                            size: 24.sp,
-                          ),
-                        ),
+              // ---------------- PAY NOW ----------------
+              Obx(() => appButton(
+                    onTap: () {
+                      if (isPlacingOrder.value) return; // 🔒 guard
 
-                        SizedBox(width: 12.w),
+                      debugPrint("🟢 Bottom sheet Pay Now tapped");
 
-                        // Text
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Razorpay Payment",
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                "UPI, Card, Net Banking & More",
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: AppColors.grey,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      enableAutoPay.value = tempEnableAutoPay.value;
 
-                        // Check indicator
-                        _buildCheckIndicator(
-                            selectedPaymentMethod.value == "RAZORPAY"),
-                      ],
-                    ),
-                  ),
-                )),
+                      if (Get.isBottomSheetOpen ?? false) {
+                        Get.back();
+                      }
 
-            SizedBox(height: 20.h),
-
-            // ---------------- PAY NOW ----------------
-            Obx(() => appButton(
-                  onTap: () {
-                    if (isPlacingOrder.value) return; // 🔒 guard
-
-                    debugPrint("🟢 Bottom sheet Pay Now tapped");
-
-                    enableAutoPay.value = tempEnableAutoPay.value;
-
-                    if (Get.isBottomSheetOpen ?? false) {
-                      Get.back();
-                    }
-
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      payNow();
-                    });
-                  },
-                  width: double.infinity,
-                  height: 45.h,
-                  buttonColor: isPlacingOrder.value
-                      ? AppColors.grey
-                      : AppColors.mediumAmber,
-                  child: isPlacingOrder.value
-                      ? SizedBox(
-                          height: 18.h,
-                          width: 18.w,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        payNow();
+                      });
+                    },
+                    width: double.infinity,
+                    height: 45.h,
+                    buttonColor: isPlacingOrder.value
+                        ? AppColors.grey
+                        : AppColors.mediumAmber,
+                    child: isPlacingOrder.value
+                        ? SizedBox(
+                            height: 18.h,
+                            width: 18.w,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.white,
+                            ),
+                          )
+                        : appText(
+                            "Pay Now",
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w700,
                             color: AppColors.white,
                           ),
-                        )
-                      : appText(
-                          "Pay Now",
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.white,
-                        ),
-                ))
-          ],
-        ),
-      ),
+                  ))
+            ],
+          ),
+        );
+      }),
       isScrollControlled: true,
       isDismissible: true,
       enableDrag: true,

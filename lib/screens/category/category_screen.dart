@@ -108,67 +108,20 @@ class _CategoryScreenState extends State<CategoryScreen> {
           );
         }
 
-        return Padding(
+        return GridView.builder(
+          itemCount: controller.categoryGroups.length + 1,
           padding: EdgeInsets.all(12.w),
-          child: GridView.builder(
-            itemCount: controller.categoryGroups.length + 1,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 14.h,
-              crossAxisSpacing: 14.w,
-              childAspectRatio: 0.78,
-            ),
-            itemBuilder: (context, index) {
-              if (index == controller.categoryGroups.length) {
-                return GestureDetector(
-                  onTap: () {
-                    Get.to(() => const ProductListing());
-                  },
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 80.h,
-                        width: 80.h,
-                        decoration: BoxDecoration(
-                          color: AppColors.lightGrey,
-                          borderRadius: BorderRadius.circular(14.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.shadowColor,
-                              blurRadius: 6.r,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          Icons.grid_view_rounded,
-                          size: 24.sp,
-                          color: AppColors.primaryColor,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      appText(
-                        "See All",
-                        textAlign: TextAlign.center,
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              //  CATEGORY TILE
-              final category = controller.categoryGroups[index];
-
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            mainAxisSpacing: 14.h,
+            crossAxisSpacing: 14.w,
+            childAspectRatio: 0.78,
+          ),
+          itemBuilder: (context, index) {
+            if (index == controller.categoryGroups.length) {
               return GestureDetector(
                 onTap: () {
-                  category.subCategories.isEmpty
-                      ? Get.to(
-                          () => const ProductListing(),
-                          arguments: {'categoryId': category.id},
-                        )
-                      : Get.to(() => SubCategoryScreen(category: category));
+                  Get.to(() => const ProductListing());
                 },
                 child: Column(
                   children: [
@@ -186,31 +139,76 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           ),
                         ],
                       ),
-                      padding: EdgeInsets.all(12.w),
-                      child: Image.network(
-                        category.categoryImage?.url ?? '',
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => Icon(
-                          Icons.image_outlined,
-                          size: 40.sp,
-                          color: AppColors.grey,
-                        ),
+                      child: Icon(
+                        Icons.grid_view_rounded,
+                        size: 24.sp,
+                        color: AppColors.primaryColor,
                       ),
                     ),
                     SizedBox(height: 8.h),
                     appText(
-                      category.name,
+                      "See All",
                       textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                       fontSize: 11.sp,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                     ),
                   ],
                 ),
               );
-            },
-          ),
+            }
+
+            //  CATEGORY TILE
+            final category = controller.categoryGroups[index];
+
+            return GestureDetector(
+              onTap: () {
+                category.subCategories.isEmpty
+                    ? Get.to(
+                        () => const ProductListing(),
+                        arguments: {'categoryId': category.id},
+                      )
+                    : Get.to(() => SubCategoryScreen(category: category));
+              },
+              child: Column(
+                children: [
+                  Container(
+                    height: 80.h,
+                    width: 80.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.lightGrey,
+                      borderRadius: BorderRadius.circular(14.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.shadowColor,
+                          blurRadius: 6.r,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    padding: EdgeInsets.all(12.w),
+                    child: Image.network(
+                      category.categoryImage?.url ?? '',
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.image_outlined,
+                        size: 40.sp,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  appText(
+                    category.name,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ],
+              ),
+            );
+          },
         );
       }),
     );

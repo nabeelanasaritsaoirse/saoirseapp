@@ -4,9 +4,8 @@ run-name: "🚀 iOS Build by ${{ github.actor }} on ${{ github.ref_name }}"
 on:
   push:
     tags:
-      - "ios-v*"
-  workflow_dispatch:
-
+      - "v*"
+ 
 
 concurrency:
   group: ios-build-${{ github.ref }}
@@ -348,3 +347,74 @@ jobs:
           echo "- **Status:** ✅ Uploaded to TestFlight" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "The build will be available for testing once Apple completes processing." >> $GITHUB_STEP_SUMMARY
+
+  ios-submit-review:
+    name: 🚀 Submit to App Store Review
+    needs:
+      - ios-ci
+      - ios-deploy
+    runs-on: macos-latest
+  
+    environment:
+      name: ios-review
+  
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+  
+      - name: 🚀 Install Fastlane
+        run: sudo gem install fastlane -N
+  
+      - name: 🔐 Write api_key.json
+        run: echo '${{ secrets.APP_STORE_CONNECT_API_KEY_JSON_BUILD }}' > api_key.json
+  
+      - name: 📝 Generate Release Notes
+        env:
+          VERSION_NAME: ${{ needs.ios-ci.outputs.version_name }}
+          BUILD_NUMBER: ${{ needs.ios-ci.outputs.build_number }}
+        run: |
+          mkdir -p ios/fastlane/metadata/en-US
+          echo "Bug fixes and performance improvements. Build $BUILD_NUMBER." \
+            > ios/fastlane/metadata/en-US/release_notes.txt
+          echo "✅ release_notes.txt content:"
+          cat ios/fastlane/metadata/en-US/release_notes.txt
+  
+      # STEP 1 — Upload metadata only, explicitly no submit
+      - name: 📤 Upload Metadata (whatsNew)
+        env:
+          VERSION_NAME: ${{ needs.ios-ci.outputs.version_name }}
+          BUILD_NUMBER: ${{ needs.ios-ci.outputs.build_number }}
+        run: |
+          cd ios
+          fastlane deliver \
+            --api_key_path api_key.json \
+            --app_version "$VERSION_NAME" \
+            --skip_binary_upload true \
+            --skip_screenshots true \
+            --submit_for_review false \
+            --skip_app_version_update false \
+            --run_precheck_before_submit false \
+            --force
+      
+      - name: 🚀 Submit to App Store Review
+        env:
+          VERSION_NAME: ${{ needs.ios-ci.outputs.version_name }}
+          BUILD_NUMBER: ${{ needs.ios-ci.outputs.build_number }}
+        run: |
+          cd ios
+          fastlane deliver \
+            --api_key_path api_key.json \
+            --app_version "$VERSION_NAME" \
+            --skip_metadata true \
+            --skip_binary_upload true \
+            --skip_screenshots true \
+            --submit_for_review true \
+            --run_precheck_before_submit false \
+            --force
+            
+      - name: 🧾 Review Submission Summary
+        run: |
+          echo "## 🍎 App Store Submission" >> $GITHUB_STEP_SUMMARY
+          echo "- Bundle: ${{ env.BUNDLE_ID }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Tag: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: Submitted to Apple Review ✅" >> $GITHUB_STEP_SUMMARY

@@ -4,8 +4,7 @@ run-name: "🚀 Release note"
 on:
   push:
     tags:
-      - 'android-v*'
-      - 'ios-v*'
+      - 'v*'
 
 permissions:
   contents: write
@@ -83,5 +82,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.TAG }}
-          name: Release ${{ env.TAG }}
+          name: "${{ env.PLATFORM }} Release v${{ env.VERSION }}"
           body_path: RELEASE_NOTES.md

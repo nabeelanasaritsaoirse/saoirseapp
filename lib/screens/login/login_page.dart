@@ -552,7 +552,6 @@ class _LoginPageState extends State<LoginPage> {
               // Option 1 — Scan QR
               GestureDetector(
                 onTap: () {
-                  Get.back();
                   scanQRWithCamera();
                 },
                 child: Container(

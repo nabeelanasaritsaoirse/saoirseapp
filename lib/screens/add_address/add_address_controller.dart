@@ -13,7 +13,7 @@ class AddAddressController extends GetxController {
   TextEditingController cityController = TextEditingController();
   TextEditingController stateController = TextEditingController();
   TextEditingController countryController = TextEditingController();
-  TextEditingController zipController = TextEditingController();
+  TextEditingController pinController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
   RxBool isLoading = false.obs;
@@ -29,7 +29,7 @@ class AddAddressController extends GetxController {
     cityController.text = address.city;
     stateController.text = address.state;
     countryController.text = address.country;
-    zipController.text = address.pincode;
+    pinController.text = address.pincode;
     phoneController.text = address.phoneNumber;
   }
 
@@ -119,7 +119,7 @@ class AddAddressController extends GetxController {
       "city": cityController.text.trim(),
       "state": stateController.text.trim(),
       "country": countryController.text.trim(),
-      "pincode": zipController.text.trim(),
+      "pincode": pinController.text.trim(),
       "phoneNumber": phoneController.text.trim(),
       "isDefault": true,
     };
@@ -187,7 +187,7 @@ class AddAddressController extends GetxController {
     cityController.clear();
     stateController.clear();
     countryController.clear();
-    zipController.clear();
+    pinController.clear();
     phoneController.clear();
 
     isEdit.value = false;
