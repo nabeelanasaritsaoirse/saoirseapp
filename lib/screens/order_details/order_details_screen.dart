@@ -53,18 +53,42 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+    
       orderController.initPreviewContext(
         productId: widget.product!.id,
         variantId: widget.selectVarientId ?? "",
-        deliveryAddress: {
-          "name": widget.addresses.name,
-          "phoneNumber": widget.addresses.phoneNumber,
-          "addressLine1": widget.addresses.addressLine1,
-          "city": widget.addresses.city,
-          "state": widget.addresses.state,
-          "pincode": widget.addresses.pincode,
-          "country": widget.addresses.country,
-        },
+        deliveryAddress: buildDeliveryAddress(widget.addresses),
+      );
+
+      /// INIT QUANTITY ONLY ON FIRST ENTRY
+      if (orderController.orderPreview.value == null) {
+        orderController.quantity.value = widget.quantity ?? 1;
+      }
+
+      /// FIRST TIME API CALL
+      if (orderController.orderPreview.value == null) {
+        orderController.fetchOrderPreview(
+          productId: widget.product!.id,
+          variantId: widget.selectVarientId ?? "",
+          quantity: orderController.quantity.value,
+          totalDays: widget.selectedDays,
+          couponCode: "",
+          deliveryAddress: buildDeliveryAddress(widget.addresses),
+        );
+      } else {
+        /// 🔥 ADDRESS CHANGED → UPDATE CACHE FIRST
+        orderController.updateDeliveryAddress(
+          buildDeliveryAddress(widget.addresses),
+        );
+
+        /// THEN REFRESH PREVIEW
+        orderController.refreshOrderPreview();
+      }
+
+      orderController.initProductPricing(
+        finalPrice: widget.product!.pricing.finalPrice,
+        dailyAmount: widget.selectedAmount,
+        days: widget.selectedDays,
       );
 
       // 2️⃣ INIT QUANTITY ONLY ON FIRST ENTRY
@@ -80,15 +104,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
           totalDays: widget.selectedDays,
           // couponCode: orderController.appliedCouponCode.value,
           couponCode: "",
-          deliveryAddress: {
-            "name": widget.addresses.name,
-            "phoneNumber": widget.addresses.phoneNumber,
-            "addressLine1": widget.addresses.addressLine1,
-            "city": widget.addresses.city,
-            "state": widget.addresses.state,
-            "pincode": widget.addresses.pincode,
-            "country": widget.addresses.country,
-          },
+         
+          deliveryAddress: buildDeliveryAddress(widget.addresses),
         );
       } else {
         // 🔥 Address changed → refresh preview WITH SAME QTY
@@ -101,6 +118,28 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         days: widget.selectedDays,
       );
     });
+  }
+
+  Map<String, dynamic> buildDeliveryAddress(Address address) {
+    final map = {
+      "name": address.name,
+      "phoneNumber": address.phoneNumber,
+      "addressLine1": address.addressLine1,
+      "city": address.city,
+      "state": address.state,
+      "pincode": address.pincode,
+      "country": address.country,
+    };
+
+    if (address.addressLine2.trim().isNotEmpty) {
+      map["addressLine2"] = address.addressLine2;
+    }
+
+    if (address.landmark.trim().isNotEmpty) {
+      map["landmark"] = address.landmark;
+    }
+
+    return map;
   }
 
   @override
@@ -191,6 +230,22 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                     softWrap: true,
                                     maxLines: null,
                                   ),
+
+                                  if (address?.addressLine2 != null &&
+                                      address!.addressLine2!.trim().isNotEmpty)
+                                    appText(
+                                      address.addressLine2!,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+
+                                  if (address?.landmark != null &&
+                                      address!.landmark!.trim().isNotEmpty)
+                                    appText(
+                                      address.landmark!,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
 
                                   // City + Pincode
                                   Row(
