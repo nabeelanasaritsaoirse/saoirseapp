@@ -41,81 +41,87 @@ class DashboardScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
-        body: Obx(() => pages[controller.selectedIndex.value]),
-        bottomNavigationBar: Obx(
-          () => Container(
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -3),
-                ),
-              ],
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.r),
-                topRight: Radius.circular(20.r),
+        body: Obx(
+          () => Column(
+            children: [
+              Expanded(
+                child: pages[controller.selectedIndex.value],
               ),
-            ),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: EdgeInsets.only(top: 4.h, bottom: 2.h),
-                child: BottomNavigationBar(
-                  type: BottomNavigationBarType.fixed,
-                  backgroundColor: Colors.transparent,
-                  currentIndex: controller.selectedIndex.value,
-                  onTap: controller.changeTab,
-                  elevation: 0,
-                  selectedItemColor: AppColors.primaryColor,
-                  unselectedItemColor: AppColors.grey,
-                  showUnselectedLabels: true,
-                  selectedLabelStyle: TextStyle(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  unselectedLabelStyle: TextStyle(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  items: [
-                    _navItem(
-                      index: 0,
-                      icon: Iconsax.home,
-                      activeIcon: Iconsax.home,
-                      label: 'Home',
-                    ),
-                    _navItem(
-                      index: 1,
-                      icon: Iconsax.category,
-                      activeIcon: Iconsax.category5,
-                      label: 'Category',
-                    ),
-                    _navItem(
-                      index: 2,
-                      icon: Iconsax.gift,
-                      activeIcon: Iconsax.gift,
-                      label: 'Referral',
-                    ),
-                    _navItem(
-                      index: 3,
-                      icon: Iconsax.shopping_cart,
-                      activeIcon: Iconsax.shopping_cart,
-                      label: 'Cart',
-                      badgeCount:
-                          cartController.cartCount.value, //directy passing
-                    ),
-                    _navItem(
-                      index: 4,
-                      icon: Iconsax.user,
-                      activeIcon: Iconsax.user,
-                      label: 'You',
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, -3),
                     ),
                   ],
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20.r),
+                    topRight: Radius.circular(20.r),
+                  ),
+                ),
+                child: SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 4.h, bottom: 2.h),
+                    child: BottomNavigationBar(
+                      type: BottomNavigationBarType.fixed,
+                      backgroundColor: Colors.transparent,
+                      currentIndex: controller.selectedIndex.value,
+                      onTap: controller.changeTab,
+                      elevation: 0,
+                      selectedItemColor: AppColors.primaryColor,
+                      unselectedItemColor: AppColors.grey,
+                      showUnselectedLabels: true,
+                      selectedLabelStyle: TextStyle(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      unselectedLabelStyle: TextStyle(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      items: [
+                        _navItem(
+                          index: 0,
+                          icon: Iconsax.home,
+                          activeIcon: Iconsax.home,
+                          label: 'Home',
+                        ),
+                        _navItem(
+                          index: 1,
+                          icon: Iconsax.category,
+                          activeIcon: Iconsax.category5,
+                          label: 'Category',
+                        ),
+                        _navItem(
+                          index: 2,
+                          icon: Iconsax.gift,
+                          activeIcon: Iconsax.gift,
+                          label: 'Referral',
+                        ),
+                        _navItem(
+                          index: 3,
+                          icon: Iconsax.shopping_cart,
+                          activeIcon: Iconsax.shopping_cart,
+                          label: 'Cart',
+                          badgeCount:
+                              cartController.cartCount.value, //directy passing
+                        ),
+                        _navItem(
+                          index: 4,
+                          icon: Iconsax.user,
+                          activeIcon: Iconsax.user,
+                          label: 'You',
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),
