@@ -37,10 +37,11 @@ class CartScreen extends StatelessWidget {
         title: AppStrings.carttitle,
         actions: [
           Obx(() {
+            final isLoggedIn = storage.read(AppConst.USER_ID) != null;
             final hasItems = controller.cartData.value != null &&
                 controller.cartData.value!.products.isNotEmpty;
 
-            if (!hasItems) {
+            if (!isLoggedIn || !hasItems) {
               return const SizedBox.shrink(); // hide delete icon
             }
 
