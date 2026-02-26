@@ -20,6 +20,7 @@ import '../../services/wishlist_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_toast.dart';
+import '../cart/cart_controller.dart';
 import '../dashboard/dashboard_controller.dart';
 import '../login/login_page.dart';
 import '../notification/notification_controller.dart';
@@ -348,7 +349,7 @@ class ProfileController extends GetxController {
           Get.find<DashboardController>().selectedIndex.value = 0;
         }
         // Navigate immediately
-        Get.offAll(() => LoginPage());
+        Get.to(() => LoginPage());
 
         // Perform logout in background
         logoutUserInBackground();
@@ -374,6 +375,10 @@ class ProfileController extends GetxController {
 
       // Clear storage
       await storage.erase();
+
+      Get.find<NotificationController>().updateToken('');
+      Get.find<NotificationController>().unreadCount.value = 0;
+      Get.find<CartController>().cartCount.value = 0;
 
       // // Clear controllers
       // Get.deleteAll(force: true);

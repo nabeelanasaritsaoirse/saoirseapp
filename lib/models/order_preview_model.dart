@@ -298,19 +298,23 @@ class PreviewAddress {
   final String name;
   final String phoneNumber;
   final String addressLine1;
+  final String? addressLine2;
   final String city;
   final String state;
   final String pincode;
   final String country;
+  final String? landmark;
 
   PreviewAddress({
     required this.name,
     required this.phoneNumber,
     required this.addressLine1,
+    this.addressLine2,
     required this.city,
     required this.state,
     required this.pincode,
     required this.country,
+    this.landmark,
   });
 
   factory PreviewAddress.fromJson(Map<String, dynamic> json) {
@@ -318,10 +322,12 @@ class PreviewAddress {
       name: json['name'] ?? '',
       phoneNumber: json['phoneNumber'] ?? '',
       addressLine1: json['addressLine1'] ?? '',
+      addressLine2: json['addressLine2'],
       city: json['city'] ?? '',
       state: json['state'] ?? '',
       pincode: json['pincode'] ?? '',
       country: json['country'] ?? '',
+      landmark: json['landmark'],
     );
   }
 }
