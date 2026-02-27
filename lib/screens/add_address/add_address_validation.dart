@@ -1,10 +1,18 @@
 class AddAddressValidation {
   // Phone validation
+  // Phone validation
   static String? phoneValidation({required String phone}) {
-    if (phone.trim().isEmpty) return "Phone number is required";
-    if (!RegExp(r'^[0-9]{10}$').hasMatch(phone)) {
-      return "Enter a valid 10 digit phone number";
+    phone = phone.trim();
+
+    if (phone.isEmpty) {
+      return "Please enter your phone number";
     }
+
+    // Must start with 6,7,8 or 9 and be exactly 10 digits
+    if (!RegExp(r'^[6-9][0-9]{9}$').hasMatch(phone)) {
+      return "Enter a valid 10-digit mobile number starting with 6–9.";
+    }
+
     return null;
   }
 
@@ -53,11 +61,19 @@ class AddAddressValidation {
   }
 
   // Zip Code Validation
+  // Pin Code Validation
   static String? zipValidation({required String zip}) {
-    if (zip.trim().isEmpty) return "Pin code is required";
-    if (!RegExp(r"^[0-9]{4,10}$").hasMatch(zip)) {
-      return "Enter valid pin code";
+    zip = zip.trim();
+
+    if (zip.isEmpty) {
+      return "Pin code is required";
     }
+
+    // Must be exactly 6 digits
+    if (!RegExp(r'^[0-9]{6}$').hasMatch(zip)) {
+      return "Invalid 6-digit PIN code";
+    }
+
     return null;
   }
 }

@@ -192,6 +192,7 @@ class _AddAddressState extends State<AddAddress> {
                           textInputType: TextInputType.number,
                           hintText: AppStrings.PinCode,
                           hintColor: AppColors.grey,
+                          maxLength: 6,
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 10.h, horizontal: 10.w),
                           validator: (value) =>
@@ -214,6 +215,7 @@ class _AddAddressState extends State<AddAddress> {
                 textColor: AppColors.black,
                 textInputType: TextInputType.phone,
                 hintText: AppStrings.phoneNumber,
+                maxLength: 10,
                 hintColor: AppColors.grey,
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
