@@ -93,7 +93,7 @@ class CartScreen extends StatelessWidget {
                               "material": item.variant?.attributes.material,
                             });
                             return Container(
-                              margin: EdgeInsets.only(bottom: 15.h),
+                              margin: EdgeInsets.only(bottom: 13.h),
                               padding: EdgeInsets.all(10.w),
                               decoration: BoxDecoration(
                                 color: AppColors.white,
@@ -185,7 +185,7 @@ class CartScreen extends StatelessWidget {
                                           children: [
                                             appText(
                                               item.name,
-                                              fontSize: 16.sp,
+                                              fontSize: 14.sp,
                                               fontWeight: FontWeight.w600,
                                               textAlign: TextAlign.start,
                                             ),
@@ -304,7 +304,7 @@ class CartScreen extends StatelessWidget {
 
                       return Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 16.w, vertical: 12.h),
+                            horizontal: 12.w, vertical: 6.h),
                         decoration: BoxDecoration(
                           color: AppColors.white,
                           boxShadow: [
@@ -346,8 +346,8 @@ class CartScreen extends StatelessWidget {
                                 );
                               },
                               child: Container(
-                                width: 95.w,
-                                height: 40.h,
+                                width: 90.w,
+                                height: 35.h,
                                 decoration: BoxDecoration(
                                     color: AppColors.lightGrey,
                                     borderRadius: BorderRadius.circular(10.r),
@@ -372,8 +372,8 @@ class CartScreen extends StatelessWidget {
 
                             /// CHECKOUT BUTTON
                             SizedBox(
-                              height: 40.h,
-                              width: 130.w,
+                              height: 35.h,
+                              width: 125.w,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primaryColor,
@@ -409,7 +409,7 @@ class CartScreen extends StatelessWidget {
                                 child: appText(
                                   "Check Out",
                                   color: AppColors.white,
-                                  fontSize: 15.sp,
+                                  fontSize: 14.sp,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
