@@ -32,7 +32,7 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.paperColor,
       appBar: CustomAppBar(
         title: AppStrings.carttitle,
         actions: [
@@ -72,15 +72,11 @@ class CartScreen extends StatelessWidget {
                       child: Obx(() {
                         if (controller.cartData.value == null ||
                             controller.cartData.value!.products.isEmpty) {
-                          return ListView(
-                            children: const [
-                              SizedBox(
-                                height: 300,
-                                child: Center(
-                                  child: Text("Your cart is empty"),
-                                ),
-                              )
-                            ],
+                          return Center(
+                            child: appText(
+                              "Your cart is empty",
+                              fontSize: 16.sp,
+                            ),
                           );
                         }
 
