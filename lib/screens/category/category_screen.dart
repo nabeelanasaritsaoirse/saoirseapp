@@ -100,12 +100,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
         if (controller.categoryGroups.isEmpty) {
           return Center(
-            child: appText(
-              'No categories found',
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          );
+                            child: appText(
+                              "No categories found",
+                              fontSize: 16.sp,
+                            ),
+                          );
         }
 
         return GridView.builder(

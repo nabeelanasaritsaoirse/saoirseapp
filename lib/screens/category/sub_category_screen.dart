@@ -26,12 +26,12 @@ class SubCategoryScreen extends StatelessWidget {
       ),
       body: category.subCategories.isEmpty
           ? Center(
-              child: appText(
-                'No subcategories found',
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-              ),
-            )
+                            child: appText(
+                              "No subcategories found",
+                              fontSize: 16.sp,
+                            ),
+                          )
+            
           : GridView.builder(
               itemCount: category.subCategories.length,
               padding: EdgeInsets.all(12.w),

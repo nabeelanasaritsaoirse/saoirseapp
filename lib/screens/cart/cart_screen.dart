@@ -32,13 +32,12 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.paperColor,
       appBar: CustomAppBar(
         title: AppStrings.carttitle,
         actions: [
           Obx(() {
-            final hasItems = controller.cartData.value != null &&
-                controller.cartData.value!.products.isNotEmpty;
+            final hasItems = controller.cartData.value != null && controller.cartData.value!.products.isNotEmpty;
 
             if (!hasItems) {
               return const SizedBox.shrink(); // hide delete icon
@@ -69,17 +68,12 @@ class CartScreen extends StatelessWidget {
                     /// CART LIST
                     Expanded(
                       child: Obx(() {
-                        if (controller.cartData.value == null ||
-                            controller.cartData.value!.products.isEmpty) {
-                          return ListView(
-                            children: const [
-                              SizedBox(
-                                height: 300,
-                                child: Center(
-                                  child: Text("Your cart is empty"),
-                                ),
-                              )
-                            ],
+                        if (controller.cartData.value == null || controller.cartData.value!.products.isEmpty) {
+                          return Center(
+                            child: appText(
+                              "Your cart is empty",
+                              fontSize: 16.sp,
+                            ),
                           );
                         }
 
@@ -87,8 +81,7 @@ class CartScreen extends StatelessWidget {
                           padding: EdgeInsets.symmetric(horizontal: 15.w),
                           itemCount: controller.cartData.value!.products.length,
                           itemBuilder: (context, index) {
-                            final item =
-                                controller.cartData.value!.products[index];
+                            final item = controller.cartData.value!.products[index];
                             final variantText = buildVariantText({
                               "color": item.variant?.attributes.color,
                               "weight": item.variant?.attributes.weight,
@@ -103,12 +96,10 @@ class CartScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(20.r),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black
-                                        .withOpacity(0.2), // light shadow
+                                    color: Colors.black.withOpacity(0.2), // light shadow
                                     blurRadius: 15, // smooth blur
                                     spreadRadius: 2, // subtle spread
-                                    offset: const Offset(
-                                        0, 4), // slight downward shadow
+                                    offset: const Offset(0, 4), // slight downward shadow
                                   ),
                                 ],
                               ),
@@ -116,48 +107,38 @@ class CartScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       /// IMAGE
                                       ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(10.r),
+                                        borderRadius: BorderRadius.circular(10.r),
                                         child: SizedBox(
                                           width: 80.w,
                                           height: 80.h,
                                           child: item.images.isNotEmpty
-                                              ? item.images.first.url
-                                                      .startsWith('http')
+                                              ? item.images.first.url.startsWith('http')
                                                   ? Image.network(
                                                       item.images.first.url,
                                                       width: 80.w,
                                                       height: 80.h,
                                                       fit: BoxFit.contain,
-                                                      loadingBuilder: (context,
-                                                          child,
-                                                          loadingProgress) {
-                                                        if (loadingProgress ==
-                                                            null) {
+                                                      loadingBuilder: (context, child, loadingProgress) {
+                                                        if (loadingProgress == null) {
                                                           return child;
                                                         }
                                                         return Center(
-                                                          child:
-                                                              CupertinoActivityIndicator(
+                                                          child: CupertinoActivityIndicator(
                                                             radius: 10.0,
-                                                            color: AppColors
-                                                                .textGray,
+                                                            color: AppColors.textGray,
                                                           ),
                                                         );
                                                       },
-                                                      errorBuilder: (context,
-                                                          error, stackTrace) {
+                                                      errorBuilder: (context, error, stackTrace) {
                                                         return Center(
                                                           child: Icon(
                                                             Icons.broken_image,
                                                             size: 80.sp,
-                                                            color:
-                                                                AppColors.grey,
+                                                            color: AppColors.grey,
                                                           ),
                                                         );
                                                       },
@@ -183,8 +164,7 @@ class CartScreen extends StatelessWidget {
                                       /// PRODUCT DETAILS
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             appText(
                                               item.name,
@@ -210,11 +190,7 @@ class CartScreen extends StatelessWidget {
                                             ),
                                             SizedBox(height: 2.h),
                                             Obx(() {
-                                              if (!controller.isCartPlanApplied
-                                                      .value ||
-                                                  item.installmentPlan
-                                                          .totalDays ==
-                                                      0) {
+                                              if (!controller.isCartPlanApplied.value || item.installmentPlan.totalDays == 0) {
                                                 return const SizedBox.shrink();
                                               }
 
@@ -236,34 +212,25 @@ class CartScreen extends StatelessWidget {
                                           /// DELETE ICON
                                           GestureDetector(
                                             onTap: () {
-                                              controller.removeCartItem(
-                                                  item.productId);
+                                              controller.removeCartItem(item.productId);
                                             },
-                                            child: const Icon(Iconsax.trash,
-                                                color: AppColors.black),
+                                            child: const Icon(Iconsax.trash, color: AppColors.black),
                                           ),
 
                                           SizedBox(height: 20.h),
 
                                           /// QUANTITY WIDGET
                                           Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 10.w,
-                                                vertical: 5.h),
+                                            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
                                             decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(20.r),
-                                              border: Border.all(
-                                                  color: AppColors.black26),
+                                              borderRadius: BorderRadius.circular(20.r),
+                                              border: Border.all(color: AppColors.black26),
                                             ),
                                             child: Row(
                                               children: [
                                                 GestureDetector(
-                                                  onTap: () => controller
-                                                      .decreaseQty(index),
-                                                  child: Icon(Icons.remove,
-                                                      size: 15.sp,
-                                                      color: AppColors.black),
+                                                  onTap: () => controller.decreaseQty(index),
+                                                  child: Icon(Icons.remove, size: 15.sp, color: AppColors.black),
                                                 ),
                                                 SizedBox(width: 10.w),
                                                 appText(
@@ -273,11 +240,8 @@ class CartScreen extends StatelessWidget {
                                                 ),
                                                 SizedBox(width: 10.w),
                                                 GestureDetector(
-                                                  onTap: () => controller
-                                                      .increaseQty(index),
-                                                  child: Icon(Icons.add,
-                                                      size: 15.sp,
-                                                      color: AppColors.black),
+                                                  onTap: () => controller.increaseQty(index),
+                                                  child: Icon(Icons.add, size: 15.sp, color: AppColors.black),
                                                 ),
                                               ],
                                             ),
@@ -306,8 +270,7 @@ class CartScreen extends StatelessWidget {
                       }
 
                       return Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16.w, vertical: 12.h),
+                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                         decoration: BoxDecoration(
                           color: AppColors.white,
                           boxShadow: [
@@ -354,8 +317,7 @@ class CartScreen extends StatelessWidget {
                                 decoration: BoxDecoration(
                                     color: AppColors.lightGrey,
                                     borderRadius: BorderRadius.circular(10.r),
-                                    border: Border.all(
-                                        color: AppColors.shadowColor)),
+                                    border: Border.all(color: AppColors.shadowColor)),
                                 alignment: Alignment.center,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -385,8 +347,7 @@ class CartScreen extends StatelessWidget {
                                   ),
                                 ),
                                 onPressed: () {
-                                  final hasPlan =
-                                      controller.isCartPlanApplied.value;
+                                  final hasPlan = controller.isCartPlanApplied.value;
 
                                   if (!hasPlan) {
                                     WarningDialog.show(
@@ -403,8 +364,7 @@ class CartScreen extends StatelessWidget {
                                       cartData: controller.cartData.value,
                                       quantity: 1,
                                       selectedDays: controller.customDays.value,
-                                      selectedAmount:
-                                          controller.customAmount.value,
+                                      selectedAmount: controller.customAmount.value,
                                       checkoutSource: CheckoutSource.cart,
                                     ),
                                   );
@@ -445,10 +405,7 @@ class CartScreen extends StatelessWidget {
     String? weight = valid["weight"];
 
     // Convert remaining attributes (exclude color & weight)
-    List<String> others = valid.entries
-        .where((e) => e.key != "color" && e.key != "weight")
-        .map((e) => e.value)
-        .toList();
+    List<String> others = valid.entries.where((e) => e.key != "color" && e.key != "weight").map((e) => e.value).toList();
 
     //  color + weight available → show only these two
     if (color != null && weight != null) {

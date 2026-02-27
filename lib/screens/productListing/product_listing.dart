@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/widgets/app_text.dart';
 
 import '../../constants/app_assets.dart';
 import '../../widgets/app_text_field.dart';
@@ -172,7 +173,12 @@ class _ProductListingState extends State<ProductListing> {
               }
 
               if (productlistingController.products.isEmpty) {
-                return const Center(child: Text("No products found"));
+                return Center(
+                            child: appText(
+                              "No products found",
+                              fontSize: 16.sp,
+                            ),
+                          );
               }
 
               return GridView.builder(
