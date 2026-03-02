@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_constant.dart';
+import 'package:saoirse_app/main.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/faq_model.dart';
@@ -57,7 +59,8 @@ class FaqController extends GetxController {
   Future<void> openWhatsAppSupport() async {
     try {
       final String number = dotenv.env['CUSTOMER_SUPPORT_NUMBER'] ?? '';
-      const String message = "Hello, I need help regarding EPI services.";
+      final String username = storage.read(AppConst.USER_NAME) ?? '';
+      final String message = "Hello, I'm $username.\nI need help regarding EPI services.";
 
       if (number.isEmpty) {
         return;
