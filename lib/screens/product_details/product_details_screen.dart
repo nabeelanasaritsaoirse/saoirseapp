@@ -375,9 +375,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         width: isSelected ? 2 : 1,
                       ),
                     ),
+                    // child: Center(
+                    //   child: appText(
+                    //     variant.attributes.color,
+                    //     fontSize: 13.sp,
+                    //     fontWeight: FontWeight.w600,
+                    //     color: isSelected
+                    //         ? AppColors.primaryColor
+                    //         : AppColors.textBlack,
+                    //   ),
+                    // ),
                     child: Center(
                       child: appText(
-                        variant.attributes.color,
+                        variant.attributes.isNotEmpty
+                            ? variant.attributes.first.color
+                            : '',
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w600,
                         color: isSelected

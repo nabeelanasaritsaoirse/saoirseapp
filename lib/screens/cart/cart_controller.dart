@@ -439,7 +439,7 @@ class CartController extends GetxController {
       name: item.name,
       brand: item.brand,
       sku: "",
-      description: Description(short: "", long: "", features: []),
+      description: Description(short: "", long: "", features: [] , specifications: [], ),
       category: Category(
         mainCategoryId: "",
         mainCategoryName: "",
