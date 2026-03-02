@@ -29,34 +29,6 @@ class ProductService {
     );
   }
 
-  // Fetch productslisting with pagination
-  // Future<ProductListResponse?> getProducts(
-  //   int page,
-  //   int limit, {
-  //   String? search,
-  // }) async {
-  //   try {
-  //     final query =
-  //         search != null && search.isNotEmpty ? "&search=$search" : "";
-  //     final url = "${AppURLs.PRODUCTS_LISTING}?page=$page&limit=$limit$query";
-
-  //     final response = await APIService.getRequest(
-  //       url: url,
-  //       onSuccess: (data) => data,
-  //       headers: {
-  //         "Authorization": "Bearer $token",
-  //       },
-  //     );
-
-  //     if (response == null) return null;
-
-  //     return ProductListResponse.fromJson(response);
-  //   } catch (e) {
-
-  //     return null;
-  //   }
-  // }
-
   Future<ProductListResponse?> getProducts(
     int page,
     int limit, {
@@ -88,6 +60,7 @@ class ProductService {
 
       return ProductListResponse.fromJson(response);
     } catch (e) {
+      debugPrint("PRODUCT ERROR: $e");
       return null;
     }
   }
@@ -151,57 +124,56 @@ class ProductService {
   }
 
   Future<ReviewResponse?> fetchProductReviews({
-  required String productId, // PROD185699527
-  int page = 1,
-  int limit = 10,
-  String sort = "newest",
-  String? rating,
-  bool? verified,
-  bool? hasImages,
-  String? search,
-}) async {
-  try {
-    final queryParams = <String>[];
-    queryParams.add("page=$page");
-    queryParams.add("limit=$limit");
-    queryParams.add("sort=$sort");
+    required String productId,
+    int page = 1,
+    int limit = 10,
+    String sort = "newest",
+    String? rating,
+    bool? verified,
+    bool? hasImages,
+    String? search,
+  }) async {
+    try {
+      final queryParams = <String>[];
+      queryParams.add("page=$page");
+      queryParams.add("limit=$limit");
+      queryParams.add("sort=$sort");
 
-    if (rating != null && rating.isNotEmpty) {
-      queryParams.add("rating=$rating");
-    }
-    if (verified == true) {
-      queryParams.add("verified=true");
-    }
-    if (hasImages == true) {
-      queryParams.add("hasImages=true");
-    }
-    if (search != null && search.isNotEmpty) {
-      queryParams.add("search=$search");
-    }
+      if (rating != null && rating.isNotEmpty) {
+        queryParams.add("rating=$rating");
+      }
+      if (verified == true) {
+        queryParams.add("verified=true");
+      }
+      if (hasImages == true) {
+        queryParams.add("hasImages=true");
+      }
+      if (search != null && search.isNotEmpty) {
+        queryParams.add("search=$search");
+      }
 
-    /// 🔵 FINAL URL (match Postman exactly)
-    final String url =
-        "${AppURLs.PRODUCT_REVIEWS_API}$productId/reviews?${queryParams.join("&")}";
+      /// 🔵 FINAL URL (match Postman exactly)
+      final String url =
+          "${AppURLs.PRODUCT_REVIEWS_API}$productId/reviews?${queryParams.join("&")}";
 
-    debugPrint("🔵 Reviews API URL => $url");
+      debugPrint("🔵 Reviews API URL => $url");
 
-    final response = await APIService.getRequest(
-      url: url,
-      onSuccess: (data) => data,
-    );
+      final response = await APIService.getRequest(
+        url: url,
+        onSuccess: (data) => data,
+      );
 
-    debugPrint("🟢 Reviews API response => $response");
+      debugPrint("🟢 Reviews API response => $response");
 
-    if (response == null || response["success"] != true) {
+      if (response == null || response["success"] != true) {
+        return null;
+      }
+
+      return ReviewResponse.fromJson(response);
+    } catch (e, stack) {
+      debugPrint("❌ fetchProductReviews error: $e");
+      debugPrint(stack.toString());
       return null;
     }
-
-    return ReviewResponse.fromJson(response);
-  } catch (e, stack) {
-    debugPrint("❌ fetchProductReviews error: $e");
-    debugPrint(stack.toString());
-    return null;
   }
-}
-
 }

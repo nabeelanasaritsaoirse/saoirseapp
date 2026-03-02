@@ -5,7 +5,6 @@ import '../../constants/app_constant.dart';
 import '../../main.dart';
 import '../../models/cart_response_model.dart';
 import '../../models/plan_model.dart';
-import '../../models/product_details_model.dart';
 import '../../services/cart_service.dart';
 import '../../services/product_service.dart';
 import '../../widgets/app_toast.dart';
@@ -429,59 +428,5 @@ class CartController extends GetxController {
     if (!isCartPlanApplied.value || customAmount.value <= 0) return;
 
     applyCartPlan(customAmount.value);
-  }
-
-  ProductDetailsData convertCartToProductDetails(CartProduct item) {
-    return ProductDetailsData(
-      id: item.productId,
-      productId: item.productId,
-      variantId: item.variant?.variantId ?? "",
-      name: item.name,
-      brand: item.brand,
-      sku: "",
-      description: Description(short: "", long: "", features: []),
-      category: Category(
-        mainCategoryId: "",
-        mainCategoryName: "",
-        subCategoryId: "",
-        subCategoryName: "",
-      ),
-      availability: Availability(
-        isAvailable: true,
-        stockQuantity: item.stock,
-        lowStockLevel: 0,
-        stockStatus: item.stock > 0 ? "in_stock" : "out_of_stock",
-      ),
-      pricing: Pricing(
-        regularPrice: item.price,
-        salePrice: item.finalPrice,
-        finalPrice: item.finalPrice,
-        currency: "INR",
-      ),
-      seo: Seo(keywords: []),
-      warranty: Warranty(period: 0),
-      images: item.images
-          .map((img) => ImageData(
-                url: img.url,
-                altText: img.altText,
-                isPrimary: img.isPrimary,
-                id: img.id,
-              ))
-          .toList(),
-      isPopular: false,
-      isBestSeller: false,
-      isTrending: false,
-      status: "active",
-      hasVariants: item.variant != null,
-      regionalPricing: [],
-      regionalSeo: [],
-      regionalAvailability: [],
-      relatedProducts: [],
-      variants: [],
-      plans: [],
-      createdAt: "",
-      updatedAt: "",
-      v: 0,
-    );
   }
 }
