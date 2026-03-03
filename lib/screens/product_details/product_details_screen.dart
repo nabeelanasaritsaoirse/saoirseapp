@@ -475,9 +475,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 ),
                             ],
                           ),
-                          SizedBox(
-                            height: 4.h,
-                          ),
+                          SizedBox(height: 2.h),
                           appText(
                             variant.stock > 0 ? "In stock" : "Out of stock",
                             fontSize: 12.sp,
