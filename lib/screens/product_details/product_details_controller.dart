@@ -8,7 +8,7 @@ import '../../main.dart';
 import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';
 import '../../models/product_faq.dart';
-import '../../models/product_list_response.dart';
+import '../../models/product_list_response.dart' hide Variant;
 import '../../models/review_resposne.dart';
 import '../../services/product_service.dart';
 import '../../services/wishlist_service.dart';
@@ -44,6 +44,16 @@ class ProductDetailsController extends GetxController {
   RxBool isFavorite = false.obs;
   RxInt selectedPlanIndex = (-1).obs;
   RxString selectedVariantId = "".obs;
+
+  /// ---------------- VARIANT ENGINE ----------------
+
+  Rx<PriceRange?> priceRange = Rx<PriceRange?>(null);
+  RxList<Variant> allVariants = <Variant>[].obs;
+  Rx<Variant?> selectedVariant = Rx<Variant?>(null);
+
+  /// Stores selected attributes like:
+  /// { "Grade": "Organic A+", "Weight": "3 kg" }
+  RxMap<String, String> selectedAttributes = <String, String>{}.obs;
 
   /// Custom plan values
   RxInt customDays = 0.obs;
@@ -100,38 +110,217 @@ class ProductDetailsController extends GetxController {
     checkIfInWishlist(productId);
   }
 
+  // Future<void> fetchProductDetails() async {
+  //   try {
+  //     isProductLoading(true);
+
+  //     final result = await productService.fetchProductDetails(productId);
+  //     product.value = result;
+
+  //     if (result == null) return;
+
+  //     // Start with base images
+  //     mergedImages.assignAll(result.images);
+
+  //     if (result.hasVariants && result.variants.isNotEmpty) {
+  //       final firstVariant = result.variants.first;
+  //       selectedVariantId.value = firstVariant.variantId;
+
+  //       if (firstVariant.images.isNotEmpty) {
+  //         mergedImages[0] = firstVariant.images.first;
+  //       }
+  //     }
+
+  //     // Reset page
+  //     currentImageIndex.value = 0;
+  //     jumpToPageSafe(0);
+  //   } finally {
+  //     isProductLoading(false);
+  //   }
+
+  //   /// Load other sections AFTER product is ready
+  //   fetchFaqs();
+  //   fetchSimilarProducts();
+  //   fetchProductReviews();
+  // }
+
+  // Future<void> fetchProductDetails() async {
+  //   try {
+  //     isProductLoading(true);
+
+  //     /// 🔵 Call API (now returns ProductDetailsResponse)
+  //     final response = await productService.fetchProductDetails(productId);
+
+  //     if (response == null || response.data == null) {
+  //       product.value = null;
+  //       return;
+  //     }
+
+  //     /// 🟢 Set product data
+  //     product.value = response.data;
+
+  //     /// 🟢 Store price range (for variant products)
+  //     priceRange.value = response.priceRange;
+
+  //     /// 🟢 Start with base product images
+  //     mergedImages.assignAll(response.data!.images);
+
+  //     /// 🟢 If product has variants → fetch them separately
+  //     if (response.data!.hasVariants) {
+  //       await fetchVariants();
+  //     } else {
+  //       /// If no variants → clear selection
+  //       selectedVariant.value = null;
+  //       selectedVariantId.value = "";
+  //     }
+
+  //     /// 🟢 Reset image slider
+  //     currentImageIndex.value = 0;
+  //     jumpToPageSafe(0);
+  //   } catch (e) {
+  //     debugPrint("❌ fetchProductDetails error: $e");
+  //   } finally {
+  //     isProductLoading(false);
+  //   }
+
+  //   /// 🔽 Load other sections AFTER product loads
+  //   fetchFaqs();
+  //   fetchSimilarProducts();
+  //   fetchProductReviews();
+  // }
+
   Future<void> fetchProductDetails() async {
     try {
       isProductLoading(true);
 
-      final result = await productService.fetchProductDetails(productId);
-      product.value = result;
+      final response = await productService.fetchProductDetails(productId);
 
-      if (result == null) return;
-
-      // Start with base images
-      mergedImages.assignAll(result.images);
-
-      if (result.hasVariants && result.variants.isNotEmpty) {
-        final firstVariant = result.variants.first;
-        selectedVariantId.value = firstVariant.variantId;
-
-        if (firstVariant.images.isNotEmpty) {
-          mergedImages[0] = firstVariant.images.first;
-        }
+      if (response == null || response.data == null) {
+        product.value = null;
+        return;
       }
 
-      // Reset page
+      product.value = response.data;
+      priceRange.value = response.priceRange;
+
+      /// 🔥 CRITICAL FIX: Check if product has variants
+      if (response.data!.hasVariants) {
+        // Product HAS variants - fetch them
+        await fetchVariants();
+
+        // If after fetching variants, we still have no variants (empty list)
+        if (allVariants.isEmpty) {
+          // Fallback to product images
+          mergedImages.assignAll(response.data!.images);
+          selectedVariant.value = null;
+          selectedVariantId.value = "";
+        }
+      } else {
+        /// 🔥 PRODUCT HAS NO VARIANTS - Load ALL product images
+        print("📸 Loading ${response.data!.images.length} product images");
+        mergedImages.assignAll(response.data!.images);
+        selectedVariant.value = null;
+        selectedVariantId.value = "";
+      }
+
+      // Reset to first image
       currentImageIndex.value = 0;
       jumpToPageSafe(0);
+    } catch (e) {
+      print("❌ Error fetching product details: $e");
     } finally {
       isProductLoading(false);
     }
 
-    /// Load other sections AFTER product is ready
+    // Load other data
     fetchFaqs();
     fetchSimilarProducts();
     fetchProductReviews();
+  }
+
+// ============================================================
+  // FETCH VARIANTS
+  // ============================================================
+
+  Future<void> fetchVariants() async {
+    try {
+      final variants = await productService.fetchProductVariants(productId);
+      allVariants.assignAll(variants);
+
+      /// If no variants, don't change images
+      if (variants.isEmpty) {
+        return;
+      }
+
+      /// Select first variant by default
+      final first = variants.first;
+      selectedVariant.value = first;
+      selectedVariantId.value = first.variantId;
+
+      /// For variants, use variant images if available
+      if (first.images.isNotEmpty) {
+        mergedImages.assignAll(first.images);
+      } else {
+        /// Fallback to product images
+
+        mergedImages.assignAll(product.value?.images ?? []);
+      }
+    } catch (e) {
+      // print("Error fetching variants: $e");
+    }
+  }
+
+  // ============================================================
+  // GROUP ATTRIBUTES (DYNAMIC)
+  // ============================================================
+
+  Map<String, List<String>> get groupedAttributes {
+    final Map<String, Set<String>> map = {};
+
+    for (var variant in allVariants) {
+      for (var attr in variant.attributes) {
+        map.putIfAbsent(attr.name, () => <String>{});
+        map[attr.name]!.add(attr.value);
+      }
+    }
+
+    return map.map((k, v) => MapEntry(k, v.toList()));
+  }
+
+  // ============================================================
+  // BUILD ATTRIBUTE KEY
+  // ============================================================
+
+  String buildAttributeKey() {
+    final sortedKeys = selectedAttributes.keys.toList()..sort();
+
+    return sortedKeys.map((key) => "$key:${selectedAttributes[key]}").join("|");
+  }
+
+  void selectAttribute(String name, String value) {
+    selectedAttributes[name] = value;
+
+    final key = buildAttributeKey();
+
+    final match = allVariants.firstWhereOrNull(
+      (variant) => variant.attributeKey == key,
+    );
+
+    if (match != null) {
+      selectedVariant.value = match;
+      selectedVariantId.value = match.variantId;
+
+     
+
+      if (match.images.isNotEmpty) {
+        mergedImages.assignAll(match.images);
+      } else {
+        mergedImages.assignAll(product.value?.images ?? []);
+      }
+
+      currentImageIndex.value = 0;
+      jumpToPageSafe(0);
+    }
   }
 
   // ========================================================
@@ -407,6 +596,8 @@ class ProductDetailsController extends GetxController {
     Get.back();
   }
 
+  
+
   void selectVariantById(String variantId) {
     selectedVariantId.value = variantId;
 
@@ -418,26 +609,14 @@ class ProductDetailsController extends GetxController {
       orElse: () => data.variants.first,
     );
 
-    // Always start with base product images
-    mergedImages.assignAll(data.images);
-
-    // Replace only the FIRST image if variant has its own image
     if (variant.images.isNotEmpty) {
-      mergedImages[0] = variant.images.first;
+      mergedImages.assignAll(variant.images);
+    } else {
+      mergedImages.assignAll(data.images);
     }
 
-    // Reset slider
     currentImageIndex.value = 0;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (pageController.hasClients) {
-        pageController.animateToPage(
-          0,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
+    jumpToPageSafe(0);
   }
 
   void clearSelectedVariant() {

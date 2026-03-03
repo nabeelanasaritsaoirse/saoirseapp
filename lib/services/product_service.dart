@@ -7,7 +7,7 @@ import '../main.dart';
 import '../models/plan_model.dart';
 import '../models/product_details_model.dart';
 import '../models/product_faq.dart';
-import '../models/product_list_response.dart';
+import '../models/product_list_response.dart' hide Variant;
 import 'api_service.dart';
 
 class ProductService {
@@ -15,18 +15,51 @@ class ProductService {
     return storage.read(AppConst.ACCESS_TOKEN);
   }
 
-  Future<ProductDetailsData?> fetchProductDetails(String productId) async {
-    final url = "${AppURLs.PRODUCT_DETAILS_API}$productId";
 
-    return APIService.getRequest<ProductDetailsData?>(
+
+  Future<ProductDetailsResponse?> fetchProductDetails(String productId) async {
+  final url = "${AppURLs.PRODUCT_DETAILS_API}$productId";
+
+  return APIService.getRequest<ProductDetailsResponse?>(
+    url: url,
+    onSuccess: (data) {
+      if (data["success"] == true) {
+        return ProductDetailsResponse.fromJson(data);
+      }
+      return null;
+    },
+  );
+}
+
+  
+
+
+
+  Future<List<Variant>> fetchProductVariants(String productId) async {
+    final url = "${AppURLs.PRODUCT_DETAILS_API}$productId/variants";
+
+    final response = await APIService.getRequest(
       url: url,
-      onSuccess: (data) {
-        if (data["success"] == true && data["data"] != null) {
-          return ProductDetailsData.fromJson(data["data"]);
-        }
-        return null;
-      },
+      onSuccess: (data) => data,
     );
+
+    if (response == null || response["success"] != true) {
+      return [];
+    }
+
+    final dynamic data = response["data"];
+
+    if (data is List) {
+      return data.map((e) => Variant.fromJson(e)).toList();
+    }
+
+    if (data is Map && data["variants"] is List) {
+      return (data["variants"] as List)
+          .map((e) => Variant.fromJson(e))
+          .toList();
+    }
+
+    return [];
   }
 
   Future<ProductListResponse?> getProducts(
