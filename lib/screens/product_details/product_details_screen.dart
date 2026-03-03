@@ -525,7 +525,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 children: [
                   /// LEFT SIDE (Label + Colon aligned)
                   Expanded(
-                    flex: 4,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -541,7 +540,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                   /// RIGHT SIDE (Value)
                   Expanded(
-                    flex: 12,
                     child: Row(
                       spacing: 10.w,
                       children: [
