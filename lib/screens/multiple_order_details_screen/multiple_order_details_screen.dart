@@ -1271,7 +1271,42 @@ class _MultipleOrderDetailsScreenState
   Widget _buildCartProductItem(PreviewItem item, Address deliveryAddress) {
     final imageUrl =
         item.product.images.isNotEmpty ? item.product.images.first.url : "";
-    final variantText = item.variant?.attributes.color ?? "";
+      // 🔥 FIX: Find attribute by name from the list
+    String getAttributeValue(String attributeName) {
+      if (item.variant?.attributes == null) return "";
+      final attribute = item.variant!.attributes.firstWhere(
+        (attr) => attr.name.toLowerCase() == attributeName.toLowerCase(),
+        orElse: () => PreviewVariantAttribute(name: '', value: '', id: null),
+      );
+      return attribute.value;
+    }
+
+    // Get specific attribute values
+    final colorValue = getAttributeValue('color');
+    final sizeValue = getAttributeValue('size');
+    final gradeValue = getAttributeValue('grade');
+    final ripenessValue = getAttributeValue('ripeness');
+    
+    // Create a display string from relevant attributes
+    String getVariantDisplayText() {
+      List<String> parts = [];
+      
+      // Add color if exists
+      if (colorValue.isNotEmpty) parts.add(colorValue);
+      
+      // Add size if exists
+      if (sizeValue.isNotEmpty) parts.add(sizeValue);
+      
+      // Add grade if exists (common in your products)
+      if (gradeValue.isNotEmpty) parts.add(gradeValue);
+      
+      // Add ripeness if exists (common in your products)
+      if (ripenessValue.isNotEmpty) parts.add(ripenessValue);
+      
+      return parts.join(" • ");
+    }
+
+    final variantDisplayText = getVariantDisplayText();
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
@@ -1318,11 +1353,12 @@ class _MultipleOrderDetailsScreenState
 
                 // VARIANT
 
-                if (variantText.isNotEmpty)
+                if (variantDisplayText.isNotEmpty)
                   appText(
-                    variantText,
+                    variantDisplayText,
                     fontSize: 11.sp,
                     fontWeight: FontWeight.w600,
+                    color: AppColors.primaryColor,
                   ),
 
                 // PRICE
