@@ -606,6 +606,7 @@ class Variant {
   final List<ImageData> images;
   final bool isActive;
   final String id;
+  final String attributeKey; // NEW FIELD
 
   Variant({
     required this.attributes,
@@ -618,6 +619,7 @@ class Variant {
     required this.images,
     required this.isActive,
     required this.id,
+    required this.attributeKey, // NEW FIELD
   });
 
   factory Variant.fromJson(Map<String, dynamic> json) {
@@ -636,18 +638,56 @@ class Variant {
           .toList(),
       isActive: json["isActive"] ?? false,
       id: json["_id"] ?? "",
+      attributeKey: json["attributeKey"] ?? "", // NEW FIELD
+    );
+  }
+
+  // Optional: Add a copyWith method for easy updating
+  Variant copyWith({
+    List<VariantAttributes>? attributes,
+    String? variantId,
+    String? sku,
+    double? price,
+    double? salePrice,
+    PaymentPlan? paymentPlan,
+    int? stock,
+    List<ImageData>? images,
+    bool? isActive,
+    String? id,
+    String? attributeKey,
+  }) {
+    return Variant(
+      attributes: attributes ?? this.attributes,
+      variantId: variantId ?? this.variantId,
+      sku: sku ?? this.sku,
+      price: price ?? this.price,
+      salePrice: salePrice ?? this.salePrice,
+      paymentPlan: paymentPlan ?? this.paymentPlan,
+      stock: stock ?? this.stock,
+      images: images ?? this.images,
+      isActive: isActive ?? this.isActive,
+      id: id ?? this.id,
+      attributeKey: attributeKey ?? this.attributeKey,
     );
   }
 }
 
 class VariantAttributes {
-  final String color;
+  final String id;
+  final String name;
+  final String value;
 
-  VariantAttributes({required this.color});
+  VariantAttributes({
+    required this.id,
+    required this.name,
+    required this.value,
+  });
 
   factory VariantAttributes.fromJson(Map<String, dynamic> json) {
     return VariantAttributes(
-      color: json["color"] ?? "",
+      id: json["_id"] ?? "",
+      name: json["name"] ?? "",
+      value: json["value"] ?? "",
     );
   }
 }
