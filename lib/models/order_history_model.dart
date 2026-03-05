@@ -85,7 +85,7 @@ class OrderHistoryItem {
       color: "Not specified",
       storage: "",
       price: pricing["finalPrice"] ?? 0,
-      totalProductPrice: json["totalProductPrice"] ?? 0,//actual price
+      totalProductPrice: json["totalProductPrice"] ?? 0, //actual price
       qty: json["quantity"] ?? 1,
       image: imageUrl,
       dailyPlan:
