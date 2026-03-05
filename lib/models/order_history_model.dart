@@ -37,6 +37,7 @@ class OrderHistoryItem {
   final String closeDate;
   final int invested;
   final String currency;
+  final String description;
 
   OrderHistoryItem({
     required this.id,
@@ -53,6 +54,7 @@ class OrderHistoryItem {
     required this.closeDate,
     required this.invested,
     required this.currency,
+    required this.description,
   });
 
 
@@ -62,6 +64,7 @@ class OrderHistoryItem {
   final images = (product["images"] as List?) ?? [];
   final snapshot = json["productSnapshot"] ?? {};
   final schedule = (json["paymentSchedule"] as List?) ?? [];
+  final variant = json["variantDetails"] ?? {};
 
   String imageUrl = "";
   if (images.isNotEmpty && images[0]["url"] != null) {
@@ -90,6 +93,7 @@ class OrderHistoryItem {
     closeDate: closeDateValue,
     invested: json["totalPaidAmount"] ?? 0,
     currency: pricing["currency"] ?? "INR",
+    description: variant["description"] ?? "Not specified",
   );
 }
 
