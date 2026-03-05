@@ -86,11 +86,13 @@ class CartScreen extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final item =
                                 controller.cartData.value!.products[index];
+                           
                             final variantText = buildVariantText({
                               "color": item.variant?.attributes.color,
                               "weight": item.variant?.attributes.weight,
                               "size": item.variant?.attributes.size,
                               "material": item.variant?.attributes.material,
+                              ...?item.variant?.attributes.others
                             });
                             return Container(
                               margin: EdgeInsets.only(bottom: 13.h),
@@ -216,7 +218,7 @@ class CartScreen extends StatelessWidget {
                                               }
 
                                               return appText(
-                                                "Plan: ₹${item.installmentPlan.dailyAmount.toStringAsFixed(2)} / "
+                                                "Plan: ₹${item.installmentPlan.dailyAmount!.toStringAsFixed(2)} / "
                                                 "${item.installmentPlan.totalDays} days",
                                                 fontSize: 12.sp,
                                                 color: AppColors.primaryColor,
@@ -392,7 +394,8 @@ class CartScreen extends StatelessWidget {
                                     );
                                     return;
                                   }
-
+                                  print(
+                                      '🚀 Passing variantIds: ${controller.variantIds}'); // Add this
                                   // ✅ Continue checkout if plan is applied
                                   Get.to(
                                     () => SelectAddress(
@@ -403,6 +406,7 @@ class CartScreen extends StatelessWidget {
                                       selectedAmount:
                                           controller.customAmount.value,
                                       checkoutSource: CheckoutSource.cart,
+                                      variantIds: controller.variantIds,
                                     ),
                                   );
                                 },
