@@ -1,4 +1,39 @@
-## Version 1.7.4+115
+## Version 1.7.5+116
 
-- Merge pull request #421 from nabeelanasaritsaoirse/ci/nabeelanasaritsaoirse-patch-1
-- Update pubspec.yaml
+- Merge pull request #424 from nabeelanasaritsaoirse/developer
+- Merge pull request #423 from nabeelanasaritsaoirse/deep
+- Merge branch 'main' of https://github.com/nishantitsaoirse-head/saoirseapp into deep
+- fix: changed base url
+- Merge remote-tracking branch 'origin/sahir' into deep
+- Fix incorrect converted days and amount calculation in Select Plan sheet
+- fix:
+- updated actual price in order history card,updated model
+- Merge remote-tracking branch 'origin/meganathan' into deep
+- order history model updated,order screen variation changed to description
+- Merge remote-tracking branch 'origin/sahir' into deep
+- Reduced the Atribuite showing space
+- fix: analyze issue
+- Changed CartResponse model and resolved varient showing issue in cart screen
+- fix: solve overflow issue
+- Merge remote-tracking branch 'origin/sahir' into deep
+- Changed the BulkOrderPreviewResponse
+- Merge remote-tracking branch 'origin/sahir' into deep
+- feat(product-details): add variant selection with dynamic pricing and image update
+- Merge remote-tracking branch 'origin/meganathan' into deep
+- In FAQ section what's app message changed
+- Merge remote-tracking branch 'origin/sahir' into deep
+- Update ProductDetails and ProductListing models according to new API response structure
+-  alignment is slightly changed in cart screen
+- Merge remote-tracking branch 'origin/sahir' into deep
+- Merge remote-tracking branch 'origin/meganathan' into deep
+- The empty message font alignment is slightly changed on some screens
+- Update Validation to the phone and pincode fields in Add Address section
+- cart screen delete icon condtion added
+- fix: solved android navbar overlaps issue
+- fea: added skip option in login screen & solved android navbar overlaps issue
+- Merge remote-tracking branch 'origin/sahir' into deep
+- Added optional address fields support in single & multiple order details screens and fixed preview loading issue
+- fix: change to dev url
+- Added optional fields support in Add Address screen and implemented optional address display across Select Address and Order Details screens
+- Merge remote-tracking branch 'origin/meganathan' into deep
+- added image delete api in edit profile
