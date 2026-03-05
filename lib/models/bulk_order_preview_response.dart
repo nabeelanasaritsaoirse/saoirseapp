@@ -33,6 +33,7 @@ class BulkOrderPreviewData {
   final PreviewPayment payment;
   final PreviewWallet wallet;
   final PreviewAddress deliveryAddress;
+  final dynamic referrer; // ✅ Added missing field
   final PreviewValidation validation;
 
   BulkOrderPreviewData({
@@ -43,6 +44,7 @@ class BulkOrderPreviewData {
     required this.payment,
     required this.wallet,
     required this.deliveryAddress,
+    this.referrer, // ✅ Added
     required this.validation,
   });
 
@@ -56,6 +58,7 @@ class BulkOrderPreviewData {
       payment: PreviewPayment.fromJson(json['payment']),
       wallet: PreviewWallet.fromJson(json['wallet']),
       deliveryAddress: PreviewAddress.fromJson(json['deliveryAddress']),
+      referrer: json['referrer'], // ✅ Added
       validation: PreviewValidation.fromJson(json['validation']),
     );
   }
@@ -164,61 +167,74 @@ class PreviewProduct {
 class PreviewImage {
   final String url;
   final bool isPrimary;
+  final String? altText; // ✅ Added missing field
+  final int? order; // ✅ Added missing field
+  final String? id; // ✅ Added missing field
 
   PreviewImage({
     required this.url,
     required this.isPrimary,
+    this.altText,
+    this.order,
+    this.id,
   });
 
   factory PreviewImage.fromJson(Map<String, dynamic> json) {
     return PreviewImage(
       url: json['url'],
       isPrimary: json['isPrimary'] ?? false,
+      altText: json['altText'],
+      order: json['order'],
+      id: json['_id'],
     );
   }
 }
 
-/* ======================= VARIANT ======================= */
+/* ======================= VARIANT (COMPLETELY REWRITTEN) ======================= */
 
 class PreviewVariant {
   final String sku;
-  final PreviewAttributes attributes;
+  final List<PreviewVariantAttribute> attributes; // ✅ Now a LIST
   final double price;
+  final String? description; // ✅ Added missing field
 
   PreviewVariant({
     required this.sku,
     required this.attributes,
     required this.price,
+    this.description,
   });
 
   factory PreviewVariant.fromJson(Map<String, dynamic> json) {
     return PreviewVariant(
       sku: json['sku'],
-      attributes: PreviewAttributes.fromJson(json['attributes']),
+      attributes: (json['attributes'] as List)
+          .map((e) => PreviewVariantAttribute.fromJson(e))
+          .toList(),
       price: (json['price'] ?? 0).toDouble(),
+      description: json['description'],
     );
   }
 }
 
-class PreviewAttributes {
-  final String? color;
-  final String? size;
-  final String? weight;
-  final String? material;
+/* ======================= VARIANT ATTRIBUTE (NEW) ======================= */
 
-  PreviewAttributes({
-    this.color,
-    this.size,
-    this.weight,
-    this.material,
+class PreviewVariantAttribute {
+  final String name;
+  final String value;
+  final String? id;
+
+  PreviewVariantAttribute({
+    required this.name,
+    required this.value,
+    this.id,
   });
 
-  factory PreviewAttributes.fromJson(Map<String, dynamic> json) {
-    return PreviewAttributes(
-      color: json['color'],
-      size: json['size'],
-      weight: json['weight'],
-      material: json['material'],
+  factory PreviewVariantAttribute.fromJson(Map<String, dynamic> json) {
+    return PreviewVariantAttribute(
+      name: json['name'],
+      value: json['value'],
+      id: json['_id'],
     );
   }
 }
@@ -333,30 +349,36 @@ class PreviewAddress {
   final String name;
   final String phoneNumber;
   final String addressLine1;
+  final String? addressLine2;
   final String city;
   final String state;
   final String pincode;
   final String country;
+  final String? landmark;
 
   PreviewAddress({
     required this.name,
     required this.phoneNumber,
     required this.addressLine1,
+    this.addressLine2,
     required this.city,
     required this.state,
     required this.pincode,
     required this.country,
+    this.landmark,
   });
 
   factory PreviewAddress.fromJson(Map<String, dynamic> json) {
     return PreviewAddress(
-      name: json['name'],
-      phoneNumber: json['phoneNumber'],
-      addressLine1: json['addressLine1'],
-      city: json['city'],
-      state: json['state'],
-      pincode: json['pincode'],
-      country: json['country'],
+      name: json['name'] ?? '',
+      phoneNumber: json['phoneNumber'] ?? '',
+      addressLine1: json['addressLine1'] ?? '',
+      addressLine2: json['addressLine2'],
+      city: json['city'] ?? '',
+      state: json['state'] ?? '',
+      pincode: json['pincode'] ?? '',
+      country: json['country'] ?? '',
+      landmark: json['landmark'],
     );
   }
 }

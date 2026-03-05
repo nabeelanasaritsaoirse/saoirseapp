@@ -32,15 +32,16 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.paperColor,
       appBar: CustomAppBar(
         title: AppStrings.carttitle,
         actions: [
           Obx(() {
+            final isLoggedIn = storage.read(AppConst.USER_ID) != null;
             final hasItems = controller.cartData.value != null &&
                 controller.cartData.value!.products.isNotEmpty;
 
-            if (!hasItems) {
+            if (!isLoggedIn || !hasItems) {
               return const SizedBox.shrink(); // hide delete icon
             }
 
@@ -71,15 +72,11 @@ class CartScreen extends StatelessWidget {
                       child: Obx(() {
                         if (controller.cartData.value == null ||
                             controller.cartData.value!.products.isEmpty) {
-                          return ListView(
-                            children: const [
-                              SizedBox(
-                                height: 300,
-                                child: Center(
-                                  child: Text("Your cart is empty"),
-                                ),
-                              )
-                            ],
+                          return Center(
+                            child: appText(
+                              "Your cart is empty",
+                              fontSize: 16.sp,
+                            ),
                           );
                         }
 
@@ -89,14 +86,16 @@ class CartScreen extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final item =
                                 controller.cartData.value!.products[index];
+
                             final variantText = buildVariantText({
                               "color": item.variant?.attributes.color,
                               "weight": item.variant?.attributes.weight,
                               "size": item.variant?.attributes.size,
                               "material": item.variant?.attributes.material,
+                              ...?item.variant?.attributes.others
                             });
                             return Container(
-                              margin: EdgeInsets.only(bottom: 15.h),
+                              margin: EdgeInsets.only(bottom: 13.h),
                               padding: EdgeInsets.all(10.w),
                               decoration: BoxDecoration(
                                 color: AppColors.white,
@@ -188,7 +187,7 @@ class CartScreen extends StatelessWidget {
                                           children: [
                                             appText(
                                               item.name,
-                                              fontSize: 16.sp,
+                                              fontSize: 14.sp,
                                               fontWeight: FontWeight.w600,
                                               textAlign: TextAlign.start,
                                             ),
@@ -219,7 +218,7 @@ class CartScreen extends StatelessWidget {
                                               }
 
                                               return appText(
-                                                "Plan: ₹${item.installmentPlan.dailyAmount.toStringAsFixed(2)} / "
+                                                "Plan: ₹${item.installmentPlan.dailyAmount!.toStringAsFixed(2)} / "
                                                 "${item.installmentPlan.totalDays} days",
                                                 fontSize: 12.sp,
                                                 color: AppColors.primaryColor,
@@ -307,7 +306,7 @@ class CartScreen extends StatelessWidget {
 
                       return Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 16.w, vertical: 12.h),
+                            horizontal: 12.w, vertical: 6.h),
                         decoration: BoxDecoration(
                           color: AppColors.white,
                           boxShadow: [
@@ -349,8 +348,8 @@ class CartScreen extends StatelessWidget {
                                 );
                               },
                               child: Container(
-                                width: 95.w,
-                                height: 40.h,
+                                width: 90.w,
+                                height: 35.h,
                                 decoration: BoxDecoration(
                                     color: AppColors.lightGrey,
                                     borderRadius: BorderRadius.circular(10.r),
@@ -375,8 +374,8 @@ class CartScreen extends StatelessWidget {
 
                             /// CHECKOUT BUTTON
                             SizedBox(
-                              height: 40.h,
-                              width: 130.w,
+                              height: 35.h,
+                              width: 125.w,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primaryColor,
@@ -406,13 +405,14 @@ class CartScreen extends StatelessWidget {
                                       selectedAmount:
                                           controller.customAmount.value,
                                       checkoutSource: CheckoutSource.cart,
+                                      variantIds: controller.variantIds,
                                     ),
                                   );
                                 },
                                 child: appText(
                                   "Check Out",
                                   color: AppColors.white,
-                                  fontSize: 15.sp,
+                                  fontSize: 14.sp,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -450,15 +450,15 @@ class CartScreen extends StatelessWidget {
         .map((e) => e.value)
         .toList();
 
-    //  color + weight available → show only these two
+    // color + weight available → show only these two
     if (color != null && weight != null) {
-      return "$color   |   $weight";
+      return "$color | $weight";
     }
 
-    //  color exists → color + one fallback (if exists)
+    // color exists → color + one fallback (if exists)
     if (color != null) {
-      if (weight != null) return "$color   |   $weight";
-      if (others.isNotEmpty) return "$color   |   ${others.first}";
+      if (weight != null) return "$color | $weight";
+      if (others.isNotEmpty) return "$color | ${others.first}";
       return color; // only one → show it
     }
 
@@ -467,7 +467,7 @@ class CartScreen extends StatelessWidget {
     if (weight != null) finalList.add(weight);
     finalList.addAll(others);
 
-    return finalList.take(2).join("   |   "); // one or two both show
+    return finalList.join(" | "); // one or two both show
   }
 }
 

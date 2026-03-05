@@ -65,8 +65,7 @@ class ManageAddressScreen extends StatelessWidget {
 
                     return addressCard(
                       title: "${item.addressType} (${item.name})",
-                      subtitle:
-                          "${item.addressLine1}, ${item.city}, ${item.state}, ${item.pincode}",
+                      subtitle: getFormattedAddress(item),
                       context: context,
                       address: item,
                     );
@@ -80,6 +79,18 @@ class ManageAddressScreen extends StatelessWidget {
     );
   }
 
+  String getFormattedAddress(Address address) {
+    final line2 = address.addressLine2.trim();
+
+    if (line2.isNotEmpty) {
+      return "${address.addressLine1},\n$line2,"
+          "\n${address.landmark}, ${address.city}, ${address.state}, ${address.pincode}";
+    }
+
+    return "${address.addressLine1}, "
+        "${address.city}, ${address.state}, ${address.pincode}";
+  }
+
   Widget addressCard({
     required String title,
     required String subtitle,
@@ -87,93 +98,124 @@ class ManageAddressScreen extends StatelessWidget {
     required Address address,
   }) {
     return GestureDetector(
-      child: Container(
-        margin: EdgeInsets.only(bottom: 15.h),
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(26), // smoother like image
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadowColor,
-              blurRadius: 20,
-              spreadRadius: 2,
-              offset: const Offset(0, 4), // softer long shadow
+      child: Stack(
+        children: [
+          /// ADDRESS CARD
+          Container(
+            margin: EdgeInsets.only(
+              bottom: 15.h,
+              top: address.isDefault ? 8.h : 0, // prevent badge shadow overlap
             ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // LEFT ICON CIRCLE
-            Container(
-              height: 45.h,
-              width: 45.w,
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor, // navy blue
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.location_on_rounded,
-                color: AppColors.white,
-                size: 26.sp,
-              ),
-            ),
-
-            SizedBox(width: 10.w),
-
-            // TEXT SECTION
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  appText(
-                    title,
-                    fontSize: 17.sp,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.black,
-                  ),
-                  SizedBox(height: 4.h),
-                  appText(
-                    subtitle,
-                    fontSize: 13.sp,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.left,
-                    color: AppColors.textGray,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ],
-              ),
-            ),
-            Column(
-              spacing: 4.h,
-              children: [
-                _actionIconButton(
-                  icon: Icons.edit,
-                  iconColor: AppColors.primaryColor,
-                  backgroundColor: const Color(0xFFEFF1FF),
-                  onTap: () {
-                    Get.to(() => AddAddress(
-                          address: address,
-                        ));
-                  },
-                ),
-                _actionIconButton(
-                  icon: Icons.delete,
-                  iconColor: AppColors.red,
-                  backgroundColor: const Color(0xFFFFECEC),
-                  onTap: () {
-                    DeleteAccountDialog.show(
-                      onDelete: () async {
-                        await controller.deleteAddress(address.id);
-                      },
-                    );
-                  },
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(26),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadowColor,
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 4),
                 ),
               ],
-            )
-          ],
-        ),
+            ),
+            child: Row(
+              children: [
+                /// LEFT ICON CIRCLE
+                Container(
+                  height: 45.h,
+                  width: 45.w,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.location_on_rounded,
+                    color: AppColors.white,
+                    size: 26.sp,
+                  ),
+                ),
+
+                SizedBox(width: 10.w),
+
+                /// TEXT SECTION
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      appText(
+                        title,
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.black,
+                      ),
+                      SizedBox(height: 4.h),
+                      appText(
+                        subtitle,
+                        fontSize: 13.sp,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.left,
+                        color: AppColors.textGray,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ],
+                  ),
+                ),
+
+                /// ACTION BUTTONS
+                Column(
+                  spacing: 4.h,
+                  children: [
+                    _actionIconButton(
+                      icon: Icons.edit,
+                      iconColor: AppColors.primaryColor,
+                      backgroundColor: const Color(0xFFEFF1FF),
+                      onTap: () {
+                        Get.to(() => AddAddress(address: address));
+                      },
+                    ),
+                    _actionIconButton(
+                      icon: Icons.delete,
+                      iconColor: AppColors.red,
+                      backgroundColor: const Color(0xFFFFECEC),
+                      onTap: () {
+                        DeleteAccountDialog.show(
+                          onDelete: () async {
+                            await controller.deleteAddress(address.id);
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+
+          /// 🔥 DEFAULT BADGE (FLOATING TOP LEFT)
+          if (address.isDefault)
+            Positioned(
+              top: 10.r,
+              left: 0,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(26.r),
+                    bottomRight: Radius.circular(14.r),
+                  ),
+                ),
+                child: appText(
+                  "Default",
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.white,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

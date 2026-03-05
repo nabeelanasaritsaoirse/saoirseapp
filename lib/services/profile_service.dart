@@ -183,4 +183,28 @@ class ProfileService {
       );
     }
   }
+
+  // -------- REMOVE PROFILE PICTURE --------
+  Future<bool> removeProfilePicture(String userId) async {
+    try {
+      final token = storage.read(AppConst.ACCESS_TOKEN);
+
+      final url = "${AppURLs.PROFILE_UPDATE_API}$userId/profile-picture";
+
+      final response = await APIService.deleteRequest(
+        url: url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        onSuccess: (json) => json,
+      );
+
+      if (response == null) return false;
+
+      return response["success"] == true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

@@ -151,22 +151,67 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 /// PRICE
                 Row(
                   children: [
-                    appText(
-                      "₹${product.pricing.finalPrice}",
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textBlack,
-                    ),
+                    Obx(() {
+                      final selectedVariant = controller.selectedVariant.value;
+                      final priceRange = controller.priceRange.value;
+
+                      /// If variant selected → show variant pricing
+                      if (selectedVariant != null) {
+                        return Row(
+                          children: [
+                            appText(
+                              "₹${selectedVariant.salePrice.toStringAsFixed(0)}",
+                              fontSize: 22.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textBlack,
+                            ),
+                            SizedBox(width: 8.w),
+                            if (selectedVariant.salePrice !=
+                                selectedVariant.price)
+                              appText(
+                                "₹${selectedVariant.price.toStringAsFixed(0)}",
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.grey,
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                          ],
+                        );
+                      }
+
+                      /// If has variants but none selected → show range
+                      if (product.hasVariants && priceRange != null) {
+                        return appText(
+                          "₹${priceRange.min.toStringAsFixed(0)} - ₹${priceRange.max.toStringAsFixed(0)}",
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textBlack,
+                        );
+                      }
+
+                      /// Normal product (no variants)
+                      return Row(
+                        children: [
+                          appText(
+                            "₹${product.pricing.finalPrice.toStringAsFixed(0)}",
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textBlack,
+                          ),
+                          SizedBox(width: 8.w),
+                          if (product.pricing.finalPrice !=
+                              product.pricing.regularPrice)
+                            appText(
+                              "₹${product.pricing.regularPrice.toStringAsFixed(0)}",
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.grey,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                        ],
+                      );
+                    }),
                     SizedBox(width: 8.w),
-                    if (product.pricing.finalPrice !=
-                        product.pricing.regularPrice)
-                      appText(
-                        "₹${product.pricing.regularPrice}",
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.grey,
-                        decoration: TextDecoration.lineThrough,
-                      ),
                   ],
                 ),
 
@@ -334,66 +379,189 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   // ----------------- VARIANT OPTIONS -----------------
+
   Widget buildVariantOptions(ProductDetailsData product) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        appText(
-          AppStrings.ColorAvailable,
-          fontWeight: FontWeight.w600,
-          fontSize: 14.sp,
-          color: AppColors.textBlack,
-        ),
-        SizedBox(height: 12.h),
-        Obx(() {
-          final selected = controller.selectedVariantId.value;
+    return Obx(() {
+      final variants = controller.allVariants;
 
-          return SizedBox(
-            height: 45.h,
-            child: ListView.builder(
+      if (variants.isEmpty) return const SizedBox.shrink();
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          appText(
+            "Available Variants",
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+          ),
+          SizedBox(height: 10.h),
+          SizedBox(
+            height: 85.h, // 🔥 small horizontal cards
+            child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: product.variants.length,
+              itemCount: variants.length,
+              separatorBuilder: (_, __) => SizedBox(width: 12.w),
               itemBuilder: (context, index) {
-                final variant = product.variants[index];
-                final isSelected = selected == variant.variantId;
+                final variant = variants[index];
 
-                return GestureDetector(
-                  onTap: () => controller.selectVariantById(variant.variantId),
-                  child: Container(
-                    margin: EdgeInsets.only(right: 10.w),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.primaryColor.withOpacity(0.15)
-                          : AppColors.white,
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(
+                return Obx(() {
+                  final isSelected =
+                      controller.selectedVariantId.value == variant.variantId;
+
+                  final attributeText =
+                      variant.attributes.map((attr) => attr.value).join(", ");
+
+                  return GestureDetector(
+                    onTap: () {
+                      controller.selectedVariant.value = variant;
+                      controller.selectedVariantId.value = variant.variantId;
+
+                      if (variant.images.isNotEmpty) {
+                        controller.mergedImages.assignAll(variant.images);
+                      } else {
+                        controller.mergedImages
+                            .assignAll(controller.product.value?.images ?? []);
+                      }
+
+                      controller.currentImageIndex.value = 0;
+                      controller.jumpToPageSafe(0);
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      width: 155.w,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                      decoration: BoxDecoration(
                         color: isSelected
                             ? AppColors.primaryColor
-                            : AppColors.lightGrey,
-                        width: isSelected ? 2 : 1,
+                                .withOpacity(0.12) // 👈 overlay
+                            : AppColors.white,
+                        borderRadius: BorderRadius.circular(16.r),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.primaryColor
+                              : AppColors.lightGrey,
+                          width: isSelected ? 2 : 1,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          appText(
+                            attributeText,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                            maxLines: 2,
+                            textAlign: TextAlign.left,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 4.h),
+                          Row(
+                            children: [
+                              appText(
+                                "₹${variant.salePrice.toStringAsFixed(0)}",
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              SizedBox(
+                                width: 5.w,
+                              ),
+                              if (variant.salePrice != variant.price)
+                                appText(
+                                  "₹${variant.price.toStringAsFixed(0)}",
+                                  fontSize: 12.sp,
+                                  color: AppColors.grey,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
+                            ],
+                          ),
+                          SizedBox(height: 2.h),
+                          appText(
+                            variant.stock > 0 ? "In stock" : "Out of stock",
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                            color:
+                                variant.stock > 0 ? Colors.green : Colors.red,
+                          ),
+                        ],
                       ),
                     ),
-                    child: Center(
-                      child: appText(
-                        variant.attributes.color,
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                        color: isSelected
-                            ? AppColors.primaryColor
-                            : AppColors.textBlack,
-                      ),
-                    ),
-                  ),
-                );
+                  );
+                });
               },
             ),
-          );
-        }),
-        SizedBox(height: 20.h),
-      ],
-    );
+          ),
+          SizedBox(height: 5.h),
+          buildSelectedVariantAttributes()
+        ],
+      );
+    });
+  }
+
+  Widget buildSelectedVariantAttributes() {
+    return Obx(() {
+      final variant = controller.selectedVariant.value;
+
+      if (variant == null || variant.attributes.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 8.h),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          // border: Border.all(color: AppColors.lightGrey),
+        ),
+        child: Column(
+          children: variant.attributes.map((attr) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 6.h),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// LEFT SIDE (Label + Colon aligned)
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        appText(
+                          attr.name,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textBlack,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  /// RIGHT SIDE (Value)
+                  Expanded(
+                    child: Row(
+                      spacing: 10.w,
+                      children: [
+                        appText(
+                          "  ",
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        appText(
+                          attr.value,
+                          fontSize: 13.sp,
+                          textAlign: TextAlign.left,
+                          color: AppColors.textBlack,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      );
+    });
   }
 
   // ----------------- BOTTOM BAR -----------------

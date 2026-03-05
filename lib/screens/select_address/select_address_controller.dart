@@ -23,6 +23,15 @@ class SelectAddressController extends GetxController {
 
     if (response != null && response.success) {
       addressList.assignAll(response.addresses);
+
+      final defaultIndex =
+          addressList.indexWhere((element) => element.isDefault == true);
+
+      if (defaultIndex != -1) {
+        selectedIndex.value = defaultIndex;
+      } else {
+        selectedIndex.value = 0;
+      }
     }
 
     isLoading.value = false;
