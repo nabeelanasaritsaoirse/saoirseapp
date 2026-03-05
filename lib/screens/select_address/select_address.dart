@@ -30,6 +30,7 @@ class SelectAddress extends StatelessWidget {
   final ProductDetailsData? product;
   final CartData? cartData;
   final String? selectVarientId;
+  final List<String>? variantIds;
   final int selectedDays; // NEW
   final double selectedAmount;
   final int? quantity;
@@ -39,6 +40,7 @@ class SelectAddress extends StatelessWidget {
     this.product,
     this.cartData,
     this.selectVarientId,
+    this.variantIds,
     required this.checkoutSource,
     required this.selectedDays,
     required this.selectedAmount,
@@ -149,7 +151,7 @@ class SelectAddress extends StatelessWidget {
                         product: product,
                         cartData: cartData!,
                         selectedDays: selectedDays,
-                        selectVarientId: selectVarientId ?? "",
+                        selectVarientId: variantIds?.join(','),
                         selectedAmount: selectedAmount,
                         quantity: quantity,
                       ),

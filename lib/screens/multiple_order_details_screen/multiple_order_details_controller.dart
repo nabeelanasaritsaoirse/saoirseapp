@@ -231,8 +231,8 @@ class MultipleOrderDetailsController extends GetxController {
       SelectPlanSheetForCart(
         productId: item.productId,
         plans: plans,
-        initialDays: item.installmentPlan.totalDays,
-        initialAmount: item.installmentPlan.dailyAmount,
+        initialDays: item.installmentPlan.totalDays ?? 0,
+        initialAmount: item.installmentPlan.dailyAmount ?? 0,
         totalProductAmount: item.installmentPlan.totalAmount,
         onPlanSelected: (days, amount) async {
           // 🔥 1. UPDATE CART (SOURCE OF TRUTH)
@@ -320,11 +320,13 @@ class MultipleOrderDetailsController extends GetxController {
 
     final updatedQty = item.quantity + 1;
 
+    // Add null checks
+    final dailyAmount = item.installmentPlan.dailyAmount ?? 0.0;
+    final totalDays = item.installmentPlan.totalDays ?? 0;
+
     final updatedItem = item.copyWith(
       quantity: updatedQty,
-      itemTotal: updatedQty *
-          item.installmentPlan.dailyAmount *
-          item.installmentPlan.totalDays,
+      itemTotal: updatedQty * dailyAmount * totalDays,
     );
 
     products[index] = updatedItem; // 🔥 UI updates
@@ -341,11 +343,13 @@ class MultipleOrderDetailsController extends GetxController {
 
     final updatedQty = item.quantity - 1;
 
+    // Add null checks
+    final dailyAmount = item.installmentPlan.dailyAmount ?? 0.0;
+    final totalDays = item.installmentPlan.totalDays ?? 0;
+
     final updatedItem = item.copyWith(
       quantity: updatedQty,
-      itemTotal: updatedQty *
-          item.installmentPlan.dailyAmount *
-          item.installmentPlan.totalDays,
+      itemTotal: updatedQty * dailyAmount * totalDays,
     );
 
     products[index] = updatedItem; // 🔥 UI updates
@@ -360,12 +364,16 @@ class MultipleOrderDetailsController extends GetxController {
     final cartItem = products[index];
     final newQty = cartItem.quantity + 1;
 
+    // Add null checks
+    final dailyAmount = cartItem.installmentPlan.dailyAmount ?? 0.0;
+    final totalDays = cartItem.installmentPlan.totalDays ?? 0;
+
     // 🔥 base per-day amount for 1 qty
-    final basePerDay = cartItem.installmentPlan.dailyAmount / cartItem.quantity;
+    final basePerDay = dailyAmount / cartItem.quantity;
 
     final updatedPlan = cartItem.installmentPlan.copyWith(
       dailyAmount: basePerDay * newQty, // 🔥 SCALE
-      totalAmount: basePerDay * newQty * cartItem.installmentPlan.totalDays,
+      totalAmount: basePerDay * newQty * totalDays,
     );
 
     // 🔥 UPDATE CART (SOURCE OF TRUTH)
@@ -397,11 +405,15 @@ class MultipleOrderDetailsController extends GetxController {
 
     final newQty = cartItem.quantity - 1;
 
-    final basePerDay = cartItem.installmentPlan.dailyAmount / cartItem.quantity;
+    // Add null checks
+    final dailyAmount = cartItem.installmentPlan.dailyAmount ?? 0.0;
+    final totalDays = cartItem.installmentPlan.totalDays ?? 0;
+
+    final basePerDay = dailyAmount / cartItem.quantity;
 
     final updatedPlan = cartItem.installmentPlan.copyWith(
       dailyAmount: basePerDay * newQty,
-      totalAmount: basePerDay * newQty * cartItem.installmentPlan.totalDays,
+      totalAmount: basePerDay * newQty * totalDays,
     );
 
     cartController.updateProductWithPlan(

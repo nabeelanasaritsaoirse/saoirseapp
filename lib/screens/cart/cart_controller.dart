@@ -429,4 +429,29 @@ class CartController extends GetxController {
 
     applyCartPlan(customAmount.value);
   }
+
+  // Add this getter to CartController
+  List<String> get variantIds {
+    if (cartData.value == null) return [];
+
+    return cartData.value!.products
+        .map((product) {
+          // Return variantId if exists, otherwise empty string or productId
+          return product.variant?.variantId ?? '';
+        })
+        .where((id) => id.isNotEmpty)
+        .toList();
+  }
+
+  // Or if you need both productId and variantId mapping
+  Map<String, String?> get productVariantMap {
+    if (cartData.value == null) return {};
+
+    // ignore: prefer_for_elements_to_map_fromiterable
+    return Map.fromIterable(
+      cartData.value!.products,
+      key: (p) => p.productId,
+      value: (p) => p.variant?.variantId,
+    );
+  }
 }

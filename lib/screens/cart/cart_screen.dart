@@ -86,11 +86,13 @@ class CartScreen extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final item =
                                 controller.cartData.value!.products[index];
+
                             final variantText = buildVariantText({
                               "color": item.variant?.attributes.color,
                               "weight": item.variant?.attributes.weight,
                               "size": item.variant?.attributes.size,
                               "material": item.variant?.attributes.material,
+                              ...?item.variant?.attributes.others
                             });
                             return Container(
                               margin: EdgeInsets.only(bottom: 13.h),
@@ -216,7 +218,7 @@ class CartScreen extends StatelessWidget {
                                               }
 
                                               return appText(
-                                                "Plan: ₹${item.installmentPlan.dailyAmount.toStringAsFixed(2)} / "
+                                                "Plan: ₹${item.installmentPlan.dailyAmount!.toStringAsFixed(2)} / "
                                                 "${item.installmentPlan.totalDays} days",
                                                 fontSize: 12.sp,
                                                 color: AppColors.primaryColor,
@@ -403,6 +405,7 @@ class CartScreen extends StatelessWidget {
                                       selectedAmount:
                                           controller.customAmount.value,
                                       checkoutSource: CheckoutSource.cart,
+                                      variantIds: controller.variantIds,
                                     ),
                                   );
                                 },
@@ -447,15 +450,15 @@ class CartScreen extends StatelessWidget {
         .map((e) => e.value)
         .toList();
 
-    //  color + weight available → show only these two
+    // color + weight available → show only these two
     if (color != null && weight != null) {
-      return "$color   |   $weight";
+      return "$color | $weight";
     }
 
-    //  color exists → color + one fallback (if exists)
+    // color exists → color + one fallback (if exists)
     if (color != null) {
-      if (weight != null) return "$color   |   $weight";
-      if (others.isNotEmpty) return "$color   |   ${others.first}";
+      if (weight != null) return "$color | $weight";
+      if (others.isNotEmpty) return "$color | ${others.first}";
       return color; // only one → show it
     }
 
@@ -464,7 +467,7 @@ class CartScreen extends StatelessWidget {
     if (weight != null) finalList.add(weight);
     finalList.addAll(others);
 
-    return finalList.take(2).join("   |   "); // one or two both show
+    return finalList.join(" | "); // one or two both show
   }
 }
 
