@@ -116,7 +116,7 @@ class OrderCard extends StatelessWidget {
                             textAlign: TextAlign.start),
                         SizedBox(height: 4.h),
                         appText(
-                          '₹${order.price.toString()}',
+                          '₹${order.totalProductPrice}',
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                           color: AppColors.textBlack,
