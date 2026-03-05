@@ -94,7 +94,8 @@ class CartProduct {
       stock: json['stock'] ?? 0,
       isActive: json['isActive'] ?? false,
       quantity: json['quantity'] ?? 1,
-      variant: json['variant'] != null ? Variant.fromJson(json['variant']) : null,
+      variant:
+          json['variant'] != null ? Variant.fromJson(json['variant']) : null,
       installmentPlan: InstallmentPlan.fromJson(json['installmentPlan'] ?? {}),
       addedAt: json['addedAt'] ?? "",
       updatedAt: json['updatedAt'] ?? "",
@@ -148,45 +149,45 @@ class Variant {
       description: json['description'] ?? "",
     );
   }
-  
+
   static VariantAttributes _parseAttributes(dynamic attributesJson) {
-  if (attributesJson == null) {
-    return VariantAttributes();
-  }
-
-  if (attributesJson is List) {
-    Map<String, String> others = {};
-    VariantAttributes base = VariantAttributes();
-
-    for (var attr in attributesJson) {
-      final map = Map<String, dynamic>.from(attr);
-
-      // format 1: {color,size,weight}
-      if (map.containsKey("color") ||
-          map.containsKey("size") ||
-          map.containsKey("weight")) {
-        base = VariantAttributes.fromJson(map);
-      }
-
-      // format 2: {name,value}
-      if (map.containsKey("name") && map.containsKey("value")) {
-        others[map["name"].toString()] = map["value"].toString();
-      }
+    if (attributesJson == null) {
+      return VariantAttributes();
     }
 
-    return VariantAttributes(
-      color: base.color,
-      size: base.size,
-      weight: base.weight,
-      purity: base.purity,
-      material: base.material,
-      others: others,
-    );
-  }
+    if (attributesJson is List) {
+      Map<String, String> others = {};
+      VariantAttributes base = VariantAttributes();
 
-  return VariantAttributes.fromJson(
-      Map<String, dynamic>.from(attributesJson));
-}
+      for (var attr in attributesJson) {
+        final map = Map<String, dynamic>.from(attr);
+
+        // format 1: {color,size,weight}
+        if (map.containsKey("color") ||
+            map.containsKey("size") ||
+            map.containsKey("weight")) {
+          base = VariantAttributes.fromJson(map);
+        }
+
+        // format 2: {name,value}
+        if (map.containsKey("name") && map.containsKey("value")) {
+          others[map["name"].toString()] = map["value"].toString();
+        }
+      }
+
+      return VariantAttributes(
+        color: base.color,
+        size: base.size,
+        weight: base.weight,
+        purity: base.purity,
+        material: base.material,
+        others: others,
+      );
+    }
+
+    return VariantAttributes.fromJson(
+        Map<String, dynamic>.from(attributesJson));
+  }
 }
 
 class VariantAttributes {
@@ -249,8 +250,8 @@ class InstallmentPlan {
   factory InstallmentPlan.fromJson(Map<String, dynamic> json) {
     return InstallmentPlan(
       totalDays: json['totalDays'], // Can be null
-      dailyAmount: json['dailyAmount'] != null 
-          ? (json['dailyAmount'] as num).toDouble() 
+      dailyAmount: json['dailyAmount'] != null
+          ? (json['dailyAmount'] as num).toDouble()
           : null,
       totalAmount: (json['totalAmount'] ?? 0).toDouble(),
     );
@@ -294,5 +295,3 @@ class ProductImage {
     );
   }
 }
-
-

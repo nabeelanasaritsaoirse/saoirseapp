@@ -86,7 +86,7 @@ class CartScreen extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final item =
                                 controller.cartData.value!.products[index];
-                           
+
                             final variantText = buildVariantText({
                               "color": item.variant?.attributes.color,
                               "weight": item.variant?.attributes.weight,
@@ -394,8 +394,7 @@ class CartScreen extends StatelessWidget {
                                     );
                                     return;
                                   }
-                                  print(
-                                      '🚀 Passing variantIds: ${controller.variantIds}'); // Add this
+
                                   // ✅ Continue checkout if plan is applied
                                   Get.to(
                                     () => SelectAddress(

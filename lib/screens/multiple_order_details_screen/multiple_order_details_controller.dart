@@ -193,34 +193,32 @@ class MultipleOrderDetailsController extends GetxController {
     return map;
   }
 
-
   void updatePlan({
-  required String productId,
-  required int days,
-  required double dailyAmount,
-}) {
-  final index = products.indexWhere(
-    (p) => p.productId == productId,
-  );
+    required String productId,
+    required int days,
+    required double dailyAmount,
+  }) {
+    final index = products.indexWhere(
+      (p) => p.productId == productId,
+    );
 
-  if (index == -1) return;
+    if (index == -1) return;
 
-  final oldItem = products[index];
-  
- 
-  final updatedPlan = oldItem.installmentPlan.copyWith(
-    totalDays: days,
-    dailyAmount: dailyAmount,
-    totalAmount: days * dailyAmount,
-  );
+    final oldItem = products[index];
 
-  final updatedItem = oldItem.copyWith(
-    installmentPlan: updatedPlan,
-    itemTotal: days * dailyAmount * oldItem.quantity, // 👈 IMPORTANT
-  );
+    final updatedPlan = oldItem.installmentPlan.copyWith(
+      totalDays: days,
+      dailyAmount: dailyAmount,
+      totalAmount: days * dailyAmount,
+    );
 
-  products[index] = updatedItem; // 🔥 instant UI update
-}
+    final updatedItem = oldItem.copyWith(
+      installmentPlan: updatedPlan,
+      itemTotal: days * dailyAmount * oldItem.quantity, // 👈 IMPORTANT
+    );
+
+    products[index] = updatedItem; // 🔥 instant UI update
+  }
 
   void openPlanEditor(CartProduct item) async {
     appLoader();
@@ -322,16 +320,14 @@ class MultipleOrderDetailsController extends GetxController {
 
     final updatedQty = item.quantity + 1;
 
-      // Add null checks
-  final dailyAmount = item.installmentPlan.dailyAmount ?? 0.0;
-  final totalDays = item.installmentPlan.totalDays ?? 0;
+    // Add null checks
+    final dailyAmount = item.installmentPlan.dailyAmount ?? 0.0;
+    final totalDays = item.installmentPlan.totalDays ?? 0;
 
-    
-
-      final updatedItem = item.copyWith(
-    quantity: updatedQty,
-    itemTotal: updatedQty * dailyAmount * totalDays,
-  );
+    final updatedItem = item.copyWith(
+      quantity: updatedQty,
+      itemTotal: updatedQty * dailyAmount * totalDays,
+    );
 
     products[index] = updatedItem; // 🔥 UI updates
   }
@@ -347,16 +343,14 @@ class MultipleOrderDetailsController extends GetxController {
 
     final updatedQty = item.quantity - 1;
 
-      // Add null checks
-  final dailyAmount = item.installmentPlan.dailyAmount ?? 0.0;
-  final totalDays = item.installmentPlan.totalDays ?? 0;
+    // Add null checks
+    final dailyAmount = item.installmentPlan.dailyAmount ?? 0.0;
+    final totalDays = item.installmentPlan.totalDays ?? 0;
 
-    
-     final updatedItem = item.copyWith(
-    quantity: updatedQty,
-    itemTotal: updatedQty * dailyAmount * totalDays,
-  );
-
+    final updatedItem = item.copyWith(
+      quantity: updatedQty,
+      itemTotal: updatedQty * dailyAmount * totalDays,
+    );
 
     products[index] = updatedItem; // 🔥 UI updates
   }
@@ -370,18 +364,17 @@ class MultipleOrderDetailsController extends GetxController {
     final cartItem = products[index];
     final newQty = cartItem.quantity + 1;
 
-     // Add null checks
-  final dailyAmount = cartItem.installmentPlan.dailyAmount ?? 0.0;
-  final totalDays = cartItem.installmentPlan.totalDays ?? 0;
+    // Add null checks
+    final dailyAmount = cartItem.installmentPlan.dailyAmount ?? 0.0;
+    final totalDays = cartItem.installmentPlan.totalDays ?? 0;
 
-  // 🔥 base per-day amount for 1 qty
-  final basePerDay = dailyAmount / cartItem.quantity;
-
+    // 🔥 base per-day amount for 1 qty
+    final basePerDay = dailyAmount / cartItem.quantity;
 
     final updatedPlan = cartItem.installmentPlan.copyWith(
-    dailyAmount: basePerDay * newQty, // 🔥 SCALE
-    totalAmount: basePerDay * newQty * totalDays,
-  );
+      dailyAmount: basePerDay * newQty, // 🔥 SCALE
+      totalAmount: basePerDay * newQty * totalDays,
+    );
 
     // 🔥 UPDATE CART (SOURCE OF TRUTH)
     cartController.updateProductWithPlan(
@@ -412,17 +405,16 @@ class MultipleOrderDetailsController extends GetxController {
 
     final newQty = cartItem.quantity - 1;
 
-     // Add null checks
-  final dailyAmount = cartItem.installmentPlan.dailyAmount ?? 0.0;
-  final totalDays = cartItem.installmentPlan.totalDays ?? 0;
+    // Add null checks
+    final dailyAmount = cartItem.installmentPlan.dailyAmount ?? 0.0;
+    final totalDays = cartItem.installmentPlan.totalDays ?? 0;
 
-  final basePerDay = dailyAmount / cartItem.quantity;
+    final basePerDay = dailyAmount / cartItem.quantity;
 
-
-      final updatedPlan = cartItem.installmentPlan.copyWith(
-    dailyAmount: basePerDay * newQty,
-    totalAmount: basePerDay * newQty * totalDays,
-  );
+    final updatedPlan = cartItem.installmentPlan.copyWith(
+      dailyAmount: basePerDay * newQty,
+      totalAmount: basePerDay * newQty * totalDays,
+    );
 
     cartController.updateProductWithPlan(
       productId: cartItem.productId,

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import '../constants/app_constant.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
@@ -61,8 +59,6 @@ class CartService {
                   "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}")
               .toList(),
       };
-
-      log("Sending add TO cart body =====> $body");
 
       final response = await APIService.postRequest(
         url: url,
