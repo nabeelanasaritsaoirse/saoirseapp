@@ -151,7 +151,7 @@ class PreviewCategory {
 class PreviewVariant {
   final String variantId;
   final String sku;
-  final Map<String, dynamic> attributes;
+  final List<PreviewVariantAttribute> attributes;
   final double price;
 
   PreviewVariant({
@@ -165,8 +165,30 @@ class PreviewVariant {
     return PreviewVariant(
       variantId: json['variantId'] ?? '',
       sku: json['sku'] ?? '',
-      attributes: json['attributes'] ?? {},
+      attributes: (json['attributes'] as List? ?? [])
+          .map((e) => PreviewVariantAttribute.fromJson(e))
+          .toList(),
       price: (json['price'] ?? 0).toDouble(),
+    );
+  }
+}
+
+class PreviewVariantAttribute {
+  final String id;
+  final String name;
+  final String value;
+
+  PreviewVariantAttribute({
+    required this.id,
+    required this.name,
+    required this.value,
+  });
+
+  factory PreviewVariantAttribute.fromJson(Map<String, dynamic> json) {
+    return PreviewVariantAttribute(
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      value: json['value'] ?? '',
     );
   }
 }

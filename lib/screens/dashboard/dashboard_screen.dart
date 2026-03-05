@@ -41,6 +41,7 @@ class DashboardScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
+        backgroundColor: AppColors.paperColor,
         body: Obx(
           () => Column(
             children: [
