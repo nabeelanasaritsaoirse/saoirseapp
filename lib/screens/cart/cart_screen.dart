@@ -86,7 +86,7 @@ class CartScreen extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final item =
                                 controller.cartData.value!.products[index];
-                           
+
                             final variantText = buildVariantText({
                               "color": item.variant?.attributes.color,
                               "weight": item.variant?.attributes.weight,
@@ -458,8 +458,8 @@ class CartScreen extends StatelessWidget {
 
     //  color exists → color + one fallback (if exists)
     if (color != null) {
-      if (weight != null) return "$color   |   $weight";
-      if (others.isNotEmpty) return "$color   |   ${others.first}";
+      if (weight != null) return "$color | $weight";
+      if (others.isNotEmpty) return "$color | ${others.first}";
       return color; // only one → show it
     }
 
@@ -468,7 +468,7 @@ class CartScreen extends StatelessWidget {
     if (weight != null) finalList.add(weight);
     finalList.addAll(others);
 
-    return finalList.take(2).join("   |   "); // one or two both show
+    return finalList.join(" | "); // one or two both show
   }
 }
 
