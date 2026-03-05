@@ -20,6 +20,7 @@ import '../../services/wishlist_service.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_toast.dart';
+import '../cart/cart_controller.dart';
 import '../dashboard/dashboard_controller.dart';
 import '../login/login_page.dart';
 import '../notification/notification_controller.dart';
@@ -40,6 +41,7 @@ class ProfileController extends GetxController {
   // ================== IMAGE PICKER ==================
   final ImagePicker _picker = ImagePicker();
   Rx<File?> profileImage = Rx<File?>(null);
+  RxBool isImageMarkedForDeletion = false.obs;
 
   // ------------------ COUNTRY ------------------
   Rx<Country?> country = Rx<Country?>(null);
@@ -227,6 +229,7 @@ class ProfileController extends GetxController {
       phoneNumberController.text = user.phoneNumber;
     }
     profileImage.value = null;
+    isImageMarkedForDeletion.value = false;
   }
 
   // This method updates both the username and profile picture if (provided)
@@ -246,6 +249,21 @@ class ProfileController extends GetxController {
 
     try {
       isLoading(true);
+
+      // -------- DELETE IMAGE --------
+      if (isImageMarkedForDeletion.value) {
+        final deleted = await _profileService.removeProfilePicture(userId);
+
+        if (!deleted) {
+          appToaster(
+            error: true,
+            content: "Unable to remove profile picture",
+          );
+          return;
+        }
+
+        isImageMarkedForDeletion.value = false;
+      }
 
       // Upload image if selected
       if (profileImage.value != null) {
@@ -331,7 +349,7 @@ class ProfileController extends GetxController {
           Get.find<DashboardController>().selectedIndex.value = 0;
         }
         // Navigate immediately
-        Get.offAll(() => LoginPage());
+        Get.to(() => LoginPage());
 
         // Perform logout in background
         logoutUserInBackground();
@@ -357,6 +375,10 @@ class ProfileController extends GetxController {
 
       // Clear storage
       await storage.erase();
+
+      Get.find<NotificationController>().updateToken('');
+      Get.find<NotificationController>().unreadCount.value = 0;
+      Get.find<CartController>().cartCount.value = 0;
 
       // // Clear controllers
       // Get.deleteAll(force: true);
@@ -489,6 +511,19 @@ class ProfileController extends GetxController {
   }
 
 //-------------------------------------------------------------------------------------------------------------------------------------
+
+// ---------------- REMOVE PROFILE IMAGE (LOCAL ONLY) ----------------
+  void removeProfileImage() {
+    profileImage.value = null;
+
+    final hasServerImage =
+        profile.value?.user.profilePicture.isNotEmpty ?? false;
+
+    if (hasServerImage) {
+      isImageMarkedForDeletion.value = true;
+    }
+  }
+
   // ================== CLEANUP ==================
   @override
   void onClose() {

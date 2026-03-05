@@ -1,9 +1,10 @@
-import 'dart:developer';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../constants/app_constant.dart';
+import '../../main.dart';
 import '../../models/faq_model.dart';
 import '../../services/faq_service.dart';
 
@@ -30,7 +31,7 @@ class FaqController extends GetxController {
 
       faqList.assignAll(result);
     } catch (e) {
-      log(e.toString());
+      debugPrint(e.toString());
     } finally {
       isLoading.value = false;
     }
@@ -49,7 +50,7 @@ class FaqController extends GetxController {
 
       await launchUrl(phoneUri);
     } catch (e) {
-      log('Error launching dialer: $e');
+      debugPrint('Error launching dialer: $e');
     }
   }
 
@@ -57,7 +58,9 @@ class FaqController extends GetxController {
   Future<void> openWhatsAppSupport() async {
     try {
       final String number = dotenv.env['CUSTOMER_SUPPORT_NUMBER'] ?? '';
-      const String message = "Hello, I need help regarding EPI services.";
+      final String username = storage.read(AppConst.USER_NAME) ?? '';
+      final String message =
+          "Hello, I'm $username.\nI need help regarding EPI services.";
 
       if (number.isEmpty) {
         return;
@@ -72,7 +75,7 @@ class FaqController extends GetxController {
         mode: LaunchMode.externalApplication,
       );
     } catch (e) {
-      log('Error launching WhatsApp: $e');
+      debugPrint('Error launching WhatsApp: $e');
     }
   }
 

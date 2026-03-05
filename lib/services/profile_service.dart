@@ -42,7 +42,7 @@ class ProfileService {
   Future<bool> updateProfilePicture(String userId, String imagePath) async {
     try {
       final token = storage.read(AppConst.ACCESS_TOKEN); // FETCH DYNAMICALLY
-      final url = "${AppURLs.BASE_API}api/users/$userId/profile-picture";
+      final url = "${AppURLs.PROFILE_UPDATE_API}$userId/profile-picture";
 
       // ---- FORCE NEW FILE NAME WITH .jpg ----
       final originalFile = File(imagePath);
@@ -181,6 +181,30 @@ class ProfileService {
       throw Exception(
         "Failed to load DELETE INFO (${response.statusCode})",
       );
+    }
+  }
+
+  // -------- REMOVE PROFILE PICTURE --------
+  Future<bool> removeProfilePicture(String userId) async {
+    try {
+      final token = storage.read(AppConst.ACCESS_TOKEN);
+
+      final url = "${AppURLs.PROFILE_UPDATE_API}$userId/profile-picture";
+
+      final response = await APIService.deleteRequest(
+        url: url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        onSuccess: (json) => json,
+      );
+
+      if (response == null) return false;
+
+      return response["success"] == true;
+    } catch (e) {
+      return false;
     }
   }
 }

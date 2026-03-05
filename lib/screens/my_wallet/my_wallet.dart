@@ -71,195 +71,202 @@ class _WalletScreenState extends State<WalletScreen> {
       ),
       body: !isLoggedIn
           ? _loginOnlyView()
-          : RefreshIndicator(
-              onRefresh: controller.refreshAll,
-              color: AppColors.primaryColor, // spinner color
-              backgroundColor: AppColors.white,
+          : Column(
+              children: [
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: controller.refreshAll,
+                    color: AppColors.primaryColor, // spinner color
+                    backgroundColor: AppColors.white,
 
-              child: Obx(() {
-                if (controller.errorMessage.isNotEmpty) {
-                  return ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      SizedBox(height: 200.h),
-                      Center(child: Text(controller.errorMessage.value)),
-                    ],
-                  );
-                }
+                    child: Obx(() {
+                      if (controller.errorMessage.isNotEmpty) {
+                        return ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            SizedBox(height: 200.h),
+                            Center(child: Text(controller.errorMessage.value)),
+                          ],
+                        );
+                      }
 
-                if (controller.isLoading.value) {
-                  return ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      SizedBox(height: 200.h),
-                      appLoader(),
-                    ],
-                  );
-                }
+                      if (controller.isLoading.value) {
+                        return ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            SizedBox(height: 200.h),
+                            appLoader(),
+                          ],
+                        );
+                      }
 
-                final walletData = controller.wallet.value;
+                      final walletData = controller.wallet.value;
 
-                if (walletData == null) {
-                  return ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      SizedBox(height: 200.h),
-                      Center(
-                        child: appText(
-                          "Failed to load wallet...!",
-                          color: AppColors.black,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16.sp,
-                        ),
-                      ),
-                    ],
-                  );
-                }
-
-                if (walletData.transactions.isEmpty) {
-                  return ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      walletCard(
-                        mainBalance: walletData.walletBalance,
-                        totalBalance: walletData.totalBalance,
-                        referralBonus: walletData.referralBonus,
-                        holdBalance: walletData.holdBalance,
-                        investDaily: walletData.totalBalance,
-                      ),
-                      SizedBox(height: 40.h),
-                      Column(
-                        children: [
-                          SizedBox(
-                            height: 50.h,
-                          ),
-                          Center(
-                            child: appText(
-                              "No wallet history found",
-                              color: AppColors.grey,
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w500,
+                      if (walletData == null) {
+                        return ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            SizedBox(height: 200.h),
+                            Center(
+                              child: appText(
+                                "Failed to load wallet...!",
+                                color: AppColors.black,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 16.sp,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                }
+                          ],
+                        );
+                      }
 
-                return ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  itemCount: walletData.transactions.length + 4,
-                  itemBuilder: (context, index) {
-                    // ---------- WALLET CARD ----------
-                    if (index == 0) {
-                      return walletCard(
-                        mainBalance: walletData.walletBalance,
-                        totalBalance: walletData.totalBalance,
-                        referralBonus: walletData.referralBonus,
-                        holdBalance: walletData.holdBalance,
-                        investDaily: walletData.totalBalance,
-                      );
-                    }
-
-                    if (index == 1) {
-                      return SizedBox(height: 8.h);
-                    }
-
-                    // ---------- TITLE ----------
-                    if (index == 2) {
-                      return Center(
-                        child: appText(
-                          "Wallet History",
-                          color: AppColors.black,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
-                        ),
-                      );
-                    }
-
-                    if (index == 3) {
-                      return SizedBox(height: 8.h);
-                    }
-
-                    // ---------- TRANSACTIONS ----------
-                    final item = walletData.transactions[index - 4];
-
-                    return Container(
-                      margin: EdgeInsets.only(
-                        left: 12.w,
-                        right: 12.w,
-                        bottom: 16.h,
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(12.r),
-                            decoration: BoxDecoration(
-                              color: AppColors.blueshade,
-                              borderRadius: BorderRadius.circular(14.r),
+                      if (walletData.transactions.isEmpty) {
+                        return ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            walletCard(
+                              mainBalance: walletData.walletBalance,
+                              totalBalance: walletData.totalBalance,
+                              referralBonus: walletData.referralBonus,
+                              holdBalance: walletData.holdBalance,
+                              investDaily: walletData.totalBalance,
                             ),
-                            child:
-                                Text("💸", style: TextStyle(fontSize: 30.sp)),
-                          ),
-                          SizedBox(width: 12.w),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            SizedBox(height: 40.h),
+                            Column(
                               children: [
-                                appText(
-                                  item.type.toUpperCase(),
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w700,
+                                SizedBox(
+                                  height: 50.h,
                                 ),
-                                SizedBox(height: 3.h),
-                                appText(
-                                  item.status,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w400,
+                                Center(
+                                  child: appText(
+                                    "No wallet history found",
+                                    color: AppColors.grey,
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                          appText(
-                            "₹ ${item.amount}",
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                            color: item.amount > 0 ? Colors.green : Colors.red,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              }),
-            ),
-      bottomNavigationBar: !isLoggedIn
-          ? const SizedBox.shrink()
-          : Obx(() {
-              final walletData = controller.wallet.value;
+                          ],
+                        );
+                      }
 
-              if (walletData == null || walletData.walletBalance <= 0) {
-                return const SizedBox.shrink(); // hide withdraw button
-              }
+                      return ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        itemCount: walletData.transactions.length + 4,
+                        itemBuilder: (context, index) {
+                          // ---------- WALLET CARD ----------
+                          if (index == 0) {
+                            return walletCard(
+                              mainBalance: walletData.walletBalance,
+                              totalBalance: walletData.totalBalance,
+                              referralBonus: walletData.referralBonus,
+                              holdBalance: walletData.holdBalance,
+                              investDaily: walletData.totalBalance,
+                            );
+                          }
 
-              return Padding(
-                padding: const EdgeInsets.all(10),
-                child: appButton(
-                  buttonColor: AppColors.primaryColor,
-                  onTap: () => Get.to(() => SelectAccountScreen()),
-                  child: Center(
-                    child: appText(
-                      "Withdraw",
-                      color: AppColors.white,
-                      fontSize: 20.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+                          if (index == 1) {
+                            return SizedBox(height: 8.h);
+                          }
+
+                          // ---------- TITLE ----------
+                          if (index == 2) {
+                            return Center(
+                              child: appText(
+                                "Wallet History",
+                                color: AppColors.black,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16.sp,
+                              ),
+                            );
+                          }
+
+                          if (index == 3) {
+                            return SizedBox(height: 8.h);
+                          }
+
+                          // ---------- TRANSACTIONS ----------
+                          final item = walletData.transactions[index - 4];
+
+                          return Container(
+                            margin: EdgeInsets.only(
+                              left: 12.w,
+                              right: 12.w,
+                              bottom: 16.h,
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(12.r),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.blueshade,
+                                    borderRadius: BorderRadius.circular(14.r),
+                                  ),
+                                  child: Text("💸",
+                                      style: TextStyle(fontSize: 30.sp)),
+                                ),
+                                SizedBox(width: 12.w),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      appText(
+                                        item.type.toUpperCase(),
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      SizedBox(height: 3.h),
+                                      appText(
+                                        item.status,
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                appText(
+                                  "₹ ${item.amount}",
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: item.amount > 0
+                                      ? Colors.green
+                                      : Colors.red,
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    }),
                   ),
                 ),
-              );
-            }),
+                Obx(() {
+                  final walletData = controller.wallet.value;
+
+                  if (walletData == null || walletData.walletBalance <= 0) {
+                    return const SizedBox.shrink(); // hide withdraw button
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: appButton(
+                      buttonColor: AppColors.primaryColor,
+                      onTap: () => Get.to(() => SelectAccountScreen()),
+                      child: Center(
+                        child: appText(
+                          "Withdraw",
+                          color: AppColors.white,
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            ),
     );
   }
 

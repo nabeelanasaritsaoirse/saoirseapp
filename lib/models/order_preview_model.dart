@@ -151,7 +151,7 @@ class PreviewCategory {
 class PreviewVariant {
   final String variantId;
   final String sku;
-  final Map<String, dynamic> attributes;
+  final List<PreviewVariantAttribute> attributes;
   final double price;
 
   PreviewVariant({
@@ -165,8 +165,30 @@ class PreviewVariant {
     return PreviewVariant(
       variantId: json['variantId'] ?? '',
       sku: json['sku'] ?? '',
-      attributes: json['attributes'] ?? {},
+      attributes: (json['attributes'] as List? ?? [])
+          .map((e) => PreviewVariantAttribute.fromJson(e))
+          .toList(),
       price: (json['price'] ?? 0).toDouble(),
+    );
+  }
+}
+
+class PreviewVariantAttribute {
+  final String id;
+  final String name;
+  final String value;
+
+  PreviewVariantAttribute({
+    required this.id,
+    required this.name,
+    required this.value,
+  });
+
+  factory PreviewVariantAttribute.fromJson(Map<String, dynamic> json) {
+    return PreviewVariantAttribute(
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      value: json['value'] ?? '',
     );
   }
 }
@@ -298,19 +320,23 @@ class PreviewAddress {
   final String name;
   final String phoneNumber;
   final String addressLine1;
+  final String? addressLine2;
   final String city;
   final String state;
   final String pincode;
   final String country;
+  final String? landmark;
 
   PreviewAddress({
     required this.name,
     required this.phoneNumber,
     required this.addressLine1,
+    this.addressLine2,
     required this.city,
     required this.state,
     required this.pincode,
     required this.country,
+    this.landmark,
   });
 
   factory PreviewAddress.fromJson(Map<String, dynamic> json) {
@@ -318,10 +344,12 @@ class PreviewAddress {
       name: json['name'] ?? '',
       phoneNumber: json['phoneNumber'] ?? '',
       addressLine1: json['addressLine1'] ?? '',
+      addressLine2: json['addressLine2'],
       city: json['city'] ?? '',
       state: json['state'] ?? '',
       pincode: json['pincode'] ?? '',
       country: json['country'] ?? '',
+      landmark: json['landmark'],
     );
   }
 }

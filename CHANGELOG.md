@@ -1,4 +1,4 @@
-## Version 1.6.5+74
+## Version 1.7.4+115
 
-- Merge pull request #408 from nabeelanasaritsaoirse/nabeelanasaritsaoirse-patch-2
-- Update Flutter ios.yml
+- Merge pull request #421 from nabeelanasaritsaoirse/ci/nabeelanasaritsaoirse-patch-1
+- Update pubspec.yaml

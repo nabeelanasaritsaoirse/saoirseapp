@@ -105,12 +105,12 @@ class MultipleOrderDetailsController extends GetxController {
     }
   }
 
-// ---------------- PREVIEW ITEMS ----------------
+  // ---------------- PREVIEW ITEMS ----------------
   List<PreviewItem> get previewItems {
     return previewData.value?.items ?? [];
   }
 
-// ---------------- PREVIEW ADDRESS (SAFE MAPPING) ----------------
+  // ---------------- PREVIEW ADDRESS (SAFE MAPPING) ----------------
   Address? get previewAddress {
     final data = previewData.value;
     if (data == null) return null;
@@ -118,65 +118,79 @@ class MultipleOrderDetailsController extends GetxController {
     final a = data.deliveryAddress;
 
     return Address(
-      id: "", // preview does not return id
+      id: "",
       name: a.name,
       phoneNumber: a.phoneNumber,
       addressLine1: a.addressLine1,
-      addressLine2: "", // not provided by preview
+      addressLine2: a.addressLine2 ?? "",
       city: a.city,
       state: a.state,
       pincode: a.pincode,
       country: a.country,
-      landmark: "", // optional in preview
-      isDefault: false, // preview address is not default
-      addressType: "", // HOME / WORK not sent by preview
-      createdAt: DateTime.now(), // safe fallback
-      updatedAt: DateTime.now(), // safe fallback
+      landmark: a.landmark ?? "",
+      isDefault: false,
+      addressType: "",
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
   }
 
   /* ===============================================================
      BULK ORDER PREVIEW
      =============================================================== */
-
-  Future<void> fetchBulkOrderPreview({
+  Future<void> fetchBulkOrderPreviewWithLoader({
     required Address deliveryAddress,
   }) async {
+    final oldPreview = previewData.value;
+
     isPreviewLoading.value = true;
 
     try {
       final body = {
         "items": buildBulkItems(),
-        "deliveryAddress": {
-          "name": deliveryAddress.name,
-          "phoneNumber": deliveryAddress.phoneNumber,
-          "addressLine1": deliveryAddress.addressLine1,
-          "city": deliveryAddress.city,
-          "state": deliveryAddress.state,
-          "pincode": deliveryAddress.pincode,
-          "country": deliveryAddress.country,
-        },
+        "deliveryAddress": buildDeliveryAddress(deliveryAddress),
       };
-
-      log("📤 [PREVIEW] Request: $body");
 
       final response = await OrderService.bulkOrderPreview(body);
 
       if (response == null) {
-        appToast(error: true, content: "Failed to load order preview");
+        appToast(error: true, content: "Preview failed");
+
+        previewData.value = oldPreview;
         return;
       }
 
       final preview = BulkOrderPreviewResponse.fromJson(response);
       previewData.value = preview.data;
-
-      log("📥 [PREVIEW] Loaded successfully");
     } catch (e) {
-      log("❌ [PREVIEW] Error: $e");
+      previewData.value = oldPreview;
+
       appToast(error: true, content: "Unable to load order preview");
     } finally {
       isPreviewLoading.value = false;
     }
+  }
+
+  Map<String, dynamic> buildDeliveryAddress(Address address) {
+    final map = {
+      "name": address.name,
+      "phoneNumber": address.phoneNumber,
+      "addressLine1": address.addressLine1,
+      "city": address.city,
+      "state": address.state,
+      "pincode": address.pincode,
+      "country": address.country,
+    };
+
+    if (address.addressLine2.trim().isNotEmpty) {
+      map["addressLine2"] = address.addressLine2;
+    }
+
+    if (address.landmark.trim().isNotEmpty) {
+      map["landmark"] = address.landmark;
+    }
+
+    return map;
   }
 
   void updatePlan({
@@ -217,8 +231,8 @@ class MultipleOrderDetailsController extends GetxController {
       SelectPlanSheetForCart(
         productId: item.productId,
         plans: plans,
-        initialDays: item.installmentPlan.totalDays,
-        initialAmount: item.installmentPlan.dailyAmount,
+        initialDays: item.installmentPlan.totalDays ?? 0,
+        initialAmount: item.installmentPlan.dailyAmount ?? 0,
         totalProductAmount: item.installmentPlan.totalAmount,
         onPlanSelected: (days, amount) async {
           // 🔥 1. UPDATE CART (SOURCE OF TRUTH)
@@ -238,7 +252,7 @@ class MultipleOrderDetailsController extends GetxController {
           // 🔥 3. REFRESH PREVIEW
           final address = previewAddress;
           if (address != null) {
-            await fetchBulkOrderPreview(deliveryAddress: address);
+            await fetchBulkOrderPreviewWithLoader(deliveryAddress: address);
           }
         },
       ),
@@ -306,11 +320,13 @@ class MultipleOrderDetailsController extends GetxController {
 
     final updatedQty = item.quantity + 1;
 
+    // Add null checks
+    final dailyAmount = item.installmentPlan.dailyAmount ?? 0.0;
+    final totalDays = item.installmentPlan.totalDays ?? 0;
+
     final updatedItem = item.copyWith(
       quantity: updatedQty,
-      itemTotal: updatedQty *
-          item.installmentPlan.dailyAmount *
-          item.installmentPlan.totalDays,
+      itemTotal: updatedQty * dailyAmount * totalDays,
     );
 
     products[index] = updatedItem; // 🔥 UI updates
@@ -327,11 +343,13 @@ class MultipleOrderDetailsController extends GetxController {
 
     final updatedQty = item.quantity - 1;
 
+    // Add null checks
+    final dailyAmount = item.installmentPlan.dailyAmount ?? 0.0;
+    final totalDays = item.installmentPlan.totalDays ?? 0;
+
     final updatedItem = item.copyWith(
       quantity: updatedQty,
-      itemTotal: updatedQty *
-          item.installmentPlan.dailyAmount *
-          item.installmentPlan.totalDays,
+      itemTotal: updatedQty * dailyAmount * totalDays,
     );
 
     products[index] = updatedItem; // 🔥 UI updates
@@ -346,12 +364,16 @@ class MultipleOrderDetailsController extends GetxController {
     final cartItem = products[index];
     final newQty = cartItem.quantity + 1;
 
+    // Add null checks
+    final dailyAmount = cartItem.installmentPlan.dailyAmount ?? 0.0;
+    final totalDays = cartItem.installmentPlan.totalDays ?? 0;
+
     // 🔥 base per-day amount for 1 qty
-    final basePerDay = cartItem.installmentPlan.dailyAmount / cartItem.quantity;
+    final basePerDay = dailyAmount / cartItem.quantity;
 
     final updatedPlan = cartItem.installmentPlan.copyWith(
       dailyAmount: basePerDay * newQty, // 🔥 SCALE
-      totalAmount: basePerDay * newQty * cartItem.installmentPlan.totalDays,
+      totalAmount: basePerDay * newQty * totalDays,
     );
 
     // 🔥 UPDATE CART (SOURCE OF TRUTH)
@@ -368,7 +390,7 @@ class MultipleOrderDetailsController extends GetxController {
     );
 
     // 🔁 REFRESH PREVIEW
-    fetchBulkOrderPreview(deliveryAddress: address);
+    fetchBulkOrderPreviewWithLoader(deliveryAddress: address);
   }
 
   void decreasePreviewQty(PreviewItem item, Address address) {
@@ -383,11 +405,15 @@ class MultipleOrderDetailsController extends GetxController {
 
     final newQty = cartItem.quantity - 1;
 
-    final basePerDay = cartItem.installmentPlan.dailyAmount / cartItem.quantity;
+    // Add null checks
+    final dailyAmount = cartItem.installmentPlan.dailyAmount ?? 0.0;
+    final totalDays = cartItem.installmentPlan.totalDays ?? 0;
+
+    final basePerDay = dailyAmount / cartItem.quantity;
 
     final updatedPlan = cartItem.installmentPlan.copyWith(
       dailyAmount: basePerDay * newQty,
-      totalAmount: basePerDay * newQty * cartItem.installmentPlan.totalDays,
+      totalAmount: basePerDay * newQty * totalDays,
     );
 
     cartController.updateProductWithPlan(
@@ -401,7 +427,7 @@ class MultipleOrderDetailsController extends GetxController {
       installmentPlan: updatedPlan,
     );
 
-    fetchBulkOrderPreview(deliveryAddress: address);
+    fetchBulkOrderPreviewWithLoader(deliveryAddress: address);
   }
 
   // ------------------------- FETCH COUPONS -----------------------------------
@@ -449,7 +475,7 @@ class MultipleOrderDetailsController extends GetxController {
       previewCouponCode.value = couponCode.trim();
       isCouponApplied.value = true;
 
-      await fetchBulkOrderPreview(
+      await fetchBulkOrderPreviewWithLoader(
         deliveryAddress: deliveryAddress,
       );
 
@@ -475,7 +501,7 @@ class MultipleOrderDetailsController extends GetxController {
     isCouponApplied.value = false;
 
     //  Reload preview WITHOUT coupon
-    await fetchBulkOrderPreview(
+    await fetchBulkOrderPreviewWithLoader(
       deliveryAddress: deliveryAddress,
     );
 

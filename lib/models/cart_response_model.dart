@@ -104,9 +104,9 @@ class CartProduct {
   }
 
   CartProduct copyWith({
-    InstallmentPlan? installmentPlan,
     int? quantity,
     double? itemTotal,
+    InstallmentPlan? installmentPlan,
   }) {
     return CartProduct(
       productId: productId,
@@ -145,9 +145,48 @@ class Variant {
     return Variant(
       variantId: json['variantId'] ?? "",
       sku: json['sku'] ?? "",
-      attributes: VariantAttributes.fromJson(json['attributes'] ?? {}),
+      attributes: _parseAttributes(json['attributes']),
       description: json['description'] ?? "",
     );
+  }
+
+  static VariantAttributes _parseAttributes(dynamic attributesJson) {
+    if (attributesJson == null) {
+      return VariantAttributes();
+    }
+
+    if (attributesJson is List) {
+      Map<String, String> others = {};
+      VariantAttributes base = VariantAttributes();
+
+      for (var attr in attributesJson) {
+        final map = Map<String, dynamic>.from(attr);
+
+        // format 1: {color,size,weight}
+        if (map.containsKey("color") ||
+            map.containsKey("size") ||
+            map.containsKey("weight")) {
+          base = VariantAttributes.fromJson(map);
+        }
+
+        // format 2: {name,value}
+        if (map.containsKey("name") && map.containsKey("value")) {
+          others[map["name"].toString()] = map["value"].toString();
+        }
+      }
+
+      return VariantAttributes(
+        color: base.color,
+        size: base.size,
+        weight: base.weight,
+        purity: base.purity,
+        material: base.material,
+        others: others,
+      );
+    }
+
+    return VariantAttributes.fromJson(
+        Map<String, dynamic>.from(attributesJson));
   }
 }
 
@@ -158,55 +197,65 @@ class VariantAttributes {
   final String? purity;
   final String? material;
 
+  /// Dynamic attributes (Grade, Ripeness, Packaging etc)
+  final Map<String, String> others;
+
   VariantAttributes({
     this.color,
     this.size,
     this.weight,
     this.purity,
     this.material,
+    this.others = const {},
   });
 
   factory VariantAttributes.fromJson(Map<String, dynamic> json) {
-    return VariantAttributes(
-      color: json['color'],
-      size: json['size'],
-      weight: json['weight'],
-      purity: json['purity'],
-      material: json['material'],
-    );
+    // Case 1 → normal attribute object
+    if (json.containsKey("color") ||
+        json.containsKey("size") ||
+        json.containsKey("weight")) {
+      return VariantAttributes(
+        color: json['color']?.toString(),
+        size: json['size']?.toString(),
+        weight: json['weight']?.toString(),
+        purity: json['purity']?.toString(),
+        material: json['material']?.toString(),
+      );
+    }
+
+    // Case 2 → name/value attribute
+    if (json.containsKey("name") && json.containsKey("value")) {
+      return VariantAttributes(
+        others: {
+          json['name'].toString(): json['value'].toString(),
+        },
+      );
+    }
+
+    return VariantAttributes();
   }
 }
 
-// class InstallmentPlan {
-//   final int totalDays;
-//   final double dailyAmount;
-//   final double totalAmount;
-
-//   InstallmentPlan({
-//     required this.totalDays,
-//     required this.dailyAmount,
-//     required this.totalAmount,
-//   });
-
-//   factory InstallmentPlan.fromJson(Map<String, dynamic> json) {
-//     return InstallmentPlan(
-//       totalDays: json['totalDays'] ?? 0,
-//       dailyAmount: (json['dailyAmount'] ?? 0).toDouble(),
-//       totalAmount: (json['totalAmount'] ?? 0).toDouble(),
-//     );
-//   }
-// }
-
 class InstallmentPlan {
-  final int totalDays;
-  final double dailyAmount;
+  final int? totalDays;
+  final double? dailyAmount;
   final double totalAmount;
 
   InstallmentPlan({
-    required this.totalDays,
-    required this.dailyAmount,
+    this.totalDays,
+    this.dailyAmount,
     required this.totalAmount,
   });
+
+  factory InstallmentPlan.fromJson(Map<String, dynamic> json) {
+    return InstallmentPlan(
+      totalDays: json['totalDays'], // Can be null
+      dailyAmount: json['dailyAmount'] != null
+          ? (json['dailyAmount'] as num).toDouble()
+          : null,
+      totalAmount: (json['totalAmount'] ?? 0).toDouble(),
+    );
+  }
 
   InstallmentPlan copyWith({
     int? totalDays,
@@ -219,26 +268,20 @@ class InstallmentPlan {
       totalAmount: totalAmount ?? this.totalAmount,
     );
   }
-
-  factory InstallmentPlan.fromJson(Map<String, dynamic> json) {
-    return InstallmentPlan(
-      totalDays: json['totalDays'] ?? 0,
-      dailyAmount: (json['dailyAmount'] ?? 0).toDouble(),
-      totalAmount: (json['totalAmount'] ?? 0).toDouble(),
-    );
-  }
 }
 
 class ProductImage {
   final String url;
   final bool isPrimary;
   final String altText;
+  final int order;
   final String id;
 
   ProductImage({
     required this.url,
     required this.isPrimary,
     required this.altText,
+    required this.order,
     required this.id,
   });
 
@@ -247,6 +290,7 @@ class ProductImage {
       url: json['url'] ?? "",
       isPrimary: json['isPrimary'] ?? false,
       altText: json['altText'] ?? "",
+      order: json['order'] ?? 0,
       id: json['_id'] ?? "",
     );
   }

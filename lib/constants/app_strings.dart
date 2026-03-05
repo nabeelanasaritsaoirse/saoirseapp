@@ -8,6 +8,7 @@ class AppStrings {
   static String sign_in = 'Sign In';
 
   //Login Screen
+  static String skip = "Skip";
   static String send_otp = "Send OTP";
   static String login = 'LOGIN';
   static String sign_up = "SIGN UP";
