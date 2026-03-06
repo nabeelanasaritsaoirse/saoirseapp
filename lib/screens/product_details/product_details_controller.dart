@@ -417,13 +417,7 @@ class ProductDetailsController extends GetxController {
     if (isUpdating) return;
     isUpdating = true;
 
-    final data = product.value;
-    if (data == null) {
-      isUpdating = false;
-      return;
-    }
-
-    final double totalPrice = data.pricing.finalPrice;
+    final double totalPrice = getCalculationPrice();
     final int days = int.tryParse(daysController.text.trim()) ?? 0;
 
     if (days <= 0) {
@@ -446,13 +440,7 @@ class ProductDetailsController extends GetxController {
     if (isUpdating) return;
     isUpdating = true;
 
-    final data = product.value;
-    if (data == null) {
-      isUpdating = false;
-      return;
-    }
-
-    final double totalPrice = data.pricing.finalPrice;
+    final double totalPrice = getCalculationPrice();
     final double perDayAmount =
         double.tryParse(amountController.text.trim()) ?? 0;
 
@@ -467,6 +455,21 @@ class ProductDetailsController extends GetxController {
     daysController.text = days.toString();
 
     isUpdating = false;
+  }
+
+  double getCalculationPrice() {
+    final variant = selectedVariant.value;
+    final data = product.value;
+
+    if (variant != null) {
+      return variant.salePrice;
+    }
+
+    if (data != null) {
+      return data.pricing.finalPrice;
+    }
+
+    return 0;
   }
 
   Future loadPlans(String productId) async {

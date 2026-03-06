@@ -38,6 +38,7 @@ class OrderHistoryItem {
   final int invested;
   final String currency;
   final String description;
+  final int totalProductPrice;
 
   OrderHistoryItem({
     required this.id,
@@ -55,6 +56,7 @@ class OrderHistoryItem {
     required this.invested,
     required this.currency,
     required this.description,
+    required this.totalProductPrice,
   });
 
   factory OrderHistoryItem.fromJson(Map<String, dynamic> json) {
@@ -83,6 +85,7 @@ class OrderHistoryItem {
       color: "Not specified",
       storage: "",
       price: pricing["finalPrice"] ?? 0,
+      totalProductPrice: json["totalProductPrice"] ?? 0, //actual price
       qty: json["quantity"] ?? 1,
       image: imageUrl,
       dailyPlan:
