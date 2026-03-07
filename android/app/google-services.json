@@ -94,6 +94,14 @@
           }
         },
         {
+          "client_id": "486829564070-unnpck5d1dd8148oe2sef826q8lao2qi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saoirse.epi",
+            "certificate_hash": "f77b4dd168db5bd9f75b7c4a500c913a79537af1"
+          }
+        },
+        {
           "client_id": "486829564070-mkrkm4v9tji249t6u7gdfiefups09gs4.apps.googleusercontent.com",
           "client_type": 3
         }
