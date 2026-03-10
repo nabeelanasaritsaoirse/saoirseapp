@@ -156,32 +156,31 @@ class ProfileService {
     }
   }
 
- 
   Future<DeleteAccountModel> getDeleteInfo() async {
-  final token = storage.read(AppConst.ACCESS_TOKEN);
-  final userId = storage.read(AppConst.USER_ID);
-  
-  final uri = "${AppURLs.BASE_API}api/users/$userId/deletion-info";
+    final token = storage.read(AppConst.ACCESS_TOKEN);
+    final userId = storage.read(AppConst.USER_ID);
 
-  final result = await APIService.getRequest<DeleteAccountModel>(
-    url: uri,
-    headers: {
-      "Authorization": "Bearer $token",
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-    },
-    onSuccess: (data) {
-      log("DELETE_INFO_GET_SUCCESS: ${jsonEncode(data)}");
-      return DeleteAccountModel.fromJson(data);
-    },
-  );
+    final uri = "${AppURLs.BASE_API}api/users/$userId/deletion-info";
 
-  if (result == null) {
-    throw Exception("Failed to load DELETE INFO");
+    final result = await APIService.getRequest<DeleteAccountModel>(
+      url: uri,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      onSuccess: (data) {
+        log("DELETE_INFO_GET_SUCCESS: ${jsonEncode(data)}");
+        return DeleteAccountModel.fromJson(data);
+      },
+    );
+
+    if (result == null) {
+      throw Exception("Failed to load DELETE INFO");
+    }
+
+    return result;
   }
-
-  return result;
-}
 
   // -------- REMOVE PROFILE PICTURE --------
   Future<bool> removeProfilePicture(String userId) async {
