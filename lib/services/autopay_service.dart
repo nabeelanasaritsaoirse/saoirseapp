@@ -13,57 +13,45 @@ import '../models/autopay_dashboard_model.dart';
 import '../models/autopay_setting_dialog_model.dart';
 import 'api_service.dart';
 
-import 'package:http/http.dart' as http;
+
 
 class AutopayService {
   final box = GetStorage();
-  Future<AutopayDashboardModel> getAutopayDashboard() async {
-    final token = box.read(AppConst.ACCESS_TOKEN);
-    final uri = Uri.parse(AppURLs.AUTOPAY_DASHBOARD_API);
+ 
+  Future<AutopayDashboardModel?> getAutopayDashboard() async {
+  final token = box.read(AppConst.ACCESS_TOKEN);
+  final uri = AppURLs.AUTOPAY_DASHBOARD_API;
 
-    final response = await http.get(
-      uri,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-      },
-    );
+  return await APIService.getRequest<AutopayDashboardModel>(
+    url: uri,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Accept": "application/json",
+    },
+    onSuccess: (data) {
+      log("AUTOPAY_DASHBORD_ GET==_${jsonEncode(data)}");
+      return AutopayDashboardModel.fromJson(data);
+    },
+  );
+}
 
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-      log("AUTOPAY_DASHBORD_ GET==_${response.body}");
+ 
+  Future<AutopaySettingsDialogModel?> getautopaysettings() async {
+  final token = box.read(AppConst.ACCESS_TOKEN);
+  final uri = AppURLs.AUTOPAY_SETTINGS_API;
 
-      final dashboardModel = AutopayDashboardModel.fromJson(decoded);
-      return dashboardModel;
-    } else {
-      throw Exception(
-        "Failed to load Autopay Dashboard (${response.statusCode})",
-      );
-    }
-  }
-
-  Future<AutopaySettingsDialogModel> getautopaysettings() async {
-    final token = box.read(AppConst.ACCESS_TOKEN);
-    final uri = Uri.parse(AppURLs.AUTOPAY_SETTINGS_API);
-
-    final response = await http.get(
-      uri,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-      },
-    );
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-      log("AUTOPAY SETTINGS  GET======>${response.body}");
-      final settingsModel = AutopaySettingsDialogModel.fromJson(decoded);
-      return settingsModel;
-    } else {
-      throw Exception(
-        "Failed to load Autopay Settings (${response.statusCode})",
-      );
-    }
-  }
+  return await APIService.getRequest<AutopaySettingsDialogModel>(
+    url: uri,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Accept": "application/json",
+    },
+    onSuccess: (data) {
+      log("AUTOPAY_SETTINGS_GET_SUCCESS: ${jsonEncode(data)}");
+      return AutopaySettingsDialogModel.fromJson(data);
+    },
+  );
+}
 
   Future<bool> updateAutopaySettings({
     required bool enabled,
@@ -164,28 +152,23 @@ class AutopayService {
     return result ?? false;
   }
 
-  Future<AutopayStatus> getAutopayStatus() async {
-    final token = box.read(AppConst.ACCESS_TOKEN);
-    final uri = Uri.parse(AppURLs.AUTOPAY_STATUS_API);
 
-    final response = await http.get(
-      uri,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-      },
-    );
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-      log("AUTOPAY STATUS GET======>${response.body}");
-      final statusModel = AutopayStatus.fromJson(decoded);
-      return statusModel;
-    } else {
-      throw Exception(
-        "Failed to load Autopay Status (${response.statusCode})",
-      );
-    }
-  }
+  Future<AutopayStatus?> getAutopayStatus() async {
+  final token = box.read(AppConst.ACCESS_TOKEN);
+  final uri = AppURLs.AUTOPAY_STATUS_API;
+
+  return await APIService.getRequest<AutopayStatus>(
+    url: uri,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Accept": "application/json",
+    },
+    onSuccess: (data) {
+      log("AUTOPAY_STATUS_GET_SUCCESS: ${jsonEncode(data)}");
+      return AutopayStatus.fromJson(data);
+    },
+  );
+}
 
 // ================= REMOVE SKIP DATE =================
   Future<bool> removeSkipDate({
@@ -216,31 +199,24 @@ class AutopayService {
     return result ?? false;
   }
 
-  Future<AutopaySuggestedTopupModel> getSuggestedTopUp({int days = 7}) async {
-    final token = box.read(AppConst.ACCESS_TOKEN);
+  
 
-    final uri = Uri.parse(
-      "${AppURLs.AUTOPAY_SUGGESTED_TOPUP_API}?days=$days",
-    );
+  Future<AutopaySuggestedTopupModel?> getSuggestedTopUp({int days = 7}) async {
+  final token = box.read(AppConst.ACCESS_TOKEN);
+  final uri = "${AppURLs.AUTOPAY_SUGGESTED_TOPUP_API}?days=$days";
 
-    final response = await http.get(
-      uri,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-      log("SUGGESTED TOPUP GET ==> ${response.body}");
-      return AutopaySuggestedTopupModel.fromJson(decoded);
-    } else {
-      throw Exception(
-        "Failed to load Suggested Top-up (${response.statusCode})",
-      );
-    }
-  }
+  return await APIService.getRequest<AutopaySuggestedTopupModel>(
+    url: uri,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Accept": "application/json",
+    },
+    onSuccess: (data) {
+      log("SUGGESTED_TOPUP_GET_SUCCESS: ${jsonEncode(data)}");
+      return AutopaySuggestedTopupModel.fromJson(data);
+    },
+  );
+}
 
 // ================= PAUSE / RESUME AUTOPAY =================
   Future<bool> pauseAutopay({

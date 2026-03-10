@@ -241,7 +241,7 @@ class AutopayController extends GetxController {
       isSettingsLoading.value = true;
 
       final response = await service.getautopaysettings();
-      final settings = response.data.settings;
+      final settings = response!.data.settings;
       final notifications = response.data.notificationPreferences;
 
       autopayEnabled.value = settings.enabled;
@@ -271,7 +271,7 @@ class AutopayController extends GetxController {
       errorMessage.value = '';
 
       final response = await service.getAutopayDashboard();
-      final data = response.data;
+      final data = response!.data;
 
       walletBalance.value = data.wallet.balance.toDouble();
       dailyDeduction.value = data.autopay.totalDailyDeduction;
@@ -469,7 +469,7 @@ class AutopayController extends GetxController {
     try {
       final response = await service.getSuggestedTopUp(days: days);
 
-      suggestedTopUp.value = response.data.suggestedTopUp.toDouble();
+      suggestedTopUp.value = response!.data.suggestedTopUp.toDouble();
       daysRequested.value = response.data.daysRequested;
 
       log("SUGGESTED TOPUP UPDATED: ₹${suggestedTopUp.value}");

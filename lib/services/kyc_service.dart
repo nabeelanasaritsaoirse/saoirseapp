@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:get_storage/get_storage.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
+import 'package:saoirse_app/services/api_service.dart';
 
 import '../constants/app_urls.dart';
 import '../constants/app_constant.dart';
@@ -56,59 +58,71 @@ class KycServices {
   }
 
   // ===================== SUBMIT KYC =====================
+
   Future<Map<String, dynamic>> submitKyc({
-    String? aadhaarNumber,
-    String? panNumber,
-    required List<Map<String, dynamic>> documents,
-  }) async {
-    final token = box.read(AppConst.ACCESS_TOKEN);
-    final uri = Uri.parse(AppURLs.KYC_SUBMIT_API);
+  String? aadhaarNumber,
+  String? panNumber,
+  required List<Map<String, dynamic>> documents,
+}) async {
+  final token = box.read(AppConst.ACCESS_TOKEN);
+  final uri = AppURLs.KYC_SUBMIT_API;
 
-    final Map<String, dynamic> body = {
-      "documents": documents,
-    };
+  final Map<String, dynamic> body = {
+    "documents": documents,
+  };
 
-    if (aadhaarNumber != null) {
-      body["aadhaarNumber"] = aadhaarNumber;
-    }
-
-    if (panNumber != null) {
-      body["panNumber"] = panNumber;
-    }
-
-    final response = await http.post(
-      uri,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode(body),
-    );
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return jsonDecode(response.body);
-    } else {
-      throw "KYC submit failed (${response.statusCode}): ${response.body}";
-    }
+  if (aadhaarNumber != null) {
+    body["aadhaarNumber"] = aadhaarNumber;
   }
 
-  // ===================== GET KYC =====================
-  Future<KycModel> getKyc() async {
-    final token = box.read(AppConst.ACCESS_TOKEN);
-    final uri = Uri.parse(AppURLs.KYC_API);
-
-    final response = await http.get(
-      uri,
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return kycModelFromJson(response.body);
-    } else {
-      throw "Failed to fetch KYC status (${response.statusCode}): ${response.body}";
-    }
+  if (panNumber != null) {
+    body["panNumber"] = panNumber;
   }
+
+  final result = await APIService.postRequest<Map<String, dynamic>>(
+    url: uri,
+    body: body,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+    onSuccess: (data) {
+      log("KYC_SUBMIT_SUCCESS: ${jsonEncode(data)}");
+      return data;
+    },
+  );
+
+  if (result == null) {
+    throw "KYC submit failed";
+  }
+
+  return result;
+}
+
+
+
+Future<KycModel> getKyc() async {
+  final token = box.read(AppConst.ACCESS_TOKEN);
+  final uri = AppURLs.KYC_API;
+
+  final result = await APIService.getRequest<KycModel>(
+    url: uri,
+    headers: {
+      "Authorization": "Bearer $token",
+      "Accept": "application/json",
+    },
+    onSuccess: (data) {
+      log("KYC_GET_SUCCESS: ${jsonEncode(data)}");
+      // Convert the map back to JSON string
+      return kycModelFromJson(jsonEncode(data));
+    },
+  );
+
+  if (result == null) {
+    throw "Failed to fetch KYC status";
+  }
+
+  return result;
+}
+  
 }
