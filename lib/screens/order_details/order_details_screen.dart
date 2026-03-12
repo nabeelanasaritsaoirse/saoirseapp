@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: prefer_const_constructors_in_immutables, deprecated_member_use
 
 import 'package:flutter/cupertino.dart';
@@ -393,7 +394,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                           child: ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(8.r),
-                                            child: Image.network(
+                                            child: AppImage.network(
                                               product?.images.isNotEmpty == true
                                                   ? product!.images.first.url
                                                   : '',

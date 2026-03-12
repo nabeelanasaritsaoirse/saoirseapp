@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -62,7 +63,7 @@ class OrderCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: order.image.isNotEmpty
-                      ? Image.network(
+                      ? AppImage.network(
                           order.image,
                           fit: BoxFit.contain,
                           loadingBuilder: (context, child, loadingProgress) {

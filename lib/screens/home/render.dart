@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -149,7 +150,7 @@ class Design2CompactList extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8.r),
-                      child: Image.network(
+                      child: AppImage.network(
                         product.image,
                         width: 70.w,
                         height: 70.w,
@@ -243,7 +244,7 @@ class Design3Widget extends StatelessWidget {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20.r),
-                      child: Image.network(
+                      child: AppImage.network(
                         product.image,
                         fit: BoxFit.contain,
                         errorBuilder: (_, __, ___) => const Icon(
@@ -359,7 +360,7 @@ Widget _productCard(FeaturedProduct p) {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20.r),
-              child: Image.network(
+              child: AppImage.network(
                 p.image,
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) =>
@@ -521,7 +522,7 @@ Widget _design5ProductCard(FeaturedProduct p) {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.r),
-              child: Image.network(
+              child: AppImage.network(
                 p.image,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) =>

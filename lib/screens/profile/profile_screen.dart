@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -149,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     backgroundColor: Colors.grey.shade300,
                                     child: user.profilePicture.isNotEmpty
                                         ? ClipOval(
-                                            child: Image.network(
+                                            child: AppImage.network(
                                               user.profilePicture,
                                               fit: BoxFit.cover,
                                               width: 84.w,

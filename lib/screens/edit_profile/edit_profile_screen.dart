@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/cupertino.dart';
@@ -84,7 +85,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       height: 120.w,
                                     )
                                   : (user?.profilePicture.isNotEmpty ?? false
-                                      ? Image.network(
+                                      ? AppImage.network(
                                           user!.profilePicture,
                                           fit: BoxFit.cover,
                                           width: 120.w,

@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: deprecated_member_use
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -147,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12.r),
-                              child: Image.network(
+                              child: AppImage.network(
                                 imagePath,
                                 fit: BoxFit.fill,
                                 width: double.infinity,
@@ -295,7 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 mainAxisSize: MainAxisSize.min, // 🔥 important
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Image.network(
+                                  AppImage.network(
                                     cat.illustrationImage?.url ?? '',
                                     width: 24.w,
                                     height: 24.w,
@@ -440,7 +441,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 shape: BoxShape.circle,
                               ),
                               alignment: Alignment.center,
-                              child: Image.network(
+                              child: AppImage.network(
                                 sub.image?.url ?? '',
                                 width: 26.w,
                                 height: 26.w,
@@ -670,7 +671,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(20.r),
-                              child: Image.network(
+                              child: AppImage.network(
                                 story.imageUrl,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
@@ -808,7 +809,7 @@ class _HomeScreenState extends State<HomeScreen> {
   //               children: [
   //                 ClipRRect(
   //                   borderRadius: BorderRadius.circular(8.r),
-  //                   child: Image.network(
+  //                   child: AppImage.network(
   //                     product.image,
   //                     width: 70.w,
   //                     height: 70.w,
@@ -879,7 +880,7 @@ class _CategoryItem extends StatelessWidget {
             ),
             child: Padding(
               padding: EdgeInsets.all(10.w),
-              child: Image.network(
+              child: AppImage.network(
                 iconUrl,
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) => Icon(Icons.image_not_supported),

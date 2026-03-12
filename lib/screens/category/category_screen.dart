@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -185,7 +186,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       ],
                     ),
                     padding: EdgeInsets.all(12.w),
-                    child: Image.network(
+                    child: AppImage.network(
                       category.categoryImage?.url ?? '',
                       fit: BoxFit.contain,
                       errorBuilder: (_, __, ___) => Icon(

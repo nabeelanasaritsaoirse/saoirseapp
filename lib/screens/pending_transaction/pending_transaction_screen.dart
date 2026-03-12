@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: curly_braces_in_flow_control_structures
 
 import 'package:flutter/cupertino.dart';
@@ -90,7 +91,7 @@ class PendingTransaction extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(8.r),
                                 ),
                                 child: item.productImage.isNotEmpty
-                                    ? Image.network(
+                                    ? AppImage.network(
                                         item.productImage,
                                         fit: BoxFit.contain,
                                         loadingBuilder:

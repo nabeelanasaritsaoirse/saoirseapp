@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -213,7 +214,7 @@ class WriteReviewDialog extends StatelessWidget {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8.r),
-                                  child: Image.network(
+                                  child: AppImage.network(
                                     image.thumbnail ?? image.url,
                                     width: 70.w,
                                     height: 70.h,

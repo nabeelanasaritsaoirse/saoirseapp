@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -66,7 +67,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                         bottomLeft: Radius.circular(20.r),
                         bottomRight: Radius.circular(20.r),
                       ),
-                      child: Image.network(
+                      child: AppImage.network(
                         item.imageUrl!,
                         width: double.infinity,
                         height: 220.h,

@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/cupertino.dart';
@@ -128,7 +129,7 @@ class CartScreen extends StatelessWidget {
                                           child: item.images.isNotEmpty
                                               ? item.images.first.url
                                                       .startsWith('http')
-                                                  ? Image.network(
+                                                  ? AppImage.network(
                                                       item.images.first.url,
                                                       width: 80.w,
                                                       height: 80.h,

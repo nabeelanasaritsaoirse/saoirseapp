@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -220,7 +221,7 @@ class PaymentMessageScreen extends StatelessWidget {
                         backgroundColor: AppColors.white,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(36.r),
-                          child: Image.network(
+                          child: AppImage.network(
                             profilePic,
                             width: 72.w,
                             height: 72.w,

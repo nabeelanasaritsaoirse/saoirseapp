@@ -122,8 +122,12 @@ class MyApp extends StatelessWidget {
             locale: locale,
             debugShowCheckedModeBanner: false,
             title: AppStrings.app_name,
+            defaultTransition: Transition.cupertino,
+            transitionDuration: const Duration(milliseconds: 400),
             theme: ThemeData(
               scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
+              canvasColor: const Color.fromARGB(255, 235, 230, 230),
+              dialogBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
               textTheme: GoogleFonts.poppinsTextTheme(),
               highlightColor: AppColors.transparent,
               splashColor: AppColors.transparent,

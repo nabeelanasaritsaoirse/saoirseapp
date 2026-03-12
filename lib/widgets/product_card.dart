@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -89,7 +90,7 @@ class _ProductCardState extends State<ProductCard> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10.r),
                       child: widget.image.startsWith('http')
-                          ? Image.network(
+                          ? AppImage.network(
                               widget.image,
                               fit: BoxFit.contain,
                               width: double.infinity,

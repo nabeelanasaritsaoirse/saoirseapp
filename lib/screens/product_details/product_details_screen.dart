@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: deprecated_member_use, curly_braces_in_flow_control_structures
 
 import 'package:flutter/cupertino.dart';
@@ -753,7 +754,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   color: AppColors.lightGrey,
                   child: Padding(
                     padding: EdgeInsets.all(15.w),
-                    child: Image.network(
+                    child: AppImage.network(
                       img.url,
                       fit: BoxFit.cover,
                       loadingBuilder: (context, child, loadingProgress) {
@@ -1174,7 +1175,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   padding: EdgeInsets.only(right: 6.w),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8.r),
-                    child: Image.network(
+                    child: AppImage.network(
                       img.url,
                       height: 65.h,
                       width: 80.w,

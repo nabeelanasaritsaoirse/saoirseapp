@@ -13,7 +13,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../screens/onboard/onboard_screen.dart';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+
+dynamic _decodeJson(String source) => jsonDecode(source);
 
 class APIService {
   static bool internet = false;
@@ -45,7 +48,7 @@ class APIService {
         switch (response.statusCode) {
           case 200:
           case 201:
-            final data = jsonDecode(response.body);
+            final data = await compute(_decodeJson, response.body);
             if (data is! Map<String, dynamic>) {
               return null;
             }
@@ -128,7 +131,7 @@ class APIService {
         switch (response.statusCode) {
           case 200:
           case 201:
-            final data = jsonDecode(response.body);
+            final data = await compute(_decodeJson, response.body);
             if (data is Map<String, dynamic>) {
               return onSuccess(data); // ✅ stop retry on success
             }
@@ -223,7 +226,7 @@ class APIService {
         switch (response.statusCode) {
           case 200:
           case 201:
-            final data = jsonDecode(response.body);
+            final data = await compute(_decodeJson, response.body);
             if (data is! Map<String, dynamic>) {
               ("Invalid response format from server.");
               return null;
@@ -328,7 +331,7 @@ class APIService {
               return onSuccess({}); // ✅ stop retry on success
             }
 
-            final data = jsonDecode(response.body);
+            final data = await compute(_decodeJson, response.body);
 
             if (data is! Map<String, dynamic>) {
               ("Invalid server response format.");

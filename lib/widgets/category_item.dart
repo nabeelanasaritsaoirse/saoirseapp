@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -88,7 +89,7 @@ class _CategoryImage extends StatelessWidget {
       );
     }
 
-    return Image.network(
+    return AppImage.network(
       imageUrl,
       width: 50.w,
       height: 50.h,

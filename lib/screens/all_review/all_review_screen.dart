@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
@@ -143,7 +144,7 @@ class AllReviewsScreen extends StatelessWidget {
               child: SizedBox(
                 height: 70.h,
                 width: 80.w,
-                child: Image.network(
+                child: AppImage.network(
                   url,
                   fit: BoxFit.cover,
                   loadingBuilder: (context, child, progress) {

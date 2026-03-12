@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: unnecessary_to_list_in_spreads, deprecated_member_use
 
 import 'package:flutter/cupertino.dart';
@@ -1325,7 +1326,7 @@ class _MultipleOrderDetailsScreenState
             height: 55.h,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
-              child: Image.network(
+              child: AppImage.network(
                 imageUrl,
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) => Container(

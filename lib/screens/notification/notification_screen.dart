@@ -1,3 +1,4 @@
+import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
@@ -112,7 +113,7 @@ class NotificationCard extends StatelessWidget {
                 if (item.imageUrl != null && item.imageUrl!.isNotEmpty)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10.r),
-                    child: Image.network(
+                    child: AppImage.network(
                       item.imageUrl!,
                       width: 70.w,
                       height: 70.w,
