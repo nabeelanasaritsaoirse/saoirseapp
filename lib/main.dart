@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -119,6 +120,8 @@ class MyApp extends StatelessWidget {
             }
           },
           child: GetMaterialApp(
+            navigatorObservers:
+                AppConst.isDebugMode ? [ChuckerFlutter.navigatorObserver] : [],
             initialBinding: AllController(),
             locale: locale,
             debugShowCheckedModeBanner: false,

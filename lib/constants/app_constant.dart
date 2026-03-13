@@ -1,6 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
 class AppConst {
+  static bool isDebugMode = false;
+
   static String USER_ID = 'User ID';
   static String USER_NAME = "User name";
   static String ACCESS_TOKEN = 'Access Token';

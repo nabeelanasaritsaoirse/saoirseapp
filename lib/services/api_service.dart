@@ -6,13 +6,14 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
 import 'package:url_launcher/url_launcher.dart';
 
+import '../constants/app_constant.dart';
 import '../screens/onboard/onboard_screen.dart';
 
 import 'package:http/http.dart' as http;
@@ -21,6 +22,8 @@ dynamic _decodeJson(String source) => jsonDecode(source);
 
 class APIService {
   static bool internet = false;
+  static final http.Client _httpClient =
+      AppConst.isDebugMode ? ChuckerHttpClient(http.Client()) : http.Client();
 
   // ---------------------------------------------------------------------------
   // POST REQUEST
@@ -37,7 +40,7 @@ class APIService {
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        final response = await http
+        final response = await _httpClient
             .post(
               Uri.parse(url),
               body: jsonEncode(body),
@@ -125,7 +128,7 @@ class APIService {
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        final response = await http
+        final response = await _httpClient
             .get(
               Uri.parse(url),
               headers: headers ?? {"Content-Type": "application/json"},
@@ -222,7 +225,7 @@ class APIService {
         ("PUT Attempt $attempt/$maxRetries: $url");
         ("BODY: $body");
 
-        final response = await http
+        final response = await _httpClient
             .put(
               Uri.parse(url),
               body: jsonEncode(body),
@@ -331,7 +334,9 @@ class APIService {
         if (body != null) request.body = jsonEncode(body);
 
         final response = await http.Response.fromStream(
-          await request.send().timeout(Duration(seconds: timeoutSeconds)),
+          await _httpClient
+              .send(request)
+              .timeout(Duration(seconds: timeoutSeconds)),
         );
 
         switch (response.statusCode) {
@@ -464,8 +469,9 @@ class APIService {
 
       if (body != null) request.fields.addAll(body);
 
-      var streamedResponse =
-          await request.send().timeout(Duration(seconds: timeoutSeconds));
+      var streamedResponse = await _httpClient
+          .send(request)
+          .timeout(Duration(seconds: timeoutSeconds));
 
       var response = await http.Response.fromStream(streamedResponse);
 
@@ -500,8 +506,9 @@ class APIService {
       }
 
       //  Apply timeout to the entire operation, not just .send()
-      final streamedResponse =
-          await request.send().timeout(Duration(seconds: timeoutSeconds));
+      final streamedResponse = await _httpClient
+          .send(request)
+          .timeout(Duration(seconds: timeoutSeconds));
 
       // Also apply timeout to reading the response
       final response = await http.Response.fromStream(streamedResponse).timeout(
