@@ -355,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
               if (subs.isEmpty) {
                 return Padding(
                   padding: EdgeInsets.all(16.w),
-                  child: appText("No sub-categories found"),
+                  child: appText(AppStrings.no_sub_categories_found),
                 );
               }
 
@@ -404,8 +404,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               SizedBox(height: 6.h),
                               SizedBox(
                                 height: 28.h, // SAME TEXT HEIGHT
-                                child: appText(
-                                  "View All",
+                                child: appText(AppStrings.view_all,
                                   fontSize: 10.sp,
                                   fontWeight: FontWeight.w500,
                                   textAlign: TextAlign.center,
@@ -550,8 +549,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // Empty state
               if (homeController.featuredLists.isEmpty) {
                 return Center(
-                  child: appText(
-                    "No featured products available",
+                  child: appText(AppStrings.no_featured_products_available,
                     color: Colors.grey,
                   ),
                 );
@@ -950,8 +948,7 @@ class _ViewAllCategory extends StatelessWidget {
             ),
           ),
           SizedBox(height: 6.h),
-          appText(
-            "View All",
+          appText(AppStrings.view_all,
             fontSize: 11.sp,
             fontWeight: FontWeight.w600,
           ),

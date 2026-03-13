@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 import 'app_text.dart';
 
 class LanguageSwitcher extends StatelessWidget {
@@ -27,7 +28,7 @@ class LanguageSwitcher extends StatelessWidget {
             children: [
               const Icon(Icons.flag, color: Colors.blueAccent, size: 18),
               const SizedBox(width: 8),
-              appText('English'),
+              appText(AppStrings.english),
             ],
           ),
         ),
@@ -37,7 +38,7 @@ class LanguageSwitcher extends StatelessWidget {
             children: [
               const Icon(Icons.flag, color: Colors.orangeAccent, size: 18),
               const SizedBox(width: 8),
-              appText('हिंदी'),
+              appText(AppStrings.text_3),
             ],
           ),
         ),
@@ -47,7 +48,7 @@ class LanguageSwitcher extends StatelessWidget {
             children: [
               const Icon(Icons.flag, color: Colors.green, size: 18),
               const SizedBox(width: 8),
-              appText('മലയാളം'),
+              appText(AppStrings.text_4),
             ],
           ),
         ),

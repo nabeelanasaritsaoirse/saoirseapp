@@ -38,16 +38,14 @@ class ReferralQrPopup extends StatelessWidget {
                   SizedBox(height: 4.h),
 
                   // Heading
-                  appText(
-                    "Invite & Earn",
+                  appText(AppStrings.invite_earn,
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textBlack,
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 6.h),
-                  appText(
-                    "Share your code or QR with friends and start earning rewards.",
+                  appText(AppStrings.share_your_code_or_qr_with_fri,
                     fontSize: 12.sp,
                     color: AppColors.grey,
                     textAlign: TextAlign.center,

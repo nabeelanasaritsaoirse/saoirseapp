@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../models/wishlist_response_model.dart';
 import '../../services/wishlist_service.dart';
@@ -55,7 +56,9 @@ class WishlistController extends GetxController {
       wishlistProducts.removeWhere((item) => item.productId == productId);
       wishlistProducts.refresh();
 
-      appToast(title: "Removed", content: "Item removed from wishlist");
+      appToast(
+          title: AppStrings.removed,
+          content: AppStrings.item_removed_from_wishlist);
     }
   }
 

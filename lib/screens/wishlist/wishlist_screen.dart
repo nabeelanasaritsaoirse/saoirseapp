@@ -40,8 +40,7 @@ class WishlistScreen extends StatelessWidget {
 
               if (controller.wishlistProducts.isEmpty) {
                 return Center(
-                  child: appText(
-                    "Your wishlist is empty",
+                  child: appText(AppStrings.your_wishlist_is_empty,
                     fontSize: 16.sp,
                   ),
                 );
@@ -89,8 +88,7 @@ class WishlistScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            appText(
-              "Please login to view your wishlist",
+            appText(AppStrings.please_login_to_view_your_wish,
               fontSize: 16.sp,
               fontWeight: FontWeight.w500,
             ),
@@ -100,8 +98,7 @@ class WishlistScreen extends StatelessWidget {
               onTap: () {
                 Get.to(() => LoginPage());
               },
-              child: appText(
-                "Login",
+              child: appText(AppStrings.login_1,
                 color: AppColors.white,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,

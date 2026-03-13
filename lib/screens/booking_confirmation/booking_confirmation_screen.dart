@@ -85,8 +85,7 @@ class BookingConfirmationScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10.r),
                       gradient: AppGradients.primaryGradient),
                   child: Center(
-                    child: appText(
-                      "Thank You",
+                    child: appText(AppStrings.thank_you,
                       color: AppColors.white,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,

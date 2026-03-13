@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
@@ -237,13 +238,19 @@ class ProfileController extends GetxController {
     final name = fullNameController.text.trim();
 
     if (name.isEmpty) {
-      appToast(error: true, title: "Error", content: "Name cannot be empty");
+      appToast(
+          error: true,
+          title: AppStrings.error,
+          content: AppStrings.name_cannot_be_empty);
       return;
     }
 
     final userId = profile.value?.user.id;
     if (userId == null) {
-      appToast(error: true, title: "Error", content: "User not found");
+      appToast(
+          error: true,
+          title: AppStrings.error,
+          content: AppStrings.user_not_found);
       return;
     }
 
@@ -257,7 +264,7 @@ class ProfileController extends GetxController {
         if (!deleted) {
           appToaster(
             error: true,
-            content: "Unable to remove profile picture",
+            content: AppStrings.unable_to_remove_profile_pictu,
           );
           return;
         }
@@ -275,8 +282,8 @@ class ProfileController extends GetxController {
         if (!imageUpdated) {
           appToast(
             error: true,
-            title: "Failed",
-            content: "Unable to update profile picture",
+            title: AppStrings.failed,
+            content: AppStrings.unable_to_update_profile_pictu,
           );
           // return;
         }
@@ -286,14 +293,22 @@ class ProfileController extends GetxController {
       final success = await _profileService.updateUserName(userId, name);
 
       if (success) {
-        appToast(title: "Success", content: "Profile updated successfully");
+        appToast(
+            title: AppStrings.success,
+            content: AppStrings.profile_updated_successfully);
         await fetchUserProfile();
         Get.back();
       } else {
-        appToast(error: true, title: "Failed", content: "Update failed");
+        appToast(
+            error: true,
+            title: AppStrings.failed,
+            content: AppStrings.update_failed);
       }
     } catch (e) {
-      appToast(error: true, title: "Error", content: "Something went wrong");
+      appToast(
+          error: true,
+          title: AppStrings.error,
+          content: AppStrings.something_went_wrong_1);
     } finally {
       isLoading(false);
     }
@@ -304,15 +319,18 @@ class ProfileController extends GetxController {
     if (imagePath.isEmpty) {
       appToast(
         error: true,
-        title: "Error",
-        content: "Invalid image selected",
+        title: AppStrings.error,
+        content: AppStrings.invalid_image_selected,
       );
       return;
     }
 
     final userId = profile.value?.user.id;
     if (userId == null) {
-      appToast(error: true, title: "Error", content: "User not found");
+      appToast(
+          error: true,
+          title: AppStrings.error,
+          content: AppStrings.user_not_found);
       return;
     }
 
@@ -325,18 +343,21 @@ class ProfileController extends GetxController {
       if (!success) {
         appToast(
           error: true,
-          title: "Failed",
-          content: "Unable to upload profile picture",
+          title: AppStrings.failed,
+          content: AppStrings.unable_to_upload_profile_pictu,
         );
       }
     } catch (e) {
-      appToast(error: true, title: "Error", content: "Something went wrong");
+      appToast(
+          error: true,
+          title: AppStrings.error,
+          content: AppStrings.something_went_wrong_1);
     }
   }
 
   void confirmLogout() {
     Get.defaultDialog(
-      title: "Logout",
+      title: AppStrings.logout,
       middleText: "Are you sure you want to exit?",
       textConfirm: "Yes",
       textCancel: "No",
@@ -403,7 +424,7 @@ class ProfileController extends GetxController {
     await fetchDeleteInfo();
 
     Get.defaultDialog(
-      title: "Delete Account",
+      title: AppStrings.delete_account,
       content: Obx(() {
         final info = deletionInfo;
 
@@ -421,7 +442,7 @@ class ProfileController extends GetxController {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             appText(
-              "The following data will be deleted:",
+              AppStrings.the_following_data_will_be_del,
               fontWeight: FontWeight.w600,
               color: AppColors.grey,
             ),
@@ -456,7 +477,7 @@ class ProfileController extends GetxController {
             ],
             SizedBox(height: 16.h),
             appText(
-              "This action is permanent. Are you sure you want to delete your account?",
+              AppStrings.this_action_is_permanent_are_y,
               textAlign: TextAlign.left,
               fontSize: 13.sp,
               color: AppColors.textBlack,

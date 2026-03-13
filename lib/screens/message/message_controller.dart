@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -121,7 +122,7 @@ class MessageController extends GetxController {
 
     final text = textController.text.trim();
     if (text.isEmpty) {
-      appToast(error: true, content: "Text message cannot be empty");
+      appToast(error: true, content: AppStrings.text_message_cannot_be_empty);
       return;
     }
 
@@ -154,7 +155,7 @@ class MessageController extends GetxController {
     if (referralCode.value.isEmpty) {
       appToast(
         error: true,
-        content: "Referral code is empty",
+        content: AppStrings.referral_code_is_empty,
       );
       return;
     }
@@ -166,7 +167,7 @@ class MessageController extends GetxController {
     if (Platform.isIOS) {
       // Show success toast
       appToaster(
-        content: "Referral code copied to clipboard",
+        content: AppStrings.referral_code_copied_to_clipbo,
       );
     }
   }

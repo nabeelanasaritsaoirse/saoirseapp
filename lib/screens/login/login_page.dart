@@ -141,8 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            appText(
-                              "Username",
+                            appText(AppStrings.username,
                               fontWeight: FontWeight.w500,
                               color: AppColors.primaryColor,
                               fontSize: 15.sp,
@@ -155,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                                 color: AppColors.black,
                               ),
                               prefixWidth: 20.w,
-                              hintText: "Username",
+                              hintText: AppStrings.username,
                               hintColor: AppColors.black,
                               textColor: AppColors.black,
                               hintSize: 15.sp,
@@ -336,8 +335,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           SizedBox(width: 10.w),
-                          appText(
-                            "or",
+                          appText(AppStrings.or,
                             color: AppColors.black,
                             fontSize: 15.sp,
                             fontFamily: "Poppins",
@@ -554,8 +552,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 20.h),
 
               // Title
-              appText(
-                "Choose QR Method",
+              appText(AppStrings.choose_qr_method,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
                 color: AppColors.black87,
@@ -588,8 +585,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(width: 14.w),
                       Expanded(
-                        child: appText(
-                          "Scan using Camera",
+                        child: appText(AppStrings.scan_using_camera,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                         ),
@@ -627,8 +623,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(width: 14),
                       Expanded(
-                        child: appText(
-                          "Upload QR from Gallery",
+                        child: appText(AppStrings.upload_qr_from_gallery,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                         ),

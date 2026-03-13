@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_colors.dart';
 import '../../models/bank_account_model.dart';
@@ -20,8 +21,8 @@ class ManageAccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
-      appBar: const CustomAppBar(
-        title: "Manage Accounts",
+      appBar: CustomAppBar(
+        title: AppStrings.manage_accounts,
         showBack: true,
       ),
       body: SafeArea(
@@ -35,7 +36,7 @@ class ManageAccountScreen extends StatelessWidget {
               child: appButton(
                 buttonColor: AppColors.primaryColor,
                 child: appText(
-                  "+ Add New Account",
+                  AppStrings.add_new_account,
                   color: AppColors.white,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
@@ -50,7 +51,8 @@ class ManageAccountScreen extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (controller.accountList.isEmpty) {
-                  return Center(child: appText("No bank accounts found"));
+                  return Center(
+                      child: appText(AppStrings.no_bank_accounts_found));
                 }
 
                 return ListView.builder(
@@ -213,7 +215,7 @@ class DeleteAccountDialog {
 
               /// TITLE
               appText(
-                "Delete Account",
+                AppStrings.delete_account,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w700,
                 color: AppColors.black,
@@ -224,7 +226,7 @@ class DeleteAccountDialog {
 
               /// DESCRIPTION
               appText(
-                "Are you sure you want to delete this account?",
+                AppStrings.are_you_sure_you_want_to_delet_1,
                 fontSize: 13.sp,
                 color: AppColors.black54,
                 textAlign: TextAlign.center,
@@ -247,7 +249,7 @@ class DeleteAccountDialog {
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: appText(
-                          "Cancel",
+                          AppStrings.cancel,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                           color: AppColors.black,
@@ -273,7 +275,7 @@ class DeleteAccountDialog {
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: appText(
-                          "Delete",
+                          AppStrings.delete,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                           color: AppColors.white,

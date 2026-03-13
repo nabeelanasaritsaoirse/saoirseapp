@@ -74,7 +74,7 @@ class _AddAddressState extends State<AddAddress> {
                     AddAddressValidation.nameValidation(name: value ?? ""),
               ),
               SizedBox(height: 10.h),
-              appText("Address Line 1",
+              appText(AppStrings.address_line_1,
                   fontSize: 14.sp, fontWeight: FontWeight.w600),
               SizedBox(
                 height: 5.h,
@@ -91,26 +91,26 @@ class _AddAddressState extends State<AddAddress> {
                     AddAddressValidation.streetValidation(street: value ?? ""),
               ),
               SizedBox(height: 10.h),
-              appText("Address Line 2 (Optional)",
+              appText(AppStrings.address_line_2_optional,
                   fontSize: 14.sp, fontWeight: FontWeight.w600),
               SizedBox(height: 5.h),
               appTextField(
                 controller: addAddressController.addressLine2Controller,
                 textColor: AppColors.black,
-                hintText: "Address Line 2",
+                hintText: AppStrings.address_line_2,
                 textInputType: TextInputType.streetAddress,
                 hintColor: AppColors.grey,
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
               ),
               SizedBox(height: 10.h),
-              appText("Landmark (Optional)",
+              appText(AppStrings.landmark_optional,
                   fontSize: 14.sp, fontWeight: FontWeight.w600),
               SizedBox(height: 5.h),
               appTextField(
                 controller: addAddressController.landmarkController,
                 textColor: AppColors.black,
-                hintText: "Landmark",
+                hintText: AppStrings.landmark,
                 hintColor: AppColors.grey,
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
@@ -223,7 +223,7 @@ class _AddAddressState extends State<AddAddress> {
                     phone: value?.trim() ?? ""),
               ),
               SizedBox(height: 15.h),
-              appText("Address Type",
+              appText(AppStrings.address_type,
                   fontSize: 14.sp, fontWeight: FontWeight.w600),
               SizedBox(height: 5.h),
               Row(
@@ -248,8 +248,7 @@ class _AddAddressState extends State<AddAddress> {
                               value == false) {
                             appToaster(
                               error: true,
-                              content:
-                                  "At least 1 address should be set as default",
+                              content: AppStrings.at_least_1_address_should_be_s,
                             );
 
                             return; // ⛔ DON'T CHANGE VALUE
@@ -260,8 +259,7 @@ class _AddAddressState extends State<AddAddress> {
                               value ?? false;
                         },
                       ),
-                      appText(
-                        "Save as Default",
+                      appText(AppStrings.save_as_default,
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),

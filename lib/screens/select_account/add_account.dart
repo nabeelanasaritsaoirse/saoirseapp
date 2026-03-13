@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_colors.dart';
 import '../../widgets/app_button.dart';
@@ -29,7 +30,7 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
       appBar: CustomAppBar(
-        title: "Add Account",
+        title: AppStrings.add_account,
         showBack: true,
       ),
       body: SingleChildScrollView(
@@ -40,7 +41,7 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               appText(
-                "Enter the account details",
+                AppStrings.enter_the_account_details,
                 fontWeight: FontWeight.w600,
                 color: AppColors.black,
                 fontSize: 16.sp,
@@ -48,12 +49,12 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
               SizedBox(height: 15.h),
 
               /// ACCOUNT HOLDER NAME
-              appText("Account holder name",
+              appText(AppStrings.account_holder_name,
                   color: AppColors.grey, fontSize: 15.sp),
               SizedBox(height: 6.h),
               appTextField(
                 controller: controller.nameController,
-                hintText: "Name",
+                hintText: AppStrings.name,
                 textInputType: TextInputType.name,
                 hintColor: AppColors.grey,
                 textColor: AppColors.black,
@@ -70,11 +71,12 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
               SizedBox(height: 15.h),
 
               /// ACCOUNT NUMBER
-              appText("Account number", color: AppColors.grey, fontSize: 15.sp),
+              appText(AppStrings.account_number,
+                  color: AppColors.grey, fontSize: 15.sp),
               SizedBox(height: 6.h),
               appTextField(
                 controller: controller.accController,
-                hintText: "Account number",
+                hintText: AppStrings.account_number,
                 textInputType: TextInputType.number,
                 hintColor: AppColors.grey,
                 textColor: AppColors.black,
@@ -99,12 +101,12 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
               SizedBox(height: 15.h),
 
               /// CONFIRM ACCOUNT NUMBER
-              appText("Confirm account number",
+              appText(AppStrings.confirm_account_number,
                   color: AppColors.grey, fontSize: 15.sp),
               SizedBox(height: 6.h),
               appTextField(
                 controller: controller.confirmAccController,
-                hintText: "Confirm account number",
+                hintText: AppStrings.confirm_account_number,
                 textInputType: TextInputType.number,
                 hintColor: AppColors.grey,
                 textColor: AppColors.black,
@@ -126,11 +128,12 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
               SizedBox(height: 15.h),
 
               /// IFSC CODE
-              appText("IFSC code", color: AppColors.grey, fontSize: 15.sp),
+              appText(AppStrings.ifsc_code,
+                  color: AppColors.grey, fontSize: 15.sp),
               SizedBox(height: 6.h),
               appTextField(
                 controller: controller.ifscController,
-                hintText: "IFSC code",
+                hintText: AppStrings.ifsc_code,
                 textInputType: TextInputType.text,
                 hintColor: AppColors.grey,
                 textColor: AppColors.black,
@@ -150,11 +153,12 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
               /// BANK NAME
               ///
               SizedBox(height: 15.h),
-              appText("Bank name", color: AppColors.grey, fontSize: 15.sp),
+              appText(AppStrings.bank_name,
+                  color: AppColors.grey, fontSize: 15.sp),
               SizedBox(height: 6.h),
               appTextField(
                 controller: controller.bankNameController,
-                hintText: "Bank name",
+                hintText: AppStrings.bank_name,
                 textInputType: TextInputType.text,
                 hintColor: AppColors.grey,
                 textColor: AppColors.black,
@@ -174,11 +178,12 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
               SizedBox(height: 15.h),
 
               /// BRANCH NAME
-              appText("Branch name", color: AppColors.grey, fontSize: 15.sp),
+              appText(AppStrings.branch_name,
+                  color: AppColors.grey, fontSize: 15.sp),
               SizedBox(height: 6.h),
               appTextField(
                 controller: controller.branchNameController,
-                hintText: "Branch name",
+                hintText: AppStrings.branch_name,
                 textInputType: TextInputType.text,
                 hintColor: AppColors.grey,
                 textColor: AppColors.black,
@@ -200,7 +205,7 @@ class _AddAccountScreenState extends State<AddAccountScreen> {
               appButton(
                 buttonColor: AppColors.primaryColor,
                 child: appText(
-                  "Save",
+                  AppStrings.Save,
                   fontSize: 20.sp,
                   fontWeight: FontWeight.w800,
                   color: AppColors.white,

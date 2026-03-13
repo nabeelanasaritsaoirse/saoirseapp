@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_colors.dart';
 import '../../models/bank_account_model.dart';
@@ -26,7 +27,7 @@ class SelectAccountScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
       appBar: CustomAppBar(
-        title: "Select Account",
+        title: AppStrings.select_account,
         showBack: true,
       ),
       body: SafeArea(
@@ -40,7 +41,7 @@ class SelectAccountScreen extends StatelessWidget {
               child: appButton(
                 buttonColor: AppColors.primaryColor,
                 child: appText(
-                  "+ Add New Account",
+                  AppStrings.add_new_account,
                   color: AppColors.white,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
@@ -60,7 +61,7 @@ class SelectAccountScreen extends StatelessWidget {
 
                 if (controller.accountList.isEmpty) {
                   return Center(
-                    child: appText("No bank accounts found"),
+                    child: appText(AppStrings.no_bank_accounts_found),
                   );
                 }
 
@@ -88,7 +89,7 @@ class SelectAccountScreen extends StatelessWidget {
                 child: appButton(
                   buttonColor: AppColors.primaryColor,
                   child: appText(
-                    "Continue",
+                    AppStrings.continues,
                     color: AppColors.white,
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w600,

@@ -6,6 +6,7 @@ import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:crypto/crypto.dart';
 
@@ -73,9 +74,7 @@ class AuthService {
   /// STEP 2: VERIFY OTP
   static Future<String?> verifyOTP(String otp) async {
     if (verificationId == null) {
-      appToast(
-          content: "OTP expired or not sent. Please send OTP again.",
-          error: true);
+      appToast(content: AppStrings.otp_expired_or_not_sent_please, error: true);
       return null;
     }
 
@@ -112,7 +111,7 @@ class AuthService {
       final GoogleSignInAccount? account = await google.authenticate();
 
       if (account == null) {
-        appToast(content: "Login cancelled", error: true);
+        appToast(content: AppStrings.login_cancelled, error: true);
         return null;
       }
       googleUser = account;
@@ -123,7 +122,8 @@ class AuthService {
       final idToken = authData.idToken;
 
       if (idToken == null) {
-        appToast(content: "Failed to get Google ID Token", error: true);
+        appToast(
+            content: AppStrings.failed_to_get_google_id_token, error: true);
         return null;
       }
 

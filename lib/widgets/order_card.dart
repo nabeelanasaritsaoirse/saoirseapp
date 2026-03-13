@@ -1,3 +1,4 @@
+import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -200,7 +201,7 @@ class OrderCard extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: onWriteReview,
                     child: appText(
-                      "Write Review",
+                      AppStrings.write_review,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

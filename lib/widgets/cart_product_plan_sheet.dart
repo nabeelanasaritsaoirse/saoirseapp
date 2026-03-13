@@ -105,8 +105,7 @@ class CartProductPlanSheet extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        appText(
-                          "Days",
+                        appText(AppStrings.days,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -137,8 +136,7 @@ class CartProductPlanSheet extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        appText(
-                          "Amount",
+                        appText(AppStrings.amount_2,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -176,8 +174,8 @@ class CartProductPlanSheet extends StatelessWidget {
                       if (days <= 0 || amount <= 0) {
                         appToast(
                           error: true,
-                          title: "Invalid Input",
-                          content: "Please enter valid days and amount",
+                          title: AppStrings.invalid_input,
+                          content: AppStrings.please_enter_valid_days_and_am,
                         );
                         return;
                       }
@@ -185,7 +183,7 @@ class CartProductPlanSheet extends StatelessWidget {
                       if (days < controller.minimumDays) {
                         appToast(
                           error: true,
-                          title: "Invalid Days",
+                          title: AppStrings.invalid_days,
                           content:
                               "Minimum ${controller.minimumDays} days required",
                         );
@@ -195,8 +193,8 @@ class CartProductPlanSheet extends StatelessWidget {
                       if (amount < 50) {
                         appToast(
                           error: true,
-                          title: "Invalid Amount",
-                          content: "Minimum ₹50 per day required",
+                          title: AppStrings.invalid_amount,
+                          content: AppStrings.minimum_50_per_day_required,
                         );
                         return;
                       }
@@ -234,8 +232,7 @@ class CartProductPlanSheet extends StatelessWidget {
                 if (controller.plans.isEmpty) {
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: 30.h),
-                    child: appText(
-                      "No plans available",
+                    child: appText(AppStrings.no_plans_available,
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
                       color: AppColors.grey,
@@ -297,8 +294,7 @@ class CartProductPlanSheet extends StatelessWidget {
                                               borderRadius:
                                                   BorderRadius.circular(8.r),
                                             ),
-                                            child: appText(
-                                              "Recommended",
+                                            child: appText(AppStrings.recommended,
                                               fontSize: 10.sp,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -352,8 +348,8 @@ class CartProductPlanSheet extends StatelessWidget {
                     if (perDay < 50) {
                       appToast(
                         error: true,
-                        title: "Invalid Plan",
-                        content: "Selected plan amount is invalid",
+                        title: AppStrings.invalid_plan,
+                        content: AppStrings.selected_plan_amount_is_invali,
                       );
                       return;
                     }

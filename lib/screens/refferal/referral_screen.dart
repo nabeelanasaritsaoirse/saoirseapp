@@ -784,7 +784,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       contentPadding: EdgeInsets.all(10.r),
                       controller: referralCtrl,
                       textColor: AppColors.black,
-                      hintText: "Enter the referral code",
+                      hintText: AppStrings.enter_the_referral_code,
                       hintSize: 14.sp,
                       hintColor: AppColors.grey,
                       validator: (value) {
@@ -862,8 +862,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
     return GestureDetector(
       onTap: () => showReferralInputPopup(),
-      child: appText(
-        "Apply Referral",
+      child: appText(AppStrings.apply_referral,
         decoration: TextDecoration.underline,
         fontWeight: FontWeight.w600,
         color: Colors.blue,
@@ -996,8 +995,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
               SizedBox(height: 20.h),
 
               // Title
-              appText(
-                "Choose QR Method",
+              appText(AppStrings.choose_qr_method,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
                 color: AppColors.black87,
@@ -1032,8 +1030,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       ),
                       SizedBox(width: 14.w),
                       Expanded(
-                        child: appText(
-                          "Scan using Camera",
+                        child: appText(AppStrings.scan_using_camera,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                           textAlign: TextAlign.start,
@@ -1073,8 +1070,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       ),
                       SizedBox(width: 14),
                       Expanded(
-                        child: appText(
-                          "Upload QR from Gallery",
+                        child: appText(AppStrings.upload_qr_from_gallery,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                           textAlign: TextAlign.start,
@@ -1132,8 +1128,7 @@ Widget referredByCard(ReferrerInfoModel r) {
               color: Color(0xFFE8F5E9),
               borderRadius: BorderRadius.circular(10.r),
               border: Border.all(color: Colors.green)),
-          child: appText(
-            "Referred by",
+          child: appText(AppStrings.referred_by,
             fontSize: 15,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
@@ -1166,8 +1161,7 @@ Widget _buildLoginOnlyView() {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          appText(
-            "Please login to view Referral",
+          appText(AppStrings.please_login_to_view_referral,
             fontSize: 16.sp,
             fontWeight: FontWeight.w500,
           ),
@@ -1177,8 +1171,7 @@ Widget _buildLoginOnlyView() {
             onTap: () {
               Get.to(() => LoginPage());
             },
-            child: appText(
-              "Login",
+            child: appText(AppStrings.login_1,
               color: AppColors.white,
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,

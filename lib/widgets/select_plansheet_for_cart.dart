@@ -173,7 +173,7 @@ class _SelectPlanSheetForCartState extends State<SelectPlanSheetForCart> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        appText("Days",
+                        appText(AppStrings.days,
                             fontSize: 14.sp, fontWeight: FontWeight.w600),
                         SizedBox(height: 6.h),
                         appTextField(
@@ -202,7 +202,7 @@ class _SelectPlanSheetForCartState extends State<SelectPlanSheetForCart> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        appText("Amount",
+                        appText(AppStrings.amount_2,
                             fontSize: 14.sp, fontWeight: FontWeight.w600),
                         SizedBox(height: 6.h),
                         appTextField(
@@ -248,7 +248,7 @@ class _SelectPlanSheetForCartState extends State<SelectPlanSheetForCart> {
                       if (days < 5 || amount < 50) {
                         appToast(
                           error: true,
-                          content: "Minimum 5 days and ₹50 amount required",
+                          content: AppStrings.minimum_5_days_and_50_amount_r,
                         );
                         return;
                       }
@@ -290,8 +290,7 @@ class _SelectPlanSheetForCartState extends State<SelectPlanSheetForCart> {
               if (widget.plans.isEmpty)
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 30.h),
-                  child: appText(
-                    "No plans available",
+                  child: appText(AppStrings.no_plans_available,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
                     color: AppColors.grey,
@@ -381,7 +380,7 @@ class _SelectPlanSheetForCartState extends State<SelectPlanSheetForCart> {
                   if (days <= 0 || amount <= 0) {
                     appToast(
                       error: true,
-                      content: "Please select or customize a plan",
+                      content: AppStrings.please_select_or_customize_a_p,
                     );
                     return;
                   }
@@ -595,8 +594,8 @@ class _SelectPlanSheetForCartState extends State<SelectPlanSheetForCart> {
 //                       if (days <= 0 || amount <= 0) {
 //                         appToast(
 //                           error: true,
-//                           title: "Invalid Input",
-//                           content: "Please enter valid days and amount",
+//                           title: AppStrings.invalid_input,
+//                           content: AppStrings.please_enter_valid_days_and_am,
 //                         );
 //                         return;
 //                       }
@@ -604,8 +603,8 @@ class _SelectPlanSheetForCartState extends State<SelectPlanSheetForCart> {
 //                       if (days < 5) {
 //                         appToast(
 //                           error: true,
-//                           title: "Invalid Days",
-//                           content: "Days cannot be less than 5",
+//                           title: AppStrings.invalid_days,
+//                           content: AppStrings.days_cannot_be_less_than_5,
 //                         );
 //                         return;
 //                       }
@@ -613,8 +612,8 @@ class _SelectPlanSheetForCartState extends State<SelectPlanSheetForCart> {
 //                       if (amount < 50) {
 //                         appToast(
 //                           error: true,
-//                           title: "Invalid Amount",
-//                           content: "Amount cannot be more less 50",
+//                           title: AppStrings.invalid_amount,
+//                           content: AppStrings.amount_cannot_be_more_less_50,
 //                         );
 //                         return;
 //                       }

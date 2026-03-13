@@ -1,3 +1,4 @@
+import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,8 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
       appBar: AppBar(
           backgroundColor: AppColors.primaryColor,
           iconTheme: const IconThemeData(color: Colors.white),
-          title: appText("Notification Details", color: AppColors.white)),
+          title:
+              appText(AppStrings.notification_details, color: AppColors.white)),
       body: Obx(() {
         if (controller.isDetailsLoading.value) {
           return Center(child: appLoader());
@@ -47,7 +49,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
         final item = controller.notificationDetails.value;
 
         if (item == null) {
-          return Center(child: appText("No Details Available"));
+          return Center(child: appText(AppStrings.no_details_available));
         }
 
         final date = item.publishedAt.split("T").first;
@@ -213,7 +215,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: appText(
-            "Comments",
+            AppStrings.comments,
             fontSize: 16.sp,
             fontWeight: FontWeight.w600,
             color: AppColors.black,
@@ -225,7 +227,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
             return Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: appText(
-                "No comments yet",
+                AppStrings.no_comments_yet,
                 color: AppColors.darkGray,
                 fontSize: 13.sp,
               ),
@@ -326,7 +328,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                 maxLines: 2,
                 minLines: 1,
                 decoration: InputDecoration(
-                  hintText: "Write a comment...",
+                  hintText: AppStrings.write_a_comment,
                   filled: true,
                   fillColor: AppColors.scaffoldColor,
                   contentPadding:

@@ -1,3 +1,4 @@
+import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: deprecated_member_use
 
@@ -15,10 +16,11 @@ import 'all_review_controller.dart';
 class AllReviewsScreen extends StatelessWidget {
   final String productId;
   AllReviewsScreen({super.key, required this.productId}) {
-    Get.put(AllReviewsController(productId: productId,
-    
-    ),
-    permanent: true,
+    Get.put(
+      AllReviewsController(
+        productId: productId,
+      ),
+      permanent: true,
     );
   }
 
@@ -28,7 +30,7 @@ class AllReviewsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: CustomAppBar(
-        title: "All Reviews",
+        title: AppStrings.all_reviews,
         showBack: true,
       ),
       body: SingleChildScrollView(
@@ -41,7 +43,7 @@ class AllReviewsScreen extends StatelessWidget {
             _buildImageRow(controller),
             SizedBox(height: 16.h),
             appText(
-              "All Users",
+              AppStrings.all_users,
               fontSize: 14.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -53,7 +55,7 @@ class AllReviewsScreen extends StatelessWidget {
 
               if (controller.reviews.isEmpty) {
                 return appText(
-                  "No reviews available",
+                  AppStrings.no_reviews_available,
                   color: AppColors.grey,
                 );
               }
@@ -85,7 +87,7 @@ class AllReviewsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             appText(
-              "OUT OF 5",
+              AppStrings.out_of_5,
               fontSize: 11.sp,
               fontWeight: FontWeight.w600,
               color: AppColors.grey,
@@ -123,7 +125,6 @@ class AllReviewsScreen extends StatelessWidget {
     );
   }
 
-  
   Widget _buildImageRow(AllReviewsController controller) {
     return Obx(() {
       if (controller.reviewImages.isEmpty) {
@@ -173,7 +174,6 @@ class AllReviewsScreen extends StatelessWidget {
     });
   }
 
- 
   Widget _buildReviewCard(Review review) {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),

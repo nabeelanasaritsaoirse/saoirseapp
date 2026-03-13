@@ -196,8 +196,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             size: 16.sp,
                           ),
                           SizedBox(width: 6.w),
-                          appText(
-                            "Remove Image",
+                          appText(AppStrings.remove_image,
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
                             color: AppColors.red,

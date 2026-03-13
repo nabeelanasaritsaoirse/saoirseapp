@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_assets.dart';
 import '../../widgets/app_text.dart';
@@ -68,7 +69,7 @@ class _ProductListingState extends State<ProductListing> {
             padding: EdgeInsets.only(right: 15.w),
             child: appTextField(
               controller: productlistingController.nameContoller,
-              hintText: "Search",
+              hintText: AppStrings.search,
               hintColor: AppColors.textBlack,
               fillColor: AppColors.white,
               contentPadding:
@@ -132,7 +133,7 @@ class _ProductListingState extends State<ProductListing> {
           //             mainAxisAlignment: MainAxisAlignment.center,
           //             children: [
           //               Icon(LucideIcons.arrowUpDown, size: 18.sp),
-          //               appText("sort", fontSize: 18.sp),
+          //               appText(AppStrings.sort, fontSize: 18.sp),
           //             ],
           //           ),
           //           onTap: () {
@@ -152,7 +153,7 @@ class _ProductListingState extends State<ProductListing> {
           //             mainAxisAlignment: MainAxisAlignment.center,
           //             children: [
           //               Icon(LucideIcons.filter, size: 18.sp),
-          //               appText("Filter", fontSize: 18.sp),
+          //               appText(AppStrings.filter, fontSize: 18.sp),
           //             ],
           //           ),
           //           onTap: () {
@@ -173,7 +174,7 @@ class _ProductListingState extends State<ProductListing> {
               if (productlistingController.products.isEmpty) {
                 return Center(
                   child: appText(
-                    "No products found",
+                    AppStrings.no_products_found,
                     fontSize: 16.sp,
                   ),
                 );

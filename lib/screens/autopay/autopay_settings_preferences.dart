@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_colors.dart';
 import '../../widgets/app_button.dart';
@@ -51,7 +52,7 @@ class _AutopaySettingsSheetState extends State<AutopaySettingsSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               appText(
-                'Autopay Preference',
+                AppStrings.autopay_preference,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w600,
               ),
@@ -133,7 +134,7 @@ class _AutopaySettingsSheetState extends State<AutopaySettingsSheet> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           appText(
-            'Enable Autopay',
+            AppStrings.enable_autopay,
             fontWeight: FontWeight.w600,
           ),
           Switch(
@@ -158,7 +159,7 @@ class _AutopaySettingsSheetState extends State<AutopaySettingsSheet> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         appText(
-          'Priority (1-100)',
+          AppStrings.priority_1_100,
           fontWeight: FontWeight.w600,
         ),
         SizedBox(
@@ -167,7 +168,7 @@ class _AutopaySettingsSheetState extends State<AutopaySettingsSheet> {
             textColor: AppColors.black,
             controller: controller.priorityCtrl,
             textInputType: TextInputType.number,
-            hintText: '85',
+            hintText: AppStrings.num_85,
             hintColor: AppColors.textGray,
             onChanged: (value) {
               final parsed = int.tryParse(value);
@@ -253,7 +254,7 @@ class _AutopaySettingsSheetState extends State<AutopaySettingsSheet> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             appText(
-              'Skip Dates',
+              AppStrings.skip_dates,
               fontWeight: FontWeight.w600,
             ),
             GestureDetector(
@@ -269,7 +270,7 @@ class _AutopaySettingsSheetState extends State<AutopaySettingsSheet> {
                     const Icon(Icons.add, color: Colors.white, size: 16),
                     SizedBox(width: 4.w),
                     appText(
-                      'Add',
+                      AppStrings.add,
                       color: AppColors.white,
                       fontSize: 12.sp,
                     ),
@@ -285,7 +286,7 @@ class _AutopaySettingsSheetState extends State<AutopaySettingsSheet> {
             return Padding(
               padding: EdgeInsets.only(top: 8.h),
               child: appText(
-                'No skip dates added',
+                AppStrings.no_skip_dates_added,
                 fontSize: 12.sp,
                 color: AppColors.grey,
               ),

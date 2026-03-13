@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_constant.dart';
 import '../../main.dart';
@@ -78,7 +79,7 @@ class CartController extends GetxController {
     final response = await service.updateCartQty(product.productId, newQty);
 
     if (response == null) {
-      appToast(content: "Unable to update quantity", error: true);
+      appToast(content: AppStrings.unable_to_update_quantity, error: true);
       return;
     }
 
@@ -107,7 +108,7 @@ class CartController extends GetxController {
     final response = await service.updateCartQty(product.productId, newQty);
 
     if (response == null) {
-      appToast(content: "Unable to update quantity", error: true);
+      appToast(content: AppStrings.unable_to_update_quantity, error: true);
       return;
     }
 
@@ -135,7 +136,8 @@ class CartController extends GetxController {
       final token = storage.read(AppConst.ACCESS_TOKEN);
 
       if (token == null || token.isEmpty) {
-        appToast(content: "Please login to add items to cart", error: true);
+        appToast(
+            content: AppStrings.please_login_to_add_items_to_c, error: true);
         return;
       }
 
@@ -150,7 +152,7 @@ class CartController extends GetxController {
       );
 
       if (response == null) {
-        appToast(content: "Failed to add to cart", error: true);
+        appToast(content: AppStrings.failed_to_add_to_cart, error: true);
         return;
       }
 
@@ -172,7 +174,7 @@ class CartController extends GetxController {
   Future<void> clearCartItems() async {
     try {
       if (cartData.value == null || cartData.value!.products.isEmpty) {
-        appToast(content: "No items to clear", error: true);
+        appToast(content: AppStrings.no_items_to_clear, error: true);
         return;
       }
 
@@ -192,9 +194,9 @@ class CartController extends GetxController {
         cartCount.value = 0; // Reset badge count
         cartData.refresh();
 
-        appToast(content: "Cart cleared successfully");
+        appToast(content: AppStrings.cart_cleared_successfully);
       } else {
-        appToast(content: "Failed to clear cart", error: true);
+        appToast(content: AppStrings.failed_to_clear_cart, error: true);
       }
     } catch (e) {
       appToast(content: "Error: $e", error: true);
@@ -211,7 +213,7 @@ class CartController extends GetxController {
       final response = await service.removeItemCart(productId);
 
       if (response == null) {
-        appToast(content: "Failed to remove item", error: true);
+        appToast(content: AppStrings.failed_to_remove_item, error: true);
         return;
       }
 
@@ -220,7 +222,7 @@ class CartController extends GetxController {
         cartData.value?.products.removeWhere((p) => p.productId == productId);
         cartData.refresh();
 
-        appToast(content: "Item is removed from cart");
+        appToast(content: AppStrings.item_is_removed_from_cart);
 
         // Re-fetch cart if needed
         fetchCart();

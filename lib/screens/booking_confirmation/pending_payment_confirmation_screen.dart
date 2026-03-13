@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_constant.dart';
@@ -44,7 +45,7 @@ class PendingPaymentConfirmationScreen extends StatelessWidget {
 
               // ✅ Title
               appText(
-                "One Step Closer!",
+                AppStrings.one_step_closer,
                 color: AppColors.black,
                 fontSize: 20.sp,
                 fontWeight: FontWeight.w700,
@@ -56,9 +57,7 @@ class PendingPaymentConfirmationScreen extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 25.w),
                 child: appText(
-                  "Your payment has been received and your installment is updated. "
-                  "You are getting closer to your product delivery! "
-                  "Your product will be shipped once the full amount is paid.",
+                  AppStrings.your_payment_has_been_received,
                   color: AppColors.black87,
                   fontSize: 14.sp,
                   textAlign: TextAlign.center,
@@ -89,7 +88,7 @@ class PendingPaymentConfirmationScreen extends StatelessWidget {
                   ),
                   child: Center(
                     child: appText(
-                      "Thank You",
+                      AppStrings.thank_you,
                       color: AppColors.white,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,

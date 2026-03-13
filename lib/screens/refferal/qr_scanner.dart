@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../widgets/custom_appbar.dart';
 
@@ -14,7 +15,7 @@ class QRScannerScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         showBack: true,
-        title: "Scan Referral QR Code",
+        title: AppStrings.scan_referral_qr_code,
       ),
       body: MobileScanner(
         onDetect: (capture) {

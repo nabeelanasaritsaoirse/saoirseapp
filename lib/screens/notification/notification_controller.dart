@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../models/notification_details_response_model.dart';
 import '../../models/notification_response.dart';
@@ -286,7 +287,7 @@ class NotificationController extends GetxController {
     }
 
     final success = await service.sendCustomNotification(
-      title: "Payment Received",
+      title: AppStrings.payment_received,
       message: "Your installment has been paid.",
       sendPush: true,
       sendInApp: true,
@@ -306,7 +307,7 @@ class NotificationController extends GetxController {
     }
 
     final success = await service.sendCustomNotification(
-      title: "⚡ Flash Sale Alert!",
+      title: AppStrings.flash_sale_alert,
       message: "Limited time offer: 50% OFF on all products. Shop now!",
       sendPush: true, // ✔ Push notification
       sendInApp: false, // ❌ Don't show in notification feed

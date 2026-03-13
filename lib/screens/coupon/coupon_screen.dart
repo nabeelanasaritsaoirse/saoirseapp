@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../constants/app_colors.dart';
@@ -20,8 +21,8 @@ class CouponScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.paperColor,
-      appBar: const CustomAppBar(
-        title: "Coupons",
+      appBar: CustomAppBar(
+        title: AppStrings.coupons,
         showBack: true,
       ),
       body: Obx(() {
@@ -30,7 +31,7 @@ class CouponScreen extends StatelessWidget {
         }
 
         if (controller.coupons.isEmpty) {
-          return Center(child: appText("No coupons available"));
+          return Center(child: appText(AppStrings.no_coupons_available));
         }
 
         return ListView.builder(
@@ -214,7 +215,7 @@ class CouponCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           appText(
-                            "Exp.",
+                            AppStrings.exp,
                             fontSize: 14.sp,
                             color: AppColors.textGray,
                           ),

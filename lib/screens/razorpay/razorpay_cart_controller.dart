@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../services/payment_service.dart';
 import '../../widgets/app_loader.dart';
@@ -48,7 +49,8 @@ class RazorpayCartController extends GetxController {
 
         razorpay.open(options);
       } catch (e) {
-        appToast(error: true, content: "Could not open payment window");
+        appToast(
+            error: true, content: AppStrings.could_not_open_payment_window);
       }
     });
   }
@@ -71,7 +73,7 @@ class RazorpayCartController extends GetxController {
     if (razorpayOrderId.isEmpty ||
         razorpayPaymentId.isEmpty ||
         razorpaySignature.isEmpty) {
-      appToast(error: true, content: "Invalid payment response");
+      appToast(error: true, content: AppStrings.invalid_payment_response);
       return;
     }
 
@@ -137,7 +139,7 @@ class RazorpayCartController extends GetxController {
 
       appToast(
         error: true,
-        content: "Bulk payment verification failed unexpectedly",
+        content: AppStrings.bulk_payment_verification_fail,
       );
     }
   }

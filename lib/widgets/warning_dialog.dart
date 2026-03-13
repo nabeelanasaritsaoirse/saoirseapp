@@ -156,8 +156,7 @@ class KycRequiredDialog {
                 buttonColor: AppColors.primaryColor,
                 borderRadius: BorderRadius.circular(8.r),
                 child: Center(
-                  child: appText(
-                    "Verify",
+                  child: appText(AppStrings.verify,
                     color: AppColors.white,
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w600,

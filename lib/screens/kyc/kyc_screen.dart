@@ -106,13 +106,13 @@ class NotSubmittedUI extends StatelessWidget {
           Icon(Icons.info_outline, size: 70.sp, color: AppColors.orange),
           SizedBox(height: 8.h),
 
-          appText("KYC Not Submitted",
+          appText(AppStrings.kyc_not_submitted,
               fontSize: 18.sp, fontWeight: FontWeight.bold),
           SizedBox(height: 20.h),
           // ============================
           //      SELFIE (Required)
           // ============================
-          appText("Upload Selfie (Required)",
+          appText(AppStrings.upload_selfie_required,
               fontSize: 16.sp, fontWeight: FontWeight.w600),
           SizedBox(height: 10.h),
           Obx(() => GestureDetector(
@@ -139,7 +139,7 @@ class NotSubmittedUI extends StatelessWidget {
           SizedBox(height: 20.h),
 
           // ---------------- DOCUMENT SELECT ----------------
-          appText("Upload Document",
+          appText(AppStrings.upload_document,
               fontSize: 16.sp, fontWeight: FontWeight.w600),
           SizedBox(height: 12.h),
 //=================================================================
@@ -162,7 +162,7 @@ class NotSubmittedUI extends StatelessWidget {
                     children: [
                       Icon(Icons.document_scanner_outlined),
                       SizedBox(width: 10.w),
-                      Expanded(child: appText("Aadhaar Card")),
+                      Expanded(child: appText(AppStrings.aadhaar_card)),
                       Checkbox(
                           value: controller.aadhaarSelected.value,
                           onChanged: (_) =>
@@ -192,7 +192,7 @@ class NotSubmittedUI extends StatelessWidget {
                     children: [
                       Icon(Icons.document_scanner_outlined),
                       SizedBox(width: 10.w),
-                      Expanded(child: appText("PAN Card")),
+                      Expanded(child: appText(AppStrings.pan_card)),
                       Checkbox(
                           value: controller.panSelected.value,
                           onChanged: (_) => controller.panSelected.toggle()),
@@ -260,7 +260,7 @@ Widget aadhaarSection(KycController controller) {
       sectionTitle("Aadhaar Details"),
       appTextField(
         controller: controller.aadhaarNumberController,
-        hintText: "XXXX XXXX XXXX",
+        hintText: AppStrings.xxxx_xxxx_xxxx,
         textInputType: TextInputType.number,
         textColor: AppColors.black,
         hintColor: AppColors.darkGray,
@@ -319,7 +319,7 @@ Widget panSection(KycController controller) {
       sectionTitle("PAN Details"),
       appTextField(
         controller: controller.panNumberController,
-        hintText: "ABCDE1234F",
+        hintText: AppStrings.abcde1234f,
         hintColor: AppColors.darkGray,
         textColor: AppColors.black,
         validator: panValidator,
@@ -422,8 +422,8 @@ class PendingUI extends StatelessWidget {
         children: [
           Icon(Icons.hourglass_bottom, size: 80.sp, color: AppColors.orange),
           SizedBox(height: 10.h),
-          appText("KYC Pending", fontSize: 20.sp),
-          appText("Documents under review"),
+          appText(AppStrings.kyc_pending, fontSize: 20.sp),
+          appText(AppStrings.documents_under_review),
         ],
       ),
     );
@@ -444,7 +444,7 @@ class ApprovedUI extends StatelessWidget {
         children: [
           Icon(Icons.check_circle, size: 90.sp, color: AppColors.green),
           SizedBox(height: 10.h),
-          appText("KYC Approved", fontSize: 20.sp),
+          appText(AppStrings.kyc_approved, fontSize: 20.sp),
         ],
       ),
     );
@@ -472,7 +472,7 @@ class RejectedUI extends StatelessWidget {
             Icon(Icons.cancel, size: 100.sp, color: AppColors.red),
             SizedBox(height: 12.sp),
 
-            appText("KYC Rejected",
+            appText(AppStrings.kyc_rejected,
                 fontSize: 20.sp, fontWeight: FontWeight.bold),
             SizedBox(height: 10.sp),
 
@@ -481,7 +481,7 @@ class RejectedUI extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                appText("Reason:",
+                appText(AppStrings.reason,
                     fontSize: 15.sp, fontWeight: FontWeight.bold),
                 SizedBox(height: 10.sp),
                 SizedBox(

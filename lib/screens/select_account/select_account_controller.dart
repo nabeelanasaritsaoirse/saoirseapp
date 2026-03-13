@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../models/bank_account_model.dart';
 import '../../services/add_account_service.dart';
@@ -47,7 +48,8 @@ class SelectAccountController extends GetxController {
       final accounts = await BankAccountService.getBankAccounts();
       accountList.assignAll(accounts);
     } catch (e) {
-      appToast(title: "Error", content: "Failed to load accounts");
+      appToast(
+          title: AppStrings.error, content: AppStrings.failed_to_load_accounts);
     } finally {
       isLoading.value = false;
     }
@@ -99,7 +101,8 @@ class SelectAccountController extends GetxController {
 
       Get.back();
     } catch (e) {
-      appToast(title: "Error", content: "Failed to save account");
+      appToast(
+          title: AppStrings.error, content: AppStrings.failed_to_save_account);
     } finally {
       _saveAccountLock?.complete();
       _saveAccountLock = null;
@@ -132,10 +135,12 @@ class SelectAccountController extends GetxController {
 
       if (success) {
         accountList.removeAt(index);
-        appToast(title: "Deleted", content: "Account deleted successfully");
+        appToast(
+            title: AppStrings.deleted,
+            content: AppStrings.account_deleted_successfully);
       }
     } catch (e) {
-      appToast(title: "Error", content: "Delete failed");
+      appToast(title: AppStrings.error, content: AppStrings.delete_failed);
     } finally {
       isLoading.value = false;
     }

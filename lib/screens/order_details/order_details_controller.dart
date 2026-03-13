@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/payment_methods.dart';
 import '../../models/coupon_model.dart';
@@ -224,7 +225,7 @@ class OrderDetailsController extends GetxController {
     int quantity = 1,
   }) async {
     if (couponCode.trim().isEmpty) {
-      appToast(error: true, content: "Please enter a coupon code");
+      appToast(error: true, content: AppStrings.please_enter_a_coupon_code);
       return;
     }
     startLoading();
@@ -336,13 +337,13 @@ class OrderDetailsController extends GetxController {
       debugPrint("📥 [ORDER] API response: $response");
 
       if (response == null) {
-        appToast(error: true, content: "Failed to place order");
+        appToast(error: true, content: AppStrings.failed_to_place_order);
         return;
       }
 
       final data = response['data'];
       if (data == null || data is! Map<String, dynamic>) {
-        appToast(error: true, content: "Invalid payment response");
+        appToast(error: true, content: AppStrings.invalid_payment_response);
         return;
       }
 
@@ -360,7 +361,7 @@ class OrderDetailsController extends GetxController {
 
           if (autoPayResponse?.success == true) {
             await notificationService.sendCustomNotification(
-              title: "Autopay Enabled",
+              title: AppStrings.autopay_enabled,
               message:
                   "Your payments will now be made automatically from your wallet.",
               sendPush: true,
@@ -380,7 +381,7 @@ class OrderDetailsController extends GetxController {
       debugPrint("🟣 [RAZORPAY] OrderId: $razorpayOrderId");
 
       if (razorpayOrderId.isEmpty) {
-        appToast(error: true, content: "Invalid Razorpay Order ID");
+        appToast(error: true, content: AppStrings.invalid_razorpay_order_id);
         return;
       }
 
@@ -393,7 +394,7 @@ class OrderDetailsController extends GetxController {
       debugPrint("❌ [ORDER] Exception: $e");
       debugPrint("📌 [ORDER] StackTrace: $stack");
 
-      appToast(error: true, content: "Payment initialization failed");
+      appToast(error: true, content: AppStrings.payment_initialization_failed);
     } finally {
       isPlacingOrder.value = false; // 🔓 UNLOCK
       debugPrint("🔓 [ORDER] placeOrder UNLOCKED");
@@ -426,7 +427,7 @@ class OrderDetailsController extends GetxController {
 
   void decreaseQty() {
     if (quantity.value <= 1) {
-      appToaster(content: "Minimum quantity is 1", error: true);
+      appToaster(content: AppStrings.minimum_quantity_is_1, error: true);
       return;
     }
     quantity.value--;

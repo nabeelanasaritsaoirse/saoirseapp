@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_colors.dart';
 import '../../widgets/app_text.dart';
@@ -26,7 +27,7 @@ class ProductFaqScreen extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         title: appText(
-          "FAQs",
+          AppStrings.FAQsTitle,
           color: AppColors.white,
           fontWeight: FontWeight.w600,
           fontSize: 16.sp,
@@ -48,7 +49,7 @@ class ProductFaqScreen extends StatelessWidget {
               ),
               alignment: Alignment.center,
               child: appText(
-                "No FAQs available for this product",
+                AppStrings.no_faqs_available_for_this_pro,
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w500,
                 color: AppColors.grey,

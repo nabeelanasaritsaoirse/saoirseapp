@@ -401,8 +401,7 @@ class _MultipleOrderDetailsScreenState
                                           if (address == null) {
                                             appToaster(
                                               error: true,
-                                              content:
-                                                  "Address not ready. Please wait.",
+                                              content: AppStrings.address_not_ready_please_wait,
                                             );
                                             return;
                                           }
@@ -439,8 +438,7 @@ class _MultipleOrderDetailsScreenState
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        appText(
-                                          "Available Coupons",
+                                        appText(AppStrings.available_coupons,
                                           fontSize: 13.sp,
                                           fontWeight: FontWeight.w700,
                                         ),
@@ -516,8 +514,7 @@ class _MultipleOrderDetailsScreenState
                                               Container(
                                                 width: double.infinity,
                                                 alignment: Alignment.center,
-                                                child: appText(
-                                                  "Coupon applied successfully",
+                                                child: appText(AppStrings.coupon_applied_successfully,
                                                   fontSize: 13.sp,
                                                   fontWeight: FontWeight.w700,
                                                   color: AppColors.green,
@@ -577,8 +574,7 @@ class _MultipleOrderDetailsScreenState
                                                 if (address == null) {
                                                   appToaster(
                                                     error: true,
-                                                    content:
-                                                        "Address not ready. Please wait.",
+                                                    content: AppStrings.address_not_ready_please_wait,
                                                   );
                                                   return;
                                                 }
@@ -600,8 +596,7 @@ class _MultipleOrderDetailsScreenState
                                                       BorderRadius.circular(
                                                           5.r),
                                                 ),
-                                                child: appText(
-                                                  "Remove Coupon",
+                                                child: appText(AppStrings.remove_coupon,
                                                   color: Colors.red,
                                                   fontSize: 12.sp,
                                                   fontWeight: FontWeight.w600,
@@ -642,8 +637,7 @@ class _MultipleOrderDetailsScreenState
                             children: [
                               Align(
                                 alignment: Alignment.centerLeft,
-                                child: appText(
-                                  "Price Details",
+                                child: appText(AppStrings.price_details,
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -725,7 +719,7 @@ class _MultipleOrderDetailsScreenState
                                     /// SHIPPING
                                     buildPriceInfo(
                                       label: AppStrings.shipping_charge,
-                                      content: "Free",
+                                      content: AppStrings.free,
                                     ),
 
                                     /// DISCOUNT (ONLY IF COUPON APPLIED)
@@ -914,8 +908,7 @@ class _MultipleOrderDetailsScreenState
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                appText(
-                  "Select Payment Method",
+                appText(AppStrings.select_payment_method,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryColor,
@@ -949,7 +942,7 @@ class _MultipleOrderDetailsScreenState
 
                   if (walletBalance < payNowAmount) {
                     appToaster(
-                      content: "Insufficient wallet balance",
+                      content: AppStrings.insufficient_wallet_balance,
                       error: true,
                     );
 
@@ -996,8 +989,7 @@ class _MultipleOrderDetailsScreenState
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "Wallet Payment",
+                                Text(AppStrings.wallet_payment,
                                   style: TextStyle(
                                     fontSize: 15.sp,
                                     fontWeight: FontWeight.w600,
@@ -1054,8 +1046,7 @@ class _MultipleOrderDetailsScreenState
                                             ),
                                           ),
                                           SizedBox(width: 8.w),
-                                          Text(
-                                            "Enable AutoPay for future payments",
+                                          Text(AppStrings.enable_autopay_for_future_paym,
                                             style: TextStyle(
                                               fontSize: 12.5.sp,
                                               color: AppColors.grey,
@@ -1122,16 +1113,14 @@ class _MultipleOrderDetailsScreenState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Razorpay Payment",
+                            Text(AppStrings.razorpay_payment,
                               style: TextStyle(
                                 fontSize: 15.sp,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             SizedBox(height: 4.h),
-                            Text(
-                              "UPI, Card, Net Banking & More",
+                            Text(AppStrings.upi_card_net_banking_more,
                               style: TextStyle(
                                 fontSize: 13.sp,
                                 color: AppColors.grey,
@@ -1171,7 +1160,7 @@ class _MultipleOrderDetailsScreenState
                             if (walletBalance < payNowAmount) {
                               appToaster(
                                 error: true,
-                                content: "Insufficient wallet balance",
+                                content: AppStrings.insufficient_wallet_balance,
                               );
 
                               return;
@@ -1197,8 +1186,7 @@ class _MultipleOrderDetailsScreenState
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
-                  child: Text(
-                    "Confirm Payment Method",
+                  child: Text(AppStrings.confirm_payment_method,
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w600,
@@ -1405,8 +1393,7 @@ class _MultipleOrderDetailsScreenState
                             border: Border.all(color: AppColors.shadowColor),
                             borderRadius: BorderRadius.circular(5.r)),
                         child: Center(
-                            child: appText(
-                          "Edit",
+                            child: appText(AppStrings.edit,
                           fontSize: 12.sp,
                         )),
                       ),

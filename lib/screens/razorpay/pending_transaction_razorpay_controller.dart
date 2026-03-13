@@ -1,6 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../services/pending_transaction_service.dart';
 import '../../widgets/app_loader.dart';
@@ -44,7 +45,8 @@ class PendingTransactionRazorpayController extends GetxController {
           "";
 
       if (apiRazorpayOrderId.isEmpty || apiAmount == 0 || apiKeyId.isEmpty) {
-        appToast(error: true, content: "Invalid payment data from server.");
+        appToast(
+            error: true, content: AppStrings.invalid_payment_data_from_serv);
 
         return;
       }
@@ -54,7 +56,7 @@ class PendingTransactionRazorpayController extends GetxController {
           amount: apiAmount,
           keyId: apiKeyId);
     } catch (e) {
-      appToast(error: true, content: "Could not start payment.");
+      appToast(error: true, content: AppStrings.could_not_start_payment);
     }
   }
 
@@ -73,7 +75,7 @@ class PendingTransactionRazorpayController extends GetxController {
 
       razorpay.open(options);
     } catch (e) {
-      appToast(error: true, content: "Could not open payment window");
+      appToast(error: true, content: AppStrings.could_not_open_payment_window);
     }
   }
 
@@ -91,7 +93,7 @@ class PendingTransactionRazorpayController extends GetxController {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    appToast(error: true, content: "Pending Payment Failed");
+    appToast(error: true, content: AppStrings.pending_payment_failed);
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -119,13 +121,13 @@ class PendingTransactionRazorpayController extends GetxController {
         final pendingController = Get.find<PendingTransactionController>();
         pendingController.removePaidOrders(selectedOrders);
 
-        appToast(content: "Payment processed successfully");
+        appToast(content: AppStrings.payment_processed_successfully);
 
         Get.to(() => PendingPaymentConfirmationScreen());
       }
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
-      appToast(error: true, content: "Payment verification error!");
+      appToast(error: true, content: AppStrings.payment_verification_error);
     }
   }
 

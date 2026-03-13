@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../constants/app_assets.dart';
 import '../constants/app_colors.dart';
@@ -67,7 +68,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         SizedBox(height: 2.h),
         appText(
-          "Welcome to EPI",
+          AppStrings.welcome_to_epi,
           fontSize: 12.sp,
           fontWeight: FontWeight.w400,
           color: AppColors.white.withOpacity(0.9),

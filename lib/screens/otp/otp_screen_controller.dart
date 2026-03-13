@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
@@ -78,7 +79,7 @@ class VerifyOtpController extends GetxController {
     final res = await AuthService.loginWithIdToken(idToken);
 
     if (res == null || res.success != true) {
-      appToast(content: "Login failed", error: true);
+      appToast(content: AppStrings.login_failed, error: true);
       return;
     }
 
@@ -140,7 +141,7 @@ class VerifyOtpController extends GetxController {
 
     /// STEP 4 — Navigate to Home
     Get.offAll(() => DashboardScreen());
-    appToast(content: "Login Successful!");
+    appToast(content: AppStrings.login_successful);
 
     isLoading.value = false;
   }
@@ -212,8 +213,7 @@ class VerifyOtpController extends GetxController {
 
   /// --- Resend OTP (Local mock) ---
   Future<void> resendOtp() async {
-    appToast(
-        content: "Resending OTP...A new OTP has been sent to your number.");
+    appToast(content: AppStrings.resending_otp_a_new_otp_has_be);
   }
 
 //------------------new-----------------------------

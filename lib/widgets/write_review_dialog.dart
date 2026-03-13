@@ -1,3 +1,4 @@
+import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:saoirse_app/widgets/app_image.dart';
 import 'dart:io';
 
@@ -36,7 +37,7 @@ class WriteReviewDialog extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   appText(
-                    "Rate your Experience",
+                    AppStrings.rate_your_experience,
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
                   ),
@@ -90,13 +91,13 @@ class WriteReviewDialog extends StatelessWidget {
                   Row(
                     children: [
                       appText(
-                        "Add Image",
+                        AppStrings.add_image,
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w600,
                       ),
                       SizedBox(width: 6.w),
                       appText(
-                        "(Max 5)",
+                        AppStrings.max_5,
                         fontSize: 10.sp,
                         color: AppColors.grey,
                       ),
@@ -114,7 +115,7 @@ class WriteReviewDialog extends StatelessWidget {
                           isMaxReached ? AppColors.grey : AppColors.lightBlue,
                     ),
                     label: appText(
-                      "Add Image",
+                      AppStrings.add_image,
                       color:
                           isMaxReached ? AppColors.grey : AppColors.lightBlue,
                       fontWeight: FontWeight.w500,
@@ -303,7 +304,7 @@ class WriteReviewDialog extends StatelessWidget {
                 controller: controller.reviewTextController,
                 onChanged: controller.updateReviewText,
                 decoration: InputDecoration(
-                  hintText: "Write your valuable feedback",
+                  hintText: AppStrings.write_your_valuable_feedback,
                   hintStyle: TextStyle(
                     color: AppColors.grey,
                     fontSize: 12.sp,
@@ -365,7 +366,7 @@ class WriteReviewDialog extends StatelessWidget {
                               controller.resetReviewForm();
                               Get.back();
                             },
-                      child: appText("Cancel"),
+                      child: appText(AppStrings.cancel),
                     ),
                   ),
                   SizedBox(width: 10.w),
@@ -573,7 +574,7 @@ class WriteReviewDialog extends StatelessWidget {
 //                 maxLines: 4,
 //                 onChanged: controller.updateReviewText,
 //                 decoration: InputDecoration(
-//                   hintText: "Write your valuable feedback",
+//                   hintText: AppStrings.write_your_valuable_feedback,
 //                   hintStyle: TextStyle(
 //                     color: AppColors.grey,
 //                     fontSize: 12.sp,
@@ -656,7 +657,7 @@ class WriteReviewDialog extends StatelessWidget {
 //                               controller.resetReviewForm();
 //                               Get.back();
 //                             },
-//                       child: appText("Cancel"),
+//                       child: appText(AppStrings.cancel),
 //                     ),
 //                   ),
 //                   SizedBox(width: 10.w),

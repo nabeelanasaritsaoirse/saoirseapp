@@ -60,8 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            appText(
-              "Please login to view your Profile",
+            appText(AppStrings.please_login_to_view_your_prof,
               fontSize: 16.sp,
               fontWeight: FontWeight.w500,
             ),
@@ -76,8 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   controller.fetchDeleteInfo();
                 }
               },
-              child: appText(
-                "Login",
+              child: appText(AppStrings.login_1,
                 color: AppColors.white,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
@@ -116,7 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     if (profile == null) {
                       return SizedBox(
                         height: 200.h,
-                        child: Center(child: appText("Failed to load profile")),
+                        child: Center(child: appText(AppStrings.failed_to_load_profile)),
                       );
                     }
 
@@ -241,8 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // -------------------- MY ORDERS TITLE ---------------------
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: appText(
-                      "My Orders",
+                    child: appText(AppStrings.my_orders,
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textBlack,
@@ -312,8 +309,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // -------------------- SETTINGS TITLE ---------------------
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: appText(
-                      "Settings",
+                    child: appText(AppStrings.settings,
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textBlack,
@@ -417,22 +413,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 itemBuilder: (context) => [
                   _menuItem(
                       value: "contactus",
-                      title: "Contact Us",
+                      title: AppStrings.contact_us,
                       icon: Icons.call),
                   _menuItem(
                       value: "privacypolicy",
-                      title: "Privacy Policy",
+                      title: AppStrings.privacy_policy,
                       icon: Icons.privacy_tip),
                   _menuItem(
                       value: "termsandconditions",
-                      title: "Terms & Conditions",
+                      title: AppStrings.terms_conditions,
                       icon: Icons.description),
                   _menuItem(
                       value: "delete",
-                      title: "Delete Account",
+                      title: AppStrings.delete_account,
                       icon: Icons.delete),
                   _menuItem(
-                      value: "logout", title: "Logout", icon: Icons.logout),
+                      value: "logout", title: AppStrings.logout, icon: Icons.logout),
                 ],
               ),
             ]

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -337,12 +338,12 @@ class ProductDetailsController extends GetxController {
     final productData = product.value;
 
     if (productData == null) {
-      appToast(content: "Product not loaded");
+      appToast(content: AppStrings.product_not_loaded);
       return;
     }
 
     if (id.isEmpty) {
-      appToast(content: "Invalid Product ID", error: true);
+      appToast(content: AppStrings.invalid_product_id, error: true);
       return;
     }
 
@@ -351,9 +352,10 @@ class ProductDetailsController extends GetxController {
 
       if (removed) {
         isFavorite(false);
-        appToaster(content: "Removed from wishlist");
+        appToaster(content: AppStrings.removed_from_wishlist);
       } else {
-        appToast(content: "Failed to remove from wishlist", error: true);
+        appToast(
+            content: AppStrings.failed_to_remove_from_wishlist, error: true);
       }
 
       return;
@@ -363,9 +365,9 @@ class ProductDetailsController extends GetxController {
 
     if (added) {
       isFavorite(true);
-      appToaster(content: "Added to wishlist");
+      appToaster(content: AppStrings.added_to_wishlist);
     } else {
-      appToast(content: "Failed to add wishlist", error: true);
+      appToast(content: AppStrings.failed_to_add_wishlist, error: true);
     }
   }
 

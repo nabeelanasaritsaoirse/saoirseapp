@@ -44,8 +44,7 @@ class PendingTransaction extends StatelessWidget {
 
               if (controller.transactions.isEmpty) {
                 return Center(
-                  child: appText(
-                    "No pending payment",
+                  child: appText(AppStrings.no_pending_payment,
                     fontSize: 16.sp,
                   ),
                 );
@@ -205,8 +204,7 @@ class PendingTransaction extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      appText(
-                        "Total Amount",
+                      appText(AppStrings.total_amount,
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w500,
                         color: AppColors.grey,
@@ -226,8 +224,7 @@ class PendingTransaction extends StatelessWidget {
                       controller.showPaymentMethodSheet();
                     },
                     child: Center(
-                      child: appText(
-                        "Pay Now",
+                      child: appText(AppStrings.pay_now,
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
                         color: AppColors.white,

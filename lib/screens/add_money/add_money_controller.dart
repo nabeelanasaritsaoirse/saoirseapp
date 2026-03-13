@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../services/payment_service.dart';
 import '../../widgets/app_toast.dart';
@@ -17,7 +18,10 @@ class AddMoneyController extends GetxController {
     String raw = amountController.text.replaceAll(".00", "");
 
     if (raw.isEmpty || raw == "0") {
-      appToast(title: "Error", content: "Please enter an amount", error: true);
+      appToast(
+          title: AppStrings.error,
+          content: AppStrings.please_enter_an_amount,
+          error: true);
       return false;
     }
 
@@ -45,7 +49,7 @@ class AddMoneyController extends GetxController {
       };
 
       appToast(
-        title: "Processing",
+        title: AppStrings.processing,
         content: "Sending ₹${enteredAmount.toStringAsFixed(2)}",
       );
 
@@ -54,8 +58,8 @@ class AddMoneyController extends GetxController {
 
       if (order == null || !order.success) {
         appToast(
-          title: "Error",
-          content: "Unable to create order. Please try again.",
+          title: AppStrings.error,
+          content: AppStrings.unable_to_create_order_please,
           error: true,
         );
         return;
@@ -65,8 +69,8 @@ class AddMoneyController extends GetxController {
           order.transactionId.isEmpty ||
           order.amount == 0) {
         appToast(
-          title: "Error",
-          content: "Invalid order details received. Please retry.",
+          title: AppStrings.error,
+          content: AppStrings.invalid_order_details_received,
           error: true,
         );
         return;
@@ -88,8 +92,8 @@ class AddMoneyController extends GetxController {
       debugPrint("📌 StackTrace: $stack");
 
       appToast(
-        title: "Error",
-        content: "Unexpected error occurred. Please try again.",
+        title: AppStrings.error,
+        content: AppStrings.unexpected_error_occurred_plea,
         error: true,
       );
     } finally {

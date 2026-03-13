@@ -34,7 +34,7 @@ class ManageAddressScreen extends StatelessWidget {
               child: appButton(
                 buttonColor: AppColors.primaryColor,
                 child: appText(
-                  "+ Add New Address",
+                  AppStrings.add_new_address,
                   color: AppColors.white,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
@@ -53,7 +53,7 @@ class ManageAddressScreen extends StatelessWidget {
 
                 if (controller.addressList.isEmpty) {
                   return Center(
-                    child: appText("No address found"),
+                    child: appText(AppStrings.no_address_found),
                   );
                 }
 
@@ -208,7 +208,7 @@ class ManageAddressScreen extends StatelessWidget {
                   ),
                 ),
                 child: appText(
-                  "Default",
+                  AppStrings.defaults,
                   fontSize: 11.sp,
                   fontWeight: FontWeight.w600,
                   color: AppColors.white,
@@ -257,7 +257,7 @@ class DeleteAccountDialog {
 
               /// TITLE
               appText(
-                "Delete Address",
+                AppStrings.delete_address,
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w700,
                 color: AppColors.black,
@@ -268,7 +268,7 @@ class DeleteAccountDialog {
 
               /// DESCRIPTION
               appText(
-                "Are you sure you want to delete this address?",
+                AppStrings.are_you_sure_you_want_to_delet,
                 fontSize: 13.sp,
                 color: AppColors.black54,
                 textAlign: TextAlign.center,
@@ -291,7 +291,7 @@ class DeleteAccountDialog {
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: appText(
-                          "Cancel",
+                          AppStrings.cancel,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                           color: AppColors.black,
@@ -317,7 +317,7 @@ class DeleteAccountDialog {
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: appText(
-                          "Delete",
+                          AppStrings.delete,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                           color: AppColors.white,

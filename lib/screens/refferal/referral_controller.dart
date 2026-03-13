@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../constants/app_constant.dart';
@@ -238,12 +239,12 @@ class ReferralController extends GetxController {
 
       appToaster(
         error: false,
-        content: "Referral link copied. Paste it or add Link sticker.",
+        content: AppStrings.referral_link_copied_paste_it,
       );
     } catch (e) {
       appToast(
         error: true,
-        content: "Failed to open Instagram Story",
+        content: AppStrings.failed_to_open_instagram_story,
       );
     }
   }
@@ -284,7 +285,8 @@ class ReferralController extends GetxController {
         );
         await intent.launch();
       } catch (e) {
-        appToast(error: true, content: "Gmail app not found on this device.");
+        appToast(
+            error: true, content: AppStrings.gmail_app_not_found_on_this_de);
       }
     } else if (Platform.isIOS) {
       final uri = Uri.parse(
@@ -368,7 +370,7 @@ class ReferralController extends GetxController {
     if (Platform.isIOS) {
       // Show success message
       appToaster(
-        content: "Referral code copied to clipboard",
+        content: AppStrings.referral_code_copied_to_clipbo,
       );
     }
   }

@@ -56,8 +56,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   color: AppColors.white,
                   borderRadius: BorderRadius.circular(25.r),
                 ),
-                child: appText(
-                  "Add Money",
+                child: appText(AppStrings.add_money,
                   color: AppColors.primaryColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -108,8 +107,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           children: [
                             SizedBox(height: 200.h),
                             Center(
-                              child: appText(
-                                "Failed to load wallet...!",
+                              child: appText(AppStrings.failed_to_load_wallet,
                                 color: AppColors.black,
                                 fontWeight: FontWeight.w400,
                                 fontSize: 16.sp,
@@ -137,8 +135,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                   height: 50.h,
                                 ),
                                 Center(
-                                  child: appText(
-                                    "No wallet history found",
+                                  child: appText(AppStrings.no_wallet_history_found,
                                     color: AppColors.grey,
                                     fontSize: 15.sp,
                                     fontWeight: FontWeight.w500,
@@ -173,8 +170,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           // ---------- TITLE ----------
                           if (index == 2) {
                             return Center(
-                              child: appText(
-                                "Wallet History",
+                              child: appText(AppStrings.wallet_history,
                                 color: AppColors.black,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16.sp,
@@ -203,7 +199,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                     color: AppColors.blueshade,
                                     borderRadius: BorderRadius.circular(14.r),
                                   ),
-                                  child: appText("💸",
+                                  child: appText(AppStrings.text_1,
                                       fontSize: 30.sp),
                                 ),
                                 SizedBox(width: 12.w),
@@ -255,8 +251,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       buttonColor: AppColors.primaryColor,
                       onTap: () => Get.to(() => SelectAccountScreen()),
                       child: Center(
-                        child: appText(
-                          "Withdraw",
+                        child: appText(AppStrings.withdraw,
                           color: AppColors.white,
                           fontSize: 20.sp,
                           fontWeight: FontWeight.bold,
@@ -293,7 +288,7 @@ class _WalletScreenState extends State<WalletScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          appText("Main Balance", color: AppColors.white, fontSize: 18.sp),
+          appText(AppStrings.main_balance, color: AppColors.white, fontSize: 18.sp),
           SizedBox(height: 2.h),
           appText(
             "₹ $mainBalance",
@@ -358,8 +353,7 @@ Widget _loginOnlyView() {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          appText(
-            "Please login to view your wallet",
+          appText(AppStrings.please_login_to_view_your_wall,
             fontSize: 16.sp,
             fontWeight: FontWeight.w500,
           ),
@@ -369,8 +363,7 @@ Widget _loginOnlyView() {
             onTap: () {
               Get.to(() => LoginPage());
             },
-            child: appText(
-              "Login",
+            child: appText(AppStrings.login_1,
               color: AppColors.white,
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,

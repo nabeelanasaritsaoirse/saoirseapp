@@ -41,8 +41,7 @@ class InviteFriendDetailsScreen extends StatelessWidget {
 
         if (user == null) {
           return Center(
-            child: appText(
-              "No data found",
+            child: appText(AppStrings.no_data_found,
               fontSize: 14.sp,
               color: AppColors.grey,
             ),
@@ -263,8 +262,7 @@ class InviteFriendDetailsScreen extends StatelessWidget {
                     Center(
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: 30.h),
-                        child: appText(
-                          "No products purchased yet",
+                        child: appText(AppStrings.no_products_purchased_yet,
                           fontSize: 14.sp,
                           color: AppColors.grey,
                           fontWeight: FontWeight.w500,

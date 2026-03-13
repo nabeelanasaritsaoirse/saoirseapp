@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_constant.dart';
@@ -143,7 +144,7 @@ class PendingTransactionController extends GetxController {
       if (selectedOrderIds.isEmpty) {
         appToast(
           error: true,
-          content: "Please select at least one order to pay.",
+          content: AppStrings.please_select_at_least_one_ord,
         );
         return;
       }
@@ -157,7 +158,8 @@ class PendingTransactionController extends GetxController {
             Get.find<MyWalletController>().wallet.value?.walletBalance ?? 0;
 
         if (walletBalance < totalAmount.value) {
-          appToast(error: true, content: "Insufficient wallet balance");
+          appToast(
+              error: true, content: AppStrings.insufficient_wallet_balance);
           return;
         }
 
@@ -205,7 +207,8 @@ class PendingTransactionController extends GetxController {
       debugPrint("📥 [PAY NOW] Razorpay create response: $response");
 
       if (response == null || response['success'] != true) {
-        appToast(error: true, content: "Failed to create Razorpay order");
+        appToast(
+            error: true, content: AppStrings.failed_to_create_razorpay_orde);
         return;
       }
 
@@ -226,7 +229,7 @@ class PendingTransactionController extends GetxController {
 
       appToast(
         error: true,
-        content: "Payment initialization failed",
+        content: AppStrings.payment_initialization_failed,
       );
     } finally {
       // 🔓 unlock ONLY if still on this screen
@@ -271,7 +274,7 @@ class PendingTransactionController extends GetxController {
     // 🔔 SINGLE notification
     if (successCount > 0) {
       await notificationService.sendCustomNotification(
-        title: "AutoPay Enabled",
+        title: AppStrings.autopay_enabled_1,
         message:
             "Your payments will now be made automatically from your wallet",
         sendPush: true,
@@ -310,7 +313,7 @@ class PendingTransactionController extends GetxController {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   appText(
-                    "Select Payment Method",
+                    AppStrings.select_payment_method,
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryColor,
@@ -332,7 +335,7 @@ class PendingTransactionController extends GetxController {
                       if (!isWalletEnabled) {
                         appToast(
                           error: true,
-                          content: "Insufficient wallet balance",
+                          content: AppStrings.insufficient_wallet_balance,
                         );
 
                         return;
@@ -386,7 +389,7 @@ class PendingTransactionController extends GetxController {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Wallet Payment",
+                                        AppStrings.wallet_payment,
                                         style: TextStyle(
                                           fontSize: 15.sp,
                                           fontWeight: FontWeight.w600,
@@ -454,7 +457,8 @@ class PendingTransactionController extends GetxController {
                                                 ),
                                                 SizedBox(width: 8.w),
                                                 Text(
-                                                  "Enable AutoPay for future payments",
+                                                  AppStrings
+                                                      .enable_autopay_for_future_paym,
                                                   style: TextStyle(
                                                     fontSize: 12.5.sp,
                                                     color: AppColors.grey,
@@ -520,7 +524,7 @@ class PendingTransactionController extends GetxController {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Razorpay Payment",
+                                  AppStrings.razorpay_payment,
                                   style: TextStyle(
                                     fontSize: 15.sp,
                                     fontWeight: FontWeight.w600,
@@ -529,7 +533,7 @@ class PendingTransactionController extends GetxController {
                                 ),
                                 SizedBox(height: 4.h),
                                 Text(
-                                  "UPI, Card, Net Banking & More",
+                                  AppStrings.upi_card_net_banking_more,
                                   style: TextStyle(
                                     fontSize: 13.sp,
                                     color: AppColors.grey,
@@ -582,7 +586,7 @@ class PendingTransactionController extends GetxController {
                             ),
                           )
                         : appText(
-                            "Pay Now",
+                            AppStrings.pay_now,
                             fontSize: 16.sp,
                             fontWeight: FontWeight.w700,
                             color: AppColors.white,

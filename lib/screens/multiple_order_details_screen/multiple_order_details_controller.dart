@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/payment_methods.dart';
 import '../../models/address_response.dart';
@@ -154,7 +155,7 @@ class MultipleOrderDetailsController extends GetxController {
       final response = await OrderService.bulkOrderPreview(body);
 
       if (response == null) {
-        appToast(error: true, content: "Preview failed");
+        appToast(error: true, content: AppStrings.preview_failed);
 
         previewData.value = oldPreview;
         return;
@@ -165,7 +166,7 @@ class MultipleOrderDetailsController extends GetxController {
     } catch (e) {
       previewData.value = oldPreview;
 
-      appToast(error: true, content: "Unable to load order preview");
+      appToast(error: true, content: AppStrings.unable_to_load_order_preview);
     } finally {
       isPreviewLoading.value = false;
     }
@@ -334,7 +335,7 @@ class MultipleOrderDetailsController extends GetxController {
 
   void decreaseQty(CartProduct item) {
     if (item.quantity <= 1) {
-      appToaster(content: "Minimum quantity should be 1", error: true);
+      appToaster(content: AppStrings.minimum_quantity_should_be_1, error: true);
       return;
     }
 
@@ -399,7 +400,7 @@ class MultipleOrderDetailsController extends GetxController {
 
     final cartItem = products[index];
     if (cartItem.quantity <= 1) {
-      appToaster(content: "Minimum quantity should be 1", error: true);
+      appToaster(content: AppStrings.minimum_quantity_should_be_1, error: true);
       return;
     }
 
@@ -450,12 +451,12 @@ class MultipleOrderDetailsController extends GetxController {
     required Address deliveryAddress,
   }) async {
     if (couponCode.trim().isEmpty) {
-      appToaster(error: true, content: "Please enter a coupon code");
+      appToaster(error: true, content: AppStrings.please_enter_a_coupon_code);
       return;
     }
 
     if (products.isEmpty) {
-      appToaster(error: true, content: "No products in cart");
+      appToaster(error: true, content: AppStrings.no_products_in_cart);
       return;
     }
 
@@ -479,7 +480,7 @@ class MultipleOrderDetailsController extends GetxController {
         deliveryAddress: deliveryAddress,
       );
 
-      appToast(content: "Coupon applied successfully");
+      appToast(content: AppStrings.coupon_applied_successfully);
     } catch (e) {
       previewCouponCode.value = "";
       isCouponApplied.value = false;
@@ -509,8 +510,8 @@ class MultipleOrderDetailsController extends GetxController {
     controller?.clear();
 
     appToast(
-      title: "Coupon Removed",
-      content: "Coupon removed from order preview",
+      title: AppStrings.coupon_removed,
+      content: AppStrings.coupon_removed_from_order_prev,
     );
   }
 
@@ -597,7 +598,7 @@ class MultipleOrderDetailsController extends GetxController {
       if (walletBalance < payNowAmount) {
         appToaster(
           error: true,
-          content: "Insufficient wallet balance",
+          content: AppStrings.insufficient_wallet_balance,
         );
 
         return; // 🚫 STOP ORDER CREATION
@@ -630,7 +631,7 @@ class MultipleOrderDetailsController extends GetxController {
       log("📥 [BULK ORDER] API response: $response");
 
       if (response == null || response["success"] != true) {
-        appToast(error: true, content: "Bulk order failed");
+        appToast(error: true, content: AppStrings.bulk_order_failed);
         return;
       }
 
@@ -649,7 +650,7 @@ class MultipleOrderDetailsController extends GetxController {
           }
 
           await notificationService.sendCustomNotification(
-            title: "Autopay Enabled",
+            title: AppStrings.autopay_enabled,
             message:
                 "Your installment payments will now be made automatically from your wallet.",
             sendPush: true,
@@ -671,7 +672,7 @@ class MultipleOrderDetailsController extends GetxController {
       log("🟣 [BULK RAZORPAY] OrderId: $razorpayOrderId");
 
       if (razorpayOrderId.isEmpty) {
-        appToast(error: true, content: "Invalid Razorpay order");
+        appToast(error: true, content: AppStrings.invalid_razorpay_order);
         return;
       }
 
@@ -683,7 +684,7 @@ class MultipleOrderDetailsController extends GetxController {
       log(" [BULK ORDER] Exception: $e");
       log(" [BULK ORDER] StackTrace: $stack");
 
-      appToast(error: true, content: "Payment initialization failed");
+      appToast(error: true, content: AppStrings.payment_initialization_failed);
     } finally {
       _placeOrderLock?.complete();
       _placeOrderLock = null;

@@ -111,7 +111,7 @@ class PaymentMessageScreen extends StatelessWidget {
                       keyboardType: TextInputType.multiline,
                       textInputAction: TextInputAction.newline,
                       decoration: InputDecoration(
-                        hintText: 'Type a message...',
+                        hintText: AppStrings.type_a_message,
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 20,
@@ -194,8 +194,7 @@ class PaymentMessageScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      appText(
-                        "Profile",
+                      appText(AppStrings.profile,
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w600,
                         color: AppColors.white,

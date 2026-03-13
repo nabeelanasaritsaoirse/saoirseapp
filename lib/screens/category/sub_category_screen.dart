@@ -1,3 +1,4 @@
+import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,7 +29,7 @@ class SubCategoryScreen extends StatelessWidget {
       body: category.subCategories.isEmpty
           ? Center(
               child: appText(
-                "No subcategories found",
+                AppStrings.no_subcategories_found,
                 fontSize: 16.sp,
               ),
             )

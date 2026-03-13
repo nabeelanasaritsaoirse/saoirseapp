@@ -43,7 +43,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
         }
         if (controller.transactions.isEmpty) {
           return Center(
-            child: appText("No transactions found"),
+            child: appText(AppStrings.no_transactions_found),
           );
         }
         return Padding(
@@ -130,8 +130,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               Expanded(
                 child: Row(
                   children: [
-                    appText(
-                      "Status : ",
+                    appText(AppStrings.status,
                       color: AppColors.mediumGray,
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w600,
@@ -154,8 +153,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    appText(
-                      "Amount : ",
+                    appText(AppStrings.amount_1,
                       color: AppColors.black54,
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w600,

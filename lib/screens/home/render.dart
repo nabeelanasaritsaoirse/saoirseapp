@@ -1,3 +1,4 @@
+import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -445,7 +446,7 @@ class Design5Widget extends StatelessWidget {
                   );
                 },
                 child: appText(
-                  "View all",
+                  AppStrings.view_all_1,
                   fontSize: 13.sp,
                   fontWeight: FontWeight.w600,
                   color: AppColors.black,

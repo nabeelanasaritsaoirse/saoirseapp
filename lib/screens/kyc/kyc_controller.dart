@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../models/LoginAuth/kyc_model.dart';
 import '../../services/kyc_service.dart';
@@ -159,7 +160,7 @@ class KycController extends GetxController {
     // ---------------- SELFIE ----------------
     if (selfieImage.value == null) {
       selfieError.value = true;
-      appToast(content: "Upload selfie", error: true);
+      appToast(content: AppStrings.upload_selfie, error: true);
       isValid = false;
     }
 
@@ -167,7 +168,7 @@ class KycController extends GetxController {
     if (!aadhaarSelected.value && !panSelected.value) {
       aadhaarError.value = true;
       panError.value = true;
-      appToast(content: "Select Aadhaar or PAN", error: true);
+      appToast(content: AppStrings.select_aadhaar_or_pan, error: true);
       isValid = false;
     }
 
@@ -175,19 +176,19 @@ class KycController extends GetxController {
     if (aadhaarSelected.value) {
       if (aadhaarNumberController.text.trim().length != 12) {
         aadhaarNumberError.value = true;
-        appToast(content: "Enter valid Aadhaar number", error: true);
+        appToast(content: AppStrings.enter_valid_aadhaar_number, error: true);
         isValid = false;
       }
 
       if (aadhaarFront.value == null) {
         aadhaarFrontError.value = true;
-        appToast(content: "Upload Aadhaar front image", error: true);
+        appToast(content: AppStrings.upload_aadhaar_front_image, error: true);
         isValid = false;
       }
 
       if (aadhaarBack.value == null) {
         aadhaarBackError.value = true;
-        appToast(content: "Upload Aadhaar back image", error: true);
+        appToast(content: AppStrings.upload_aadhaar_back_image, error: true);
         isValid = false;
       }
     }
@@ -197,13 +198,13 @@ class KycController extends GetxController {
       final panRegex = RegExp(r'^[A-Z]{5}[0-9]{4}[A-Z]$');
       if (!panRegex.hasMatch(panNumberController.text.trim().toUpperCase())) {
         panNumberError.value = true;
-        appToast(content: "Enter valid PAN number", error: true);
+        appToast(content: AppStrings.enter_valid_pan_number, error: true);
         isValid = false;
       }
 
       if (panFront.value == null) {
         panFrontError.value = true;
-        appToast(content: "Upload PAN image", error: true);
+        appToast(content: AppStrings.upload_pan_image, error: true);
         isValid = false;
       }
     }
@@ -278,7 +279,7 @@ class KycController extends GetxController {
       fetchKycData();
     } catch (e) {
       log(e.toString());
-      //   appToast(content: "KYC submission failed", error: true);
+      //   appToast(content: AppStrings.kyc_submission_failed, error: true);
     } finally {
       isLoading(false);
     }

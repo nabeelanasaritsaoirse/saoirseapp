@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_colors.dart';
 import '../../widgets/app_loader.dart';
@@ -24,7 +25,7 @@ class OrderDeliveredScreen extends StatelessWidget {
       backgroundColor: AppColors.paperColor,
       //--------------------- APP BAR -----------------------
       appBar: CustomAppBar(
-        title: "Delivered",
+        title: AppStrings.delivered,
         showBack: true,
       ),
       //--------------------- BODY -----------------------
@@ -35,7 +36,7 @@ class OrderDeliveredScreen extends StatelessWidget {
         if (controller.orders.isEmpty) {
           return Center(
             child: appText(
-              "No delivered orders found",
+              AppStrings.no_delivered_orders_found,
               fontSize: 16.sp,
               color: AppColors.textBlack,
             ),
@@ -81,7 +82,8 @@ class OrderDeliveredScreen extends StatelessWidget {
                         if (result == true) {
                           controller.fetchDeliveredOrders();
 
-                          appToaster(content: "Review added successfully");
+                          appToaster(
+                              content: AppStrings.review_added_successfully);
                         }
                       }
                     : null,

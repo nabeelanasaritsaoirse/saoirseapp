@@ -103,8 +103,7 @@ class SelectPlanSheet extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        appText(
-                          "Days",
+                        appText(AppStrings.days,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -135,8 +134,7 @@ class SelectPlanSheet extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        appText(
-                          "Amount",
+                        appText(AppStrings.amount_2,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -175,7 +173,7 @@ class SelectPlanSheet extends StatelessWidget {
                       if (days <= 0 || amount <= 0) {
                         appToaster(
                             error: true,
-                            content: "Please enter valid days and amount");
+                            content: AppStrings.please_enter_valid_days_and_am);
 
                         return;
                       }
@@ -183,7 +181,7 @@ class SelectPlanSheet extends StatelessWidget {
                       if (days < 5) {
                         appToaster(
                           error: true,
-                          content: "Days cannot be less than 5",
+                          content: AppStrings.days_cannot_be_less_than_5,
                         );
                         return;
                       }
@@ -191,7 +189,7 @@ class SelectPlanSheet extends StatelessWidget {
                       if (amount < 50) {
                         appToaster(
                           error: true,
-                          content: "Amount cannot be more less 50",
+                          content: AppStrings.amount_cannot_be_more_less_50,
                         );
                         return;
                       }
@@ -241,8 +239,7 @@ class SelectPlanSheet extends StatelessWidget {
                 if (controller.plans.isEmpty) {
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: 30.h),
-                    child: appText(
-                      "No plans available",
+                    child: appText(AppStrings.no_plans_available,
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
                       color: AppColors.grey,
@@ -303,8 +300,7 @@ class SelectPlanSheet extends StatelessWidget {
                                               borderRadius:
                                                   BorderRadius.circular(8.r),
                                             ),
-                                            child: appText(
-                                              "Recommended",
+                                            child: appText(AppStrings.recommended,
                                               fontSize: 10.sp,
                                               fontWeight: FontWeight.w600,
                                             ),

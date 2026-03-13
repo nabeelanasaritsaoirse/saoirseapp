@@ -33,8 +33,7 @@ class OrdersActiveScreen extends StatelessWidget {
 
         if (controller.orders.isEmpty) {
           return Center(
-            child: appText(
-              "No Active orders found",
+            child: appText(AppStrings.no_active_orders_found,
               fontSize: 16.sp,
               color: AppColors.textBlack,
             ),

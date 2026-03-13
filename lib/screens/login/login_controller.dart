@@ -4,6 +4,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
@@ -116,7 +117,7 @@ class LoginController extends GetxController {
       final res = await AuthService.loginWithIdToken(idToken);
 
       if (res == null || res.success != true) {
-        appToast(content: "Login failed", error: true);
+        appToast(content: AppStrings.login_failed, error: true);
         loading.value = false;
         return;
       }
@@ -160,10 +161,10 @@ class LoginController extends GetxController {
 
       if (updated) {
         Get.offAll(() => DashboardScreen());
-        appToast(content: "Login Successful!");
+        appToast(content: AppStrings.login_successful);
       }
     } catch (e) {
-      appToast(content: "Something went wrong", error: true);
+      appToast(content: AppStrings.something_went_wrong_1, error: true);
     } finally {
       loading.value = false;
     }
@@ -186,7 +187,7 @@ class LoginController extends GetxController {
       final res = await AuthService.loginWithIdToken(idToken);
 
       if (res == null || res.success != true) {
-        appToast(content: "Login failed", error: true);
+        appToast(content: AppStrings.login_failed, error: true);
         loading.value = false;
         return;
       }
@@ -230,10 +231,10 @@ class LoginController extends GetxController {
 
       if (updated) {
         Get.offAll(() => DashboardScreen());
-        appToast(content: "Login Successful!");
+        appToast(content: AppStrings.login_successful);
       }
     } catch (e) {
-      appToast(content: "Something went wrong", error: true);
+      appToast(content: AppStrings.something_went_wrong_1, error: true);
     } finally {
       loading.value = false;
     }
@@ -244,19 +245,19 @@ class LoginController extends GetxController {
     String phone = phoneController.text.trim();
 
     if (username.isEmpty) {
-      appToast(content: "Username is required", error: true);
+      appToast(content: AppStrings.username_is_required, error: true);
       return false;
     }
 
     if (phone.isEmpty) {
-      appToast(content: "Phone number is required", error: true);
+      appToast(content: AppStrings.phone_number_is_required, error: true);
       return false;
     }
 
     // remove non-digit characters before checking length
     final digitsOnly = phone.replaceAll(RegExp(r'\D'), '');
     if (digitsOnly.length < 7 || digitsOnly.length > 15) {
-      appToast(content: "Enter a valid phone number", error: true);
+      appToast(content: AppStrings.enter_a_valid_phone_number, error: true);
       return false;
     }
 
@@ -311,7 +312,7 @@ class LoginController extends GetxController {
     final result = await referralService.applyReferralCode(code);
 
     if (result == null) {
-      appToast(error: true, content: "Something went wrong");
+      appToast(error: true, content: AppStrings.something_went_wrong_1);
       return false;
     }
 
@@ -319,7 +320,7 @@ class LoginController extends GetxController {
       storage.write("referral_applied", true);
       referralApplied.value = true;
 
-      appToast(title: "Success", content: result.message);
+      appToast(title: AppStrings.success, content: result.message);
       final referralController = Get.find<ReferralController>();
       referralController.fetchReferralData();
 

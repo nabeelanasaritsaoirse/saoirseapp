@@ -67,7 +67,7 @@ class SelectAddress extends StatelessWidget {
               child: appButton(
                 buttonColor: AppColors.primaryColor,
                 child: appText(
-                  "+ Add New Address",
+                  AppStrings.add_new_address,
                   color: AppColors.white,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
@@ -86,7 +86,7 @@ class SelectAddress extends StatelessWidget {
 
                 if (controller.addressList.isEmpty) {
                   return Center(
-                    child: appText("No address found"),
+                    child: appText(AppStrings.no_address_found),
                   );
                 }
 
@@ -115,7 +115,7 @@ class SelectAddress extends StatelessWidget {
               child: appButton(
                 buttonColor: AppColors.primaryColor,
                 child: appText(
-                  "Continue",
+                  AppStrings.continues,
                   color: AppColors.white,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
@@ -304,7 +304,7 @@ class SelectAddress extends StatelessWidget {
                   ),
                 ),
                 child: appText(
-                  "Default",
+                  AppStrings.defaults,
                   fontSize: 11.sp,
                   fontWeight: FontWeight.w600,
                   color: AppColors.white,

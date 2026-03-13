@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_colors.dart';
 import '../../widgets/app_text.dart';
@@ -18,7 +19,7 @@ class AddMoneyScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.paperColor,
       appBar: CustomAppBar(
-        title: "Add Money",
+        title: AppStrings.add_money,
         showBack: true,
       ),
       body: Column(
@@ -31,7 +32,7 @@ class AddMoneyScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     appText(
-                      "Enter Amount",
+                      AppStrings.enter_amount_1,
                       fontSize: 17.sp,
                       color: AppColors.grey,
                       fontWeight: FontWeight.w600,
@@ -41,7 +42,7 @@ class AddMoneyScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         appText(
-                          "₹",
+                          AppStrings.text,
                           fontSize: 38.sp,
                           fontWeight: FontWeight.bold,
                           color: AppColors.black87,
@@ -134,7 +135,7 @@ class AddMoneyScreen extends StatelessWidget {
                             ),
                           )
                         : appText(
-                            "Add Money",
+                            AppStrings.add_money,
                             fontSize: 16.sp,
                             color: AppColors.white,
                             fontWeight: FontWeight.w600,

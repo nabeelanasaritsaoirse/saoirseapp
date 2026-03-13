@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../models/razorpay_payment_response.dart';
 import '../../services/payment_service.dart';
@@ -60,7 +61,7 @@ class RazorpayWalletController extends GetxController {
 
       razorpay.open(options);
     } catch (e) {
-      appToast(error: true, content: "Could not open payment window");
+      appToast(error: true, content: AppStrings.could_not_open_payment_window);
     }
   }
 
@@ -69,7 +70,7 @@ class RazorpayWalletController extends GetxController {
   // ---------------------------------------------------------
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    appToast(content: "Wallet Payment Success!");
+    appToast(content: AppStrings.wallet_payment_success);
     final addMoneyController = Get.find<AddMoneyController>();
     addMoneyController.isAddingMoney.value = false; // 🔓 UNLOCK
     debugPrint("🔓 [ADD MONEY] UNLOCKED (SUCCESS)");
@@ -88,7 +89,7 @@ class RazorpayWalletController extends GetxController {
     addMoneyController.isAddingMoney.value = false; // 🔓 UNLOCK
     debugPrint("🔓 [ADD MONEY] UNLOCKED (FAILED)");
 
-    appToast(error: true, content: "Wallet Payment Failed");
+    appToast(error: true, content: AppStrings.wallet_payment_failed);
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -118,7 +119,7 @@ class RazorpayWalletController extends GetxController {
       if (Get.isDialogOpen ?? false) Get.back();
 
       if (response != null && response["success"] == true) {
-        appToast(content: "Money Added to Wallet Successfully!");
+        appToast(content: AppStrings.money_added_to_wallet_successf);
 
         // Optionally: refresh wallet screen
         Get.to(Transactionsuccsess());
@@ -134,7 +135,7 @@ class RazorpayWalletController extends GetxController {
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
 
-      appToast(error: true, content: "Unexpected Wallet Payment Error!");
+      appToast(error: true, content: AppStrings.unexpected_wallet_payment_erro);
     }
   }
 

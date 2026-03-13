@@ -1,6 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../models/razorpay_payment_response.dart';
 import '../../services/payment_service.dart';
@@ -52,7 +53,7 @@ class RazorpayController extends GetxController {
 
       razorpay.open(options);
     } catch (e) {
-      appToast(error: true, content: "Could not open payment window");
+      appToast(error: true, content: AppStrings.could_not_open_payment_window);
     }
   }
 
@@ -112,8 +113,7 @@ class RazorpayController extends GetxController {
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
 
-      appToast(
-          error: true, content: "Payment verification failed unexpectedly!");
+      appToast(error: true, content: AppStrings.payment_verification_failed_un);
     }
   }
 

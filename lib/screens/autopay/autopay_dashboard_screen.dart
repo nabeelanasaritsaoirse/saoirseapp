@@ -112,8 +112,7 @@ class AutopayDashboardScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
             SizedBox(height: 4.h),
-            appText(
-              'Wallet Balance',
+            appText(AppStrings.wallet_balance,
               fontSize: 14.sp,
               color: AppColors.grey,
             ),
@@ -148,8 +147,7 @@ class AutopayDashboardScreen extends StatelessWidget {
             SizedBox(height: 8.h),
             Row(
               children: [
-                appText(
-                  'Daily Deductions:',
+                appText(AppStrings.daily_deductions,
                   fontSize: 14.sp,
                   color: AppColors.grey,
                 ),
@@ -220,8 +218,7 @@ class AutopayDashboardScreen extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            appText(
-              'Forecast & Action',
+            appText(AppStrings.forecast_action,
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -243,8 +240,7 @@ class AutopayDashboardScreen extends StatelessWidget {
             Column(
               children: controller.items.isEmpty
                   ? [
-                      appText(
-                        'No autopay orders found',
+                      appText(AppStrings.no_autopay_orders_found,
                         fontSize: 13.sp,
                         color: AppColors.grey,
                       ),
@@ -445,11 +441,11 @@ class AutopaySettingsDialog extends StatelessWidget {
                       SizedBox(height: 14.h),
 
                       // WALLET RESERVES & REMINDER & NOTIFICATION
-                      appText('Wallet Reserves', fontWeight: FontWeight.w600),
+                      appText(AppStrings.wallet_reserves, fontWeight: FontWeight.w600),
                       SizedBox(height: 8.h),
                       appTextField(
                         controller: controller.minBalanceCtrl,
-                        hintText: "₹Minimum Balance Lock",
+                        hintText: AppStrings.minimum_balance_lock,
                         fillColor: AppColors.white,
                         hintColor: AppColors.grey,
                         textColor: AppColors.black,
@@ -460,7 +456,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                       SizedBox(height: 10.h),
                       appTextField(
                         controller: controller.lowBalanceCtrl,
-                        hintText: "₹ Low Balance Threshold",
+                        hintText: AppStrings.low_balance_threshold,
                         fillColor: AppColors.white,
                         hintColor: AppColors.grey,
                         textColor: AppColors.black,
@@ -471,11 +467,11 @@ class AutopaySettingsDialog extends StatelessWidget {
                       SizedBox(height: 14.h),
 
                       // REMINDER
-                      appText('Reminder', fontWeight: FontWeight.w600),
+                      appText(AppStrings.reminder, fontWeight: FontWeight.w600),
                       SizedBox(height: 8.h),
                       appTextField(
                         controller: controller.reminderHoursCtrl,
-                        hintText: 'Hours Before Payment (1–12)',
+                        hintText: AppStrings.hours_before_payment_1_12,
                         fillColor: AppColors.white,
                         hintColor: AppColors.grey,
                         textColor: AppColors.black,
@@ -484,8 +480,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                               int.tryParse(v) ?? 1;
                         },
                         textInputType: TextInputType.number,
-                        suffixWidget: appText(
-                          'hours',
+                        suffixWidget: appText(AppStrings.hours,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -493,7 +488,7 @@ class AutopaySettingsDialog extends StatelessWidget {
                       SizedBox(height: 14.h),
 
                       // NOTIFICATION PREFERENCES
-                      appText('Notification Preferences',
+                      appText(AppStrings.notification_preferences,
                           fontWeight: FontWeight.w600),
                       SizedBox(height: 10.h),
                       switchTile(
@@ -563,7 +558,7 @@ class AutopaySettingsDialog extends StatelessWidget {
     return Center(
       child: Padding(
           padding: EdgeInsets.only(bottom: 12.h),
-          child: appText('Autopay Settings',
+          child: appText(AppStrings.autopay_settings,
               fontSize: 18.sp, fontWeight: FontWeight.w600)),
     );
   }
@@ -585,22 +580,22 @@ class AutopaySettingsDialog extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        appText('Time Preference', fontWeight: FontWeight.w600),
+        appText(AppStrings.time_preference, fontWeight: FontWeight.w600),
         SizedBox(height: 6.h),
         DropdownButtonFormField<String>(
           value: controller.timePreference.value,
           items: [
             DropdownMenuItem(
               value: 'MORNING_6AM',
-              child: appText('MORNING_6AM'),
+              child: appText(AppStrings.morning_6am),
             ),
             DropdownMenuItem(
               value: 'AFTERNOON_12PM',
-              child: appText('AFTERNOON_12PM'),
+              child: appText(AppStrings.afternoon_12pm),
             ),
             DropdownMenuItem(
               value: 'EVENING_6PM',
-              child: appText('EVENING_6PM'),
+              child: appText(AppStrings.evening_6pm),
             ),
           ],
           onChanged: (v) {

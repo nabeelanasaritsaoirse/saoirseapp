@@ -76,7 +76,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           }
 
           if (product == null) {
-            return Center(child: appText("Product not found"));
+            return Center(child: appText(AppStrings.product_not_found));
           }
 
           return Column(
@@ -390,8 +390,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          appText(
-            "Available Variants",
+          appText(AppStrings.available_variants,
             fontSize: 14.sp,
             fontWeight: FontWeight.w600,
           ),
@@ -542,8 +541,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     child: Row(
                       spacing: 10.w,
                       children: [
-                        appText(
-                          "  ",
+                        appText(AppStrings.text_2,
                           fontSize: 13.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -839,8 +837,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                appText(
-                  "Similar Products",
+                appText(AppStrings.similar_products,
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w600,
                 ),
@@ -914,7 +911,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         children: [
           // FAQ BUTTON
           Obx(() => ExpandableSectionHeader(
-                title: "FAQ",
+                title: AppStrings.faq,
                 isExpanded: controller.isFaqExpanded.value,
                 onTap: () => controller.isFaqExpanded.toggle(),
               )),
@@ -931,7 +928,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
           // REVIEW BUTTON
           Obx(() => ExpandableSectionHeader(
-                title: "Reviews",
+                title: AppStrings.reviews,
                 isExpanded: controller.isReviewExpanded.value,
                 onTap: () => controller.isReviewExpanded.toggle(),
               )),
@@ -976,8 +973,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           borderRadius: BorderRadius.circular(10.r),
         ),
         alignment: Alignment.center,
-        child: appText(
-          "No FAQs available",
+        child: appText(AppStrings.no_faqs_available,
           fontSize: 13.sp,
           fontWeight: FontWeight.w500,
           color: AppColors.grey,
@@ -1074,8 +1070,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               border: Border.all(color: AppColors.black87),
             ),
             alignment: Alignment.center,
-            child: appText(
-              "Show all FAQ",
+            child: appText(AppStrings.show_all_faq,
               fontWeight: FontWeight.w600,
               fontSize: 13.sp,
             ),
@@ -1115,8 +1110,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     fontWeight: FontWeight.bold,
                   )),
               SizedBox(width: 6.w),
-              appText(
-                "OUT OF 5",
+              appText(AppStrings.out_of_5,
                 fontSize: 11.sp,
                 fontWeight: FontWeight.w600,
                 color: AppColors.grey,
@@ -1205,8 +1199,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           /// REVIEW CARDS
           Obx(() {
             if (controller.reviews.isEmpty) {
-              return appText(
-                "No reviews yet",
+              return appText(AppStrings.no_reviews_yet,
                 color: AppColors.grey,
               );
             }
@@ -1242,8 +1235,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 border: Border.all(color: AppColors.black87),
               ),
               alignment: Alignment.center,
-              child: appText(
-                "Show all reviews",
+              child: appText(AppStrings.show_all_reviews,
                 fontWeight: FontWeight.w600,
                 fontSize: 13.sp,
               ),

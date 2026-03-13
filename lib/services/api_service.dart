@@ -135,13 +135,12 @@ class APIService {
         switch (response.statusCode) {
           case 200:
           case 201:
-            // Only use compute in release mode or for large bodies (> 50KB) to avoid isolate overhead in debug
             final data = (kReleaseMode || response.body.length > 50000)
                 ? await compute(_decodeJson, response.body)
                 : jsonDecode(response.body);
 
             if (data is Map<String, dynamic>) {
-              return onSuccess(data); // ✅ stop retry on success
+              return onSuccess(data);
             }
 
             return null;

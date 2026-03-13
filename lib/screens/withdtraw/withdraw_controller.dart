@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../services/withdrawal_service.dart';
 import '../../widgets/app_toast.dart';
@@ -41,14 +42,16 @@ class WithdrawController extends GetxController {
       isLoading.value = false;
 
       if (res != null) {
-        appToaster(content: "Withdrawal request submitted successfully!");
+        appToaster(content: AppStrings.withdrawal_request_submitted_s);
         Get.off(WalletScreen());
       } else {
-        appToast(title: "Error", content: "Something went wrong");
+        appToast(
+            title: AppStrings.error,
+            content: AppStrings.something_went_wrong_1);
       }
     } catch (e) {
       isLoading.value = false;
-      appToast(title: "Error", content: e.toString());
+      appToast(title: AppStrings.error, content: e.toString());
     }
   }
 
@@ -88,8 +91,8 @@ class WithdrawController extends GetxController {
       debugPrint("📌 StackTrace: $stack");
 
       appToast(
-        title: "Error",
-        content: "Failed to verify KYC status",
+        title: AppStrings.error,
+        content: AppStrings.failed_to_verify_kyc_status,
       );
       return false;
     } finally {

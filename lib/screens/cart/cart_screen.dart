@@ -74,8 +74,7 @@ class CartScreen extends StatelessWidget {
                         if (controller.cartData.value == null ||
                             controller.cartData.value!.products.isEmpty) {
                           return Center(
-                            child: appText(
-                              "Your cart is empty",
+                            child: appText(AppStrings.your_cart_is_empty,
                               fontSize: 16.sp,
                             ),
                           );
@@ -325,8 +324,7 @@ class CartScreen extends StatelessWidget {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                appText(
-                                  "Total Amount",
+                                appText(AppStrings.total_amount,
                                   fontSize: 12.sp,
                                   color: AppColors.grey,
                                 ),
@@ -361,8 +359,7 @@ class CartScreen extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   spacing: 2.w,
                                   children: [
-                                    appText(
-                                      "Plan",
+                                    appText(AppStrings.plan,
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.textBlack,
@@ -410,8 +407,7 @@ class CartScreen extends StatelessWidget {
                                     ),
                                   );
                                 },
-                                child: appText(
-                                  "Check Out",
+                                child: appText(AppStrings.checkout,
                                   color: AppColors.white,
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.w600,
@@ -479,8 +475,7 @@ Widget _loginOnlyView() {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          appText(
-            "Please login to view your cart",
+          appText(AppStrings.please_login_to_view_your_cart,
             fontSize: 16.sp,
             fontWeight: FontWeight.w500,
           ),
@@ -490,8 +485,7 @@ Widget _loginOnlyView() {
             onTap: () {
               Get.to(() => LoginPage());
             },
-            child: appText(
-              "Login",
+            child: appText(AppStrings.login_1,
               color: AppColors.white,
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,

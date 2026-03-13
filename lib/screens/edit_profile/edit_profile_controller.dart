@@ -1,3 +1,4 @@
+
 // // ignore_for_file: prefer_conditional_assignment, avoid_print, depend_on_referenced_packages
 
 // import 'dart:developer';
@@ -58,8 +59,8 @@
 //       if (!granted) {
 //         appToast(
 //           error: true,
-//           title: "Permission Required",
-//           content: "Please allow gallery access to upload profile picture",
+//           title: AppStrings.permission_required,
+//           content: AppStrings.please_allow_gallery_access_to,
 //         );
 //         return;
 //       }
@@ -77,7 +78,7 @@
 //       }
 //     } catch (e) {
 //       appToast(
-//           error: true, title: "Error", content: "Unable to open gallery");
+//           error: true, title: AppStrings.error, content: AppStrings.unable_to_open_gallery);
 //     
 //     }
 //   }
@@ -85,7 +86,7 @@
 //   // ------------------ UPLOAD PROFILE IMAGE (MAIN FUNCTION) ------------------
 //   Future<void> uploadProfileImage() async {
 //     if (profileImage.value == null) {
-//       appToast(error: true, title: "Error", content: "No image selected");
+//       appToast(error: true, title: AppStrings.error, content: AppStrings.no_image_selected);
 //       return;
 //     }
 
@@ -118,21 +119,21 @@
 
 //       if (response != null && response.statusCode == 200) {
 //         appToast(
-//           title: "Success",
-//           content: "Profile picture updated successfully",
+//           title: AppStrings.success,
+//           content: AppStrings.profile_picture_updated_succes,
 //         );
 //       } else {
 //         appToast(
 //           error: true,
-//           title: "Failed",
-//           content: "Unable to upload image",
+//           title: AppStrings.failed,
+//           content: AppStrings.unable_to_upload_image,
 //         );
 //       }
 //     } catch (e) {
 //       appToast(
 //         error: true,
-//         title: "Error",
-//         content: "Upload Failed",
+//         title: AppStrings.error,
+//         content: AppStrings.upload_failed,
 //       );
 //      
 //     }
@@ -215,7 +216,7 @@
 //   void saveChanges() {
 //     if (!formKey.currentState!.validate()) {
 //       appToast(
-//           error: true, title: "Error", content: "Please correct the errors");
+//           error: true, title: AppStrings.error, content: AppStrings.please_correct_the_errors);
 //       return;
 //     }
 
@@ -226,7 +227,7 @@
 //       profile?.email = emailController.text.trim();
 //     });
 
-//     appToast(title: "Success", content: "Profile updated successfully");
+//     appToast(title: AppStrings.success, content: AppStrings.profile_updated_successfully);
 //     Get.back();
 //   }
 

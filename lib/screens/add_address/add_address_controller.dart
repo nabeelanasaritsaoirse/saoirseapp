@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../models/address_response.dart';
 import '../../widgets/app_toast.dart';
@@ -111,7 +112,7 @@ class AddAddressController extends GetxController {
 
       if (success) {
         appToast(
-          title: "Success",
+          title: AppStrings.success,
           content: isEdit.value
               ? "Address updated successfully"
               : "Address added successfully",
@@ -122,7 +123,7 @@ class AddAddressController extends GetxController {
       } else {
         appToast(
           error: true,
-          title: "Error",
+          title: AppStrings.error,
           content: isEdit.value
               ? "Failed to update address"
               : "Failed to add address",
@@ -131,8 +132,8 @@ class AddAddressController extends GetxController {
     } catch (e) {
       appToast(
         error: true,
-        title: "Error",
-        content: "Something went wrong",
+        title: AppStrings.error,
+        content: AppStrings.something_went_wrong_1,
       );
     } finally {
       isLoading.value = false; // 🔓 UNLOCK
