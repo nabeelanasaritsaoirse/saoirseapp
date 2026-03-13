@@ -20,8 +20,7 @@ class CreateReviewResponse {
       success: json['success'] ?? false,
       message: json['message'] ?? '',
       review: CreatedReview.fromJson(data['review'] ?? {}),
-      productStats:
-          ProductReviewStats.fromJson(data['productStats'] ?? {}),
+      productStats: ProductReviewStats.fromJson(data['productStats'] ?? {}),
       autoModeration: data['autoModeration'] != null
           ? AutoModerationInfo.fromJson(data['autoModeration'])
           : null,
@@ -63,8 +62,7 @@ class CreatedReview {
       userName: json['userName'] ?? '',
       verifiedPurchase: json['verifiedPurchase'] ?? false,
       status: json['status'] ?? '',
-      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ??
-          DateTime.now(),
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
     );
   }
 }
@@ -84,8 +82,7 @@ class ProductReviewStats {
 
   factory ProductReviewStats.fromJson(Map<String, dynamic> json) {
     return ProductReviewStats(
-      averageRating:
-          (json['averageRating'] ?? 0).toDouble(),
+      averageRating: (json['averageRating'] ?? 0).toDouble(),
       totalReviews: json['totalReviews'] ?? 0,
     );
   }

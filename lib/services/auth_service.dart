@@ -6,10 +6,10 @@ import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:crypto/crypto.dart';
 
+import '../constants/app_strings.dart';
 import '../constants/app_urls.dart';
 import '../main.dart';
 import '../models/LoginAuth/login_response/login_response.dart';

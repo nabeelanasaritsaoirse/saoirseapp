@@ -1,4 +1,3 @@
-import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -6,6 +5,7 @@ import 'package:get/get.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../../widgets/app_image.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../productListing/product_listing.dart';
@@ -75,9 +75,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       child: appText(
                         count > 9 ? "9+" : count.toString(),
                         //
-                          color: AppColors.white,
-                          fontSize: 9.sp,
-                          fontWeight: FontWeight.bold,
+                        color: AppColors.white,
+                        fontSize: 9.sp,
+                        fontWeight: FontWeight.bold,
                         //
                       ),
                     ),
@@ -101,7 +101,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
         if (controller.categoryGroups.isEmpty) {
           return Center(
-            child: appText(AppStrings.no_categories_found,
+            child: appText(
+              AppStrings.no_categories_found,
               fontSize: 16.sp,
             ),
           );
@@ -145,7 +146,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       ),
                     ),
                     SizedBox(height: 8.h),
-                    appText(AppStrings.see_all,
+                    appText(
+                      AppStrings.see_all,
                       textAlign: TextAlign.center,
                       fontSize: 11.sp,
                       fontWeight: FontWeight.w600,

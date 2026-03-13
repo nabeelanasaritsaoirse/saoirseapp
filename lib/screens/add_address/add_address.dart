@@ -46,7 +46,7 @@ class _AddAddressState extends State<AddAddress> {
       backgroundColor: AppColors.scaffoldColor,
       appBar: CustomAppBar(
         title: addAddressController.isEdit.value
-            ? "Edit Address"
+            ? AppStrings.edit_address_label
             : AppStrings.add_address_label,
         showBack: true,
       ),
@@ -248,7 +248,8 @@ class _AddAddressState extends State<AddAddress> {
                               value == false) {
                             appToaster(
                               error: true,
-                              content: AppStrings.at_least_1_address_should_be_s,
+                              content:
+                                  AppStrings.at_least_1_address_should_be_s,
                             );
 
                             return; // ⛔ DON'T CHANGE VALUE
@@ -259,7 +260,8 @@ class _AddAddressState extends State<AddAddress> {
                               value ?? false;
                         },
                       ),
-                      appText(AppStrings.save_as_default,
+                      appText(
+                        AppStrings.save_as_default,
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),

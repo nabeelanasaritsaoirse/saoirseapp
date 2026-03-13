@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_constant.dart';
+import '../../constants/app_strings.dart';
 import '../../main.dart';
 import '../../models/delete_account_model.dart';
 import '../../models/profile_response.dart';

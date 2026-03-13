@@ -1,4 +1,3 @@
-import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: unnecessary_to_list_in_spreads, deprecated_member_use
 
 import 'package:flutter/cupertino.dart';
@@ -14,6 +13,7 @@ import '../../models/bulk_order_preview_response.dart';
 import '../../models/cart_response_model.dart';
 import '../../models/product_details_model.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/app_image.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
@@ -401,7 +401,8 @@ class _MultipleOrderDetailsScreenState
                                           if (address == null) {
                                             appToaster(
                                               error: true,
-                                              content: AppStrings.address_not_ready_please_wait,
+                                              content: AppStrings
+                                                  .address_not_ready_please_wait,
                                             );
                                             return;
                                           }
@@ -438,7 +439,8 @@ class _MultipleOrderDetailsScreenState
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        appText(AppStrings.available_coupons,
+                                        appText(
+                                          AppStrings.available_coupons,
                                           fontSize: 13.sp,
                                           fontWeight: FontWeight.w700,
                                         ),
@@ -514,7 +516,9 @@ class _MultipleOrderDetailsScreenState
                                               Container(
                                                 width: double.infinity,
                                                 alignment: Alignment.center,
-                                                child: appText(AppStrings.coupon_applied_successfully,
+                                                child: appText(
+                                                  AppStrings
+                                                      .coupon_applied_successfully,
                                                   fontSize: 13.sp,
                                                   fontWeight: FontWeight.w700,
                                                   color: AppColors.green,
@@ -574,7 +578,8 @@ class _MultipleOrderDetailsScreenState
                                                 if (address == null) {
                                                   appToaster(
                                                     error: true,
-                                                    content: AppStrings.address_not_ready_please_wait,
+                                                    content: AppStrings
+                                                        .address_not_ready_please_wait,
                                                   );
                                                   return;
                                                 }
@@ -596,7 +601,8 @@ class _MultipleOrderDetailsScreenState
                                                       BorderRadius.circular(
                                                           5.r),
                                                 ),
-                                                child: appText(AppStrings.remove_coupon,
+                                                child: appText(
+                                                  AppStrings.remove_coupon,
                                                   color: Colors.red,
                                                   fontSize: 12.sp,
                                                   fontWeight: FontWeight.w600,
@@ -637,7 +643,8 @@ class _MultipleOrderDetailsScreenState
                             children: [
                               Align(
                                 alignment: Alignment.centerLeft,
-                                child: appText(AppStrings.price_details,
+                                child: appText(
+                                  AppStrings.price_details,
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -908,7 +915,8 @@ class _MultipleOrderDetailsScreenState
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                appText(AppStrings.select_payment_method,
+                appText(
+                  AppStrings.select_payment_method,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryColor,
@@ -989,7 +997,8 @@ class _MultipleOrderDetailsScreenState
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(AppStrings.wallet_payment,
+                                Text(
+                                  AppStrings.wallet_payment,
                                   style: TextStyle(
                                     fontSize: 15.sp,
                                     fontWeight: FontWeight.w600,
@@ -1046,7 +1055,9 @@ class _MultipleOrderDetailsScreenState
                                             ),
                                           ),
                                           SizedBox(width: 8.w),
-                                          Text(AppStrings.enable_autopay_for_future_paym,
+                                          Text(
+                                            AppStrings
+                                                .enable_autopay_for_future_paym,
                                             style: TextStyle(
                                               fontSize: 12.5.sp,
                                               color: AppColors.grey,
@@ -1113,14 +1124,16 @@ class _MultipleOrderDetailsScreenState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(AppStrings.razorpay_payment,
+                            Text(
+                              AppStrings.razorpay_payment,
                               style: TextStyle(
                                 fontSize: 15.sp,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             SizedBox(height: 4.h),
-                            Text(AppStrings.upi_card_net_banking_more,
+                            Text(
+                              AppStrings.upi_card_net_banking_more,
                               style: TextStyle(
                                 fontSize: 13.sp,
                                 color: AppColors.grey,
@@ -1186,7 +1199,8 @@ class _MultipleOrderDetailsScreenState
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
-                  child: Text(AppStrings.confirm_payment_method,
+                  child: Text(
+                    AppStrings.confirm_payment_method,
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w600,
@@ -1393,7 +1407,8 @@ class _MultipleOrderDetailsScreenState
                             border: Border.all(color: AppColors.shadowColor),
                             borderRadius: BorderRadius.circular(5.r)),
                         child: Center(
-                            child: appText(AppStrings.edit,
+                            child: appText(
+                          AppStrings.edit,
                           fontSize: 12.sp,
                         )),
                       ),

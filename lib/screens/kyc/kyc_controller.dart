@@ -6,8 +6,8 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
+import '../../constants/app_strings.dart';
 import '../../models/LoginAuth/kyc_model.dart';
 import '../../services/kyc_service.dart';
 import '../../widgets/app_toast.dart';

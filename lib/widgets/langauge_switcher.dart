@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
+
+import '../constants/app_strings.dart';
+import '../main.dart';
 import 'app_text.dart';
 
 class LanguageSwitcher extends StatelessWidget {
-  final box = GetStorage();
-
-  LanguageSwitcher({super.key});
+  const LanguageSwitcher({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +18,7 @@ class LanguageSwitcher extends StatelessWidget {
       onSelected: (String value) {
         final locale = Locale(value);
         Get.updateLocale(locale);
-        box.write('language', value);
+        storage.write('language', value);
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
         PopupMenuItem<String>(

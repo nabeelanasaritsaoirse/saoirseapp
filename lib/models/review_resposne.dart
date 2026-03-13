@@ -1,5 +1,3 @@
-// review_response.dart
-
 class ReviewResponse {
   final bool success;
   final String message;
@@ -38,9 +36,8 @@ class ReviewData {
 
   factory ReviewData.fromJson(Map<String, dynamic> json) {
     return ReviewData(
-      reviews: (json['reviews'] as List)
-          .map((e) => Review.fromJson(e))
-          .toList(),
+      reviews:
+          (json['reviews'] as List).map((e) => Review.fromJson(e)).toList(),
       ratingStats: RatingStats.fromJson(json['ratingStats']),
       pagination: Pagination.fromJson(json['pagination']),
     );
@@ -114,9 +111,8 @@ class Review {
       rating: json['rating'],
       title: json['title'],
       comment: json['comment'],
-      images: (json['images'] as List)
-          .map((e) => ReviewImage.fromJson(e))
-          .toList(),
+      images:
+          (json['images'] as List).map((e) => ReviewImage.fromJson(e)).toList(),
       userName: json['userName'],
       userProfilePicture: json['userProfilePicture'] ?? '',
       productName: json['productName'],
@@ -232,8 +228,9 @@ class SellerResponse {
       message: json['message'],
       respondedBy: json['respondedBy'],
       respondedByEmail: json['respondedByEmail'],
-      respondedAt:
-          json['respondedAt'] != null ? DateTime.parse(json['respondedAt']) : null,
+      respondedAt: json['respondedAt'] != null
+          ? DateTime.parse(json['respondedAt'])
+          : null,
       isVisible: json['isVisible'],
     );
   }
@@ -307,8 +304,7 @@ class RatingStats {
     return RatingStats(
       averageRating: (json['averageRating'] as num).toDouble(),
       totalReviews: json['totalReviews'],
-      ratingDistribution:
-          Map<String, int>.from(json['ratingDistribution']),
+      ratingDistribution: Map<String, int>.from(json['ratingDistribution']),
       aspectRatings: AspectRatings.fromJson(json['aspectRatings']),
     );
   }

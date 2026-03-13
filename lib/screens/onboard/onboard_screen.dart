@@ -72,16 +72,6 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                         buttonColor: AppColors.primaryColor,
                       ),
                       SizedBox(height: 30.h),
-                      // appButton(
-                      //   onTap: () {
-                      //     //SIGNUP BuTTON
-                      //   },
-                      //   height: 40.h,
-                      //   width: 100.w,
-                      //   buttonText: AppStrings.sign_up,
-                      //   textColor: AppColors.white,
-                      //   buttonColor: AppColors.primaryColor,
-                      // ),
                     ],
                   ),
                 ],

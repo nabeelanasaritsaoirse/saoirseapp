@@ -1,10 +1,7 @@
-// ignore_for_file: unnecessary_null_comparison
-
 class WalletModels {
   final bool success;
   final String message;
 
-  /// Monetary values (API sends decimals)
   final double walletBalance;
   final double totalBalance;
   final double holdBalance;

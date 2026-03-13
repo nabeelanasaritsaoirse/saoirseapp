@@ -1,4 +1,3 @@
-import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,6 +7,7 @@ import '../../constants/app_constant.dart';
 import '../../constants/app_urls.dart';
 import '../../main.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/app_image.dart';
 import '../coupon/coupon_screen.dart';
 import '../edit_profile/edit_profile_screen.dart';
 import '../faqs/faqs.dart';
@@ -60,7 +60,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            appText(AppStrings.please_login_to_view_your_prof,
+            appText(
+              AppStrings.please_login_to_view_your_prof,
               fontSize: 16.sp,
               fontWeight: FontWeight.w500,
             ),
@@ -75,7 +76,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   controller.fetchDeleteInfo();
                 }
               },
-              child: appText(AppStrings.login_1,
+              child: appText(
+                AppStrings.login_1,
                 color: AppColors.white,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
@@ -114,7 +116,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     if (profile == null) {
                       return SizedBox(
                         height: 200.h,
-                        child: Center(child: appText(AppStrings.failed_to_load_profile)),
+                        child: Center(
+                            child: appText(AppStrings.failed_to_load_profile)),
                       );
                     }
 
@@ -239,7 +242,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // -------------------- MY ORDERS TITLE ---------------------
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: appText(AppStrings.my_orders,
+                    child: appText(
+                      AppStrings.my_orders,
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textBlack,
@@ -309,7 +313,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // -------------------- SETTINGS TITLE ---------------------
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: appText(AppStrings.settings,
+                    child: appText(
+                      AppStrings.settings,
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textBlack,
@@ -428,7 +433,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: AppStrings.delete_account,
                       icon: Icons.delete),
                   _menuItem(
-                      value: "logout", title: AppStrings.logout, icon: Icons.logout),
+                      value: "logout",
+                      title: AppStrings.logout,
+                      icon: Icons.logout),
                 ],
               ),
             ]

@@ -1,4 +1,3 @@
-import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: prefer_const_constructors_in_immutables, deprecated_member_use
 
 import 'package:flutter/cupertino.dart';
@@ -12,6 +11,7 @@ import '../../constants/payment_methods.dart';
 import '../../models/address_response.dart';
 import '../../models/product_details_model.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/app_image.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
@@ -679,7 +679,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        appText(AppStrings.available_coupons,
+                                        appText(
+                                          AppStrings.available_coupons,
                                           fontSize: 13.sp,
                                           fontWeight: FontWeight.w700,
                                         ),
@@ -864,7 +865,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                                       BorderRadius.circular(
                                                           5.r),
                                                 ),
-                                                child: appText(AppStrings.remove_coupon,
+                                                child: appText(
+                                                  AppStrings.remove_coupon,
                                                   color: Colors.red,
                                                   fontSize: 12.sp,
                                                   fontWeight: FontWeight.w600,
@@ -909,7 +911,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                               children: [
                                 Align(
                                   alignment: Alignment.centerLeft,
-                                  child: appText(AppStrings.price_details,
+                                  child: appText(
+                                    AppStrings.price_details,
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -1120,7 +1123,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                appText(AppStrings.select_payment_method,
+                appText(
+                  AppStrings.select_payment_method,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryColor,
@@ -1193,7 +1197,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                appText(AppStrings.wallet_payment,
+                                appText(
+                                  AppStrings.wallet_payment,
                                   fontSize: 15.sp,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -1246,7 +1251,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                             ),
                                           ),
                                           SizedBox(width: 8.w),
-                                          appText(AppStrings.enable_autopay_for_future_paym,
+                                          appText(
+                                            AppStrings
+                                                .enable_autopay_for_future_paym,
                                             fontSize: 12.5.sp,
                                             color: AppColors.grey,
                                             fontWeight: FontWeight.w500,
@@ -1311,12 +1318,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            appText(AppStrings.razorpay_payment,
+                            appText(
+                              AppStrings.razorpay_payment,
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w600,
                             ),
                             SizedBox(height: 4.h),
-                            appText(AppStrings.upi_card_net_banking_more,
+                            appText(
+                              AppStrings.upi_card_net_banking_more,
                               fontSize: 13.sp,
                               color: AppColors.grey,
                             ),
@@ -1360,7 +1369,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
-                  child: appText(AppStrings.confirm_payment_method,
+                  child: appText(
+                    AppStrings.confirm_payment_method,
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,

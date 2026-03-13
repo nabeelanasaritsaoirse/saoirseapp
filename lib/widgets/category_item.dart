@@ -1,4 +1,3 @@
-import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,6 +6,7 @@ import 'package:get/get.dart';
 import '../constants/app_colors.dart';
 import '../models/category_model.dart';
 import '../screens/category/category_controller.dart';
+import 'app_image.dart';
 import 'app_text.dart';
 
 class CategoryItem extends StatelessWidget {

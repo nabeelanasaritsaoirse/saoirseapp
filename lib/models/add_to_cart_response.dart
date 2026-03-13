@@ -44,10 +44,3 @@ class CartItem {
     );
   }
 }
-
-
-
-
-
-
-

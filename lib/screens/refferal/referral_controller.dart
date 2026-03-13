@@ -1,22 +1,24 @@
 import 'dart:developer';
 import 'dart:io';
-import 'dart:ui' as ui;
+
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../constants/app_constant.dart';
+import '../../constants/app_strings.dart';
 import '../../main.dart';
 import '../../models/referral_response_model.dart';
 import '../../models/refferal_info_model.dart';
 import '../../services/refferal_service.dart';
 import '../../widgets/app_toast.dart';
-import 'package:share_plus/share_plus.dart';
+
+import 'dart:ui' as ui;
 
 class ReferralController extends GetxController {
   final ReferralService _referralService = ReferralService();

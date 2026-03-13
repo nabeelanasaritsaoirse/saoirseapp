@@ -116,16 +116,12 @@ class Review {
   factory Review.fromJson(Map<String, dynamic> json) {
     return Review(
       id: json['_id'] ?? '',
-      detailedRatings:
-          DetailedRatings.fromJson(json['detailedRatings'] ?? {}),
+      detailedRatings: DetailedRatings.fromJson(json['detailedRatings'] ?? {}),
       variantInfo: VariantInfo.fromJson(json['variantInfo'] ?? {}),
       helpfulness: Helpfulness.fromJson(json['helpfulness'] ?? {}),
-      sellerResponse:
-          SellerResponse.fromJson(json['sellerResponse'] ?? {}),
-      qualityMetrics:
-          QualityMetrics.fromJson(json['qualityMetrics'] ?? {}),
-      autoModeration:
-          AutoModeration.fromJson(json['autoModeration'] ?? {}),
+      sellerResponse: SellerResponse.fromJson(json['sellerResponse'] ?? {}),
+      qualityMetrics: QualityMetrics.fromJson(json['qualityMetrics'] ?? {}),
+      autoModeration: AutoModeration.fromJson(json['autoModeration'] ?? {}),
       user: json['user'] ?? '',
       product: json['product'] ?? '',
       order: json['order'] ?? '',

@@ -3,8 +3,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
+import '../../constants/app_strings.dart';
 import '../../constants/payment_methods.dart';
 import '../../models/address_response.dart';
 import '../../models/bulk_order_preview_response.dart';

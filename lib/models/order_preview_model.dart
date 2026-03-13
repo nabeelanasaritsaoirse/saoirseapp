@@ -1,5 +1,3 @@
-// order_preview_model.dart
-
 class OrderPreviewModel {
   final bool success;
   final String message;

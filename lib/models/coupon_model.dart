@@ -22,7 +22,8 @@ class Coupon {
   factory Coupon.fromJson(Map<String, dynamic> json) {
     DateTime? expiry;
 
-    if (json["expiryDate"] != null && (json["expiryDate"] as String).isNotEmpty) {
+    if (json["expiryDate"] != null &&
+        (json["expiryDate"] as String).isNotEmpty) {
       try {
         expiry = DateTime.parse(json["expiryDate"]);
       } catch (_) {

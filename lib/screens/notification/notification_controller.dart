@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
+import '../../constants/app_strings.dart';
 import '../../models/notification_details_response_model.dart';
 import '../../models/notification_response.dart';
 import '../../services/notification_service.dart';

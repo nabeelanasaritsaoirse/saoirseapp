@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
+import '../../constants/app_strings.dart';
 import '../../widgets/custom_appbar.dart';
 
 class QRScannerScreen extends StatelessWidget {

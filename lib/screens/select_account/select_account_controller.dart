@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
+import '../../constants/app_strings.dart';
 import '../../models/bank_account_model.dart';
 import '../../services/add_account_service.dart';
 import '../../widgets/app_toast.dart';

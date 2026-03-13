@@ -205,6 +205,7 @@ class AppStrings {
 
   // Add adress screen
   static String add_address_label = "Add Address";
+  static String edit_address_label = "Edit Address";
 
   // Booking confirmed screen
   static String confirm_content =

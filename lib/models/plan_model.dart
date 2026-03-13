@@ -1,5 +1,3 @@
-// plan_model.dart
-
 class PlanResponseModel {
   final bool success;
   final PlansDataModel data;

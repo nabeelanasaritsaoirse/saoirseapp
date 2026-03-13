@@ -1,12 +1,12 @@
-import 'package:saoirse_app/constants/app_strings.dart';
-import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../constants/app_colors.dart';
+import '../constants/app_strings.dart';
 import '../models/order_history_model.dart';
 import 'app_dateformatter.dart';
+import 'app_image.dart';
 import 'app_text.dart';
 
 class OrderCard extends StatelessWidget {

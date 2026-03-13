@@ -1,8 +1,8 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
+import '../../constants/app_strings.dart';
 import '../../models/razorpay_payment_response.dart';
 import '../../services/payment_service.dart';
 import '../../widgets/app_loader.dart';
@@ -37,19 +37,6 @@ class RazorpayController extends GetxController {
         'order_id': razorpayOrderId,
         'currency': 'INR',
       };
-
-      //  final options = {
-      //   'key': '',
-      //   'amount': '',
-      //   "order_id": "",
-      //   'currency': 'INR',
-      //   'name': 'Test Payment',
-      //   'description': 'Testing Razorpay Integration',
-      //   'prefill': {
-      //     'contact': '9876543210',
-      //     'email': 'test@gmail.com',
-      //   },
-      // };
 
       razorpay.open(options);
     } catch (e) {

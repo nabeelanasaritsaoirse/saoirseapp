@@ -52,7 +52,8 @@ class VerifyOTPScreen extends StatelessWidget {
                 SizedBox(height: 30.h),
 
                 /// Title
-                appText(AppStrings.verify_code,
+                appText(
+                  AppStrings.verify_code,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryColor,
                   fontSize: 25.sp,

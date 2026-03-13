@@ -35,14 +35,16 @@ class FaqScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              appText(AppStrings.know_more_about_epi,
+              appText(
+                AppStrings.know_more_about_epi,
                 fontSize: 20.sp,
                 fontWeight: FontWeight.w600,
               ),
 
               SizedBox(height: 6.h),
 
-              appText(AppStrings.curious_about_our_services_nhe,
+              appText(
+                AppStrings.curious_about_our_services_nhe,
                 fontSize: 15.sp,
                 color: AppColors.mediumGray,
                 textAlign: TextAlign.start,

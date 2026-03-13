@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
+import '../../constants/app_strings.dart';
 import '../../constants/payment_methods.dart';
 import '../../models/coupon_model.dart';
 import '../../models/coupon_validation_model.dart';

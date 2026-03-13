@@ -127,8 +127,8 @@ class ProductItem {
       productId: json['productId'] ?? '',
       pendingStatus: json['pendingStatus'] ?? '',
       totalAmount: (json['totalAmount'] ?? 0).toDouble(),
-      dateOfPurchase: DateTime.tryParse(json['dateOfPurchase'] ?? '') ??
-          DateTime.now(),
+      dateOfPurchase:
+          DateTime.tryParse(json['dateOfPurchase'] ?? '') ?? DateTime.now(),
     );
   }
 

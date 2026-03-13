@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../constants/app_constant.dart';
+import '../../constants/app_strings.dart';
 import '../../main.dart';
 import '../../models/plan_model.dart';
 import '../../models/product_details_model.dart';

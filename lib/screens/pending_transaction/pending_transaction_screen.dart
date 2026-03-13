@@ -1,4 +1,3 @@
-import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: curly_braces_in_flow_control_structures
 
 import 'package:flutter/cupertino.dart';
@@ -7,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_strings.dart';
+import '../../widgets/app_image.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
 import '../my_wallet/my_wallet_controller.dart';
@@ -44,7 +44,8 @@ class PendingTransaction extends StatelessWidget {
 
               if (controller.transactions.isEmpty) {
                 return Center(
-                  child: appText(AppStrings.no_pending_payment,
+                  child: appText(
+                    AppStrings.no_pending_payment,
                     fontSize: 16.sp,
                   ),
                 );
@@ -204,7 +205,8 @@ class PendingTransaction extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      appText(AppStrings.total_amount,
+                      appText(
+                        AppStrings.total_amount,
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w500,
                         color: AppColors.grey,
@@ -224,7 +226,8 @@ class PendingTransaction extends StatelessWidget {
                       controller.showPaymentMethodSheet();
                     },
                     child: Center(
-                      child: appText(AppStrings.pay_now,
+                      child: appText(
+                        AppStrings.pay_now,
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
                         color: AppColors.white,

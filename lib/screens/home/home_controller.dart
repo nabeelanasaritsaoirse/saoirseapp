@@ -12,9 +12,6 @@ import '../../services/success_story_banner_service.dart';
 
 class HomeController extends GetxController {
   RxBool loading = false.obs;
-  // RxBool popularLoading = false.obs;
-  // RxBool bestSellerLoading = false.obs;
-  // RxBool trendingLoading = false.obs;
   RxBool successLoading = false.obs;
   RxBool bannerLoading = false.obs;
   RxBool homeCategoryLoading = false.obs;
@@ -27,9 +24,6 @@ class HomeController extends GetxController {
   final SuccessStoryService successService = SuccessStoryService();
   final HomeBannerService bannerService = HomeBannerService();
 
-  // final Rxn<FeaturedList> popularList = Rxn<FeaturedList>();
-  // final Rxn<FeaturedList> bestSellerList = Rxn<FeaturedList>();
-  // final Rxn<FeaturedList> trendingList = Rxn<FeaturedList>();
   RxBool featuredLoading = false.obs;
 
   /// All featured lists (dynamic)
@@ -73,10 +67,6 @@ class HomeController extends GetxController {
   // Fetch all products
   Future<void> fetchAllProducts() async {
     await Future.wait([
-      // fetchPopularList(),
-      // fetchBestSellerList(),
-      // fetchTrendingList(),
-
       fetchSuccessStories(),
       fetchHomeBanners(),
       fetchParentCategories(),
@@ -105,55 +95,6 @@ class HomeController extends GetxController {
       return null;
     }
   }
-
-  // // Fetch Popular Products
-  // Future<void> fetchPopularList() async {
-  //   try {
-  //     popularLoading.value = true;
-  //     popularLoading.value = true;
-  //     final list = await HomeService.fetchPopularList(limit: 10);
-
-  //     if (list != null) {
-  //       popularList.value = list;
-  //     }
-  //   } catch (e) {
-
-  //   } finally {
-  //     popularLoading.value = false;
-  //   }
-  // }
-
-  // // // Fetch Best Seller Products
-  // Future<void> fetchBestSellerList() async {
-  //   try {
-  //     bestSellerLoading.value = true;
-  //     final list = await HomeService.fetchBestSellerList(limit: 10);
-
-  //     if (list != null) {
-  //       bestSellerList.value = list;
-  //     }
-  //   } catch (e) {
-
-  //   } finally {
-  //     bestSellerLoading.value = false;
-  //   }
-  // }
-
-  // // Fetch Trending Products
-  // Future<void> fetchTrendingList() async {
-  //   try {
-  //     trendingLoading.value = true;
-  //     final list = await HomeService.fetchTrendingList(limit: 10);
-
-  //     if (list != null) {
-  //       trendingList.value = list;
-  //     }
-  //   } catch (e) {
-
-  //   } finally {
-  //     trendingLoading.value = false;
-  //   }
-  // }
 
   // Fetch Success Stories
   Future<void> fetchSuccessStories() async {

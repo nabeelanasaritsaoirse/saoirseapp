@@ -1,4 +1,3 @@
-import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/cupertino.dart';
@@ -11,6 +10,7 @@ import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/app_image.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/app_text_field.dart';
@@ -196,7 +196,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             size: 16.sp,
                           ),
                           SizedBox(width: 6.w),
-                          appText(AppStrings.remove_image,
+                          appText(
+                            AppStrings.remove_image,
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
                             color: AppColors.red,

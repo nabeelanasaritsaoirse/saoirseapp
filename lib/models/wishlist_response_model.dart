@@ -15,8 +15,8 @@ class WishlistResponse {
       message: json["message"] ?? "",
       data: (json["data"] as List<dynamic>?)
               ?.map((e) => WishlistItem.fromJson(e))
-              .toList() 
-          ?? [],
+              .toList() ??
+          [],
     );
   }
 }
@@ -54,8 +54,8 @@ class WishlistItem {
       discount: json["discount"] ?? 0,
       images: (json["images"] as List<dynamic>?)
               ?.map((e) => ProductImage.fromJson(e))
-              .toList() 
-          ?? [],
+              .toList() ??
+          [],
       stock: json["stock"] ?? 0,
       isActive: json["isActive"] ?? false,
     );

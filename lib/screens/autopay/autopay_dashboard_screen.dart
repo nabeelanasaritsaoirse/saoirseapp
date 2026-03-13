@@ -112,7 +112,8 @@ class AutopayDashboardScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
             SizedBox(height: 4.h),
-            appText(AppStrings.wallet_balance,
+            appText(
+              AppStrings.wallet_balance,
               fontSize: 14.sp,
               color: AppColors.grey,
             ),
@@ -147,7 +148,8 @@ class AutopayDashboardScreen extends StatelessWidget {
             SizedBox(height: 8.h),
             Row(
               children: [
-                appText(AppStrings.daily_deductions,
+                appText(
+                  AppStrings.daily_deductions,
                   fontSize: 14.sp,
                   color: AppColors.grey,
                 ),
@@ -218,7 +220,8 @@ class AutopayDashboardScreen extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            appText(AppStrings.forecast_action,
+            appText(
+              AppStrings.forecast_action,
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -240,7 +243,8 @@ class AutopayDashboardScreen extends StatelessWidget {
             Column(
               children: controller.items.isEmpty
                   ? [
-                      appText(AppStrings.no_autopay_orders_found,
+                      appText(
+                        AppStrings.no_autopay_orders_found,
                         fontSize: 13.sp,
                         color: AppColors.grey,
                       ),
@@ -441,7 +445,8 @@ class AutopaySettingsDialog extends StatelessWidget {
                       SizedBox(height: 14.h),
 
                       // WALLET RESERVES & REMINDER & NOTIFICATION
-                      appText(AppStrings.wallet_reserves, fontWeight: FontWeight.w600),
+                      appText(AppStrings.wallet_reserves,
+                          fontWeight: FontWeight.w600),
                       SizedBox(height: 8.h),
                       appTextField(
                         controller: controller.minBalanceCtrl,
@@ -480,7 +485,8 @@ class AutopaySettingsDialog extends StatelessWidget {
                               int.tryParse(v) ?? 1;
                         },
                         textInputType: TextInputType.number,
-                        suffixWidget: appText(AppStrings.hours,
+                        suffixWidget: appText(
+                          AppStrings.hours,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),

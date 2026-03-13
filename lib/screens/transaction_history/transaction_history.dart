@@ -130,7 +130,8 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               Expanded(
                 child: Row(
                   children: [
-                    appText(AppStrings.status,
+                    appText(
+                      AppStrings.status,
                       color: AppColors.mediumGray,
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w600,
@@ -153,7 +154,8 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    appText(AppStrings.amount_1,
+                    appText(
+                      AppStrings.amount_1,
                       color: AppColors.black54,
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w600,

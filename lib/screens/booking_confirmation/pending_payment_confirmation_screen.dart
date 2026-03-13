@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_colors.dart';
 import '../../constants/app_constant.dart';
 import '../../constants/app_gradient.dart';
+import '../../constants/app_strings.dart';
 import '../../main.dart';
 import '../../widgets/app_text.dart';
 import '../notification/notification_controller.dart';

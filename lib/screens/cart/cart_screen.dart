@@ -1,4 +1,3 @@
-import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/cupertino.dart';
@@ -13,6 +12,7 @@ import '../../constants/app_constant.dart';
 import '../../constants/app_strings.dart';
 import '../../main.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/app_image.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/cart_product_plan_sheet.dart';
 import '../../widgets/custom_appbar.dart';
@@ -74,7 +74,8 @@ class CartScreen extends StatelessWidget {
                         if (controller.cartData.value == null ||
                             controller.cartData.value!.products.isEmpty) {
                           return Center(
-                            child: appText(AppStrings.your_cart_is_empty,
+                            child: appText(
+                              AppStrings.your_cart_is_empty,
                               fontSize: 16.sp,
                             ),
                           );
@@ -324,7 +325,8 @@ class CartScreen extends StatelessWidget {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                appText(AppStrings.total_amount,
+                                appText(
+                                  AppStrings.total_amount,
                                   fontSize: 12.sp,
                                   color: AppColors.grey,
                                 ),
@@ -359,7 +361,8 @@ class CartScreen extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   spacing: 2.w,
                                   children: [
-                                    appText(AppStrings.plan,
+                                    appText(
+                                      AppStrings.plan,
                                       fontSize: 14.sp,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.textBlack,
@@ -407,7 +410,8 @@ class CartScreen extends StatelessWidget {
                                     ),
                                   );
                                 },
-                                child: appText(AppStrings.checkout,
+                                child: appText(
+                                  AppStrings.checkout,
                                   color: AppColors.white,
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.w600,
@@ -475,7 +479,8 @@ Widget _loginOnlyView() {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          appText(AppStrings.please_login_to_view_your_cart,
+          appText(
+            AppStrings.please_login_to_view_your_cart,
             fontSize: 16.sp,
             fontWeight: FontWeight.w500,
           ),
@@ -485,7 +490,8 @@ Widget _loginOnlyView() {
             onTap: () {
               Get.to(() => LoginPage());
             },
-            child: appText(AppStrings.login_1,
+            child: appText(
+              AppStrings.login_1,
               color: AppColors.white,
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,

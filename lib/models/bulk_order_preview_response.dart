@@ -1,5 +1,3 @@
-// bulk_order_preview_response.dart
-
 class BulkOrderPreviewResponse {
   final bool success;
   final String message;

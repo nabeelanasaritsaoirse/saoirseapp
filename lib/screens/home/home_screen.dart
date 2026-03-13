@@ -1,4 +1,3 @@
-import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: deprecated_member_use
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -9,6 +8,7 @@ import 'package:get/get.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/app_image.dart';
 import '../../widgets/app_text.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/custom_appbar.dart';
@@ -91,11 +91,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: appText(
                       count > 9 ? "9+" : count.toString(),
-
-                        color: AppColors.white,
-                        fontSize: 7.sp,
-                        fontWeight: FontWeight.bold,
-
+                      color: AppColors.white,
+                      fontSize: 7.sp,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 );
@@ -404,7 +402,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               SizedBox(height: 6.h),
                               SizedBox(
                                 height: 28.h, // SAME TEXT HEIGHT
-                                child: appText(AppStrings.view_all,
+                                child: appText(
+                                  AppStrings.view_all,
                                   fontSize: 10.sp,
                                   fontWeight: FontWeight.w500,
                                   textAlign: TextAlign.center,
@@ -549,7 +548,8 @@ class _HomeScreenState extends State<HomeScreen> {
               // Empty state
               if (homeController.featuredLists.isEmpty) {
                 return Center(
-                  child: appText(AppStrings.no_featured_products_available,
+                  child: appText(
+                    AppStrings.no_featured_products_available,
                     color: Colors.grey,
                   ),
                 );
@@ -948,7 +948,8 @@ class _ViewAllCategory extends StatelessWidget {
             ),
           ),
           SizedBox(height: 6.h),
-          appText(AppStrings.view_all,
+          appText(
+            AppStrings.view_all,
             fontSize: 11.sp,
             fontWeight: FontWeight.w600,
           ),

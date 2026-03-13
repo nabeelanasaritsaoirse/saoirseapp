@@ -10,9 +10,8 @@ class NotificationDetailsResponse {
   factory NotificationDetailsResponse.fromJson(Map<String, dynamic> json) {
     return NotificationDetailsResponse(
       success: json['success'] ?? false,
-      data: json['data'] != null
-          ? NotificationData.fromJson(json['data'])
-          : null,
+      data:
+          json['data'] != null ? NotificationData.fromJson(json['data']) : null,
     );
   }
 }
@@ -102,30 +101,29 @@ class NotificationModel {
   }
 
   NotificationModel copyWith({
-  int? likeCount,
-  bool? isLikedByMe,
-  int? commentCount,
-}) {
-  return NotificationModel(
-    notificationId: notificationId,
-    id: id,
-    type: type,
-    title: title,
-    body: body,
-    imageUrl: imageUrl,
-    publishedAt: publishedAt,
-    createdAt: createdAt,
-    postType: postType,
-    likeCount: likeCount ?? this.likeCount,
-    commentCount: commentCount ?? this.commentCount,
-    viewCount: viewCount,
-    commentsEnabled: commentsEnabled,
-    likesEnabled: likesEnabled,
-    isLikedByMe: isLikedByMe ?? this.isLikedByMe,
-    createdBy: createdBy,
-  );
-}
-
+    int? likeCount,
+    bool? isLikedByMe,
+    int? commentCount,
+  }) {
+    return NotificationModel(
+      notificationId: notificationId,
+      id: id,
+      type: type,
+      title: title,
+      body: body,
+      imageUrl: imageUrl,
+      publishedAt: publishedAt,
+      createdAt: createdAt,
+      postType: postType,
+      likeCount: likeCount ?? this.likeCount,
+      commentCount: commentCount ?? this.commentCount,
+      viewCount: viewCount,
+      commentsEnabled: commentsEnabled,
+      likesEnabled: likesEnabled,
+      isLikedByMe: isLikedByMe ?? this.isLikedByMe,
+      createdBy: createdBy,
+    );
+  }
 }
 
 class CreatedBy {
@@ -196,12 +194,4 @@ class CommentModel {
       isMyComment: json['isMyComment'],
     );
   }
-
-  
 }
-
-
-
-
-
-

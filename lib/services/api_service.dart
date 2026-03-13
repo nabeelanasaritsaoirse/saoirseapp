@@ -6,14 +6,15 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 import '../screens/onboard/onboard_screen.dart';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 dynamic _decodeJson(String source) => jsonDecode(source);

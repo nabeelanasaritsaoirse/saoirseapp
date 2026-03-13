@@ -1,4 +1,3 @@
-import 'package:saoirse_app/widgets/app_image.dart';
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:get/get.dart';
 
 import '../../constants/app_strings.dart';
 import '../../models/notification_response.dart';
+import '../../widgets/app_image.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../constants/app_colors.dart';

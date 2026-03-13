@@ -1,4 +1,3 @@
-
 class CouponValidationResponse {
   final CouponInfo coupon;
   final PricingInfo pricing;
@@ -102,9 +101,8 @@ class InstallmentInfo {
       totalDays: toInt(json["totalDays"]),
       dailyAmount: toDouble(json["dailyAmount"]),
       freeDays: toInt(json["freeDays"] ?? 0),
-      reducedDays: json.containsKey("reducedDays")
-          ? toInt(json["reducedDays"])
-          : null,
+      reducedDays:
+          json.containsKey("reducedDays") ? toInt(json["reducedDays"]) : null,
     );
   }
 }

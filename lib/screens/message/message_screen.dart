@@ -1,4 +1,3 @@
-import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -10,6 +9,7 @@ import '../../constants/app_strings.dart';
 import '../../main.dart';
 import '../../models/converstion_model.dart';
 import '../../models/message_model.dart';
+import '../../widgets/app_image.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import 'message_controller.dart';
@@ -194,7 +194,8 @@ class PaymentMessageScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      appText(AppStrings.profile,
+                      appText(
+                        AppStrings.profile,
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w600,
                         color: AppColors.white,
@@ -396,7 +397,8 @@ class PaymentMessageScreen extends StatelessWidget {
           SizedBox(height: 6.h),
           appText(
             label,
-            fontSize: 9.sp, color: AppColors.grey,
+            fontSize: 9.sp,
+            color: AppColors.grey,
           ),
         ],
       ),

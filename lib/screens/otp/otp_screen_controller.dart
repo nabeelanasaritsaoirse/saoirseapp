@@ -4,9 +4,9 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_constant.dart';
+import '../../constants/app_strings.dart';
 import '../../constants/app_urls.dart';
 import '../../main.dart';
 import '../../services/api_service.dart';

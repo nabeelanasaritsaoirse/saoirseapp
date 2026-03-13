@@ -103,7 +103,8 @@ class SelectPlanSheet extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        appText(AppStrings.days,
+                        appText(
+                          AppStrings.days,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -134,7 +135,8 @@ class SelectPlanSheet extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        appText(AppStrings.amount_2,
+                        appText(
+                          AppStrings.amount_2,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -239,7 +241,8 @@ class SelectPlanSheet extends StatelessWidget {
                 if (controller.plans.isEmpty) {
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: 30.h),
-                    child: appText(AppStrings.no_plans_available,
+                    child: appText(
+                      AppStrings.no_plans_available,
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
                       color: AppColors.grey,
@@ -300,7 +303,8 @@ class SelectPlanSheet extends StatelessWidget {
                                               borderRadius:
                                                   BorderRadius.circular(8.r),
                                             ),
-                                            child: appText(AppStrings.recommended,
+                                            child: appText(
+                                              AppStrings.recommended,
                                               fontSize: 10.sp,
                                               fontWeight: FontWeight.w600,
                                             ),

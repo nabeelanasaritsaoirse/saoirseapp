@@ -3,15 +3,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 import '../../models/bank_account_model.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/app_loader.dart';
-
 import '../withdtraw/withdraw_screen.dart';
 import 'add_account.dart';
 import 'select_account_controller.dart';

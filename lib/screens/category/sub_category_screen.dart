@@ -1,11 +1,11 @@
-import 'package:saoirse_app/constants/app_strings.dart';
-import 'package:saoirse_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 import '../../models/category_model.dart';
+import '../../widgets/app_image.dart';
 import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import '../productListing/product_listing.dart';

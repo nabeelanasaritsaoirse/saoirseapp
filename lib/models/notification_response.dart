@@ -87,15 +87,15 @@ class AppNotification {
       imageUrl: json['imageUrl'],
       publishedAt: json['publishedAt'],
       createdAt: json['createdAt'],
-
       likeCount: json['likeCount'] ?? 0,
       commentCount: json['commentCount'] ?? 0,
       viewCount: json['viewCount'] ?? 0,
       commentsEnabled: json['commentsEnabled'] ?? false,
       likesEnabled: json['likesEnabled'] ?? false,
       isLikedByMe: json['isLikedByMe'] ?? false,
-      createdBy:
-          json['createdBy'] != null ? CreatedBy.fromJson(json['createdBy']) : null,
+      createdBy: json['createdBy'] != null
+          ? CreatedBy.fromJson(json['createdBy'])
+          : null,
     );
   }
 
@@ -172,8 +172,3 @@ class Pagination {
     );
   }
 }
-
-
-
-
-

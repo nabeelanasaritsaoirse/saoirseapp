@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
+import '../../constants/app_strings.dart';
 import '../../services/payment_service.dart';
 import '../../widgets/app_toast.dart';
 import '../razorpay/razorpay_wallet_controller.dart';

@@ -1,7 +1,3 @@
-// ================= ROOT RESPONSE =================
-
-// ignore_for_file: file_names
-
 class AutopayDashboardModel {
   final bool success;
   final AutopayDashboardData data;

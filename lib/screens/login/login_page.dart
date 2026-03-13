@@ -141,7 +141,8 @@ class _LoginPageState extends State<LoginPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            appText(AppStrings.username,
+                            appText(
+                              AppStrings.username,
                               fontWeight: FontWeight.w500,
                               color: AppColors.primaryColor,
                               fontSize: 15.sp,
@@ -197,35 +198,6 @@ class _LoginPageState extends State<LoginPage> {
                                 textColor: AppColors.black,
                                 hintSize: 15.sp,
                                 validator: (value) {
-                                  // final raw = value ?? "";
-                                  // final digitsOnly =
-                                  //     raw.trim().replaceAll(RegExp(r'\D'), '');
-
-                                  // if (digitsOnly.isEmpty) {
-                                  //   return "Phone number is required";
-                                  // }
-
-                                  // if (digitsOnly.length < 7 ||
-                                  //     digitsOnly.length > 15) {
-                                  //   return "Enter a valid phone number";
-                                  // }
-
-                                  // // Now call your service safely
-                                  // int? serviceResult;
-                                  // try {
-                                  //   serviceResult =
-                                  //       LoginService.phoneValidation(
-                                  //     phone: int.parse(digitsOnly),
-                                  //   );
-                                  // } catch (e) {
-                                  //   return "Enter a valid phone number";
-                                  // }
-
-                                  // // If service returns null → valid
-                                  // if (serviceResult == null) return null;
-
-                                  // // If service returns an int → convert to error text
-                                  // return "Invalid phone number";
                                   final raw = value ?? "";
                                   final digitsOnly =
                                       raw.replaceAll(RegExp(r'\D'), '');
@@ -335,7 +307,8 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           SizedBox(width: 10.w),
-                          appText(AppStrings.or,
+                          appText(
+                            AppStrings.or,
                             color: AppColors.black,
                             fontSize: 15.sp,
                             fontFamily: "Poppins",
@@ -552,7 +525,8 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 20.h),
 
               // Title
-              appText(AppStrings.choose_qr_method,
+              appText(
+                AppStrings.choose_qr_method,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
                 color: AppColors.black87,
@@ -585,7 +559,8 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(width: 14.w),
                       Expanded(
-                        child: appText(AppStrings.scan_using_camera,
+                        child: appText(
+                          AppStrings.scan_using_camera,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                         ),
@@ -623,7 +598,8 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(width: 14),
                       Expanded(
-                        child: appText(AppStrings.upload_qr_from_gallery,
+                        child: appText(
+                          AppStrings.upload_qr_from_gallery,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                         ),

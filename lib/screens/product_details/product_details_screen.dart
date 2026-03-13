@@ -1,5 +1,4 @@
-import 'package:saoirse_app/widgets/app_image.dart';
-// ignore_for_file: deprecated_member_use, curly_braces_in_flow_control_structures
+// ignore_for_file: deprecated_member_use
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ import '../../main.dart';
 import '../../models/product_details_model.dart';
 import '../../models/review_resposne.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/app_image.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/build_expandable_header.dart';
 import '../../widgets/product_card.dart';
@@ -390,7 +390,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          appText(AppStrings.available_variants,
+          appText(
+            AppStrings.available_variants,
             fontSize: 14.sp,
             fontWeight: FontWeight.w600,
           ),
@@ -541,7 +542,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     child: Row(
                       spacing: 10.w,
                       children: [
-                        appText(AppStrings.text_2,
+                        appText(
+                          AppStrings.text_2,
                           fontSize: 13.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -837,7 +839,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                appText(AppStrings.similar_products,
+                appText(
+                  AppStrings.similar_products,
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w600,
                 ),
@@ -973,7 +976,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           borderRadius: BorderRadius.circular(10.r),
         ),
         alignment: Alignment.center,
-        child: appText(AppStrings.no_faqs_available,
+        child: appText(
+          AppStrings.no_faqs_available,
           fontSize: 13.sp,
           fontWeight: FontWeight.w500,
           color: AppColors.grey,
@@ -1070,7 +1074,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               border: Border.all(color: AppColors.black87),
             ),
             alignment: Alignment.center,
-            child: appText(AppStrings.show_all_faq,
+            child: appText(
+              AppStrings.show_all_faq,
               fontWeight: FontWeight.w600,
               fontSize: 13.sp,
             ),
@@ -1110,7 +1115,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     fontWeight: FontWeight.bold,
                   )),
               SizedBox(width: 6.w),
-              appText(AppStrings.out_of_5,
+              appText(
+                AppStrings.out_of_5,
                 fontSize: 11.sp,
                 fontWeight: FontWeight.w600,
                 color: AppColors.grey,
@@ -1199,7 +1205,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           /// REVIEW CARDS
           Obx(() {
             if (controller.reviews.isEmpty) {
-              return appText(AppStrings.no_reviews_yet,
+              return appText(
+                AppStrings.no_reviews_yet,
                 color: AppColors.grey,
               );
             }
@@ -1235,7 +1242,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 border: Border.all(color: AppColors.black87),
               ),
               alignment: Alignment.center,
-              child: appText(AppStrings.show_all_reviews,
+              child: appText(
+                AppStrings.show_all_reviews,
                 fontWeight: FontWeight.w600,
                 fontSize: 13.sp,
               ),

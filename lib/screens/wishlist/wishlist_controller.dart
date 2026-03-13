@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:saoirse_app/constants/app_strings.dart';
 
+import '../../constants/app_strings.dart';
 import '../../models/wishlist_response_model.dart';
 import '../../services/wishlist_service.dart';
 import '../../widgets/app_toast.dart';
