@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../constants/app_colors.dart';
+import '../../widgets/app_text.dart';
 import '../cart/cart_controller.dart';
 import '../cart/cart_screen.dart';
 import '../category/category_screen.dart';
@@ -173,13 +174,11 @@ class DashboardScreen extends StatelessWidget {
                   color: Colors.red,
                   shape: BoxShape.circle,
                 ),
-                child: Text(
+                child: appText(
                   badgeCount > 9 ? "9+" : badgeCount.toString(),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 8.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  color: Colors.white,
+                  fontSize: 8.sp,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -225,13 +224,11 @@ class DashboardScreen extends StatelessWidget {
                   color: Colors.red,
                   shape: BoxShape.circle,
                 ),
-                child: Text(
+                child: appText(
                   badgeCount > 9 ? "9+" : badgeCount.toString(),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 8.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  color: Colors.white,
+                  fontSize: 8.sp,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),

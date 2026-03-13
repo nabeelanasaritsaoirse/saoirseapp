@@ -76,7 +76,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           }
 
           if (product == null) {
-            return Center(child: Text("Product not found"));
+            return Center(child: appText("Product not found"));
           }
 
           return Column(
@@ -704,13 +704,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   );
                 });
               },
-              child: Text(
+              child: appText(
                 AppStrings.checkout,
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.white,
-                ),
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.white,
               ),
             ),
           ),

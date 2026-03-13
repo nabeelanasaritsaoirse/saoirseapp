@@ -98,13 +98,11 @@ class InvestmentStatusCard extends StatelessWidget {
                       color: AppColors.white70,
                       fontWeight: FontWeight.w500),
                   SizedBox(height: 4.h),
-                  Text(
+                  appText(
                     "$daysLeft",
-                    style: TextStyle(
-                      fontSize: 17.sp,
-                      color: AppColors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    fontSize: 17.sp,
+                    color: AppColors.white,
+                    fontWeight: FontWeight.bold,
                   ),
                 ],
               ),

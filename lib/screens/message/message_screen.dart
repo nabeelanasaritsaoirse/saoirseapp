@@ -395,9 +395,9 @@ class PaymentMessageScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 6.h),
-          Text(
+          appText(
             label,
-            style: TextStyle(fontSize: 9.sp, color: AppColors.grey),
+            fontSize: 9.sp, color: AppColors.grey,
           ),
         ],
       ),

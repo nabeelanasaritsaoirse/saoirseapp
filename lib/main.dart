@@ -127,11 +127,12 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               scaffoldBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
               canvasColor: const Color.fromARGB(255, 235, 230, 230),
-              dialogBackgroundColor: const Color.fromARGB(255, 235, 230, 230),
               textTheme: GoogleFonts.poppinsTextTheme(),
               highlightColor: AppColors.transparent,
               splashColor: AppColors.transparent,
               useMaterial3: true,
+              dialogTheme: DialogThemeData(
+                  backgroundColor: const Color.fromARGB(255, 235, 230, 230)),
             ),
             scrollBehavior: CustomScrollBehavior(),
             home: SplashScreen(),

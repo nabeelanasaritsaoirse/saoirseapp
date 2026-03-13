@@ -73,9 +73,10 @@ class ProfileMenuCard extends StatelessWidget {
                   color: AppColors.red,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(
+                child: appText(
                   "$count",
-                  style: TextStyle(color: AppColors.white, fontSize: 10),
+                  color: AppColors.white,
+                  fontSize: 10,
                 ),
               ),
             ),

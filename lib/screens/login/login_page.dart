@@ -258,13 +258,11 @@ class _LoginPageState extends State<LoginPage> {
                                   child: Container(
                                     height: 55.h,
                                     alignment: Alignment.center,
-                                    child: Text(
+                                    child: appText(
                                       // defensive access to avoid unexpected null errors
                                       "${country?.flagEmoji ?? ''}+${country?.phoneCode ?? ''}",
-                                      style: TextStyle(
-                                        color: AppColors.black,
-                                        fontSize: 15.sp,
-                                      ),
+                                      color: AppColors.black,
+                                      fontSize: 15.sp,
                                     ),
                                   ),
                                 ),
@@ -556,13 +554,11 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 20.h),
 
               // Title
-              Text(
+              appText(
                 "Choose QR Method",
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.black87,
-                ),
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.black87,
               ),
               SizedBox(height: 20.h),
 
@@ -592,12 +588,10 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(width: 14.w),
                       Expanded(
-                        child: Text(
+                        child: appText(
                           "Scan using Camera",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       Icon(Icons.arrow_forward_ios,
@@ -633,12 +627,10 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(width: 14),
                       Expanded(
-                        child: Text(
+                        child: appText(
                           "Upload QR from Gallery",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       Icon(Icons.arrow_forward_ios,

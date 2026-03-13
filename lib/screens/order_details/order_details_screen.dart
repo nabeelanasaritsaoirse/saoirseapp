@@ -1197,20 +1197,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                appText(
                                   "Wallet Payment",
-                                  style: TextStyle(
-                                    fontSize: 15.sp,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w600,
                                 ),
                                 SizedBox(height: 4.h),
-                                Text(
+                                appText(
                                   "Balance: ₹${walletBalance.toStringAsFixed(1)}",
-                                  style: TextStyle(
-                                    fontSize: 13.sp,
-                                    color: AppColors.grey,
-                                  ),
+                                  fontSize: 13.sp,
+                                  color: AppColors.grey,
                                 ),
                               ],
                             ),
@@ -1255,13 +1251,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                                             ),
                                           ),
                                           SizedBox(width: 8.w),
-                                          Text(
+                                          appText(
                                             "Enable AutoPay for future payments",
-                                            style: TextStyle(
-                                              fontSize: 12.5.sp,
-                                              color: AppColors.grey,
-                                              fontWeight: FontWeight.w500,
-                                            ),
+                                            fontSize: 12.5.sp,
+                                            color: AppColors.grey,
+                                            fontWeight: FontWeight.w500,
                                           ),
                                         ],
                                       ),
@@ -1323,20 +1317,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            appText(
                               "Razorpay Payment",
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
                             ),
                             SizedBox(height: 4.h),
-                            Text(
+                            appText(
                               "UPI, Card, Net Banking & More",
-                              style: TextStyle(
-                                fontSize: 13.sp,
-                                color: AppColors.grey,
-                              ),
+                              fontSize: 13.sp,
+                              color: AppColors.grey,
                             ),
                           ],
                         ),
@@ -1378,13 +1368,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
-                  child: Text(
+                  child: appText(
                     "Confirm Payment Method",
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
               );

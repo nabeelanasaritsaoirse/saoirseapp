@@ -85,7 +85,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           physics: const AlwaysScrollableScrollPhysics(),
                           children: [
                             SizedBox(height: 200.h),
-                            Center(child: Text(controller.errorMessage.value)),
+                            Center(child: appText(controller.errorMessage.value)),
                           ],
                         );
                       }
@@ -203,8 +203,8 @@ class _WalletScreenState extends State<WalletScreen> {
                                     color: AppColors.blueshade,
                                     borderRadius: BorderRadius.circular(14.r),
                                   ),
-                                  child: Text("💸",
-                                      style: TextStyle(fontSize: 30.sp)),
+                                  child: appText("💸",
+                                      fontSize: 30.sp),
                                 ),
                                 SizedBox(width: 12.w),
                                 Expanded(

@@ -44,9 +44,9 @@ class PendingTransaction extends StatelessWidget {
 
               if (controller.transactions.isEmpty) {
                 return Center(
-                  child: Text(
+                  child: appText(
                     "No pending payment",
-                    style: TextStyle(fontSize: 16.sp),
+                    fontSize: 16.sp,
                   ),
                 );
               }

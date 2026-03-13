@@ -40,9 +40,9 @@ class WishlistScreen extends StatelessWidget {
 
               if (controller.wishlistProducts.isEmpty) {
                 return Center(
-                  child: Text(
+                  child: appText(
                     "Your wishlist is empty",
-                    style: TextStyle(fontSize: 16.sp),
+                    fontSize: 16.sp,
                   ),
                 );
               }

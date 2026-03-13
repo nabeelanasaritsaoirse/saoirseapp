@@ -36,11 +36,9 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
     return Scaffold(
       backgroundColor: AppColors.scaffoldColor,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text("Notification Details",
-            style: TextStyle(color: Colors.white)),
-      ),
+          backgroundColor: AppColors.primaryColor,
+          iconTheme: const IconThemeData(color: Colors.white),
+          title: appText("Notification Details", color: AppColors.white)),
       body: Obx(() {
         if (controller.isDetailsLoading.value) {
           return Center(child: appLoader());
@@ -49,7 +47,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
         final item = controller.notificationDetails.value;
 
         if (item == null) {
-          return const Center(child: Text("No Details Available"));
+          return Center(child: appText("No Details Available"));
         }
 
         final date = item.publishedAt.split("T").first;

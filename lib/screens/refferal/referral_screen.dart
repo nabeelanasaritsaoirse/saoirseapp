@@ -142,13 +142,11 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       color: AppColors.red,
                       shape: BoxShape.circle,
                     ),
-                    child: Text(
+                    child: appText(
                       count > 9 ? "9+" : count.toString(),
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontSize: 9.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      color: AppColors.white,
+                      fontSize: 9.sp,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 );
@@ -682,13 +680,11 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       // TOTAL COMMISSION
                       Expanded(
                         flex: 3,
-                        child: Text(
+                        child: appText(
                           "₹${controller.formatAmount(referral.totalCommission)}",
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textBlack,
-                          ),
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textBlack,
                           textAlign: TextAlign.end,
                         ),
                       ),
@@ -726,9 +722,10 @@ class _ReferralScreenState extends State<ReferralScreen> {
             ),
           ),
           SizedBox(height: 6.h),
-          Text(
+          appText(
             label,
-            style: TextStyle(fontSize: 10.sp, color: AppColors.grey),
+            fontSize: 10.sp,
+            color: AppColors.grey,
           ),
         ],
       ),
@@ -865,13 +862,11 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
     return GestureDetector(
       onTap: () => showReferralInputPopup(),
-      child: Text(
+      child: appText(
         "Apply Referral",
-        style: TextStyle(
-          decoration: TextDecoration.underline,
-          fontWeight: FontWeight.w600,
-          color: Colors.blue,
-        ),
+        decoration: TextDecoration.underline,
+        fontWeight: FontWeight.w600,
+        color: Colors.blue,
       ),
     );
   }
@@ -1001,13 +996,11 @@ class _ReferralScreenState extends State<ReferralScreen> {
               SizedBox(height: 20.h),
 
               // Title
-              Text(
+              appText(
                 "Choose QR Method",
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.black87,
-                ),
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.black87,
               ),
               SizedBox(height: 20.h),
 
@@ -1039,12 +1032,11 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       ),
                       SizedBox(width: 14.w),
                       Expanded(
-                        child: Text(
+                        child: appText(
                           "Scan using Camera",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                          textAlign: TextAlign.start,
                         ),
                       ),
                       Icon(Icons.arrow_forward_ios,
@@ -1081,12 +1073,11 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       ),
                       SizedBox(width: 14),
                       Expanded(
-                        child: Text(
+                        child: appText(
                           "Upload QR from Gallery",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                          textAlign: TextAlign.start,
                         ),
                       ),
                       Icon(Icons.arrow_forward_ios,
@@ -1141,13 +1132,11 @@ Widget referredByCard(ReferrerInfoModel r) {
               color: Color(0xFFE8F5E9),
               borderRadius: BorderRadius.circular(10.r),
               border: Border.all(color: Colors.green)),
-          child: Text(
+          child: appText(
             "Referred by",
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
           ),
         ),
         Positioned(

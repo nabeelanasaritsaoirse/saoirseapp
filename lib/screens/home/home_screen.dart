@@ -89,13 +89,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: AppColors.red,
                       shape: BoxShape.circle,
                     ),
-                    child: Text(
+                    child: appText(
                       count > 9 ? "9+" : count.toString(),
-                      style: TextStyle(
+
                         color: AppColors.white,
                         fontSize: 7.sp,
                         fontWeight: FontWeight.bold,
-                      ),
+
                     ),
                   ),
                 );

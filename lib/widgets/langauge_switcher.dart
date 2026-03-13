@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'app_text.dart';
 
 class LanguageSwitcher extends StatelessWidget {
   final box = GetStorage();
@@ -23,30 +24,30 @@ class LanguageSwitcher extends StatelessWidget {
         PopupMenuItem<String>(
           value: 'en',
           child: Row(
-            children: const [
-              Icon(Icons.flag, color: Colors.blueAccent, size: 18),
-              SizedBox(width: 8),
-              Text('English'),
+            children: [
+              const Icon(Icons.flag, color: Colors.blueAccent, size: 18),
+              const SizedBox(width: 8),
+              appText('English'),
             ],
           ),
         ),
         PopupMenuItem<String>(
           value: 'hi',
           child: Row(
-            children: const [
-              Icon(Icons.flag, color: Colors.orangeAccent, size: 18),
-              SizedBox(width: 8),
-              Text('हिंदी'),
+            children: [
+              const Icon(Icons.flag, color: Colors.orangeAccent, size: 18),
+              const SizedBox(width: 8),
+              appText('हिंदी'),
             ],
           ),
         ),
         PopupMenuItem<String>(
           value: 'ml',
           child: Row(
-            children: const [
-              Icon(Icons.flag, color: Colors.green, size: 18),
-              SizedBox(width: 8),
-              Text('മലയാളം'),
+            children: [
+              const Icon(Icons.flag, color: Colors.green, size: 18),
+              const SizedBox(width: 8),
+              appText('മലയാളം'),
             ],
           ),
         ),

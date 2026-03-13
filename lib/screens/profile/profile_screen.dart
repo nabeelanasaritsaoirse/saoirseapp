@@ -116,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     if (profile == null) {
                       return SizedBox(
                         height: 200.h,
-                        child: Center(child: Text("Failed to load profile")),
+                        child: Center(child: appText("Failed to load profile")),
                       );
                     }
 

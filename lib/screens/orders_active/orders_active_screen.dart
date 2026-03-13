@@ -6,6 +6,7 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../widgets/app_loader.dart';
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/app_text.dart';
 import '../../widgets/order_card.dart';
 import 'orders_active_controller.dart';
 
@@ -32,12 +33,10 @@ class OrdersActiveScreen extends StatelessWidget {
 
         if (controller.orders.isEmpty) {
           return Center(
-            child: Text(
+            child: appText(
               "No Active orders found",
-              style: TextStyle(
-                fontSize: 16.sp,
-                color: AppColors.textBlack,
-              ),
+              fontSize: 16.sp,
+              color: AppColors.textBlack,
             ),
           );
         }

@@ -246,13 +246,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      appText(
                         AppStrings.phoneNumber,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textBlack,
-                        ),
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textBlack,
                       ),
                       SizedBox(height: 8.h),
                       Row(
@@ -269,11 +267,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       border: Border.all(
                                           color: AppColors.shadowColor),
                                     ),
-                                    child: Text(
+                                    child: appText(
                                       "${controller.country.value?.flagEmoji} +${controller.country.value?.phoneCode}",
-                                      style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.bold),
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   )
                                 : SizedBox();
@@ -314,13 +311,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      appText(
                         AppStrings.email,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textBlack,
-                        ),
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textBlack,
                       ),
                       SizedBox(height: 8.h),
                       appTextField(

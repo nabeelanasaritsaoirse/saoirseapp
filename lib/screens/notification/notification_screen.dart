@@ -47,7 +47,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
         /// NO NOTIFICATIONS
         if (controller.notifications.isEmpty) {
-          return const Center(child: Text("No notifications available"));
+          return Center(child: appText("No notifications available"));
         }
 
         return NotificationList(controller);

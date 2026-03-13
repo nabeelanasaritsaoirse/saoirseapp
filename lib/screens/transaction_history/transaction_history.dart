@@ -42,8 +42,8 @@ class _TransactionHistoryState extends State<TransactionHistory> {
           return Center(child: appLoader());
         }
         if (controller.transactions.isEmpty) {
-          return const Center(
-            child: Text("No transactions found"),
+          return Center(
+            child: appText("No transactions found"),
           );
         }
         return Padding(

@@ -72,13 +72,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         color: AppColors.red,
                         shape: BoxShape.circle,
                       ),
-                      child: Text(
+                      child: appText(
                         count > 9 ? "9+" : count.toString(),
-                        style: TextStyle(
+                        //
                           color: AppColors.white,
                           fontSize: 9.sp,
                           fontWeight: FontWeight.bold,
-                        ),
+                        //
                       ),
                     ),
                   ),

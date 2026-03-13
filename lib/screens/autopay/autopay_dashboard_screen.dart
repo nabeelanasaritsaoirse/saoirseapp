@@ -589,18 +589,18 @@ class AutopaySettingsDialog extends StatelessWidget {
         SizedBox(height: 6.h),
         DropdownButtonFormField<String>(
           value: controller.timePreference.value,
-          items: const [
+          items: [
             DropdownMenuItem(
               value: 'MORNING_6AM',
-              child: Text('MORNING_6AM'),
+              child: appText('MORNING_6AM'),
             ),
             DropdownMenuItem(
               value: 'AFTERNOON_12PM',
-              child: Text('AFTERNOON_12PM'),
+              child: appText('AFTERNOON_12PM'),
             ),
             DropdownMenuItem(
               value: 'EVENING_6PM',
-              child: Text('EVENING_6PM'),
+              child: appText('EVENING_6PM'),
             ),
           ],
           onChanged: (v) {

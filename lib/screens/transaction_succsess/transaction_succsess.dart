@@ -7,6 +7,7 @@ import '../../constants/app_strings.dart';
 import '../my_wallet/my_wallet.dart';
 import '/constants/app_colors.dart';
 import '/widgets/app_button.dart';
+import '../../widgets/app_text.dart';
 
 class Transactionsuccsess extends StatefulWidget {
   const Transactionsuccsess({super.key});
@@ -34,24 +35,20 @@ class _TransactionsuccsessState extends State<Transactionsuccsess> {
                 ),
               ),
               SizedBox(height: 10.h),
-              Text(
+              appText(
                 AppStrings.payment_Sucsess,
-                style: TextStyle(
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor,
-                ),
+                fontSize: 22.sp,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryColor,
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 12.h),
-              Text(
+              appText(
                 AppStrings.payment_Sucsess_note,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  color: Colors.black,
-                  height: 1.h,
-                ),
+                fontSize: 15.sp,
+                color: Colors.black,
+                height: 1.h,
               ),
               SizedBox(height: 30.h),
               appButton(

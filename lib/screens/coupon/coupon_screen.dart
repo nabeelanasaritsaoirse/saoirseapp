@@ -7,6 +7,7 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../constants/app_colors.dart';
 import '../../models/coupon_model.dart';
+import '../../widgets/app_text.dart';
 import '../../widgets/custom_appbar.dart';
 import 'coupon_controller.dart';
 
@@ -29,7 +30,7 @@ class CouponScreen extends StatelessWidget {
         }
 
         if (controller.coupons.isEmpty) {
-          return const Center(child: Text("No coupons available"));
+          return Center(child: appText("No coupons available"));
         }
 
         return ListView.builder(
@@ -144,13 +145,11 @@ class CouponCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Center(
-                          child: Text(
+                          child: appText(
                             discountLabel,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 26.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            color: Colors.white,
+                            fontSize: 26.sp,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -162,29 +161,23 @@ class CouponCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                          appText(
                             coupon.couponCode,
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textBlack,
-                            ),
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textBlack,
                           ),
                           SizedBox(height: 4.h),
-                          Text(
+                          appText(
                             discountText,
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              color: AppColors.textGray,
-                            ),
+                            fontSize: 13.sp,
+                            color: AppColors.textGray,
                           ),
                           SizedBox(height: 2.h),
-                          Text(
+                          appText(
                             "Minimum order value ₹${coupon.minOrderValue.toInt()}",
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: AppColors.textGray,
-                            ),
+                            fontSize: 12.sp,
+                            color: AppColors.textGray,
                           ),
                           SizedBox(height: 5.h),
                           RichText(
@@ -220,29 +213,23 @@ class CouponCard extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                          appText(
                             "Exp.",
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              color: AppColors.textGray,
-                            ),
+                            fontSize: 14.sp,
+                            color: AppColors.textGray,
                           ),
                           SizedBox(height: 9.h),
-                          Text(
+                          appText(
                             expiryDay,
-                            style: TextStyle(
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF2C3E50),
-                            ),
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF2C3E50),
                           ),
-                          Text(
+                          appText(
                             expiryMonth,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF2C3E50),
-                            ),
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF2C3E50),
                           ),
                         ],
                       ),

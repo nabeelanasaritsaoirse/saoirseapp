@@ -103,13 +103,11 @@ class _ProductListingState extends State<ProductListing> {
                           color: AppColors.red,
                           shape: BoxShape.circle,
                         ),
-                        child: Text(
+                        child: appText(
                           count > 9 ? "9+" : count.toString(),
-                          style: TextStyle(
-                            color: AppColors.white,
-                            fontSize: 9.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          color: AppColors.white,
+                          fontSize: 9.sp,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
