@@ -22,7 +22,7 @@ import 'services/api_service.dart';
 import 'services/appsflyer_service.dart';
 import 'services/notification_service_helper.dart';
 
-//storage instance
+//storage instance to use globally
 GetStorage storage = GetStorage();
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
