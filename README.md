@@ -1,5 +1,4 @@
 
-
 # 🚀 Saoirse App
 
 Saoirse App is a production-ready **Flutter mobile application** with automated **Android and iOS deployments** using **GitHub Actions** and **Fastlane**.
